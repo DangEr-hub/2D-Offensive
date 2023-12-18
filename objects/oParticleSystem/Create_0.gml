@@ -1,0 +1,89 @@
+global.ParticleSystem = part_system_create();
+part_system_depth(global.ParticleSystem, -100);
+
+FlameParticle = part_type_create();
+part_type_shape(FlameParticle,pt_shape_line);
+part_type_size(FlameParticle,.25,1,0,0);
+part_type_scale(FlameParticle,0.5,1);
+part_type_color3(FlameParticle,16749459,c_orange,255);
+part_type_alpha3(FlameParticle,0.04,0.06,0.07);
+part_type_speed(FlameParticle,0.70,2.60,-0.02,0);
+part_type_direction(FlameParticle,85,95,0,9);
+part_type_blend(FlameParticle,1);
+part_type_life(FlameParticle,10,20);
+
+//Blood
+BloodParticle = part_type_create();
+part_type_size(BloodParticle,.1,1,0,.05);
+part_type_speed(BloodParticle,1,5,0,0);
+part_type_direction(BloodParticle,0,359,0,0);
+part_type_life(BloodParticle,22,22);
+part_type_sprite(BloodParticle, spr_BloodParticle, true, 0, true);
+
+//Spark
+Spark = part_type_create();
+part_type_shape(Spark, pt_shape_spark);
+part_type_size(Spark,.1,.25,0,.1);
+part_type_color3(Spark,c_orange, c_yellow, c_orange);
+part_type_speed(Spark,5,10,0,0);
+part_type_direction(Spark,0,359,0,0);
+part_type_blend(Spark, 1);
+part_type_life(Spark,5,10);
+
+//Light
+LightParticle = part_type_create();
+part_type_alpha1(LightParticle,.4);
+part_type_color1(LightParticle,c_white);
+part_type_shape(LightParticle,pt_shape_spark);
+part_type_size(LightParticle,1.5,1.5,0, .05);
+part_type_direction(LightParticle, 0, 0, 0, 0);
+part_type_orientation(LightParticle, 0, 0, 0, 0, 1);
+part_type_blend(LightParticle, 1);
+part_type_life(LightParticle, LIGHT_UPDATE + 1, LIGHT_UPDATE + 1);
+
+//Dust
+dust_particle = part_type_create();
+part_type_speed(dust_particle, 0.1, .5, 0, .05);
+part_type_alpha2(dust_particle, .1, .25);
+part_type_color1(dust_particle, make_color_rgb(194, 178, 128));
+part_type_shape(dust_particle, pt_shape_pixel);
+part_type_size(dust_particle,1,3,0, .05);
+part_type_life(dust_particle, 1 * room_speed, 2 * room_speed);
+part_type_blend(dust_particle, 1);
+part_type_direction(dust_particle, 0, 360, 0, .5);
+part_type_orientation(dust_particle, 0, 360, 0, .1, 0);
+
+//Rain
+rain_emitter = part_emitter_create(global.ParticleSystem);
+rain_particle = part_type_create();
+part_type_alpha2(rain_particle, .5, .59);
+part_type_shape(rain_particle, pt_shape_pixel);
+part_type_direction(rain_particle, 270, 270, 0, 1);
+part_type_orientation(rain_particle,350,350,0,0,1);
+part_type_scale(rain_particle, 8, 0.75);
+part_type_gravity(rain_particle, .1 * (room_speed/60), 270);
+part_type_speed(rain_particle, 9 * (room_speed/60), 10  * (room_speed/60), 0, 0);
+part_type_blend(rain_particle, 1);
+part_type_color1(rain_particle, c_gray);
+part_type_life(rain_particle, ceil(global.CameraHeight/2), ceil(global.CameraHeight/1));
+
+//Leaf
+leaf_particle = part_type_create();
+part_type_sprite(leaf_particle, spr_Leaf, false, false, 1);
+part_type_size(leaf_particle, 1, 1.5, 0.001, 0);
+part_type_direction(leaf_particle, 0, 359, 0, 1);
+part_type_speed(leaf_particle, 0.5, 1, 0, .05);
+part_type_life(leaf_particle, 2 * room_speed, 3 * room_speed);
+part_type_orientation(leaf_particle, 0, 359, 0.1, 1, 0);
+part_type_alpha3(leaf_particle, 0.5, 1, 0.02);
+
+//snow_particle
+snow_particle = part_type_create();
+part_type_blend(snow_particle, 1);
+part_type_shape(snow_particle, pt_shape_pixel);
+part_type_direction(snow_particle, 230, 330, 0, 1);
+part_type_orientation(snow_particle,0,359,0,0,1);
+part_type_life(snow_particle,180,360);
+part_type_speed(snow_particle, 1, 5, 0, 0);
+part_type_size(snow_particle, 1, 2, 0, 0);
+part_type_color2(snow_particle, c_white, c_white);

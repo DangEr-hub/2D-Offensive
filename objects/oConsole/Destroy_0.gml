@@ -1,0 +1,1 @@
+console_destroy(global.my_console);
