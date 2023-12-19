@@ -278,6 +278,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Name] = "Horizontal grip";
+		global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "Reduces horizontal recoil when shooting with firearms.";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackInaccuracyMultiplier] = 1;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackPower] = .75;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.ItemColor] = $FF4D4D4D; ///gray

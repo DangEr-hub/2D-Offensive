@@ -125,8 +125,8 @@ function player_shooting(){
 			);
 		} else {
 			if (KickBack <= kb_phase_1) {
-				ShotX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation, oCrosshair.x + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_x * horizontal_recoil_multiplier;
-				ShotY = random_range(oCrosshair.y - inaccuracy_value * inaccuracy_calculation, oCrosshair.y + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_y * vertical_recoil_multiplier;
+				ShotX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation, oCrosshair.x + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
+				ShotY = random_range(oCrosshair.y - inaccuracy_value * inaccuracy_calculation, oCrosshair.y + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
 
 				if (KickBack == kb_phase_1) {
 					DeltaX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation, oCrosshair.x + inaccuracy_value * inaccuracy_calculation) - ShotX;

@@ -281,7 +281,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		}
 		#endregion
 		
-		#region Weapon suppressor dequip
+		#region Weapon suppressor attachment
 		if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None){
 			draw_sprite_ext(
 				spr_Items,
@@ -997,14 +997,28 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						set_font("GUI_grid");
 						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
 						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
-						var DescriptionX = TabX + oDraw.HUDShift;
-						var DescriptionY = TabY + TitleHeight - oDraw.HUDShift/2 + DescriptionStringHeight;
+						var DescriptionX = TabX + oDraw.HUDShift*1.5;
+						var DescriptionY = TabY + TitleHeight + oDraw.HUDShift*1.5 + DescriptionStringHeight;
 						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
 						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-						set_font("Console");
 						#endregion
 						
+						var statistics_string;
+						var statistics_x = TabX + oDraw.HUDShift + string_width(DescriptionString)*1.5;
+						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*1.5;
+						if(Id == Item.military_suppressor){
+							statistics_string = "Accuracy: +" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nGetting spotted chance: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
+							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
+						}else if(Id == Item.vertical_grip){
+							statistics_string = "Vertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nVertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
+							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
+						}else if(Id == Item.horizontal_grip){
+							statistics_string = "Horizontal recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nVertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
+							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
+						}
+						
 					}
+					set_font("Console");
 					#endregion
 					
 					#region Draw drop button

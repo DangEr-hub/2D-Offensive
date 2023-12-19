@@ -45,8 +45,8 @@ if(instance_exists(oPlayer)){
 	#region Recoil
 	var horizontal_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackInaccuracyMultiplier];
 	var vertical_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackPower];	
-	var recoilY = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.RecoilY] * vertical_recoil_multiplier;
-	var recoilX = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.RecoilX] * horizontal_recoil_multiplier;
+	var recoilY = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.RecoilY] * horizontal_recoil_multiplier;
+	var recoilX = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.RecoilX] * vertical_recoil_multiplier;
 	if(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.HardRecoil] == true){
 		
 		#region Hard recoil
