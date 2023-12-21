@@ -37,7 +37,7 @@ if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu ==
 		Alpha = 0;
 		BackGround = -1;
 		surface_free(_surface);
-		sprite_delete(BackGround);
+		if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
 		instance_activate_all();
 		PauseMenu = false;
 	}

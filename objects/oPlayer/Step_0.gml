@@ -6,13 +6,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	DamageHP = clamp(DamageHP, 0, global.MaxHP);
 	Stamina = clamp(Stamina, 0, global.MaxStamina);
 	DamageStamina = clamp(DamageStamina, 0, global.MaxStamina);
-	headshot_x = x - 10;
-	headshot_y = y - 18;
+	var headshot_x = x - 10;
+	var headshot_y = y - 18;
 	audio_listener_position(x, y, 0);
 	
 	#region HP timer
 	if(HPTimer == 0){
-		Health = HP - AttackDamage;
+		var Health = HP - AttackDamage;
 	    if(DamageHP > Health){
 	        DamageHP -= max(global.MaxHP/100, .25);
 	    }else{
@@ -27,7 +27,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Stamina timer
 	if(StaminaTimer == 0){
-		Health = Stamina - StaminaDamage;
+		var Health = Stamina - StaminaDamage;
 	    if(DamageStamina > Health){
 	        DamageStamina -= max(global.MaxStamina/100, .25);
 	    }else{
@@ -104,14 +104,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	
 	if(instance_exists(oBulletTracer)){
-		BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
+		var BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
 		if(BulletTracerNearby.Object != id && distance_to_object(BulletTracerNearby) <= 64){
 			PlaySound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), BulletTracerNearby);	
 		}
 	}
 	
 	if(instance_exists(oShrapnel)){
-		ShrapnelNearby = instance_nearest(x, y, oShrapnel);
+		var ShrapnelNearby = instance_nearest(x, y, oShrapnel);
 		if(distance_to_object(ShrapnelNearby) <= 64){
 			PlaySound(ShrapnelNearby.x, ShrapnelNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), ShrapnelNearby);	
 		}
@@ -165,7 +165,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		
 		near_explosion = false;
 		if(instance_exists(oGrenade)){
-			HEGrenade = instance_nearest(x, y, oGrenade);
+			var HEGrenade = instance_nearest(x, y, oGrenade);
 			if(HEGrenade.Id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.Speed < .1){
 				if(distance_to_object(HEGrenade) <= 1024){
 					near_explosion = true;
@@ -1150,7 +1150,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		FlashedAlpha = lerp(FlashedAlpha, 0, 0.01);	
 	}
 	if(FlashedAlpha <= 0.075){
-		sprite_delete(FlashedBackGround);
+		if(sprite_exists(FlashedBackGround) && FlashedBackGround != -1){sprite_delete(FlashedBackGround);}
 		FlashedAlpha = 0;
 		Flashed = false;
 		FlashedBackGround = -1;

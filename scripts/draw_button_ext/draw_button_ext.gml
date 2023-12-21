@@ -54,7 +54,7 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 			case "player_death_screen_continue":
 				if(instance_exists(oDraw)){
 					if(oDraw.PopupWindow == ""){
-						sprite_delete(BackGround);
+						if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
 						save_game();
 						room_restart();
 					}

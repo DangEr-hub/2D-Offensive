@@ -1,12 +1,11 @@
 {
-  "isDnD": false,
+  "resourceType": "GMScript",
+  "resourceVersion": "1.0",
+  "name": "ObjectCreate",
   "isCompatibility": false,
+  "isDnD": false,
   "parent": {
     "name": "Game",
     "path": "folders/Scripts/Game.yy",
   },
-  "resourceVersion": "1.0",
-  "name": "ObjectCreate",
-  "tags": [],
-  "resourceType": "GMScript",
 }

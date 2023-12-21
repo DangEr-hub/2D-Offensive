@@ -2,9 +2,9 @@ varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
 uniform vec3 size;//width,height,radius
 
-const int Quality = 32;//2;
-const int Directions = 4;
-const float Pi = 3.14;//6.28318530718;//pi * 2
+const int Quality = 8;
+const int Directions = 16;
+const float Pi = 6.28318530718;
 
 void main()
 {

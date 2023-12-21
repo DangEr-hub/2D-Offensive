@@ -5,4 +5,4 @@ surface_free(BlurSurface);
 surface_free(_surface);
 surface_free(Surface1);
 surface_free(Surface2);
-sprite_delete(BackGround);
+if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
