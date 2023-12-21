@@ -98,7 +98,7 @@ function console_draw(c,h,b1,b2,t1,t2,a,w) {
 
 	    /* Reset alpha */
 	    draw_set_alpha(1);
-	    draw_set_valign(fa_center);
+	    draw_set_valign(fa_middle);
 	}
 
 

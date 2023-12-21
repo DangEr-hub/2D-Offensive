@@ -71,7 +71,7 @@ function player_shooting(){
 			10,
 			.1,
 			.75,
-			oPlayer.ShootTimer - 1
+			clamp(oPlayer.ShootTimer, 10, 30)
 		);	
 	}
 	#endregion

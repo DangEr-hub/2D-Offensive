@@ -254,6 +254,7 @@
     {"id":{"name":"spr_Icons","path":"sprites/spr_Icons/spr_Icons.yy",},},
     {"id":{"name":"light_create","path":"scripts/light_create/light_create.yy",},},
     {"id":{"name":"obj_shadow_caster","path":"objects/obj_shadow_caster/obj_shadow_caster.yy",},},
+    {"id":{"name":"snd_m4_carbine","path":"sounds/snd_m4_carbine/snd_m4_carbine.yy",},},
     {"id":{"name":"shd_GrayScale","path":"shaders/shd_GrayScale/shd_GrayScale.yy",},},
     {"id":{"name":"Camera","path":"scripts/Camera/Camera.yy",},},
     {"id":{"name":"oParentTile","path":"objects/oParentTile/oParentTile.yy",},},

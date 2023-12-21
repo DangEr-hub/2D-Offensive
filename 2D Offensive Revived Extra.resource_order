@@ -168,6 +168,7 @@
     {"name":"spr_Icons","order":3,"path":"sprites/spr_Icons/spr_Icons.yy",},
     {"name":"light_create","order":5,"path":"scripts/light_create/light_create.yy",},
     {"name":"obj_shadow_caster","order":6,"path":"objects/obj_shadow_caster/obj_shadow_caster.yy",},
+    {"name":"snd_m4_carbine","order":9,"path":"sounds/snd_m4_carbine/snd_m4_carbine.yy",},
     {"name":"shd_GrayScale","order":5,"path":"shaders/shd_GrayScale/shd_GrayScale.yy",},
     {"name":"oParentTile","order":1,"path":"objects/oParentTile/oParentTile.yy",},
     {"name":"spr_lut_light_intensity_line","order":1,"path":"sprites/spr_lut_light_intensity_line/spr_lut_light_intensity_line.yy",},

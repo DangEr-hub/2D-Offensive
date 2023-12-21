@@ -4,7 +4,7 @@ ViewX = camera_get_view_x(view_camera[0]);
 ViewY = camera_get_view_y(view_camera[0]);
 
 if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
-	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None){
+	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
 		if(show_weapon_attachments == false){
 			oPlayer.Moving = false;
 			oPlayer.Legs.image_speed = 0;

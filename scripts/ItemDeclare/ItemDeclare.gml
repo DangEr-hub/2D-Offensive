@@ -15,6 +15,12 @@ function ItemDeclare(){
 		}	
 	}
 	
+	if(suppressor_attachment == -1){
+		if(image_index == Item.m4_carbine){
+			suppressor_attachment = Item.military_suppressor;
+		}
+	}
+	
 	if(Ammo <= -1){
 		WeaponAmmo();
 	}

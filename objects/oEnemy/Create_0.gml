@@ -51,6 +51,11 @@ InfraVisionIntensity = 2;
 infra_vision_light = noone;
 EquippedGrenadeID = Item.None;
 grenade_angle = random(360);
+healing = false;
+equip_time = 0;
+equip_timer = -1;
+healing_time = -1;
+health_packs = 3;
 EquippedLandMineID = Item.None;
 LandMineAngle = random(360);
 EquippedLandMineTime = .25 * room_speed;
@@ -68,13 +73,13 @@ FlashedTime = 7 * room_speed;
 #endregion
 
 #region Set armour
-ArmourID = choose(Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest, Item.None);
+ArmourID = choose(Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest, Item.None, Item.Spas);
 HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm, Item.MilitaryNightVision, Item.BasicNightVision, Item.None);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
 #region Ranks
-Rank = irandom_range(RankType.AssaultEliteI, RankType.AssaultMaster);
+Rank = irandom_range(RankType.SilverI, RankType.SilverMaster);
 #endregion
 
 #region Movement engine
@@ -86,7 +91,7 @@ MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * room_speed * global.RankIndex[#Rank, RankStat.LessModifier], .25 * room_speed, 1.75 * room_speed);
+ReactionTime = clamp(2 * room_speed * global.RankIndex[#Rank, RankStat.LessModifier], .25 * room_speed, 1.25 * room_speed);
 ChasingDistance = min(512 * global.RankIndex[#Rank, RankStat.BoostModifier], 1024);
 
 #endregion
@@ -99,8 +104,8 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM);
-WeaponID[1] = Item.DesertEagle;
+WeaponID[0] = Item.Spas;//choose(Item.SG550, Item.AKM, Item.SSG08);
+WeaponID[1] = choose(Item.DesertEagle, Item.Glock);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
 MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];

@@ -6,8 +6,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	DamageHP = clamp(DamageHP, 0, global.MaxHP);
 	Stamina = clamp(Stamina, 0, global.MaxStamina);
 	DamageStamina = clamp(DamageStamina, 0, global.MaxStamina);
-	var headshot_x = x - 10;
-	var headshot_y = y - 18;
+	headshot_x = x - 10;
+	headshot_y = y - 18;
 	audio_listener_position(x, y, 0);
 	
 	#region HP timer
@@ -277,6 +277,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			case "Glock-17":
 				Weapon.image_index = 8;
+			break;
+			
+			case "M4A1":
+				Weapon.image_index = 9;
 			break;
 			
 			default:
@@ -763,7 +767,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				}
 				ShootTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_barrel], ItemStat.ShootTimer]);
 				player_shooting();									
-				audio_play_sound(, false, 0);
+				audio_play_sound(sound_id, false, 0);
 				Weapon.KickBackEffect = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KickBackPower];
 				KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 				KickBack ++;
@@ -864,13 +868,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 	#region Movement
 	if(player_can_shoot == true && !global.my_console[? "active"]){
-		Up = keyboard_check(global.KeyBinds[| KeyBind.KeyUp]);
-		Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
-		Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
-		Down = keyboard_check(global.KeyBinds[| KeyBind.KeyDown]);
-		Delta = delta_time / 1000000;
-		xpos = Right - Left;
-		ypos = Down - Up;
+		var Up = keyboard_check(global.KeyBinds[| KeyBind.KeyUp]);
+		var Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
+		var Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
+		var Down = keyboard_check(global.KeyBinds[| KeyBind.KeyDown]);
+		var Delta = delta_time / 1000000;
+		var xpos = Right - Left;
+		var ypos = Down - Up;
 		MoveDirection = point_direction(Left, Up, Right, Down);
 		move_xpos = abs(xpos);
 		move_ypos = abs(ypos);
@@ -1459,24 +1463,26 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 
 	#region Weapon cycling
-	if(mouse_wheel_up()){
-		if(WeaponNumber < WeaponNumberMax){
-			WeaponNumber ++;
-		}else{
-			WeaponNumber = 0;	
-		}
+	if(equip_timer == -1 && player_can_shoot == true){
+		if(mouse_wheel_up()){
+			if(WeaponNumber < WeaponNumberMax){
+				WeaponNumber ++;
+			}else{
+				WeaponNumber = 0;	
+			}
 		
-		switch_weapon_number();
-	}
+			switch_weapon_number();
+		}
 
-	if(mouse_wheel_down()){
-		if(WeaponNumber != 0){
-			WeaponNumber --;
-		}else{
-			WeaponNumber = WeaponNumberMax;	
-		}
+		if(mouse_wheel_down()){
+			if(WeaponNumber != 0){
+				WeaponNumber --;
+			}else{
+				WeaponNumber = WeaponNumberMax;	
+			}
 		
-		switch_weapon_number();
+			switch_weapon_number();
+		}
 	}
 
 	#endregion

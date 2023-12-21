@@ -55,6 +55,8 @@ if(image_index == 1){
 			}
 		}
 	}else{
+		var RandomX, RandomY;
+		var NearestTargetX, NearestTargetY;
 		if(instance_exists(Object) && Object != noone){
 			RandomX = random_range(
 				ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object), 
@@ -69,9 +71,9 @@ if(image_index == 1){
 			RandomX = ShotX;
 			RandomY = ShotY;
 		}
-		var NearestTargetX = BulletTracerX +
+		NearestTargetX = BulletTracerX +
 		lengthdir_x(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
-		var NearestTargetY = BulletTracerY + 
+		NearestTargetY = BulletTracerY + 
 		lengthdir_y(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
 	}
 	var Angle = point_direction(x, y, NearestTargetX, NearestTargetY);
@@ -98,7 +100,7 @@ if(image_index == 1){
 if(image_index == 0){
 	if(PointDistance <= global.ItemIndex[#Weapon, ItemStat.Range]){
 		if(distance_to_point(BulletTracerX, BulletTracerY) >= PointDistance){
-			Bullet = instance_create_layer(ShotX, ShotY, "ItemsO", oBullet);
+			var Bullet = instance_create_layer(ShotX, ShotY, "ItemsO", oBullet);
 			Bullet.StartingX = BulletTracerX;
 			Bullet.StartingY = BulletTracerY;
 			Bullet.Object = Object;
@@ -125,6 +127,7 @@ if(image_index == 0){
 			instance_destroy(self);
 		}
 	}else{
+		var RandomX, RandomY;
 		if(distance_to_point(BulletTracerX, BulletTracerY) >= PointDistance){
 			if(instance_exists(Object) && Object != noone){
 				RandomX = random_range(
@@ -140,11 +143,11 @@ if(image_index == 0){
 				RandomX = ShotX;
 				RandomY = ShotY;
 			}
-			BX = BulletTracerX +
+			var BX = BulletTracerX +
 			lengthdir_x(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
-			BY = BulletTracerY + 
+			var BY = BulletTracerY + 
 			lengthdir_y(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
-			Bullet = instance_create_layer(BX, BY, "ItemsO", oBullet);
+			var Bullet = instance_create_layer(BX, BY, "ItemsO", oBullet);
 			Bullet.StartingX = BulletTracerX;
 			Bullet.StartingY = BulletTracerY;
 			Bullet.Object = Object;
@@ -181,10 +184,10 @@ if(instance_exists(oParentTile)){
 			PenetrationDamage ++;
 			if(WallHit == false){
 				randomize();
-				Wall = instance_nearest(x, y, oParentTile);
-				WallParticles = irandom_range(global.ItemIndex[#Weapon, ItemStat.Damage], global.ItemIndex[#Weapon, ItemStat.Damage]*2);
+				var Wall = instance_nearest(x, y, oParentTile);
+				var WallParticles = irandom_range(global.ItemIndex[#Weapon, ItemStat.Damage], global.ItemIndex[#Weapon, ItemStat.Damage]*2);
 				if(Wall.Type == "Concrete"){
-					ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
+					var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
 					ParticleCreate(WallParticles, 0.8, random(360), ParticleTexture, 
 					random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, false, false, 0, x, y);
 					ParticleCreate(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 

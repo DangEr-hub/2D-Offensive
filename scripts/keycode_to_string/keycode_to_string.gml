@@ -1,21 +1,21 @@
 function keycode_to_string(keycode) {
     switch (keycode) {
-        case vk_shift: return "Shift"; break;
-        case vk_control: return "Control"; break;
-        case vk_alt: return "Alt"; break;
-		case mb_left: return "MB left"; break;
-		case mb_right: return "MB right"; break;
-		case ord("G"): return  "G"; break;
-		case ord("Q"): return "Q"; break;
-		case ord("E"): return "E"; break;
-		case ord("F"): return "F"; break;
-		case ord("W"): return "W"; break;
-		case ord("A"): return "A"; break;
-		case ord("S"): return "S"; break;
-		case ord("D"): return "D"; break;
-		case ord("R"): return "R"; break;
-		case ord("V"): return "V"; break;
-		case ord("Y"): return "Y"; break;
-        default: return "Key"; break;
+        case vk_shift: return "Shift"; 
+        case vk_control: return "Control"; 
+        case vk_alt: return "Alt"; 
+		case mb_left: return "MB left"; 
+		case mb_right: return "MB right"; 
+		case ord("G"): return  "G"; 
+		case ord("Q"): return "Q"; 
+		case ord("E"): return "E"; 
+		case ord("F"): return "F"; 
+		case ord("W"): return "W"; 
+		case ord("A"): return "A"; 
+		case ord("S"): return "S"; 
+		case ord("D"): return "D"; 
+		case ord("R"): return "R"; 
+		case ord("V"): return "V"; 
+		case ord("Y"): return "Y"; 
+        default: return "Key"; 
     }
 }

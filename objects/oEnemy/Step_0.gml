@@ -55,6 +55,98 @@ if(HP <= 0 && State != States.Death){
 
 if(State != States.Death){
 	
+	#region Healing kit
+	if(healing == true){
+		CanShoot = false;
+		healing_time ++;
+	}
+	if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
+		DamageIndicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, 0);
+		healing = false;
+		CanShoot = true;
+		HP += global.ItemIndex[#Item.HealingKit, ItemStat.Damage];
+		DamageHP = HP;
+		healing_time = -1;
+	}
+	#endregion
+	
+	#region Shooting state
+	var shooting_chance;
+	switch(State){
+		case States.MoveAway:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.MoveShoot:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.Move:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.MoveToward:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.MoveAwayFromGrenade:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.Chase:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.MoveFlashed:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+		
+		case States.MoveInSmoke:
+			if(ReactionTimer <= 0){
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+				if(PercentChance(shooting_chance)){
+					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				}
+			}
+		break;
+	}
+	#endregion
+	
 	#region Timers
 	HP = clamp(HP, 0, MaxHP);
 	DamageHP = clamp(DamageHP, 0, MaxHP);
@@ -70,7 +162,7 @@ if(State != States.Death){
 
 	#region HP timer
 	if(HPTimer == 0){
-		Health = HP - AttackDamage;
+		var Health = HP - AttackDamage;
 	    if(DamageHP > Health){
 	        DamageHP -= MaxHP/100;
 	    }else{
@@ -85,7 +177,7 @@ if(State != States.Death){
 
 	#region Stamina timer
 	if(StaminaTimer == 0){
-		Health = Stamina - AttackDamage;
+		var Health = Stamina - AttackDamage;
 	    if(DamageStamina > Health){
 	        DamageStamina -= MaxStamina/100;
 	    }else{
@@ -97,6 +189,10 @@ if(State != States.Death){
 	    StaminaTimer --;
 	}
 	#endregion
+	
+	if(WeaponID[WeaponPositionID] == Item.None){
+		WeaponPositionID = 1 - WeaponPositionID;
+	}
 	
 	if(EquippedGrenadeTimer > -1){
 		EquippedGrenadeTimer --;	
@@ -318,25 +414,29 @@ if(State != States.Death){
 	
 	#region Reloading
 	if (WeaponID[WeaponPositionID] != Item.None) {
-	  if (Ammo[WeaponPositionID] > MaxAmmo[WeaponPositionID]) {
-	    Ammo[WeaponPositionID] = MaxAmmo[WeaponPositionID];
-	  }
-	  AmmoNeeded = MaxAmmo[WeaponPositionID] - Ammo[WeaponPositionID];
-
-	  if (Ammo[WeaponPositionID] <= 0 && ClipAmmo[WeaponPositionID] > 0 && Reloading = false){
-		if(Ammo[1 - WeaponPositionID] > 0){
-			if(PercentChance(50)){
-				 Reloading = true;
-				 alarm[4] = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed];
-			}else{
-				WeaponPositionID = 1 - WeaponPositionID;	
-				WeaponNumber = WeaponPositionID;
-			}
-		}else{
-			Reloading = true;
-			alarm[4] = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed];
+		if (Ammo[WeaponPositionID] > MaxAmmo[WeaponPositionID]) {
+			Ammo[WeaponPositionID] = MaxAmmo[WeaponPositionID];
 		}
-	  }
+		AmmoNeeded = MaxAmmo[WeaponPositionID] - Ammo[WeaponPositionID];
+	  
+		if (Ammo[WeaponPositionID] <= 0 && ClipAmmo[WeaponPositionID] > 0 && Reloading == false) {
+		    var should_reload = true;
+
+		    if (Ammo[1 - WeaponPositionID] > 0) {
+		        if (PercentChance(50) || WeaponID[1 - WeaponPositionID] == Item.None) {
+		            should_reload = true;
+		        } else {
+		            WeaponPositionID = 1 - WeaponPositionID;
+		            WeaponNumber = WeaponPositionID;
+		            should_reload = false;
+		        }
+		    }
+			
+		    if (should_reload) {
+		        Reloading = true;
+		        alarm[4] = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed];
+		    }
+		}
 	}
 
 	if(Reloading == true){
@@ -391,7 +491,7 @@ if(State != States.Death){
 
 	#region Spot a chasing object
 	if(instance_exists(oBulletTracer)){
-		ChasingObjectBullet = instance_nearest(x, y, oBulletTracer);
+		var ChasingObjectBullet = instance_nearest(x, y, oBulletTracer);
 		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
 			if(PercentChance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
@@ -408,24 +508,25 @@ if(State != States.Death){
 
 	#region Throw grenade or lay land mine
 	if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
+		var Target_x, Target_y, GrenadeSpd;
 		switch(EquippedGrenadeID){
 			case Item.HEGrenade:
-				var Target_x = ChasingObject.x;
-				var Target_y = ChasingObject.y;
-				var GrenadeSpd = 3;
+				Target_x = ChasingObject.x;
+				Target_y = ChasingObject.y;
+				GrenadeSpd = 3;
 			break;
 		
 			case Item.FlashBangGrenade:
 				var behindAngle = RotationAngle + 180;
-				var Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
-				var Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
-				var GrenadeSpd = 5;
+				Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
+				Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
+				GrenadeSpd = 5;
 			break;
 			
 			case Item.SmokeGrenade:
-				var Target_x = random_range(x - sprite_width, x + sprite_width);
-				var Target_y = random_range(y - sprite_height, y + sprite_height);
-				var GrenadeSpd = 1;
+				Target_x = random_range(x - sprite_width, x + sprite_width);
+				Target_y = random_range(y - sprite_height, y + sprite_height);
+				GrenadeSpd = 1;
 			break;
 		}
 		GrenadeCreate(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
@@ -484,36 +585,6 @@ if(State != States.Death){
 	#endregion
 
 	#region Spot a grenade and landmine
-	/*if(instance_exists(oGrenade)){
-		NearestGrenade = instance_nearest(x, y, oGrenade);
-		if(distance_to_object(NearestGrenade) <= 256){
-			if(NearestGrenade.Speed < .1){
-				SpottedDanger = true;
-				NearestDangerX = NearestGrenade.x;
-				NearestDangerY = NearestGrenade.y;
-				NearestDangerObject = NearestGrenade.Object;
-			}
-			if(ChasingObjectSpotted == false){
-				ChasingObjectSpot(ceil(5 * room_speed * global.RankIndex[#Rank, RankStat.BoostModifier]));
-			}
-		}
-	
-	}
-	if(instance_exists(oLandMine)){
-		NearestLandMine = instance_nearest(x, y, oLandMine);
-		if(distance_to_object(NearestLandMine) <= 256){
-			SpottedDanger = true;
-			NearestDangerX = NearestLandMine.x;
-			NearestDangerY = NearestLandMine.y;
-			NearestDangerObject = NearestLandMine.Object;
-			if(NearestLandMine.Object != noone){
-				if(ChasingObjectSpotted == false){ 
-					ChasingObjectSpot(ceil(5 * room_speed * global.RankIndex[#Rank, RankStat.BoostModifier]));
-				}
-			}
-		}
-	
-	}*/
 	// Initialize variables to hold nearest instances and their distances
 	var nearestGrenade, nearestLandMine;
 	var distToGrenade = 10000, distToLandMine = 10000;

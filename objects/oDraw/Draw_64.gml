@@ -1,6 +1,6 @@
 set_font("Console");
 var TextHeightSmall = string_height("a");
-draw_set_valign(fa_center);
+draw_set_valign(fa_middle);
 	
 #region Slot
 with(oSlot){
@@ -469,20 +469,33 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				if(HP > 0 && Visible == true){
 				    HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				    HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-				    ReloadBarY = HealthY - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
+					var default_xx = HealthX - sprite_width/2;
+					var default_yy = HealthY - sprite_height - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
+					var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
 					set_font("Console");
 					draw_set_color(c_black);
 					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
 					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height, (DamageHP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height, (HP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-			
-					if(Reloading == true){
-						draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), ReloadBarY - sprite_height, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-						draw_sprite_ext(spr_HealthBar, 1, HealthX - ceil(sprite_width/2), ReloadBarY - sprite_height,
-						(ReloadTime/global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-					} 
 
-	
+					if(healing == true){
+					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					    draw_sprite_ext(spr_HealthBar, 5, default_xx, default_yy,
+					    (healing_time/global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					    default_yy -= bar_spacing;
+					}
+
+					if(Reloading == true){
+					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					    draw_sprite_ext(spr_HealthBar, 1, default_xx, default_yy,
+					    (ReloadTime/global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					}
+			
+					if(equip_timer > -1){
+					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					    draw_sprite_ext(spr_HealthBar, 7, default_xx, default_yy,
+					    (equip_time/global.ItemIndex[#WeaponID[1 - WeaponPositionID], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					}
 				}
 			}
 		}
@@ -1141,7 +1154,7 @@ if(RespawnMenu == true){
 		#endregion
 		
 		
-		draw_set_valign(fa_center);
+		draw_set_valign(fa_middle);
 		set_font("Console");
 		
 		#region Draw grid

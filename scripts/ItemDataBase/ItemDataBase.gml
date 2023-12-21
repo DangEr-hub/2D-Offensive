@@ -74,6 +74,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.Javelin, ["Semi", "Safety"]);
 	add_shooting_modes(Item.MAC11, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.Glock, ["Semi", "Burst", "Safety"]);
+	add_shooting_modes(Item.m4_carbine, ["Auto", "Burst", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -221,6 +222,13 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Glock, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.Glock, ItemStat.Description] = "Glock handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
+	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * room_speed, 790, 38, 760, 30, "Main", 1, 2, 5.5, snd_m4_carbine, 2.5, 1, true,
+	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 9, .9, 0, "Assault rifle", .89, .7, .00023, .1 * room_speed);
+	global.ItemIndex[#Item.m4_carbine, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.m4_carbine, ItemStat.AmmoSpriteID] = 8;
+	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "During the 1980s, a gas-operated, magazine-fed carbine was developed in the United States, which is essentially a compact iteration of the M16A2 assault rifle. It comes with military suppressor.";
+	
 	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Name] = "High-explosion landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.BulletCasingID] = 0;
@@ -278,7 +286,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Name] = "Horizontal grip";
-		global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "Reduces horizontal recoil when shooting with firearms.";
+	global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "Reduces horizontal recoil when shooting with firearms.";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackInaccuracyMultiplier] = 1;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackPower] = .75;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.ItemColor] = $FF4D4D4D; ///gray

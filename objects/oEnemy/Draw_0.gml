@@ -11,7 +11,7 @@ if(Visible == true){
 		draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 	}
 
-	//draw_text(x, y - 70, State); 
+	draw_text(x, y - 70, healing); 
 	
 	if(State != States.Death){
 		

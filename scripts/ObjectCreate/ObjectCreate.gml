@@ -37,7 +37,7 @@ function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness,
 
 function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, ObjectPenetrationPower, ObjectDamageDrop, Id = Item.None, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
 	randomize();
-	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
+	var Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
 	Explosion.Angle = random(360);	
 	Explosion.ExplosionWidth = bbox_right - bbox_left;

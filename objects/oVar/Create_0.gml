@@ -141,7 +141,8 @@ enum States{
 	ThrowGrenade,
 	MoveFlashed,
 	MoveInSmoke,
-	LayDownLandMine
+	LayDownLandMine,
+	MoveHealing
 }
 
 enum Hit{
