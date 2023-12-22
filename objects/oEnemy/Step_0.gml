@@ -71,79 +71,81 @@ if(State != States.Death){
 	#endregion
 	
 	#region Shooting state
-	var shooting_chance;
-	switch(State){
-		case States.MoveAway:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+	if(global.EnemyCanMove == true){
+		var shooting_chance;
+		switch(State){
+			case States.MoveAway:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.MoveShoot:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.MoveShoot:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.Move:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.Move:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.MoveToward:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.MoveToward:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.MoveAwayFromGrenade:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.MoveAwayFromGrenade:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.Chase:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.Chase:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.MoveFlashed:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.MoveFlashed:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
 		
-		case States.MoveInSmoke:
-			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
-				if(PercentChance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+			case States.MoveInSmoke:
+				if(ReactionTimer <= 0){
+					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * global.RankIndex[#Rank, RankStat.BoostModifier], 100);
+					if(PercentChance(shooting_chance)){
+						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					}
 				}
-			}
-		break;
+			break;
+		}
 	}
 	#endregion
 	
@@ -654,6 +656,10 @@ if(State != States.Death){
 			
 			case "Glock-17":
 				Weapon.image_index = 8;
+			break;
+			
+			case "M4A1":
+				Weapon.image_index = 9;
 			break;
 			
 			default:

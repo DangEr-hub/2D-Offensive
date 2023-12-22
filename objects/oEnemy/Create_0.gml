@@ -79,7 +79,7 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Ranks
-Rank = irandom_range(RankType.SilverI, RankType.SilverMaster);
+Rank = irandom_range(RankType.AssaultEliteI, RankType.SupremeMaster);
 #endregion
 
 #region Movement engine
@@ -91,7 +91,7 @@ MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * room_speed * global.RankIndex[#Rank, RankStat.LessModifier], .25 * room_speed, 1.25 * room_speed);
+ReactionTime = clamp(2 * room_speed * global.RankIndex[#Rank, RankStat.LessModifier], .25 * room_speed, .75 * room_speed);
 ChasingDistance = min(512 * global.RankIndex[#Rank, RankStat.BoostModifier], 1024);
 
 #endregion
@@ -104,7 +104,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = Item.Spas;//choose(Item.SG550, Item.AKM, Item.SSG08);
+WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine);
 WeaponID[1] = choose(Item.DesertEagle, Item.Glock);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];

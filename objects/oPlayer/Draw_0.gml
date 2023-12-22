@@ -27,6 +27,20 @@ if(HP > 0){
 	draw_set_color(c_white);
 	draw_set_alpha(1);
 	
+	if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None){
+		draw_sprite_ext(
+			spr_Items,
+			global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor],
+			Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
+			Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
+			.5,
+			.5,
+			RotationAngle,
+			c_white, 
+			1
+		);
+	}
+	
 	var armour_sprite_index = 1;
 	if(image_index == 0 || image_index == 5){
 		armour_sprite_index = 0;	

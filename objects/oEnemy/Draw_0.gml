@@ -11,9 +11,23 @@ if(Visible == true){
 		draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 	}
 
-	draw_text(x, y - 70, healing); 
+	draw_text(x, y - 70, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Defense]); 
 	
 	if(State != States.Death){
+		
+		if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
+			draw_sprite_ext(
+				spr_Items,
+				global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor],
+				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
+				.5,
+				.5,
+				RotationAngle,
+				c_white, 
+				1
+			);
+		}
 		
 		if (EquippedGrenadeTimer > -1) {
 		    var distance = sqrt(power(45, 2) + power(15, 2));

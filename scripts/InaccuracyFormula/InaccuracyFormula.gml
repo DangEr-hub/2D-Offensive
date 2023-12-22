@@ -104,6 +104,10 @@ function player_shooting(){
 		if(moving_state == player_states.prone_state){
 			prone_kickback = .5;
 		}
+		var suppressor_multiplier = 1;
+		if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None){
+			suppressor_multiplier = global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.Defense];	
+		}
 		var current_weapon_id = global.weapon_id[min(WeaponID, 2)];
 		var inaccuracy_value = global.ItemIndex[# current_weapon_id, ItemStat.Inaccuracy];
 		var inaccuracy_calculation = InaccuracyFormula(current_weapon_id, id);
@@ -146,6 +150,7 @@ function player_shooting(){
 					
 		#region Tracer
 		BulletTracer = instance_create_depth(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), -99, oBulletTracer);
+		BulletTracer.Damage = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier;
 		BulletTracer.BulletTracerX = BulletTracer.x;
 		BulletTracer.BulletTracerY = BulletTracer.y;
 		BulletTracer.ShotX = ShotX;

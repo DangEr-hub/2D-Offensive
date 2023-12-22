@@ -101,6 +101,7 @@ if(image_index == 0){
 	if(PointDistance <= global.ItemIndex[#Weapon, ItemStat.Range]){
 		if(distance_to_point(BulletTracerX, BulletTracerY) >= PointDistance){
 			var Bullet = instance_create_layer(ShotX, ShotY, "ItemsO", oBullet);
+			Bullet.Damage = Damage;
 			Bullet.StartingX = BulletTracerX;
 			Bullet.StartingY = BulletTracerY;
 			Bullet.Object = Object;
@@ -148,6 +149,7 @@ if(image_index == 0){
 			var BY = BulletTracerY + 
 			lengthdir_y(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
 			var Bullet = instance_create_layer(BX, BY, "ItemsO", oBullet);
+			Bullet.Damage = Damage;
 			Bullet.StartingX = BulletTracerX;
 			Bullet.StartingY = BulletTracerY;
 			Bullet.Object = Object;

@@ -1,6 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
+Damage = 0;
 infra_vision_light = noone;
 image_speed = 0;
 HitList = ds_list_create();

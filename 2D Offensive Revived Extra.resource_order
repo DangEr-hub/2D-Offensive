@@ -45,6 +45,7 @@
     {"name":"light_maintain_shadow_map","order":2,"path":"scripts/light_maintain_shadow_map/light_maintain_shadow_map.yy",},
     {"name":"HitEntity","order":2,"path":"scripts/HitEntity/HitEntity.yy",},
     {"name":"ItemDeclare","order":5,"path":"scripts/ItemDeclare/ItemDeclare.yy",},
+    {"name":"draw_string_line","order":14,"path":"scripts/draw_string_line/draw_string_line.yy",},
     {"name":"light_create_spot","order":10,"path":"scripts/light_create_spot/light_create_spot.yy",},
     {"name":"snd_FootStep2","order":11,"path":"sounds/snd_FootStep2/snd_FootStep2.yy",},
     {"name":"snd_MAC11","order":4,"path":"sounds/snd_MAC11/snd_MAC11.yy",},

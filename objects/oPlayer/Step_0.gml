@@ -466,7 +466,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					#endregion
 				}
 				
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon));
 			break;
 			#endregion
 	

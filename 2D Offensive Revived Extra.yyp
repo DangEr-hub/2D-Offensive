@@ -118,6 +118,7 @@
     {"id":{"name":"light_maintain_shadow_map","path":"scripts/light_maintain_shadow_map/light_maintain_shadow_map.yy",},},
     {"id":{"name":"HitEntity","path":"scripts/HitEntity/HitEntity.yy",},},
     {"id":{"name":"ItemDeclare","path":"scripts/ItemDeclare/ItemDeclare.yy",},},
+    {"id":{"name":"draw_string_line","path":"scripts/draw_string_line/draw_string_line.yy",},},
     {"id":{"name":"light_create_spot","path":"scripts/light_create_spot/light_create_spot.yy",},},
     {"id":{"name":"snd_FootStep2","path":"sounds/snd_FootStep2/snd_FootStep2.yy",},},
     {"id":{"name":"oParentEntity","path":"objects/oParentEntity/oParentEntity.yy",},},

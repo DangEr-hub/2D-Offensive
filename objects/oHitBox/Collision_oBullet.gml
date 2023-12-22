@@ -18,7 +18,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 			var ObjectArmourID = global.ArmourID[0];
 			var ObjectHelmetID = global.ArmourID[1];
 		}
-		HitEntity(MainObject, global.ItemIndex[#other.Weapon, ItemStat.Damage]* 
+		HitEntity(MainObject, other.Damage* 
 		power(1 - global.ItemIndex[#other.Weapon, ItemStat.DamageDrop], point_distance(x, y, other.StartingX, other.StartingY)), image_index, other.Weapon, other.Object,
 		global.ItemIndex[#other.Weapon, ItemStat.PenetrationPower], other.PenetrationDamage, ObjectArmourID, ObjectHelmetID);	
 		instance_destroy(other);

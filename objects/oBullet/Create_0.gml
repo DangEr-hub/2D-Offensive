@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+Damage = 0;
 Tracer = noone;
 Object = noone;
 mask_index = spr_Bullet;

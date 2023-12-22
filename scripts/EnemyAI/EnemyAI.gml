@@ -11,8 +11,12 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 					DangerShotY + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier);
 	
 	
-	
+	var suppressor_multiplier = 1;
+	if(global.ItemIndex[#EnemyWeaponID, ItemStat.has_suppressor] != Item.None){
+		suppressor_multiplier = global.ItemIndex[#global.ItemIndex[#EnemyWeaponID, ItemStat.Defense], ItemStat.Defense];	
+	}
 	EnemyBulletTracer = instance_create_depth(x, y, depth, oBulletTracer);
+	EnemyBulletTracer.Damage = global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier;
 	EnemyBulletTracer.BulletTracerX = EnemyBulletTracer.x;
 	EnemyBulletTracer.BulletTracerY = EnemyBulletTracer.y;
 	EnemyBulletTracer.ShotX = EnemyShotX;
@@ -85,6 +89,11 @@ function EnemyShooting(DangerX, DangerY){
 	
 	if(CanShoot == true && ChasingObjectSpotted == true && !collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) && distance_to_object(ChasingObject) <= ChasingDistance && State != States.Death && Ammo[WeaponPositionID] > 0){
 		
+		var sound_id = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.SoundID];
+		if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
+			sound_id = snd_Silencer;
+		}
+
 		#region Create smoke effect
 		Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
 		Fog.moving = true;
@@ -106,7 +115,7 @@ function EnemyShooting(DangerX, DangerY){
 		//part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.dust_particle, random_range(1, 10));
 		#endregion
 		
-		PlaySound(x, y, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.SoundID]);
+		PlaySound(x, y, sound_id);
 		ParticleCreate(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
 		0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BulletCasingID], x, y, 1, 60);
 		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.KickBackPower];

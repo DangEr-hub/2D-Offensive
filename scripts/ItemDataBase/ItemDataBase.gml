@@ -225,6 +225,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * room_speed, 790, 38, 760, 30, "Main", 1, 2, 5.5, snd_m4_carbine, 2.5, 1, true,
 	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 9, .9, 0, "Assault rifle", .89, .7, .00023, .1 * room_speed);
+	global.ItemIndex[#Item.m4_carbine, ItemStat.has_suppressor] = Item.military_suppressor; ///Military suppressor
 	global.ItemIndex[#Item.m4_carbine, ItemStat.ItemColor] = $FF007F02; ///gray
 	global.ItemIndex[#Item.m4_carbine, ItemStat.AmmoSpriteID] = 8;
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "During the 1980s, a gas-operated, magazine-fed carbine was developed in the United States, which is essentially a compact iteration of the M16A2 assault rifle. It comes with military suppressor.";
@@ -294,7 +295,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Name] = "Military suppressor";
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Description] = "A muzzle device functions to dampen the noise generated upon firing a firearm, thus diminishing the sound level produced by the discharge.";
-	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackPower] = .75;
-	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackInaccuracyMultiplier] = .1;
+	global.ItemIndex[#Item.military_suppressor, ItemStat.Defense] = .75; ///Damage reduction multiplier
+	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackPower] = .75; ///Inaccuracy multiplier
+	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackInaccuracyMultiplier] = .1; ///Noise reduction multiplier
 	global.ItemIndex[#Item.military_suppressor, ItemStat.ItemColor] = $FF4D4D4D; ///gray
 }

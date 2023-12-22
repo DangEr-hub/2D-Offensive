@@ -1018,17 +1018,29 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						
 						var statistics_string;
 						var statistics_x = TabX + oDraw.HUDShift + string_width(DescriptionString)*1.5;
-						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*1.5;
-						if(Id == Item.military_suppressor){
-							statistics_string = "Accuracy: +" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nGetting spotted chance: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
-							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
-						}else if(Id == Item.vertical_grip){
-							statistics_string = "Vertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nVertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
-							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
-						}else if(Id == Item.horizontal_grip){
-							statistics_string = "Horizontal recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100) + "% \nVertical recoil: -" + string((1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100) + "%";
-							draw_text_outlined(statistics_x, statistics_y, statistics_string, c_white, c_black, 1);
+						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*2;
+						if (Id == Item.military_suppressor) {
+						    var accuracy = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
+						    var spotted_chance = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
+						    var attack_power = (1 - global.ItemIndex[#Id, ItemStat.Defense]) * 100;
+
+						    draw_string_line(statistics_x, statistics_y, "Accuracy: ", accuracy, c_green, "%");
+						    draw_string_line(statistics_x, statistics_y + 20, "Getting spotted chance: ", -spotted_chance, c_green, "%");
+						    draw_string_line(statistics_x, statistics_y + 40, "Attack power: ", -attack_power, c_red, "%");
+						} else if (Id == Item.vertical_grip) {
+						    var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
+						    var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
+
+						    draw_string_line(statistics_x, statistics_y, "Vertical recoil: ", -vertical_recoil, c_green, "%");
+						    draw_string_line(statistics_x, statistics_y + 20, "Horizontal recoil: ", -horizontal_recoil, c_red, "%");
+						} else if (Id == Item.horizontal_grip) {
+						    var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
+						    var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
+
+						    draw_string_line(statistics_x, statistics_y, "Horizontal recoil: ", -horizontal_recoil, c_green, "%");
+						    draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, "%");
 						}
+
 						
 					}
 					set_font("Console");
