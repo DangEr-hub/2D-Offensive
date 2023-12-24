@@ -39,6 +39,7 @@ function save_game(){
 	ini_write_real("Vars", "admin_hud", global.AdminHUD);
 	ini_write_real("Vars", "draw_particles", global.DrawParticles);
 	ini_write_real("Vars", "crosshair_color", global.CrosshairColor);
+	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	
 	for (var i = 0; i < array_length_1d(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length_1d(global.weapon_attachments[i]); j++) {
@@ -110,6 +111,7 @@ function load_game(){
 		global.AdminHUD = ini_read_real("Vars", "admin_hud", global.AdminHUD);
 		global.DrawParticles = ini_read_real("Vars", "draw_particles", global.DrawParticles);
 		global.CrosshairColor = ini_read_real("Vars", "crosshair_color", global.CrosshairColor);
+		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
 
 		global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 2; i++) {

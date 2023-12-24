@@ -10,9 +10,9 @@ function ItemDeclare(){
 	if(scope_attachment == -1){
 		if(image_index == Item.SG550){
 			scope_attachment = Item.red_dot_scope;	
-		}else if(image_index == Item.SSG08){
+		}else if(image_index == Item.SSG08 || image_index == Item.awm){
 			scope_attachment = Item.two_scope;	
-		}	
+		}
 	}
 	
 	if(suppressor_attachment == -1){

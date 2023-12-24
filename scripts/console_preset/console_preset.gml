@@ -5,7 +5,7 @@ function console_preset(argument0) {
 	var g = (global.CrosshairColor >> 8) & 0xFF;
 	var b = global.CrosshairColor & 0xFF;
 	var c=argument0, Windowed;
-	if(!window_get_fullscreen()){ Windowed = true;}else{Windowed = false;}
+	if(!window_get_fullscreen()){ Windowed = false;}else{Windowed = true;}
 	console_add(c,"op_game_restart");
 	console_add(c,"op_game_end");
 	console_add(c, "set_dynamic_crosshair " + string(global.DynamicCrosshair));
@@ -33,6 +33,8 @@ function console_preset(argument0) {
 	console_add(c, "draw_particles " + string(global.DrawParticles));
 	console_add(c, "set_weather");
 	console_add(c, "set_crosshair_color " + string(r) + string(g) + string(b));
+	console_add(c, "draw_other_models " + string(global.draw_other_models));
+	console_add(c, "set_window_size " + string(global.window_width) + " " + string(global.window_height));
 /*	console_add(c,"window_set_fullscreen " + string(Windowed));
 	console_add(c,"draw_bullet_impact " + string(global.ShowBulletImpact));
 	console_add(c,"net_graph " + string(global.AdminHUD));

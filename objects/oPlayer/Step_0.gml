@@ -75,7 +75,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	
 	if(equipped_item("Grenade")){
 		if(Reloading == true){
 			Reloading = false;
@@ -283,6 +282,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Weapon.image_index = 9;
 			break;
 			
+			case "AWM":
+				Weapon.image_index = 10;
+			break;
+			
 			default:
 				Weapon.image_index = 0;
 			break;
@@ -349,7 +352,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					#endregion
 				}
 				
-				WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
 			break;
 			#endregion
 	
@@ -785,59 +788,65 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Shooting
 	if(global.weapon_id[min(WeaponID, 2)] != Item.None && !(equipped_item("Grenade"))){
 		if (player_can_shoot == true && !global.my_console[? "active"]) {
-		    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Defense] == 1)) && global.Ammo[WeaponID] > 0){
-				shooting = true;
+			if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Ammo[WeaponID] <= 0){
+				audio_play_sound(snd_empty_magazine, 0, false);	
+			}
+		    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Defense] == 1))){
 				
-				#region Fractionating reloading stop
-				if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Defense] == 1){
-					ReloadTimer = -1;
-					Reloading = false;
-					ReloadTime = 0;
-				}
-				#endregion
+				if(global.Ammo[WeaponID] > 0){
+					shooting = true;
 				
-				
-		        if(CanShoot == true){
-					
-					randomize();
-					
-					if(shooting_mode == "Burst"){
-						
-						#region Burstfire
-				        if (burst_fire == false) {
-				            burst_fire = true;
-				            burst_shots_fired = 0;
-				            burst_fire_timer = max(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/2, 5);
-				        }
-						#endregion
-						
-					}else{
-						
-						#region Normal fire
-						var sound_id = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.SoundID];
-						if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] == Item.military_suppressor){
-							sound_id = snd_Silencer;
-						}
-						ShootTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_barrel], ItemStat.ShootTimer]);					
-						player_shooting();
-						audio_play_sound(sound_id, false, 0);
-						Weapon.KickBackEffect = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KickBackPower];
-						KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
-						KickBack ++;
-						global.Ammo[WeaponID] --;
-						CanShoot = false;
-						#endregion
-						
-					}
-					
-					#region Scope in logic
-					if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Sniper rifle"){
-						if(ScopeIn == true){
-							ScopeIn = false;
-						}
+					#region Fractionating reloading stop
+					if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Defense] == 1){
+						ReloadTimer = -1;
+						Reloading = false;
+						ReloadTime = 0;
 					}
 					#endregion
+				
+				
+			        if(CanShoot == true){
 					
+						randomize();
+					
+						if(shooting_mode == "Burst"){
+						
+							#region Burstfire
+					        if (burst_fire == false) {
+					            burst_fire = true;
+					            burst_shots_fired = 0;
+					            burst_fire_timer = max(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/2, 5);
+					        }
+							#endregion
+						
+						}else{
+						
+							#region Normal fire
+							var sound_id = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.SoundID];
+							if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] == Item.military_suppressor){
+								sound_id = snd_Silencer;
+							}
+							ShootTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_barrel], ItemStat.ShootTimer]);					
+							player_shooting();
+							audio_play_sound(sound_id, false, 0);
+							Weapon.KickBackEffect = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KickBackPower];
+							KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
+							KickBack ++;
+							global.Ammo[WeaponID] --;
+							CanShoot = false;
+							#endregion
+						
+						}
+					
+						#region Scope in logic
+						if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Sniper rifle"){
+							if(ScopeIn == true){
+								ScopeIn = false;
+							}
+						}
+						#endregion
+					
+					}
 				}
 			}
 

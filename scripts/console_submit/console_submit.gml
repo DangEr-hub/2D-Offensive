@@ -197,7 +197,14 @@ function console_submit(argument0) {
 						}
 					break;
 	                case "window_set_fullscreen": 
-	                    if(no == 1) then window_set_fullscreen(real(c[1])); 
+	                    if(no == 1 && string_digits(c[1]) != ""){
+							window_set_fullscreen(real(c[1])); 
+							
+							if(real(c[1]) == 0){
+								window_set_size(global.window_width, global.window_height);
+								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);	
+							}
+						}
 					break;
 					case "hostage":
 						if(no == 1 && string_digits(c[1]) != "") then global.Hostage = real(c[1]);
@@ -286,6 +293,10 @@ function console_submit(argument0) {
 								case 2:
 									global.Weather = "snow";
 								break;
+								
+								default:
+									global.Weather = "sun";
+								break;
 							}
 						}
 					break;
@@ -314,30 +325,29 @@ function console_submit(argument0) {
 					    }
 					break;
 					
+					case "draw_other_models":
+						if(no == 1 && string_digits(c[1]) != "") then global.draw_other_models = real(c[1]);
+					break;
+					
+					case "set_window_size":
+					    if (no >= 2 && string_digits(c[1]) != "" && string_digits(c[2]) != "") {
+							var room_wport = view_wport[0];
+							var room_hport = view_hport[0];
+					        global.window_width = real(string_digits(c[1]));
+					        global.window_height = real(string_digits(c[2]));
+							
+							
+
+
+					        window_set_size(global.window_width, global.window_height);
+							//window_resize();
+					        //display_set_gui_size(global.window_width, global.window_height);
+					    }
+					break;
+					
 	                /*
-	                case "net_graph":
-	                    if no == 1 then global.AdminHUD = real(c[1]);
-	                break;
-	                case "no_recoil":
-	                    if no == 1 then global.NoRecoil = real(c[1]);
-	                break;
-	                case "no_view_shake":
-	                    if no == 1 then global.NoViewShake = real(c[1]);
-	                break;
-	                case "no_aimpunch":
-	                    if no == 1 then global.NoAimPunch = real(c[1]);
-	                break;
-	                case "no_inaccuracy":
-	                    if no == 1 then global.NoInaccuracy = real(c[1]);
-	                break;
 	                case "infinite_ammo":
 	                    if no == 1 then global.InfiniteAmmo = real(c[1]);
-	                break;
-	                case "god":
-	                    if no == 1 then global.God = real(c[1]);
-	                break;
-	                case "enemy_canmove":
-	                    if no == 1 then global.EnemyCanMove = real(c[1]);
 	                break;
 	                case "draw_damage":
 	                    if no == 1 then global.ShowDamage = real(c[1]);

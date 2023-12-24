@@ -150,6 +150,7 @@ if(State != States.Death){
 	#endregion
 	
 	#region Timers
+	enemy_aimpunch = lerp(enemy_aimpunch, 0, .5);
 	HP = clamp(HP, 0, MaxHP);
 	DamageHP = clamp(DamageHP, 0, MaxHP);
 	Stamina = clamp(Stamina, 0, MaxStamina);
@@ -192,6 +193,10 @@ if(State != States.Death){
 	}
 	#endregion
 	
+	if (abs(enemy_aimpunch) < 0.01) {
+	    enemy_aimpunch = 0;
+	}
+	
 	if(WeaponID[WeaponPositionID] == Item.None){
 		WeaponPositionID = 1 - WeaponPositionID;
 	}
@@ -226,10 +231,6 @@ if(State != States.Death){
 
 	if(FlashedTimer == 0){
 		Flashed = false;	
-	}
-
-	if(State == States.Death){
-		InfraVisionIntensity = lerp(InfraVisionIntensity, 0, .005);	
 	}
 
 	if(InfraVisionIntensity < 1.25){
@@ -471,13 +472,16 @@ if(State != States.Death){
 	#endregion
 
 	#region Facing
+	var relative_direction = angle_difference(RotationAngle, enemy_aimpunch_direction);
+	var direction_sign = sign(relative_direction);
+	var rotation_adjustment = lerp(enemy_aimpunch * direction_sign, 0, .1);
 	var RotationSpeed = 9;
 	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true){
 		pointdir = point_direction(x,y,FacingX, FacingY);
 		Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 		Weapon.x = x;
 		Weapon.y = y;
-		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90);
+		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
 		Weapon.image_angle = RotationAngle + KickBackAngle * .5;
 		Weapon.RotationAngle = Weapon.image_angle;
 	}else{
@@ -485,7 +489,7 @@ if(State != States.Death){
 		Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 		Weapon.x = x;
 		Weapon.y = y;
-		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90);
+		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
 		Weapon.image_angle = RotationAngle + KickBackAngle * .5;
 		Weapon.RotationAngle = Weapon.image_angle;
 	}
@@ -662,6 +666,10 @@ if(State != States.Death){
 				Weapon.image_index = 9;
 			break;
 			
+			case "AWM":
+				Weapon.image_index = 10;
+			break;
+			
 			default:
 				Weapon.image_index = 0;
 			break;
@@ -781,11 +789,12 @@ if(State != States.Death){
 			image_index = 5;
 			ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
 		}
-		WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+		WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
 	}
 	#endregion
 
 }else{
+	InfraVisionIntensity = lerp(InfraVisionIntensity, 0, .005);	
 	Weapon.image_index = 0;
 	image_index = 3;	
 	RotationAngle = MoveDirection;	

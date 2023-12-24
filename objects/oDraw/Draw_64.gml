@@ -717,6 +717,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						#endregion
 					
 					}
+					
+					#region Draw no ammo weapon
+					if(global.ClipAmmo[1 - i] <= 0 && global.Ammo[1 - i] <= 0 && global.weapon_id[1 - i] != Item.None){
+						draw_sprite_ext(
+							spr_broken, 0, HotBarX, HotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
+							1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1
+						);		
+					}
+					#endregion
+					
 					Value ++;
 				}
 			}
@@ -772,6 +782,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						#endregion
 					
 					}
+					
+					#region Draw broken armour and helmet
+					if(global.ArmourDurability[1 - i] <= 0 && global.ArmourID[1 - i] != Item.None){
+						draw_sprite_ext(
+							spr_broken, 0, ArmourHotBarX, ArmourHotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
+							1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1
+						);	
+					}
+					#endregion
+					
 					Value ++;
 				}
 			}		
@@ -808,7 +828,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						c_black,
 						c_dkgray, 
 						c_black, 
-						global.GUIHUDAlpha, 
+						global.GUIHUDAlpha*1.5, 
 						2, 
 						global.GoldColor, 
 						global.ItemIndex[#Id, ItemStat.Name], 
@@ -826,7 +846,6 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					);
 					#endregion				
 				
-					#region Draw weapon description
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
 					
 						#region Variables
@@ -926,15 +945,35 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						var DescriptionX = TabX + oDraw.HUDShift + columns*cell_width + oDraw.HUDShift;
 						var DescriptionY = TabY + TitleHeight - oDraw.HUDShift/2 + DescriptionStringHeight;
 						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
+						var disadvantages_string = global.ItemIndex[#Id, ItemStat.disadvantages];
+						var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
+						var advantages_string = global.ItemIndex[#Id, ItemStat.advantages];
+						var advantages_height = string_count_lines(advantages_string) * font_get_size(draw_get_font());
+						var disadvantages_x = DescriptionX + string_width(advantages_string)*1.5;
+						var advantages_x = DescriptionX;
+						var advantages_y = DescriptionY + DescriptionStringHeight*3;
 						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
+						draw_text_outlined(disadvantages_x, advantages_y, disadvantages_string, c_red, c_black, 1);
+						draw_text_outlined(advantages_x, advantages_y, advantages_string, c_green, c_black, 1);
+						
+						
 						set_font("Console");
 						#endregion
-					
-					}
-					#endregion
-				
-					#region Draw armour and helmet description
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+		
+						#region Draw drop button
+						draw_button_ext(
+							DescriptionX + string_width(DescriptionString)/4,
+							advantages_y + max(advantages_height, disadvantages_height) + ButtonHeight,
+							ButtonWidth,
+							ButtonHeight,
+							"Drop item",
+							c_dkgray,
+							global.GoldColor,
+							"description_drop"
+						);
+						#endregion	
+						
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 					
 						#region Variables
 						var rows = 1;
@@ -999,12 +1038,21 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 						set_font("Console");
 						#endregion
+						
+						#region Draw drop button
+						draw_button_ext(
+							DescriptionX + string_width(DescriptionString)/4,
+							DescriptionY + DescriptionStringHeight*1.1 + ButtonHeight,
+							ButtonWidth,
+							ButtonHeight,
+							"Drop item",
+							c_dkgray,
+							global.GoldColor,
+							"description_drop"
+						);
+						#endregion	
 					
-					}		
-					#endregion
-					
-					#region Draw item and grenade description
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
 						
 						#region Draw description
 						set_font("GUI_grid");
@@ -1016,6 +1064,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 						#endregion
 						
+						#region Item statistics
 						var statistics_string;
 						var statistics_x = TabX + oDraw.HUDShift + string_width(DescriptionString)*1.5;
 						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*2;
@@ -1042,14 +1091,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						}
 
 						
-					}
 					set_font("Console");
 					#endregion
-					
-					#region Draw drop button
+						
+						#region Draw drop button
 					draw_button_ext(
 						DescriptionX + string_width(DescriptionString)/4,
-						DescriptionY + DescriptionStringHeight + ButtonHeight,
+						DescriptionY + DescriptionStringHeight*1.1 + ButtonHeight,
 						ButtonWidth,
 						ButtonHeight,
 						"Drop item",
@@ -1058,6 +1106,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						"description_drop"
 					);
 					#endregion
+					
+					}
 				
 				}
 			}

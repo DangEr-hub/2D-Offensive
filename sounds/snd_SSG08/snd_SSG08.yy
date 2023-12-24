@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 1.429048,
+  "duration": 1.004542,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_SSG08",
+  "soundFile": "snd_SSG08.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.75,
 }

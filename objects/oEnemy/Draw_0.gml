@@ -11,7 +11,7 @@ if(Visible == true){
 		draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 	}
 
-	draw_text(x, y - 70, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Defense]); 
+	draw_text(x, y - 70, InfraVisionIntensity); 
 	
 	if(State != States.Death){
 		

@@ -51,6 +51,8 @@ InfraVisionIntensity = 2;
 infra_vision_light = noone;
 EquippedGrenadeID = Item.None;
 grenade_angle = random(360);
+enemy_aimpunch_direction = 0;
+enemy_aimpunch = 0;
 healing = false;
 equip_time = 0;
 equip_timer = -1;
@@ -79,7 +81,7 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Ranks
-Rank = irandom_range(RankType.AssaultEliteI, RankType.SupremeMaster);
+Rank = irandom_range(RankType.GoldI, RankType.GoldMaster);
 #endregion
 
 #region Movement engine

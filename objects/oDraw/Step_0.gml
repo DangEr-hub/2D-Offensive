@@ -3,6 +3,11 @@
 ViewX = camera_get_view_x(view_camera[0]);
 ViewY = camera_get_view_y(view_camera[0]);
 
+bloom_threshold = .29;
+if(oPlayer.ToggleInfraVision == true){
+	bloom_threshold = .35;
+}
+
 if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
 	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
 		if(show_weapon_attachments == false){

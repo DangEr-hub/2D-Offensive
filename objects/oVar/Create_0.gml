@@ -42,8 +42,11 @@ global.UnSkillPoints = 0;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
+global.window_width = 1920;
+global.window_height = 1080;
+global.draw_other_models = false;
 global.Weather = "sun";
-global.CrosshairColor = make_color_rgb(255, 255, 255);//c_white;
+global.CrosshairColor = c_white;
 global.GUIMultiplier = display_get_width()/global.CameraWidth;
 camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
 

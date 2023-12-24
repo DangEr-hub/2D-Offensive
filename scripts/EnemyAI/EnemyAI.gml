@@ -94,6 +94,8 @@ function EnemyShooting(DangerX, DangerY){
 			sound_id = snd_Silencer;
 		}
 
+		if(Visible == true){
+		
 		#region Create smoke effect
 		Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
 		Fog.moving = true;
@@ -115,6 +117,8 @@ function EnemyShooting(DangerX, DangerY){
 		//part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.dust_particle, random_range(1, 10));
 		#endregion
 		
+		}
+		
 		PlaySound(x, y, sound_id);
 		ParticleCreate(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
 		0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BulletCasingID], x, y, 1, 60);
@@ -127,7 +131,8 @@ function EnemyShooting(DangerX, DangerY){
 		#region Create flash effect
 		MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight);
 		MuzzleFlashLight.Object = Weapon;
-		MuzzleFlashLight.DestroyTimer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] - 1;
+		MuzzleFlashLight.DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] - 1);
+		show_debug_message(MuzzleFlashLight.DestroyTimer);
 		with(MuzzleFlashLight){
 			light[| eLight.Intensity] = 1.3;
 			light[| eLight.Color] = $FF0000FF;
@@ -236,7 +241,7 @@ function healing_ai(){
 	}
 }
 
-function ReloadAI(){
+function reload_ai(){
 	if(PercentChance(75 * global.RankIndex[#Rank, RankStat.BoostModifier])){
 		if(State != States.MoveAway){
 			SetReactionTimer(ceil(ReactionTime*.5));

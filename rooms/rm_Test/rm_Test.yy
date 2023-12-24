@@ -75,6 +75,7 @@
     {"name":"inst_68B40AC6","path":"rooms/rm_Test/rm_Test.yy",},
     {"name":"inst_3913BBAE","path":"rooms/rm_Test/rm_Test.yy",},
     {"name":"inst_BDC23A4","path":"rooms/rm_Test/rm_Test.yy",},
+    {"name":"inst_4C027A33","path":"rooms/rm_Test/rm_Test.yy",},
   ],
   "isDnd": false,
   "layers": [
@@ -106,6 +107,7 @@
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_68B40AC6","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":30,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oItems","path":"objects/oItems/oItems.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":913.78564,"y":87.0,},
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_3913BBAE","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":31,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oItems","path":"objects/oItems/oItems.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":672.0,"y":320.0,},
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_BDC23A4","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":32,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oItems","path":"objects/oItems/oItems.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":832.0,"y":288.0,},
+        {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_4C027A33","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":33,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oItems","path":"objects/oItems/oItems.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":896.0,"y":512.0,},
       ],"layers":[],"properties":[],"userdefinedDepth":false,"visible":true,},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"LivingO","depth":100,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_64FD2777","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oPlayer","path":"objects/oPlayer/oPlayer.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":640.0,"y":416.0,},

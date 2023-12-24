@@ -51,7 +51,17 @@ function HitEntity(Object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetratio
 		}
 		
 		Object.AttackDamage *= DamageMultiplier / (ObjectPenetrationDamage + 1);
-		Object.AttackDamage = ceil(Object.AttackDamage);	
+		Object.AttackDamage = ceil(Object.AttackDamage);
+		
+		var armour_durability, helmet_durability;
+		if(Object.object_index == oEnemy){
+			helmet_durability = Object.ArmourDurability[1];
+			armour_durability = Object.ArmourDurability[0];
+			Object.enemy_aimpunch = Object.AttackDamage;
+		}else{
+			helmet_durability = global.ArmourDurability[1];
+			armour_durability = global.ArmourDurability[0];
+		}
 		
 		// If the Object hasn't interacted with this EnemyID yet, initialize the data
 		if (!Object.HitMap[? EnemyID]) {
@@ -113,28 +123,28 @@ function HitEntity(Object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetratio
 			part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.BloodParticle, BloodParticleNumber);
 		}
 		if(BodyPart != HitBox.Head){
-			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .9 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
+			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .9 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
 				PlaySound(BloodSplashX, BloodSplashY, choose(snd_BulletHit1, snd_BulletHit2), Object);
 			}else{
 				if(Object.object_index == oPlayer){
-					global.ArmourDurability[0] -= Object.AttackDamage/10/global.ItemIndex[#ArmourID, ItemStat.Defense];	
+					global.ArmourDurability[0] -= Object.AttackDamage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];	
 					global.ArmourDurability[0] = max(global.ArmourDurability[0], 0);
 				}else{
-					Object.ArmourDurability[0] -= Object.AttackDamage/10/global.ItemIndex[#ArmourID, ItemStat.Defense];
+					Object.ArmourDurability[0] -= Object.AttackDamage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];
 					Object.ArmourDurability[0] = max(Object.ArmourDurability[0], 0);
 				}
 				part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(Object.AttackDamage/5));
 				PlaySound(BloodSplashX, BloodSplashY, choose(snd_BulletHitArmour1, snd_BulletHitArmour2), Object);	
 			}
 		}else{
-			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .9){
+			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .9 || helmet_durability <= 0){
 				PlaySound(BloodSplashX, BloodSplashY, snd_HeadShot, Object);
 			}else{
 				if(Object.object_index == oPlayer){
-					global.ArmourDurability[1] -= Object.AttackDamage/10/global.ItemIndex[#HelmetID, ItemStat.Defense];	
+					global.ArmourDurability[1] -= Object.AttackDamage/50/global.ItemIndex[#HelmetID, ItemStat.Defense];	
 					global.ArmourDurability[1] = max(global.ArmourDurability[1], 0);
 				}else{
-					Object.ArmourDurability[1] -= Object.AttackDamage/10/global.ItemIndex[#HelmetID, ItemStat.Defense];
+					Object.ArmourDurability[1] -= Object.AttackDamage/5010/global.ItemIndex[#HelmetID, ItemStat.Defense];
 					Object.ArmourDurability[1] = max(Object.ArmourDurability[1], 0);
 				}
 				part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(Object.AttackDamage/5));
