@@ -250,7 +250,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "During the 1980s, a gas-operated, magazine-fed carbine was developed in the United States, which is essentially a compact iteration of the M16A2 assault rifle. It comes with military suppressor.";
 	
 	global.ItemIndex[#Item.awm, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.awm, "AWM", 3.25 * room_speed, 1150, 118, 50, 5, "Main", 1, 2, 30, snd_SSG08, 30, 5, false,
+	WeaponStats(Item.awm, "AWM", 3.25 * room_speed, 1150, 118, 50, 5, "Main", 1, 2, 30, snd_awm, 30, 5, false,
 	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * room_speed);
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n-High damage\-High range\n-Neglidible damage drop";

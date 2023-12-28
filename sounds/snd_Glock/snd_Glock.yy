@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 1.666667,
+  "duration": 0.806625,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_Glock",
+  "soundFile": "snd_Glock.wav",
   "type": 0,
   "volume": 0.25,
 }

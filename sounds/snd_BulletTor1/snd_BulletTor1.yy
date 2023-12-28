@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.318345,
+  "duration": 0.149958,
   "parent": {
     "name": "Other",
     "path": "folders/Sounds/Other.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_BulletTor1",
+  "soundFile": "snd_BulletTor1.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.5,
 }

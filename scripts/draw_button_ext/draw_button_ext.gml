@@ -85,10 +85,10 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					0,
 					0,
-					false,
 					0,
 					0,
-					0
+					0,
+					false
 				);
 				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_scope] = Item.None;
 			break;
@@ -101,10 +101,10 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					0,
 					0,
-					false,
 					0,
 					0,
-					0
+					0,
+					false
 				);
 				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_barrel] = Item.None;
 			break;
@@ -117,10 +117,10 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					0,
 					0,
-					false,
 					0,
 					0,
-					0
+					0, 
+					false
 				);
 				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip] = Item.None;
 			break;
@@ -133,10 +133,10 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					0,
 					0,
-					false,
 					0,
 					0,
-					0
+					0,
+					false
 				);
 				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_suppressor] = Item.None;
 			break;

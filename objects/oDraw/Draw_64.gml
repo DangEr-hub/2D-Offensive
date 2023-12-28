@@ -1412,14 +1412,16 @@ console_draw(global.my_console, global.ConsoleHeight * global.GUIMultiplier,c_gr
 
 #region Crosshair
 with(oCrosshair){
-	var xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-	var yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+	var x_scale = image_xscale * .5;
+	var y_scale = image_yscale * .5;
+	xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+	yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 	if(instance_exists(oPlayer)){
 		if(HitMarker > -1){
-			draw_sprite_ext(spr_HitMarker, HitMarker, xx, yy, image_yscale, image_xscale, image_angle, image_blend, global.CrosshairAlpha);	
+			draw_sprite_ext(spr_HitMarker, HitMarker, xx, yy, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	
 		}
 		if(oPlayer.player_can_shoot == true && !global.my_console[? "active"] && oPlayer.ScopeIn == false){
-			draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, image_yscale, image_xscale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
+			draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
 			if(global.DynamicCrosshair == true){
 				Gap = 25;
 				draw_sprite_ext(
@@ -1427,8 +1429,8 @@ with(oCrosshair){
 					0, 
 					xx - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
-					image_yscale, 
-					image_xscale, 
+					y_scale, 
+					x_scale, 
 					0, 
 					global.CrosshairColor, 
 					global.CrosshairAlpha
@@ -1438,8 +1440,8 @@ with(oCrosshair){
 					0, 
 					xx + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
-					image_yscale, 
-					image_xscale, 
+					y_scale, 
+					x_scale, 
 					0, 
 					global.CrosshairColor, 
 					global.CrosshairAlpha
@@ -1449,8 +1451,8 @@ with(oCrosshair){
 					0, 
 					xx, 
 					yy - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
-					image_yscale, 
-					image_xscale, 
+					y_scale, 
+					x_scale, 
 					90, 
 					global.CrosshairColor, 
 					global.CrosshairAlpha
@@ -1460,8 +1462,8 @@ with(oCrosshair){
 					0, 
 					xx, 
 					yy + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
-					image_yscale, 
-					image_xscale, 
+					y_scale, 
+					x_scale, 
 					90, 
 					global.CrosshairColor, 
 					global.CrosshairAlpha
@@ -1469,16 +1471,15 @@ with(oCrosshair){
 			}
 		}
 	}else{
-		draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, image_yscale, image_xscale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
+		draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
 		if(global.DynamicCrosshair == true){
 			Gap = 25;
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx - Gap - 1 + x_offset, yy, image_yscale, image_xscale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Left
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx + Gap + 1 + x_offset, yy, image_yscale, image_xscale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Right
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy - Gap - 1 + y_offset, image_yscale, image_xscale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Top
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy + Gap + 1 + y_offset, image_yscale, image_xscale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Down
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx - Gap - 1 + x_offset, yy, y_scale, x_scale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Left
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx + Gap + 1 + x_offset, yy, y_scale, x_scale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Right
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy - Gap - 1 + y_offset, y_scale, x_scale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Top
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy + Gap + 1 + y_offset, y_scale, x_scale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Down
 		}
 	}
-	
 }
 #endregion
 

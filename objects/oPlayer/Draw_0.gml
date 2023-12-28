@@ -9,7 +9,8 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-//draw_text(x, y - 35, global.weapon_attachments[WeaponID][weapon_attachments.weapon_barrel]);
+//draw_text(x, y - 130, applicatio);
+//draw_text(x, y - 35, application_surface_is_enabled());
 
 if(HP > 0){
 	if (equipped_item("Grenade")) {

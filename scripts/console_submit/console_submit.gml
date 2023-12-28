@@ -196,13 +196,26 @@ function console_submit(argument0) {
 							global.GodMode = real(c[1]);
 						}
 					break;
-	                case "window_set_fullscreen": 
+	                case "set_window_fullscreen": 
 	                    if(no == 1 && string_digits(c[1]) != ""){
 							window_set_fullscreen(real(c[1])); 
 							
 							if(real(c[1]) == 0){
+								/*global.GuiW = global.window_width*(1920/global.window_width);
+								global.GuiH = global.window_height*(1080/global.window_height);
+								application_surface_draw_enable(false);
+								surface_resize(application_surface, global.GuiW, global.GuiH);
+								surface_free(oDraw.Surface1); 
+								surface_free(oDraw.Surface2); 
+								surface_free(oDraw.NightVisionSurface); 
+								surface_free(oDraw.BlurGrayScaleSurface); 
+								surface_free(oDraw.BlurSurface);*/
+							
+								//show_debug_message(display_aa);
+								display_reset(0, false);
 								window_set_size(global.window_width, global.window_height);
-								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);	
+								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
+								
 							}
 						}
 					break;
@@ -331,17 +344,13 @@ function console_submit(argument0) {
 					
 					case "set_window_size":
 					    if (no >= 2 && string_digits(c[1]) != "" && string_digits(c[2]) != "") {
-							var room_wport = view_wport[0];
-							var room_hport = view_hport[0];
 					        global.window_width = real(string_digits(c[1]));
 					        global.window_height = real(string_digits(c[2]));
 							
-							
-
-
-					        window_set_size(global.window_width, global.window_height);
-							//window_resize();
-					        //display_set_gui_size(global.window_width, global.window_height);
+							if(window_get_fullscreen() == false){
+								window_set_size(global.window_width, global.window_height);
+								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
+							}
 					    }
 					break;
 					

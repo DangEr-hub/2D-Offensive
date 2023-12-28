@@ -1,4 +1,4 @@
-function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, Destroy = true, ItemBarrel, ItemGrip, Itemsuppressor) {
+function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, Destroy = true) {
 	Slot = 0;
 	while(Slot < global.InventorySize){
 	    if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){

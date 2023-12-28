@@ -1247,7 +1247,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		    if(distance_to_object(Items) <= PickUpDistance){   
 		        if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
 		            with(Items){
-		                GainItem(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, true, barrel_attachment, grip_attachment, suppressor_attachment);
+		                GainItem(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
 		            }
 		        }
 		    }

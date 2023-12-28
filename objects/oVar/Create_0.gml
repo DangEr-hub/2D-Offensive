@@ -48,6 +48,7 @@ global.draw_other_models = false;
 global.Weather = "sun";
 global.CrosshairColor = c_white;
 global.GUIMultiplier = display_get_width()/global.CameraWidth;
+//show_debug_message(global.GUIMultiplier);
 camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
 
 enum weapon_attachments{

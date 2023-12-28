@@ -16,7 +16,7 @@ function console_preset(argument0) {
 	console_add(c, "set_hitbox_alpha " + string(global.HitBoxAlpha));
 	console_add(c,"op_room_restart");
 	console_add(c, "op_godmode " + string(global.GodMode));
-	console_add(c, "window_set_fullscreen " + string(Windowed));
+	console_add(c, "set_window_fullscreen " + string(Windowed));
 	console_add(c, "hostage " + string(global.Hostage));
 	console_add(c, "rank_modifier " + string(global.RankMultiplier));
 	console_add(c, "enemy_can_move " + string(global.EnemyCanMove));

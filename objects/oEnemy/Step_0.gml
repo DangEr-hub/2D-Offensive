@@ -689,7 +689,7 @@ if(State != States.Death){
 					image_index = 4;
 					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 				}
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .95;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
 			break;
 	
 			case "Pistol":
@@ -752,7 +752,7 @@ if(State != States.Death){
 					image_index = 4;
 					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 				}
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .95;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
 			break;
 			
 			case "Anti-tank missile":
@@ -764,7 +764,7 @@ if(State != States.Death){
 					image_index = 4;
 					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 				}
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .95;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
 			break;
 
 			default:
