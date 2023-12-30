@@ -16,7 +16,7 @@ BlackoutSurface = -1;
 zoomSurface = -1;
 ZoomValue = 1;
 
-set_font("Console");
+draw_set_font(set_font("Console"));
 
 #region Weapon attachments
 show_weapon_attachments = false;

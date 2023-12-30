@@ -1,4 +1,4 @@
-set_font("Console");
+draw_set_font(set_font("Console"));
 var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
 	
@@ -472,7 +472,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					var default_xx = HealthX - sprite_width/2;
 					var default_yy = HealthY - sprite_height - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
 					var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
-					set_font("Console");
+					draw_set_font(set_font("Console"));
 					draw_set_color(c_black);
 					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
 					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height, (DamageHP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
@@ -589,7 +589,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		with(oPlayer){
 			xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 			yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-			set_font("Console");
+			draw_set_font(set_font("Console"));
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
 
@@ -868,7 +868,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					            draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
 								draw_set_color(c_white);
 							
-								set_font("GUI_grid");
+								draw_set_font(set_font("GUI_grid"));
 						        var text = "";
 						        var statIndex = ItemStat.Damage + i * columns + j;
 						        if (statIndex <= array_length_1d(statTitles)){
@@ -939,7 +939,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						#endregion
 					
 						#region Draw description
-						set_font("GUI_grid");
+						draw_set_font(set_font("GUI_grid"));
 						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
 						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 						var DescriptionX = TabX + oDraw.HUDShift + columns*cell_width + oDraw.HUDShift;
@@ -957,7 +957,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						draw_text_outlined(advantages_x, advantages_y, advantages_string, c_green, c_black, 1);
 						
 						
-						set_font("Console");
+						draw_set_font(set_font("Console"));
 						#endregion
 		
 						#region Draw drop button
@@ -994,7 +994,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					            draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
 								draw_set_color(c_white);
 							
-								set_font("GUI_grid");
+								draw_set_font(set_font("GUI_grid"));
 						        var text = "";
 						        var statIndex = ItemStat.Weight + i * columns + j;
 						        if (statIndex - ItemStat.Weight <= array_length_1d(statTitles)){
@@ -1029,14 +1029,14 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						#endregion
 						
 						#region Draw description
-						set_font("GUI_grid");
+						draw_set_font(set_font("GUI_grid"));
 						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
 						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 						var DescriptionX = TabX + oDraw.HUDShift + columns*cell_width + oDraw.HUDShift;
 						var DescriptionY = TabY + TitleHeight - oDraw.HUDShift/2 + DescriptionStringHeight;
 						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
 						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-						set_font("Console");
+						draw_set_font(set_font("Console"));
 						#endregion
 						
 						#region Draw drop button
@@ -1055,7 +1055,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
 						
 						#region Draw description
-						set_font("GUI_grid");
+						draw_set_font(set_font("GUI_grid"));
 						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
 						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 						var DescriptionX = TabX + oDraw.HUDShift*1.5;
@@ -1091,7 +1091,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						}
 
 						
-					set_font("Console");
+					draw_set_font(set_font("Console"));
 					#endregion
 						
 						#region Draw drop button
@@ -1217,7 +1217,7 @@ if(RespawnMenu == true){
 		
 		
 		draw_set_valign(fa_middle);
-		set_font("Console");
+		draw_set_font(set_font("Console"));
 		
 		#region Draw grid
 		Keys = ds_map_keys_to_array(oPlayer.HitMap);
@@ -1384,7 +1384,7 @@ if(RespawnMenu == true){
 		#endregion
 			
 	}else{
-		set_font("Console");
+		draw_set_font(set_font("Console"));
 		draw_text_outlined(global.GuiW/2 - string_width("Toggle message [MB right]")/2, global.GuiH - string_height("a"), "Toggle message [MB right]", c_white, c_black, 1);	
 	}
 	draw_set_alpha(1);
@@ -1392,14 +1392,14 @@ if(RespawnMenu == true){
 #endregion
 
 #region Fps
-set_font("Console");
+draw_set_font(set_font("Console"));
 draw_text_outlined(50, 50, "Fps: " + string(fps), c_white, c_black, 1);
 draw_text_outlined(50, 50 + TextHeightSmall, "Real fps: " + string(fps_real), c_white, c_black, 1);
 #endregion
 
 #region Time
 if(instance_exists(oSunLight)){
-	set_font("Console");
+	draw_set_font(set_font("Console"));
 	var hour_str = (oSunLight.CurrentHour < 10 ? "0" + string(oSunLight.CurrentHour) : string(oSunLight.CurrentHour));
 	var minute_str = (oSunLight.CurrentMinute < 10 ? "0" + string(oSunLight.CurrentMinute) : string(oSunLight.CurrentMinute));
 	draw_text_outlined(50, 50 + TextHeightSmall*2, "Time: " + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);

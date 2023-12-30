@@ -16,11 +16,11 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
     
     // Draw text
 	draw_set_alpha(1);
-    set_font("GUI_button");
+    draw_set_font(set_font("GUI_button"));
     draw_set_color(c_white);
     var b_text_width = string_width(text);
     draw_text(xx + (b_width - b_text_width) / 2, yy + b_height/2, text);
-	set_font("Console");
+	draw_set_font(set_font("Console"));
     
     // Check for click
     if (mouse_over && mouse_check_button_pressed(mb_left)) {

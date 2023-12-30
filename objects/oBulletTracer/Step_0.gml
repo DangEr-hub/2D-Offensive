@@ -1,4 +1,4 @@
-var MaxDistanceToTarget = 128;
+var MaxDistanceToTarget = 256;
 var PointDistance = point_distance(ShotX, ShotY, BulletTracerX, BulletTracerY);
 
 #region Infra vision
@@ -76,7 +76,7 @@ if(image_index == 1){
 		NearestTargetY = BulletTracerY + 
 		lengthdir_y(global.ItemIndex[#Weapon, ItemStat.Range], point_direction(BulletTracerX, BulletTracerY, RandomX, RandomY));
 	}
-	var Angle = point_direction(x, y, NearestTargetX, NearestTargetY);
+	var Angle = point_direction(BulletTracerX, BulletTracerY, NearestTargetX, NearestTargetY);
 	direction += get_angle(Angle, 16);
 			
 	if(position_meeting(NearestTargetX, NearestTargetY, self) || distance_to_point(NearestTargetX, NearestTargetY) <= 64){	
@@ -89,7 +89,8 @@ if(image_index == 1){
 			Object, 
 			global.ItemIndex[#Weapon, ItemStat.PenetrationPower], 
 			global.ItemIndex[#Weapon, ItemStat.DamageDrop], 
-			128
+			128,
+			80
 		);	
 		instance_destroy(self);
 	}

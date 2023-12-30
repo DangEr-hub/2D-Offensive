@@ -38,12 +38,12 @@ function draw_menu_tab(){
 	// Draw title
 	draw_set_alpha(1.5*alpha);
 	if(title_height >= 128){
-		set_font("Title");
+		draw_set_font(set_font("Title"));
 	}else{
-		set_font("Console");
+		draw_set_font(set_font("Console"));
 	}
 	draw_text_outlined(x1 + width/2 - string_width(title_text)/2, y1 + title_height/2, title_text, argument[11], c_black, 1);
-	set_font("Console");
+	draw_set_font(set_font("Console"));
     
     // Draw second rectangle
     draw_set_alpha(alpha);

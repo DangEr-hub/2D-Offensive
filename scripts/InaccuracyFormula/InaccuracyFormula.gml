@@ -162,7 +162,7 @@ function player_shooting(){
 						
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			BulletTracer.NearestEnemy = instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy);
-			BulletTracer.direction = 0;
+			BulletTracer.direction = BulletTracer.image_angle;
 			BulletTracer.speed = 25;
 			BulletTracer.image_index = 1;
 		}

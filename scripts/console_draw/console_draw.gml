@@ -19,7 +19,7 @@ function console_draw(c,h,b1,b2,t1,t2,a,w) {
 
 	/* If enabled */
 	if c[? "active"] {
-		set_font("Console");
+		draw_set_font(set_font("Console"));
 	    l = string_height("W");
 	    p = 36; // Padding
 		ws = surface_get_width(application_surface)*0.15;
