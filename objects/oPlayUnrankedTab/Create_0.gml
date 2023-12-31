@@ -4,8 +4,12 @@ test_callback = function (_id) {
 	ui_show_popup(string(_id));
 }
 
+new_game_callback = function (){
+	room_goto(rm_Test);	
+}
+
 with (zui_create(0, 0, objUIWindowCaption)) {
-	caption = "Window";
+	caption = "Play unranked game";
 	draggable = 1;
 }
 
@@ -21,8 +25,8 @@ with (zui_create(140, 38, objUIButton)) {
 	zui_set_anchor(0, 0);
 	zui_set_size(120, 32);
 
-	caption = "Button 2";
-	callback = other.test_callback;
+	caption = "Play";
+	callback = other.new_game_callback;
 }
 
 with (zui_create(268, 38, objUIButton)) {

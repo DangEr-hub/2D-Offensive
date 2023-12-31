@@ -1,7 +1,7 @@
 {
   "resourceType": "GMFont",
   "resourceVersion": "1.0",
-  "name": "fnt_ConsoleMedium",
+  "name": "fnt_MenuSmallSmall",
   "AntiAlias": 1,
   "applyKerning": 0,
   "ascender": 13,
@@ -118,8 +118,8 @@
   "lineHeight": 17,
   "maintainGms1Font": false,
   "parent": {
-    "name": "Medium",
-    "path": "folders/Fonts/Medium.yy",
+    "name": "Small",
+    "path": "folders/Fonts/Small.yy",
   },
   "pointRounding": 0,
   "ranges": [
