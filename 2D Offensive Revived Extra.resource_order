@@ -74,6 +74,7 @@
     {"name":"set_font","order":9,"path":"scripts/set_font/set_font.yy",},
     {"name":"PercentChance","order":7,"path":"scripts/PercentChance/PercentChance.yy",},
     {"name":"oFlashLight","order":2,"path":"objects/oFlashLight/oFlashLight.yy",},
+    {"name":"spr_MapImage","order":7,"path":"sprites/spr_MapImage/spr_MapImage.yy",},
     {"name":"sprCheckBox","order":6,"path":"sprites/sprCheckBox/sprCheckBox.yy",},
     {"name":"composite_shadow_map","order":4,"path":"scripts/composite_shadow_map/composite_shadow_map.yy",},
     {"name":"fnt_GUITitleMedium","order":3,"path":"fonts/fnt_GUITitleMedium/fnt_GUITitleMedium.yy",},

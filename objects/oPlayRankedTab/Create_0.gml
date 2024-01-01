@@ -1,7 +1,7 @@
 zui_set_size(1440, 810);
 
 test_callback = function (_id) {
-	ui_show_popup(string(_id));
+	//ui_show_popup(string(_id));
 }
 
 new_game_callback = function (){

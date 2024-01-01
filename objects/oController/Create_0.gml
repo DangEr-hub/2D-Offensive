@@ -1,6 +1,14 @@
 draw_set_valign(1);
 window_set_fullscreen(true);
 
+popup_exit_callback_positive = function () {
+	game_end();
+}
+				
+exit_callback = function(){
+	ui_show_popup("Are you sure?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);
+}
+
 play_unranked_callback = function(){
 	if!(instance_exists(oPlayUnrankedTab)){
 		with(zui_main()){
@@ -36,11 +44,6 @@ play_ranked_callback = function(){
 
 with (zui_main()) {
 	var window_id;
- 
-	/*with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPlayerRankedTab, -1)) {
-		window_id = id;
-	}*/
-	
 	var button_width = 128 * global.GUIMultiplier;
 	var button_height = 32 * global.GUIMultiplier;
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1, objUIButton)){
@@ -77,7 +80,24 @@ with (zui_main()) {
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
+		caption = "Options";
+		callback = oController.exit_callback;
+	}
+	
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*7.5, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(button_width);
+		zui_set_height(button_height);
+		caption = "Keyboard input";
+		callback = oController.exit_callback;
+	}
+	
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*9, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(button_width);
+		zui_set_height(button_height);
 		caption = "Exit";
+		callback = oController.exit_callback;
 	}
 
 	with (zui_create(zui_get_width() * 0.5, zui_get_height() - 80, objUISlider)) {

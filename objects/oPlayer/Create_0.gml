@@ -4,7 +4,7 @@ AccelX = 0;
 AccelY = 0;
 VelocityX = 0;
 VelocityY = 0;
-room_speed = 60;
+game_set_speed(60, gamespeed_fps);
 shooting = false;
 ItemUsePosition = 0;
 PickUpDistance = 16;
@@ -21,7 +21,7 @@ YSpeed = 0;
 ScopeIn = false;
 ScopeInaccuracyTimer = -1;
 EquippedGrenadeTimer = -1;
-EquippedGrenadeTime = room_speed * .25;
+EquippedGrenadeTime = game_get_speed(gamespeed_fps) * .25;
 BloodTimer = -1;
 EquipmentAlpha = 0;
 ReloadTimer = -1;
@@ -39,7 +39,7 @@ KickBack = 0;
 KickBackAngle = 0;
 KickBackStabilizationSpeed = 1;
 kick_back_timer = -1;
-KickBackTime = round(.08 * room_speed);
+KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
 Range = 0;
 Reloading = false;
 ReloadTime = 0;
@@ -70,7 +70,7 @@ burst_fire_timer = 0;
 #endregion
 
 #region Statistics
-HealingTimer = room_speed;
+HealingTimer = game_get_speed(gamespeed_fps);
 HPHealingTimer = -1;
 HP = global.MaxHP;
 DamageHP = HP;
@@ -109,7 +109,7 @@ Moving = false;
 RelativeSpeedValue = MoveSpeed * 0.1;
 RelativeSpeedX = 0;
 RelativeSpeedY = 0;
-MovingStabilizationTime = .05 * room_speed;
+MovingStabilizationTime = .05 * game_get_speed(gamespeed_fps);
 MovingStabilizationTimer = -1;
 
 #endregion

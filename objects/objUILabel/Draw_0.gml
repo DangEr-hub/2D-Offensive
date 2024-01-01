@@ -1,4 +1,1 @@
-draw_set_color(color);
-draw_set_halign(halign);
-draw_set_valign(valign);
-draw_text(-1, -1, caption);
+draw_text_outlined(-1 - string_width(caption)/2, -1, caption, c_white, c_black, 1);
