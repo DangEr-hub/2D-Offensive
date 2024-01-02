@@ -467,8 +467,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		with(oEnemy){
 			if(State != States.Death){
 				if(HP > 0 && Visible == true){
-				    HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-				    HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+				    var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+				    var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 					var default_xx = HealthX - sprite_width/2;
 					var default_yy = HealthY - sprite_height - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
 					var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
@@ -643,7 +643,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			var g = 54;
 			var b = 54;
 			var Value = 0;
-			for(i=0;i<oDraw.HotBarItems - 1;i++){ ///- 1 for knife
+			for(var i=0;i<oDraw.HotBarItems - 1;i++){ ///- 1 for knife
 				if(global.weapon_id[1 - i] != Item.None){
 					if(mouse_to_gui(
 						HotBarX - sprite_get_width(spr_Items)*global.GUIMultiplier/2,  
@@ -736,7 +736,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			var Value = 0;
 			var ArmourHotBarX = HotBarX - sprite_get_width(spr_Items)/1.25*global.GUIMultiplier;
 			var ArmourHotBarY = HotBarY;
-			for(i=0;i<2;i++){
+			for(var i=0;i<2;i++){
 				if(global.ArmourID[1 - i] != Item.None){
 					if(mouse_to_gui(
 						ArmourHotBarX - sprite_get_width(spr_Items)*global.GUIMultiplier/4,  
@@ -885,7 +885,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 										break;
 									
 										case ItemStat.ReloadSpeed:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/room_speed) + "s";
+											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + "s";
 										break;
 									
 										case ItemStat.DamageDrop:
@@ -905,7 +905,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 										break;
 									
 										case ItemStat.ShootTimer:
-											text = statTitles[statIndex] + string(room_speed/global.ItemIndex[#Id, statIndex]*60);
+											text = statTitles[statIndex] + string(game_get_speed(gamespeed_fps)/global.ItemIndex[#Id, statIndex]*60);
 										break;
 
 										case ItemStat.Range:
@@ -1126,8 +1126,8 @@ if(instance_exists(oPlayer)){
 		var AdminHUDY = HUDShift;
 		
 		//Player velocity
-		var PlayerVelocity = sqrt(power(oPlayer.XSpeed, 2) + power(oPlayer.YSpeed, 2)) * room_speed;
-		var SpdString = "Velocity: " + string_format(min(PlayerVelocity, oPlayer.MoveSpeed * room_speed), 0, 1) + " Units/Second";
+		var PlayerVelocity = sqrt(power(oPlayer.XSpeed, 2) + power(oPlayer.YSpeed, 2)) * game_get_speed(gamespeed_fps);
+		var SpdString = "Velocity: " + string_format(min(PlayerVelocity, oPlayer.MoveSpeed * game_get_speed(gamespeed_fps)), 0, 1) + " Units/Second";
 		draw_text_outlined(AdminHUDX - string_width(SpdString), AdminHUDY, SpdString, c_white, c_black, 1);	
 		
 		//Crosshair range

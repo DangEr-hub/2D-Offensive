@@ -5,7 +5,7 @@ function statistics_hit(Type, Damage){
 		case "HP":
 			HP -= Damage;
 			if(HPTimer == -1){
-				HPTimer = room_speed*.5;
+				HPTimer = game_get_speed(gamespeed_fps)*.5;
 			}
 		break;
 		
@@ -14,7 +14,7 @@ function statistics_hit(Type, Damage){
 		Stamina -= StaminaDamage;
 		Stamina = max(Stamina, 0);
 		if(StaminaTimer == -1){
-			StaminaTimer = room_speed*.5;	
+			StaminaTimer = game_get_speed(gamespeed_fps)*.5;	
 		}
 		break;
 	}

@@ -1,6 +1,8 @@
 draw_set_valign(1);
 window_set_fullscreen(true);
 
+instance_create_layer(x, y, "OtherO", oConsole);
+
 popup_exit_callback_positive = function () {
 	game_end();
 }
@@ -12,7 +14,7 @@ exit_callback = function(){
 play_unranked_callback = function(){
 	if!(instance_exists(oPlayUnrankedTab)){
 		with(zui_main()){
-			var window_id;
+			var window_id = noone;
 			
 			with(objUIWindow){
 				zui_destroy();
@@ -28,7 +30,7 @@ play_unranked_callback = function(){
 play_ranked_callback = function(){
 	if!(instance_exists(oPlayRankedTab)){
 		with(zui_main()){
-			var window_id;
+			var window_id = noone;
 			
 			with(objUIWindow){
 				zui_destroy();
@@ -41,9 +43,25 @@ play_ranked_callback = function(){
 	}
 }
 
+statistics_callback = function(){
+	if!(instance_exists(oStatisticsTab)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oStatisticsTab, -1)) {
+				window_id = id;
+			}
+		}
+	}
+}
+
 
 with (zui_main()) {
-	var window_id;
+	var window_id = noone;
 	var button_width = 128 * global.GUIMultiplier;
 	var button_height = 32 * global.GUIMultiplier;
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1, objUIButton)){
@@ -67,6 +85,7 @@ with (zui_main()) {
 		zui_set_width(button_width);
 		zui_set_height(button_height);
 		caption = "Statistics";
+		callback = oController.statistics_callback;
 	}
 	
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*4.5, objUIButton)){

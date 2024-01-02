@@ -32,21 +32,21 @@ State = States.Idle;
 CanShoot = true;
 ShootTimer = -1;
 Inaccuracy = 0;
-DeathTimer = 5 * room_speed;
+DeathTimer = 5 * game_get_speed(gamespeed_fps);
 depth = ChasingObject.depth + 2;
 ReloadTime = 0;
 Reloading = false;
 SpottedDanger = false;
 EquippedGrenade = Item.None;
 EquippedGrenadeTimer = -1;
-EquippedGrenadeTime = .25 * room_speed;
+EquippedGrenadeTime = .25 * game_get_speed(gamespeed_fps);
 MaxStamina = ceil(80 * 1.1*exp(-(power(Age - 40, 2)/2)));
 Stamina = MaxStamina;
 DamageStamina = Stamina;
 FacingX = ChasingObject.x;
 FacingY = ChasingObject.y;
 VisibilityTimer = -1;
-VisibilityTime = 2 * room_speed;
+VisibilityTime = 2 * game_get_speed(gamespeed_fps);
 InfraVisionIntensity = 2;
 infra_vision_light = noone;
 EquippedGrenadeID = Item.None;
@@ -60,7 +60,7 @@ healing_time = -1;
 health_packs = 3;
 EquippedLandMineID = Item.None;
 LandMineAngle = random(360);
-EquippedLandMineTime = .25 * room_speed;
+EquippedLandMineTime = .25 * game_get_speed(gamespeed_fps);
 EquippedLandMineTimer = -1;
 LandMines = [3, 3, 3];
 AccelX = 0;AccelY = 0;VelocityX = 0;VelocityY = 0;
@@ -71,7 +71,7 @@ alarm[0] = 5;
 
 #region Flashed
 FlashedTimer = -1;
-FlashedTime = 7 * room_speed;
+FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
 #region Set armour
@@ -93,7 +93,7 @@ MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * room_speed * global.RankIndex[#Rank, RankStat.LessModifier], .25 * room_speed, .75 * room_speed);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.LessModifier], .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
 ChasingDistance = min(512 * global.RankIndex[#Rank, RankStat.BoostModifier], 1024);
 
 #endregion

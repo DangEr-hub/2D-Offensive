@@ -5,5 +5,5 @@ function PlaySound(PositionX, PositionY, Sound, falloff_ref_dist = 100, fallof_m
     audio_emitter_position(ObjectType.Emitter, oPlayer.x - (PositionX - oPlayer.x), PositionY, 0);
     audio_emitter_falloff(ObjectType.Emitter, falloff_ref_dist, fallof_max_dist, falloff_factor);
     audio_play_sound_on(ObjectType.Emitter, Sound, false, Priority);
-    ObjectType.alarm[5] = audio_sound_length(Sound)*room_speed/1000;
+    ObjectType.alarm[5] = audio_sound_length(Sound)*game_get_speed(gamespeed_fps)/1000;
 }

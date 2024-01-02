@@ -1,6 +1,6 @@
 if(console_submit(global.my_console)){
     if(console_cmd(global.my_console,"show_message")){
-        msg = console_value(global.my_console,1);
+       var  msg = console_value(global.my_console,1);
         show_message(msg);
     }
 }

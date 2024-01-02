@@ -1,4 +1,3 @@
-room_speed = 60;
 global.my_console = console_create();
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
@@ -42,6 +41,8 @@ global.UnSkillPoints = 0;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
+global.elo = 0;
+global.hard_mode = false;
 global.player_name = "DangEr";
 global.window_width = 1920;
 global.window_height = 1080;

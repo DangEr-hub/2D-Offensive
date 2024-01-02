@@ -84,8 +84,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.None, ItemStat.KickBackPower] = 1;	
 	
 	global.ItemIndex[#Item.AKM, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.AKM, "AKM", 2 * room_speed, 900, 45, 270, 30, "Main", 1, 2.5, 6, snd_AKM, 5, 2, true,
-	10, 20, 10, 5.9, 30, .03, 10, 3.5, .007, 1, 9, .25, 1, "Assault rifle", .81, .89, .00015, .5 * room_speed);
+	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 900, 45, 270, 30, "Main", 1, 2.5, 6, snd_AKM, 5, 2, true,
+	10, 20, 10, 5.9, 30, .03, 10, 3.5, .007, 1, 9, .25, 1, "Assault rifle", .81, .89, .00015, .5 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
 	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = $FF16C3E5; ///orange
@@ -98,8 +98,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.BaseDurability] = 100;
 	
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.DesertEagle, "IMI Desert eagle", 1.75 * room_speed, 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
-	0, 0, 10, 30, 7, .5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .0001, .1 * room_speed);
+	WeaponStats(Item.DesertEagle, "IMI Desert eagle", 1.75 * game_get_speed(gamespeed_fps), 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
+	0, 0, 10, 30, 7, .5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .0001, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.DesertEagle, ItemStat.disadvantages] = "-High recoil\n-Low magazine capacity";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.advantages] = "-High damage\n-High range\n-High armour penetration";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.ItemColor] = $FFB2B2B2; ///ltgray
@@ -112,8 +112,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.KevlarVest, ItemStat.BaseDurability] = 100;
 	
 	global.ItemIndex[#Item.Spas, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Spas, "Spas-12", .75 * room_speed, 500, 33, 120, 12, "Main", 5, 5, 30, snd_Spas, 15, 2, false,
-	0, 0, 20, 10, 12, 1.5, 2, 10, .009, 0, 0, .25, 2, "Shotgun", .89, .575, .00125, .75 * room_speed);
+	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 500, 33, 120, 12, "Main", 5, 5, 30, snd_Spas, 15, 2, false,
+	0, 0, 20, 10, 12, 1.5, 2, 10, .009, 0, 0, .25, 2, "Shotgun", .89, .575, .00125, .75 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Spas, ItemStat.disadvantages] = "-Low penetration power\n-Low range";
 	global.ItemIndex[#Item.Spas, ItemStat.advantages] = "-Great mobility\n-High damage";
 	global.ItemIndex[#Item.Spas, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -133,8 +133,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.BaseDurability] = 100; 
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * room_speed, 1000, 110, 100, 10, "Main", 1, 3, 30, snd_SSG08, 15, 5, false,
-	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * room_speed);
+	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 3, 30, snd_SSG08, 15, 5, false,
+	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
 	global.ItemIndex[#Item.SSG08, ItemStat.advantages] = "\n-High damage\-High range";
 	global.ItemIndex[#Item.SSG08, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -143,8 +143,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SSG08, ItemStat.Description] = "An Austrian-made sniper rifle with a bolt-action mechanism is crafted by Steyr Mannlicher. This rifle is an advanced version of Steyr's prior SSG 04 sniper model. It's known for its exceptional precision as a bolt-action sniper weapon.";
 	
 	global.ItemIndex[#Item.MAC11, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MAC11, "MAC11", 1.5 * room_speed, 790, 29, 300, 30, "Main", 1, 2, 6, snd_MAC11, 2, 1, true,
-	15, 20, -9, 9, 30, 0.025, 1.5, 2, .015, 3, 5, .9, 0, "Submachine gun", .9, .57, .00053, .1 * room_speed);
+	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 790, 29, 300, 30, "Main", 1, 2, 6, snd_MAC11, 2, 1, true,
+	15, 20, -9, 9, 30, 0.025, 1.5, 2, .015, 3, 5, .9, 0, "Submachine gun", .9, .57, .00053, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.MAC11, ItemStat.disadvantages] = "-Low penetration power\n-High bullet spread\n-Low range";
 	global.ItemIndex[#Item.MAC11, ItemStat.advantages] = "-Great mobility\-Low equip time";
 	global.ItemIndex[#Item.MAC11, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -171,8 +171,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.ItemColor] = $FFFFFFFF; ///white
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SG550, "SIG SG550", 2.5 * room_speed, 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 3, true,
-	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 10, .15, 1, "Assault rifle", .79, .97, .0001, .75 * room_speed);
+	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 3, true,
+	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 10, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
 	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\-High damage";
 	global.ItemIndex[#Item.SG550, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -206,7 +206,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.HealingKit, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.HealingKit, ItemStat.Name] = "Healing kit";
-	global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed] = 3 * room_speed;
+	global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed] = 3 * game_get_speed(gamespeed_fps);
 	global.ItemIndex[#Item.HealingKit, ItemStat.Damage] = 100;
 	global.ItemIndex[#Item.HealingKit, ItemStat.ItemColor] = $FF0000FF; ///red
 	
@@ -222,8 +222,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ItemColor] = $FF4D4D4D; ///gray
 
 	global.ItemIndex[#Item.Javelin, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Javelin, "FGM-148 Javelin", 1.5 * room_speed, 590, 138, 50, 1, "Main", 1, 25, 15, snd_Javelin, 15, 5, false,
-	0, 0, 0, 0, 1, 0, 5, 10, .001, 15, 25, .25, -1, "Anti-tank missile", .59, .99, .00075, 1 * room_speed);
+	WeaponStats(Item.Javelin, "FGM-148 Javelin", 1.5 * game_get_speed(gamespeed_fps), 590, 138, 50, 1, "Main", 1, 25, 15, snd_Javelin, 15, 5, false,
+	0, 0, 0, 0, 1, 0, 5, 10, .001, 15, 25, .25, -1, "Anti-tank missile", .59, .99, .00075, 1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Javelin, ItemStat.disadvantages] = "-Very bad mobility\n-Dangerous explosion\n-Only one rocket per shot";
 	global.ItemIndex[#Item.Javelin, ItemStat.advantages] = "-Homing projectiles\n-High damage";
 	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = $FF007F02; ///gray
@@ -231,8 +231,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "A man-portable, anti-tank weapon system developed in America, operational since 1996. Its design includes a fire-and-forget mechanism with integrated infrared guidance, enabling the operator to find shelter right after firing.";
 
 	global.ItemIndex[#Item.Glock, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Glock, "Glock-17", 1.25 * room_speed, 750, 33, 240, 24, "Secondary", 1, 2, 9, snd_Glock, 3, 1, false,
-	0, 0, 5, 8, 24, .1, 1.75, 4, .008, 0, 0, .99, 0, "Pistol", .97, .47, .001, 0.05 * room_speed);
+	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 750, 33, 240, 24, "Secondary", 1, 2, 9, snd_Glock, 3, 1, false,
+	0, 0, 5, 8, 24, .1, 1.75, 4, .008, 0, 0, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
 	global.ItemIndex[#Item.Glock, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
 	global.ItemIndex[#Item.Glock, ItemStat.ItemColor] = $FF007F02; ///gray
@@ -240,8 +240,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Glock, ItemStat.Description] = "Glock handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * room_speed, 790, 38, 760, 30, "Main", 1, 2, 5.5, snd_m4_carbine, 2.5, 1, true,
-	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 9, .9, 0, "Assault rifle", .89, .7, .00023, .1 * room_speed);
+	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 38, 760, 30, "Main", 1, 2, 5.5, snd_m4_carbine, 2.5, 1, true,
+	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 9, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.m4_carbine, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.advantages] = "-Good mobility\n-Low bullet spread\n-Low recoil";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.has_suppressor] = Item.military_suppressor; ///Military suppressor
@@ -250,8 +250,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "During the 1980s, a gas-operated, magazine-fed carbine was developed in the United States, which is essentially a compact iteration of the M16A2 assault rifle. It comes with military suppressor.";
 	
 	global.ItemIndex[#Item.awm, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.awm, "AWM", 3.25 * room_speed, 1150, 118, 50, 5, "Main", 1, 2, 30, snd_awm, 30, 5, false,
-	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * room_speed);
+	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 1150, 118, 50, 5, "Main", 1, 2, 30, snd_awm, 30, 5, false,
+	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n-High damage\-High range\n-Neglidible damage drop";
 	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = $FF007F02; ///green

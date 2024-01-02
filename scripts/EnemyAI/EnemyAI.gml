@@ -35,8 +35,8 @@ function CheckIfAvailable(ObjectType){
 function MoveRunAway(DangerX, DangerY){
 	DangerDistance = point_distance(x, y, DangerX, DangerY);
 	MoveDirection = point_direction(x, y, DangerX, DangerY) + (180 + random_range(-45, 45));
-	XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (room_speed/60);
-	YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (room_speed/60);
+	XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	Speed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
 	MoveTime = ceil(random_range(DangerDistance/Speed, DangerDistance/Speed));
 }
@@ -54,24 +54,24 @@ function MoveShooting(DangerX, DangerY){
 		SideStepMin = 45;
 		SideStepMax = 180 * global.RankIndex[#Rank, RankStat.LessModifier];
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		MoveTime = random_range(50, 90) * global.RankIndex[#Rank, RankStat.LessModifier];
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		SideStepMin = 0;
 		SideStepMax = 180 * global.RankIndex[#Rank, RankStat.LessModifier];
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		MoveTime = random_range(100, 180) * global.RankIndex[#Rank, RankStat.LessModifier];	
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		SideStepMin = 90;
 		SideStepMax = 90 * global.RankIndex[#Rank, RankStat.LessModifier];
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		MoveTime = random_range(100, 180) * global.RankIndex[#Rank, RankStat.LessModifier];	
 		alarm[0] = MoveTime * global.RankIndex[#Rank, RankStat.LessModifier];
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Submachine gun"){
@@ -152,26 +152,26 @@ function MoveRandom(){
 		MoveDirection = random(360);
 		MoveTime = random_range(50, 90) * global.RankIndex[#Rank, RankStat.LessModifier];
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier]; ///zmenit pri vyssim ranku
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		MoveDirection = random(360);
 		MoveTime = random_range(100, 180) * global.RankIndex[#Rank, RankStat.LessModifier];
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier]; ///zmenit pri vyssim ranku
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(100, 180) * global.RankIndex[#Rank, RankStat.LessModifier];
 		alarm[0] = MoveTime * global.RankIndex[#Rank, RankStat.LessModifier]; ///zmenit pri vyssim ranku
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(50, 90) * global.RankIndex[#Rank, RankStat.LessModifier];
 		alarm[0] = MoveTime * global.RankIndex[#Rank, RankStat.LessModifier]; ///zmenit pri vyssim ranku
-		XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
 
@@ -180,8 +180,8 @@ function MoveIdle(){
 	MoveDirection = random(360);
 	MoveTime = random_range(50, 90) * global.RankIndex[#Rank, RankStat.LessModifier];
 	alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
-	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
 
 function SetReactionTimer(Time){
@@ -198,32 +198,32 @@ function MoveTowards(DangerX, DangerY, Accel){
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(25, 45);
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		SideStepMin = 0;
 		SideStepMax = 30;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(50, 90);
 		alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		SideStepMin = 45;
 		SideStepMax = 90;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(100, 180);
 		alarm[0] = MoveTime * global.RankIndex[#Rank, RankStat.LessModifier];
-		XSpeed += lengthdir_x(Accel, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Accel, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Submachine gun"){
 		SideStepMin = 0;
 		SideStepMax = 15;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(100, 180);
 		alarm[0] = MoveTime * global.RankIndex[#Rank, RankStat.LessModifier];
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (room_speed/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (room_speed/60);
+		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
 
@@ -260,9 +260,11 @@ function reload_ai(){
 	}	
 }
 
-function RankStats(RankID, LessMod, BoostMod){
+function RankStats(RankID, LessMod, BoostMod, RankName, MinElo){
 	global.RankIndex[#RankID, RankStat.LessModifier] = LessMod;
 	global.RankIndex[#RankID, RankStat.BoostModifier] = BoostMod;
+	global.RankIndex[#RankID, RankStat.Name] = RankName;
+	global.RankIndex[#RankID, RankStat.Elo] = MinElo;
 }
 
 function RankDataBase(){
@@ -275,22 +277,23 @@ function RankDataBase(){
 		SupremeMaster, GlobalMaster, Total
 	}
 	enum RankStat{
-		LessModifier, BoostModifier, Total
+		LessModifier, BoostModifier, Name, Elo, Total
 	}
 	
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
+	ds_grid_clear(global.RankIndex, 0);
 	
-	RankStats(RankType.SilverI, 1.05, 0.9);	
-	RankStats(RankType.SilverII, 1.04, 0.91);
-	RankStats(RankType.SilverIII, 1, 0.92);
-	RankStats(RankType.SilverIV, 0.95, 0.93);
-	RankStats(RankType.SilverV, 0.92, 0.94);
-	RankStats(RankType.SilverMaster, 0.9, 1);
-	RankStats(RankType.GoldI, 0.88, 1.01);
-	RankStats(RankType.GoldII, 0.85, 1.03);
-	RankStats(RankType.GoldIII, 0.83, 1.05);
-	RankStats(RankType.GoldIV, 0.8, 1.07);
-	RankStats(RankType.GoldMaster, 0.79, 1.11);
+	RankStats(RankType.SilverI, 1.05, 0.9, "Silver I", 0);	
+	RankStats(RankType.SilverII, 1.04, 0.91, "Silver II", 20);
+	RankStats(RankType.SilverIII, 1, 0.92, "Silver III", 40);
+	RankStats(RankType.SilverIV, 0.95, 0.93, "Silver IV", 100);
+	RankStats(RankType.SilverV, 0.92, 0.94, "Silver V", 150);
+	RankStats(RankType.SilverMaster, 0.9, 1, "Silver master", 200);
+	RankStats(RankType.GoldI, 0.88, 1.01, "Gold I", 250);
+	RankStats(RankType.GoldII, 0.85, 1.03, "Gold II", 300);
+	RankStats(RankType.GoldIII, 0.83, 1.05, "Gold III", 350);
+	RankStats(RankType.GoldIV, 0.8, 1.07, "Gold IV", 450);
+	RankStats(RankType.GoldMaster, 0.79, 1.11, "Gold master", 500);
 	RankStats(RankType.DiamondI, 0.75, 1.14);
 	RankStats(RankType.DiamondII, 0.73, 1.15);
 	RankStats(RankType.DiamondIII, 0.71, 1.18);
@@ -311,8 +314,8 @@ function EnemyThrowGrenade(DangerX, DangerY){
 	MoveDirection = point_direction(x, y, DangerX, DangerY) - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(50, 90);
 	alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
-	XSpeed += lengthdir_x(Acceleration*3, MoveDirection) * (room_speed/60);
-	YSpeed += lengthdir_y(Acceleration*3, MoveDirection) * (room_speed/60);
+	XSpeed += lengthdir_x(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	YSpeed += lengthdir_y(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
 
 function EnemyLayDownLandMine(){
@@ -322,8 +325,8 @@ function EnemyLayDownLandMine(){
 	MoveDirection = MoveDirection - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(50, 90);
 	alarm[0] = MoveTime * random_range(1, 2) * global.RankIndex[#Rank, RankStat.LessModifier];
-	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (room_speed/60);
-	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (room_speed/60);
+	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
 
 function ChooseGrenade(){

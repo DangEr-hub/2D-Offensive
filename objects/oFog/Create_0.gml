@@ -11,5 +11,5 @@ smoke_effect_create(
 	11,
 	.9,
 	.75,
-	5 * room_speed
+	5 * game_get_speed(gamespeed_fps)
 );

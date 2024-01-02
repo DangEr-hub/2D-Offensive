@@ -406,7 +406,7 @@ function console_submit(argument0) {
 	                case "enemy_unlimited_hp":if(no==1)then global.EnemyUnlimitedHP = real(c[1]);break;
 	                case "competetive_games":if(no==1)then global.CompetetiveGames = real(c[1]);break;
 	                case "max_hp":if(no==1) then global.MaxHP = real(c[1]);break;
-	                case "developer_mode":global.Money = 100000; global.BuyTimer = 50000;obj_Alarms.alarm[6] = 100000 * room_speed;for(i=0;i<ds_grid_width(global.WeaponDic);i++){global.WeaponDic[#i, WeaponStats.Unlocked] = true;}global.God = true;break;
+	                case "developer_mode":global.Money = 100000; global.BuyTimer = 50000;obj_Alarms.alarm[6] = 100000 * game_get_speed(gamespeed_fps);for(i=0;i<ds_grid_width(global.WeaponDic);i++){global.WeaponDic[#i, WeaponStats.Unlocked] = true;}global.God = true;break;
 	                //case "bind
 	                case "unlock_all_weapons":
 	                    if(no == 1){

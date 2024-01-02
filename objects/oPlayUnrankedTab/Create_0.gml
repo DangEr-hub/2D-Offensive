@@ -1,5 +1,15 @@
-zui_set_size(1440, 810);
+play_unranked_tab_width = 720 * global.GUIMultiplier;
+play_unranked_tab_height = 405 * global.GUIMultiplier;
 
+draw_set_font(set_font("Menu_small"));
+zui_set_size(play_unranked_tab_width, play_unranked_tab_height);
+
+unranked_description_string = "Commit to a full scale match\nwithout worrying to loose any skill points.\nEnemies have randomized skill points.";
+checkbox_gap = 8 * global.GUIMultiplier;
+hard_mode_checkbox_width = 16 * global.GUIMultiplier;
+hard_mode_checkbox_height = 16 * global.GUIMultiplier;
+map_play_button_width = 64 * global.GUIMultiplier;
+map_play_button_height = 16 * global.GUIMultiplier;
 map_name_array = ["Dust", "Cache", "Nuke", "Mirage"];
 map_image_sprite_height = 64 * global.GUIMultiplier;
 map_image_sprite_width = 128 * global.GUIMultiplier;
@@ -8,9 +18,12 @@ map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
 
-new_game_callback = function (){
-	room_goto(rm_Test);	
-}
+map_callbacks = [
+    function() { room_goto(rm_Test); },
+    function() { room_goto(rm_Test); },
+    function() { room_goto(rm_Test); },
+    function() { room_goto(rm_Test); }
+];
 
 with (zui_create(0, 0, objUIWindowCaption)) {
 	caption = "Play unranked game";
@@ -27,69 +40,34 @@ for(i=0;i<4;i++){
 	}
 	
 	with (zui_create(map_image_position_x + (map_image_sprite_width)/2 + i*map_image_gap, map_image_position_y + map_image_sprite_height * 1.1, objUILabel)) {
+		color = c_dkgray;
 		caption = other.map_name_array[other.i];
+	}
+	
+	with (zui_create(map_image_position_x + (map_image_sprite_width)/2 - map_play_button_width/2 + i*map_image_gap, map_image_position_y + map_image_sprite_height * 1.25, objUIButton)) {
+		zui_set_anchor(0, 0);
+		zui_set_size(other.map_play_button_width, other.map_play_button_height);
+
+		caption = "Play!";
+		callback = other.map_callbacks[other.i];
 	}
 }
 
-with (zui_create(12, 38, objUIButton)) {
+with (zui_create(play_unranked_tab_width * .85, 64, objUICheckbox)) {
 	zui_set_anchor(0, 0);
-	zui_set_size(120, 32);
-
-	caption = "Jsem gay";
-	//callback = other.test_callback;
+	zui_set_size(other.hard_mode_checkbox_width, other.hard_mode_checkbox_height);
+	value = global.hard_mode;
+	value_type = "hard_mode";
 }
 
-with (zui_create(140, 38, objUIButton)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(120, 32);
-
-	caption = "Play";
-	callback = other.new_game_callback;
+with (zui_create(play_unranked_tab_width * .85 + hard_mode_checkbox_width + checkbox_gap + string_width("Hardmode")/2, 64 + hard_mode_checkbox_height/2, objUILabel)) {
+	color = c_white;
+	caption = "Hardmode";
 }
 
-with (zui_create(268, 38, objUIButton)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(120, 32);
-
-	caption = "Button 3";
-	//callback = other.test_callback;
-}
-
-with (zui_create(12, 82, objUIButton)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(376, 80);
-
-	caption = "Button 4";
-	//callback = other.test_callback;
-}
-
-with (zui_create(12, 170, objUICheckbox)) {
-	zui_set_anchor(0, 0);
-}
-
-with (zui_create(36, 170, objUICheckbox)) {
-	zui_set_anchor(0, 0);
-	value = 1;
-}
-
-with (zui_create(60, 170, objUISlider)) {
-	zui_set_anchor(0, 0);
-	zui_set_width(128);
-
-	minimum = 4;
-	maximum = 8;
-	value = 6;
-}
-
-with (zui_create(196, 170, objUISlider)) {
-	zui_set_anchor(0, 0);
-	zui_set_width(192);
-	minimum = 0;
-	maximum = 100;
-	value = 80;
-}
-
-with (zui_create(zui_get_width() * 0.5, zui_get_height() - 16, objUILabel)) {
-	other.position_label = id;
+with (zui_create(play_unranked_tab_width * .5, zui_get_height() - 16 - string_count_lines(unranked_description_string)*string_height("a"), objUILabel)) {
+	outline_color = c_black;
+	color = c_white;
+	caption = other.unranked_description_string;
 }
 

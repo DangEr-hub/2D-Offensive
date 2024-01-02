@@ -44,7 +44,7 @@ if(instance_exists(ChasingObject) && State != States.Death){
 	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
 		if(ChasingObjectSpotted == false){
 			ReactionTimer = ReactionTime;
-			ChasingObjectSpot(ceil(5 * room_speed * global.RankIndex[#Rank, RankStat.BoostModifier]));
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.BoostModifier]));
 		}
 		if(ReactionTimer <= 0){
 			if(State != States.Chase){	

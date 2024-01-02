@@ -9,7 +9,7 @@ function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num,
 	cloud_particles[num_cloud_particles,9] = 0;
 	image_alpha = Alpha;//random_range(.25, .5); //cloud alpha
 	cloud_fade = Fade;//random_range(.5, 1.5);  //governs how quickly clouds particles fade in and out (should be near 1.0
-	alarm[0] = Time;//random_range(3 * room_speed, 5 * room_speed);
+	alarm[0] = Time;//random_range(3 * game_get_speed(gamespeed_fps), 5 * game_get_speed(gamespeed_fps));
 
 	for (var i = 0; i < num_cloud_particles; i++)
 	{

@@ -501,7 +501,7 @@ if(State != States.Death){
 		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
 			if(PercentChance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * room_speed * global.RankIndex[#Rank, RankStat.BoostModifier]));
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.BoostModifier]));
 				}
 			}
 		}
@@ -569,7 +569,7 @@ if(State != States.Death){
 			}
 			if(FootStepTimer == 0){
 				if(Visible == true){
-					ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * room_speed);
+					ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
 				}
 			}
 		}
@@ -621,7 +621,7 @@ if(State != States.Death){
 
 		if(NearestDangerObject != noone){
 		    if (!ChasingObjectSpotted) {
-		        ChasingObjectSpot(ceil(5 * room_speed * global.RankIndex[#Rank, RankStat.BoostModifier]));
+		        ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.BoostModifier]));
 		    }
 		}
 	}

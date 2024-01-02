@@ -71,7 +71,7 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 			clamp(ceil(ExplosionDamage/10), 5, 7.5),
 			clamp(ExplosionDamage/250, .5, .9),
 			clamp(ExplosionDamage/250, .1, .75),
-			2 * room_speed
+			2 * game_get_speed(gamespeed_fps)
 		);	
 	}
 	

@@ -723,9 +723,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	if(shooting_mode == "Auto"){	
 		if(KickBack > 1){
-			KickBackTime = round(.08 * room_speed);
+			KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
 		}else{
-			KickBackTime = round(.5 * room_speed);
+			KickBackTime = round(.5 * game_get_speed(gamespeed_fps));
 		}
 		Shoot = mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]);
 		if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse])) || (global.Ammo[WeaponID] <= 0 && shooting == true)){
@@ -735,7 +735,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			crosshair_position[1] = oCrosshair.y;
 		}
 	}else if(shooting_mode == "Semi" || shooting_mode == "Burst"){
-		KickBackTime = round(.25 * room_speed);
+		KickBackTime = round(.25 * game_get_speed(gamespeed_fps));
 		Shoot = mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]);
 		/*
 			Jelikož se při auto modu vždycky resetne "shooting" na false po tom co hráč releasne tlačítko na střílení, musel jsem přidat "shooting_reset_timer"
@@ -889,19 +889,19 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		move_ypos = abs(ypos);
 	
 		#region Move speed multiplier
-		AimPunchSpeedMultiplier = 1;
+		var AimPunchSpeedMultiplier = 1;
 		if(AimPunchTimer > -1){
 			AimPunchSpeedMultiplier = .1;
 		}	
-		ShootingSpeedMultiplier = 1;
+		var ShootingSpeedMultiplier = 1;
 		if(shooting == true){
 			ShootingSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootSpdMul];
 		}
-		ReloadingSpeedMultiplier = 1;
+		var ReloadingSpeedMultiplier = 1;
 		if(Reloading == true){
 			ReloadingSpeedMultiplier = .5;
 		}
-		moving_speed_multiplier = 1;	
+		var moving_speed_multiplier = 1;	
 		if(moving_state == player_states.running_state){
 			if(Stamina > 0){
 				statistics_hit("Stamina", .1);
@@ -911,14 +911,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			moving_speed_multiplier	= .135;
 		}
 	
-		WeightSpeedMultiplier = 1 / (global.Weight/50 + 1);
+		var WeightSpeedMultiplier = 1 / (global.Weight/50 + 1);
 	
-		WeaponSpeedMultiplier = 1;
+		var WeaponSpeedMultiplier = 1;
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.MovingSpdMul] != 0){
 			WeaponSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.MovingSpdMul];
 		}
 	
-		SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * AimPunchSpeedMultiplier * moving_speed_multiplier * WeightSpeedMultiplier * WeaponSpeedMultiplier / (ScopeIn + 1) * (room_speed/60) / (Healing + 1);
+		SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * AimPunchSpeedMultiplier * moving_speed_multiplier * WeightSpeedMultiplier * WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
 
 		#endregion
 
@@ -955,7 +955,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				}
 				if(FootStepTimer == 0){
 					if(BloodTimer == -1){
-						ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * room_speed);
+						ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
 					}
 				}
 			}
