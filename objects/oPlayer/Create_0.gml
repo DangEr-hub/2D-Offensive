@@ -92,6 +92,7 @@ instance_create_layer(x, y, "OtherO", oCamera);
 instance_create_layer(x, y, "OtherO", oCrosshair);
 instance_create_layer(x, y, "ItemsO", oParticleSurface);
 instance_create_layer(x, y, "OtherO", oParticleSystem);
+instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 #endregion
 

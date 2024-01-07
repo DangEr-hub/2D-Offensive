@@ -470,13 +470,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				    var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				    var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 					var default_xx = HealthX - sprite_width/2;
-					var default_yy = HealthY - sprite_height - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
-					var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
+					var default_yy = HealthY - sprite_height*.75 - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
+					var bar_spacing = sprite_get_height(spr_ranks)*.5 * global.GUIMultiplier;
 					draw_set_font(set_font("Console"));
 					draw_set_color(c_black);
-					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height, (DamageHP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height, (HP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (DamageHP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (HP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 
 					if(healing == true){
 					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
@@ -489,13 +489,17 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 					    draw_sprite_ext(spr_HealthBar, 1, default_xx, default_yy,
 					    (ReloadTime/global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+						default_yy -= bar_spacing;
 					}
 			
 					if(equip_timer > -1){
 					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 					    draw_sprite_ext(spr_HealthBar, 7, default_xx, default_yy,
 					    (equip_time/global.ItemIndex[#WeaponID[1 - WeaponPositionID], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+						default_yy -= bar_spacing;
 					}
+					
+					draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
 				}
 			}
 		}
@@ -592,6 +596,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			draw_set_font(set_font("Console"));
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
+			
 
 			if(Healing == true){
 			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
@@ -604,13 +609,17 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 			    draw_sprite_ext(spr_HealthBar, 1, xx - sprite_width/2, default_yy,
 			    (ReloadTime/global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				default_yy -= bar_spacing;
 			}
 			
 			if(equip_timer > -1){
 			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 			    draw_sprite_ext(spr_HealthBar, 7, xx - sprite_width/2, default_yy,
 			    (equip_time/global.ItemIndex[#global.weapon_id[min(max(1 - WeaponID, 0), 2)], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				default_yy -= bar_spacing;
 			}
+			
+			draw_sprite_ext(spr_ranks, get_rank(id), xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 		}
 		#endregion
 	

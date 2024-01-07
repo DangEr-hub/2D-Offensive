@@ -49,8 +49,19 @@ global.window_height = 1080;
 global.draw_other_models = false;
 global.Weather = "sun";
 global.CrosshairColor = c_white;
+
+global.player_elo_struct = ini_player_struct_create();
+
+
+
+
+
+
+
+
+
+
 global.GUIMultiplier = display_get_width()/global.CameraWidth;
-//show_debug_message(global.GUIMultiplier);
 camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
 
 enum weapon_attachments{
@@ -159,7 +170,7 @@ display_set_gui_size(1920, 1080);
 global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 
-RankDataBase();
+rank_database();
 window_set_fullscreen(true);
 InventoryInit();
 load_game();

@@ -1110,15 +1110,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	#region Field of view
-	cx = Weapon.FlashLightX;
-	cy = Weapon.FlashLightY;
-	ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-	ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-	bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);
-	by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
-	#endregion
-	
 	#region Toggle night vision and infrared vision
 	if(global.ArmourID[1] == Item.None){
 		if(ToggleNightVision == true){
@@ -1199,18 +1190,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		if(instance_exists(infra_vision_light)){
 			instance_destroy(infra_vision_light);
 		}
-	}
-	#endregion
-	
-	#region Weapon equip
-	if(equip_timer > -1){
-		equip_time ++;
-		equip_timer --;
-	}
-	
-	if(equip_timer == 0){
-		equip_time = 0;
-		switch_weapon_number();	
 	}
 	#endregion
 
@@ -1472,26 +1451,42 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 
 	#region Weapon cycling
-	if(equip_timer == -1 && player_can_shoot == true){
-		if(mouse_wheel_up()){
-			if(WeaponNumber < WeaponNumberMax){
-				WeaponNumber ++;
-			}else{
-				WeaponNumber = 0;	
-			}
-		
-			switch_weapon_number();
-		}
+	if(equip_timer > -1){
+		equip_time ++;
+		equip_timer --;
+	}
+	
+	if(equip_timer == 0){
+		equip_time = 0;
+		switch_weapon_number();	
+	}
+	
+	// Handle weapon switching logic
+	if (equip_timer == -1 && player_can_shoot) {
+	    var changeDetected = false;
 
-		if(mouse_wheel_down()){
-			if(WeaponNumber != 0){
-				WeaponNumber --;
-			}else{
-				WeaponNumber = WeaponNumberMax;	
-			}
-		
-			switch_weapon_number();
-		}
+	    if (mouse_wheel_up()) {
+	        WeaponNumber = (WeaponNumber < WeaponNumberMax) ? WeaponNumber + 1 : 0;
+	        changeDetected = true;
+	    } else if (mouse_wheel_down()) {
+	        WeaponNumber = (WeaponNumber != 0) ? WeaponNumber - 1 : WeaponNumberMax;
+	        changeDetected = true;
+	    }
+
+	    // If there was a change in the weapon number
+	    if (changeDetected) {
+	        if (WeaponNumber != 2) {
+	            var weaponID = min(WeaponNumber, 2);
+				var equipTime = global.ItemIndex[#global.weapon_id[weaponID], ItemStat.EquipTime];
+	            if (equipTime > 0) {
+	                equip_timer = equipTime;
+	            } else {
+	                switch_weapon_number();
+	            }
+	        } else {
+	            switch_weapon_number();
+	        }
+	    }
 	}
 
 	#endregion

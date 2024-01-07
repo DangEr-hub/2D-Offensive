@@ -81,20 +81,20 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Ranks
-Rank = irandom_range(RankType.GoldI, RankType.GoldMaster);
+elo = random_range(0, 1900);
 #endregion
 
 #region Movement engine
-Acceleration = min(.59 * global.RankIndex[#Rank, RankStat.BoostModifier], .75);
+Acceleration = min(.59 * get_rank_boost(), .75);
 Friction = .75;
-MaxSpeed = min(3.5 * global.RankIndex[#Rank, RankStat.BoostModifier], 5.75);
+MaxSpeed = min(3.5 * get_rank_boost(), 5.75);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.LessModifier], .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(512 * global.RankIndex[#Rank, RankStat.BoostModifier], 1024);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
+ChasingDistance = min(512 * get_rank_boost(), 1024);
 
 #endregion
 

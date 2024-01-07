@@ -35,6 +35,7 @@ function console_preset(argument0) {
 	console_add(c, "set_crosshair_color " + string(r) + string(g) + string(b));
 	console_add(c, "draw_other_models " + string(global.draw_other_models));
 	console_add(c, "set_window_size " + string(global.window_width) + " " + string(global.window_height));
+	console_add(c, "set_elo " + string(global.elo));
 /*	console_add(c,"window_set_fullscreen " + string(Windowed));
 	console_add(c,"draw_bullet_impact " + string(global.ShowBulletImpact));
 	console_add(c,"net_graph " + string(global.AdminHUD));
@@ -76,7 +77,6 @@ function console_preset(argument0) {
 	console_add(c, "crosshair_alpha " + string(global.CrosshairAlpha));
 	console_add(c, "crosshair_color " + string(global.CrosshairColor));
 	console_add(c, "crosshair_scale " + string(global.CrosshairSize));
-	console_add(c, "elo " + string(global.Elo));
 	console_add(c, "player_min_speed " + string(global.MinSpeed*60));
 	console_add(c, "player_max_speed " + string(global.MaxSpeed*60));
 	console_add(c, "complex_recoil " + string(global.ComplexRecoil));

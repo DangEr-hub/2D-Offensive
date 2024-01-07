@@ -354,6 +354,10 @@ function console_submit(argument0) {
 					    }
 					break;
 					
+					case "set_elo":
+						if(no == 1 && string_digits(c[1]) != "") then global.elo = real(c[1]);
+					break;
+					
 	                /*
 	                case "infinite_ammo":
 	                    if no == 1 then global.InfiniteAmmo = real(c[1]);
@@ -391,7 +395,7 @@ function console_submit(argument0) {
 	                case "crosshair_alpha":if(no == 1) then global.CrosshairAlpha = real(c[1]);break;
 	                case "crosshair_color":if(no == 1) then global.CrosshairColor = real(c[1]);break;
 	                case "crosshair_scale":if(no == 1) then global.CrosshairSize = real(c[1]);break;
-	                case "elo":if(no == 1) then global.Elo = real(c[1]);break;
+	                case "set_elo":if(no == 1) then global.Elo = real(c[1]);break;
 	                case "player_min_speed":if(no == 1) then global.MinSpeed = round(real(c[1])/60);break;
 	                case "player_max_speed":if(no == 1) then global.MaxSpeed = round(real(c[1])/60);break;
 	                case "complex_recoil":if(no == 1) then global.ComplexRecoil = real(c[1]);break;

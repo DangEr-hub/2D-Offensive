@@ -8,9 +8,9 @@ function decide_movement() {
 }
 
 function handle_basic_movement() {
-    if (PercentChance(25 * global.RankIndex[#Rank, RankStat.BoostModifier]) && State != States.MoveAway) {
+    if (PercentChance(25 * get_rank_boost()) && State != States.MoveAway) {
         State = States.MoveAway;
-    } else if (PercentChance(50 * global.RankIndex[#Rank, RankStat.LessModifier]) && State != States.MoveShoot) {
+    } else if (PercentChance(50 * get_rank_less()) && State != States.MoveShoot) {
         State = States.MoveShoot;
     } else {
         choose_offensive_action();
@@ -18,9 +18,9 @@ function handle_basic_movement() {
 }
 
 function handle_smoke_movement() {
-    if (PercentChance(75 * global.RankIndex[#Rank, RankStat.BoostModifier]) && State != States.MoveInSmoke) {
+    if (PercentChance(75 * get_rank_boost()) && State != States.MoveInSmoke) {
         State = States.MoveInSmoke;
-    } else if (PercentChance(50 * global.RankIndex[#Rank, RankStat.LessModifier]) && State != States.MoveAway) {
+    } else if (PercentChance(50 * get_rank_less()) && State != States.MoveAway) {
         State = States.MoveAway;
     } else if (State != States.MoveShoot) {
         State = States.MoveShoot;
@@ -39,12 +39,12 @@ function choose_offensive_action() {
 
 if(instance_exists(ChasingObject) && State != States.Death){
     randomize();
-    alarm[0] = random_range(15, 25) * global.RankIndex[#Rank, RankStat.LessModifier];
+    alarm[0] = random_range(15, 25) * get_rank_less();
 	
 	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
 		if(ChasingObjectSpotted == false){
 			ReactionTimer = ReactionTime;
-			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * global.RankIndex[#Rank, RankStat.BoostModifier]));
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost()));
 		}
 		if(ReactionTimer <= 0){
 			if(State != States.Chase){	
@@ -56,7 +56,7 @@ if(instance_exists(ChasingObject) && State != States.Death){
 						if (HP <= MaxHP / 3) {
 						    if (Ammo[WeaponPositionID] <= 0 && Reloading == false) {
 						        reload_ai();
-						    } else if (healing == false && PercentChance(50 * global.RankIndex[#Rank, RankStat.BoostModifier])) {
+						    } else if (healing == false && PercentChance(50 * get_rank_boost())) {
 						        if (health_packs > 0) {
 									healing_ai();
 						            healing = true;
@@ -81,15 +81,15 @@ if(instance_exists(ChasingObject) && State != States.Death){
 								if(InSmoke == false){
 					
 								#region Basic movement
-								if(PercentChance(50 * global.RankIndex[#Rank, RankStat.LessModifier])){
+								if(PercentChance(50 * get_rank_less())){
 									if(State != States.Move){
 										State = States.Move;
 									}
-								}else if(PercentChance(75 * global.RankIndex[#Rank, RankStat.BoostModifier])){
+								}else if(PercentChance(75 * get_rank_boost())){
 									if(State != States.MoveShoot){
 										State = States.MoveShoot;	
 									}
-								}else if(PercentChance(25 * global.RankIndex[#Rank, RankStat.LessModifier])){
+								}else if(PercentChance(25 * get_rank_less())){
 									if(State != States.MoveToward){
 										State = States.MoveToward;	
 									}
@@ -105,11 +105,11 @@ if(instance_exists(ChasingObject) && State != States.Death){
 								}else{
 								
 									#region In smoke movement
-									if(PercentChance(50 * global.RankIndex[#Rank, RankStat.BoostModifier])){
+									if(PercentChance(50 * get_rank_boost())){
 										if(State != States.MoveInSmoke){
 											State = States.MoveInSmoke;
 										}
-									}else if(PercentChance(50 * global.RankIndex[#Rank, RankStat.LessModifier])){
+									}else if(PercentChance(50 * get_rank_less())){
 										if(State != States.MoveAway){
 											State = States.MoveAway;	
 										}
@@ -136,11 +136,11 @@ if(instance_exists(ChasingObject) && State != States.Death){
 							
 								#region Basic movement
 								if(NearestDangerObject != id){
-									if(PercentChance(50 * global.RankIndex[#Rank, RankStat.BoostModifier])){
+									if(PercentChance(50 * get_rank_boost())){
 										if(State != States.MoveAwayFromGrenade){
 											State = States.MoveAwayFromGrenade;
 										}
-									}else if (PercentChance(50 * global.RankIndex[#Rank, RankStat.LessModifier])){
+									}else if (PercentChance(50 * get_rank_less())){
 										if(State != States.MoveShoot){
 											State = States.MoveShoot;	
 										}
@@ -270,7 +270,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				if(PercentChance(50 * global.RankIndex[#Rank, RankStat.BoostModifier])){
+				if(PercentChance(50 * get_rank_boost())){
 					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
 			}
@@ -278,7 +278,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				if(PercentChance(10 * global.RankIndex[#Rank, RankStat.LessModifier])){
+				if(PercentChance(10 * get_rank_less())){
 					MoveIdle();
 				}
 			}
