@@ -39,7 +39,6 @@
     {"name":"fnt_GUIGridSmall","order":2,"path":"fonts/fnt_GUIGridSmall/fnt_GUIGridSmall.yy",},
     {"name":"shd_InfraVisionSurface","order":12,"path":"shaders/shd_InfraVisionSurface/shd_InfraVisionSurface.yy",},
     {"name":"string_count_lines","order":12,"path":"scripts/string_count_lines/string_count_lines.yy",},
-    {"name":"glicko_elo_rating_system","order":19,"path":"scripts/glicko_elo_rating_system/glicko_elo_rating_system.yy",},
     {"name":"console_value_count","order":3,"path":"scripts/console_value_count/console_value_count.yy",},
     {"name":"fnt_GUITitleSmall","order":3,"path":"fonts/fnt_GUITitleSmall/fnt_GUITitleSmall.yy",},
     {"name":"switch_weapon_number","order":10,"path":"scripts/switch_weapon_number/switch_weapon_number.yy",},

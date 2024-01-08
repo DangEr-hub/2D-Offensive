@@ -3,7 +3,7 @@
 function add_shooting_modes(weapon, modes) {
 	var shootingModesList = ds_list_create();
     
-	for (var i = 0; i < array_length_1d(modes); i++) {
+	for (var i = 0; i < array_length(modes); i++) {
 		ds_list_add(shootingModesList, modes[i]);
 	}
 

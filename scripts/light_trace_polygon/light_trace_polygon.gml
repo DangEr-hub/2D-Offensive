@@ -13,7 +13,7 @@ function light_trace_polygon(argument0, argument1) {
 
 	// Validate arguments
 	if(__LIGHTING_ERROR_CHECKS) {
-		if(!is_array(polygon) || array_length_1d(polygon) <= 3) {
+		if(!is_array(polygon) || array_length(polygon) <= 3) {
 			// This array is not a polygon
 			show_debug_message("light_trace_polygon(polygon, light): argument `polygon` is not a polygon array, or has less than 3 vertices");
 			return undefined;

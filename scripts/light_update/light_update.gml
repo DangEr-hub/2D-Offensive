@@ -215,14 +215,14 @@ function light_update(argument0) {
 		
 					if(shadow_caster_static) {
 						// Save the array; we copy it because the returned array is reused
-						var copy = array_create(array_length_1d(shadow));
-						array_copy(copy, 0, shadow, 0, array_length_1d(shadow));
+						var copy = array_create(array_length(shadow));
+						array_copy(copy, 0, shadow, 0, array_length(shadow));
 						light_static_set_array(light, id, copy);
 					}
 				}
 	
 				// Write the shadow vertices to the vertex buffer
-				var len = array_length_1d(shadow);
+				var len = array_length(shadow);
 				// There's at least 3 vertices in the array, so add those outside loop
 				var k = 0;
 				var vertex = shadow[k++];
@@ -369,14 +369,14 @@ function light_update(argument0) {
 		
 				if(shadow_caster_static) {
 					// Save the array; we copy it because the returned array is reused
-					var copy = array_create(array_length_1d(shadow));
-					array_copy(copy, 0, shadow, 0, array_length_1d(shadow));
+					var copy = array_create(array_length(shadow));
+					array_copy(copy, 0, shadow, 0, array_length(shadow));
 					light_static_set_array(light, id, copy);
 				}
 			}
 	
 			// Write the shadow vertices to the vertex buffer
-			var len = array_length_1d(shadow);
+			var len = array_length(shadow);
 			// There's at least 3 vertices in the array, so add those outside loop
 			var k = 0;
 			var vertex = shadow[k++];

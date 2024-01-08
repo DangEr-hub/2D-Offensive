@@ -19,10 +19,10 @@ map_image_gap = map_image_sprite_width * 1.1;
 
 
 map_callbacks = [
-    function() { room_goto(rm_Test); },
-    function() { room_goto(rm_Test); },
-    function() { room_goto(rm_Test); },
-    function() { room_goto(rm_Test); }
+    function() { global.ranked_game = true; room_goto(rm_Test); },
+    function() { global.ranked_game = true; room_goto(rm_Test); },
+    function() { global.ranked_game = true; room_goto(rm_Test); },
+    function() { global.ranked_game = true; room_goto(rm_Test); }
 ];
 
 with (zui_create(0, 0, objUIWindowCaption)) {

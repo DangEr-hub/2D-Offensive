@@ -355,7 +355,9 @@ function console_submit(argument0) {
 					break;
 					
 					case "set_elo":
-						if(no == 1 && string_digits(c[1]) != "") then global.elo = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.player_elo_struct.Elo = convert_to_eggy_scale(real(c[1]));	
+						}
 					break;
 					
 	                /*

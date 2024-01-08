@@ -108,7 +108,6 @@
     {"id":{"name":"shd_InfraVisionSurface","path":"shaders/shd_InfraVisionSurface/shd_InfraVisionSurface.yy",},},
     {"id":{"name":"string_count_lines","path":"scripts/string_count_lines/string_count_lines.yy",},},
     {"id":{"name":"oPlayer","path":"objects/oPlayer/oPlayer.yy",},},
-    {"id":{"name":"glicko_elo_rating_system","path":"scripts/glicko_elo_rating_system/glicko_elo_rating_system.yy",},},
     {"id":{"name":"console_value_count","path":"scripts/console_value_count/console_value_count.yy",},},
     {"id":{"name":"fnt_GUITitleSmall","path":"fonts/fnt_GUITitleSmall/fnt_GUITitleSmall.yy",},},
     {"id":{"name":"switch_weapon_number","path":"scripts/switch_weapon_number/switch_weapon_number.yy",},},

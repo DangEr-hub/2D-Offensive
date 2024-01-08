@@ -37,7 +37,7 @@ if(instance_exists(oPlayer)){
 		WobbleAimPunchMultiplier = lerp(WobbleAimPunchMultiplier, 0, WobbleResetSpeed);	
 	}
 	
-	WobbleMultiplier = WobbleCrosshairMultiplier + WobbleScopeInMultiplier + WobbleAimPunchMultiplier;
+	var WobbleMultiplier = WobbleCrosshairMultiplier + WobbleScopeInMultiplier + WobbleAimPunchMultiplier;
 	x_offset = sin(degtorad(WobbleX)) * WobbleMultiplier;
 	y_offset = sin(degtorad(WobbleY)) * WobbleMultiplier;
 	#endregion
@@ -71,15 +71,16 @@ if(instance_exists(oPlayer)){
 
 			    if (oPlayer.KickBack <= KBPhase1) {
 			        targetY -= oPlayer.KickBack * recoilY;
-					show_debug_message(string(oPlayer.KickBack) + "+" + string(targetX));
 			    } else if (oPlayer.KickBack < KBPhase2) {
 			        targetX -= ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX);
 					targetY = mouse_y - DeltaY;
-					show_debug_message(string(oPlayer.KickBack) + "+" + string(targetX));
 			    } else {
-			        targetX += ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX) - (KBPhase1 * recoilX);
+					if(sign(recoilX) == -1){
+						targetX += (oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX;
+					}else{
+						targetX += ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX) - (KBPhase1 * recoilX);
+					}
 					targetY = mouse_y - DeltaY;
-					show_debug_message(string(oPlayer.KickBack) + "+" + string(targetX));
 			    }
 
 			    x = lerp(x, targetX, recoil_speed);

@@ -99,7 +99,7 @@ if(PauseMenu == true && RespawnMenu == false){
 	
 		#region Draw exit popup window
 		if(PopupWindow == "game_end"){
-			var ButtonWidth = 32 * global.GUIMultiplier;
+			ButtonWidth = 32 * global.GUIMultiplier;
 			var PopupWindowX = MenuTabX + MenuTabWidth/4;
 			var PopupWindowY = MenuTabY + (MenuTitleHeight + MenuMiddleHeight + MenuEndHeight)/4;
 			var PopupWindowWidth = MenuTabWidth/2;
@@ -155,6 +155,13 @@ if(PauseMenu == true && RespawnMenu == false){
 #endregion
 
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
+	
+	#region Draw ranked score
+	if(global.ranked_game == true && !instance_exists(oInventory)){
+		//draw_set_font(set_font("Title"));
+		//draw_text_outlined();
+	}
+	#endregion
 	
 	#region Weapon attachments
 	if(show_weapon_attachments == true){
@@ -880,7 +887,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 								draw_set_font(set_font("GUI_grid"));
 						        var text = "";
 						        var statIndex = ItemStat.Damage + i * columns + j;
-						        if (statIndex <= array_length_1d(statTitles)){
+						        if (statIndex <= array_length(statTitles)){
 								
 									#region Specific cases
 									switch(statIndex){
@@ -1006,7 +1013,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 								draw_set_font(set_font("GUI_grid"));
 						        var text = "";
 						        var statIndex = ItemStat.Weight + i * columns + j;
-						        if (statIndex - ItemStat.Weight <= array_length_1d(statTitles)){
+						        if (statIndex - ItemStat.Weight <= array_length(statTitles)){
 								
 									#region Specific cases
 									switch(statIndex){
@@ -1074,7 +1081,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						#endregion
 						
 						#region Item statistics
-						var statistics_string;
+						var statistics_string = "";
 						var statistics_x = TabX + oDraw.HUDShift + string_width(DescriptionString)*1.5;
 						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*2;
 						if (Id == Item.military_suppressor) {
@@ -1229,19 +1236,19 @@ if(RespawnMenu == true){
 		draw_set_font(set_font("Console"));
 		
 		#region Draw grid
-		Keys = ds_map_keys_to_array(oPlayer.HitMap);
-		Damages = array_create(ds_map_size(oPlayer.HitMap), -1);
-		NumRows = ds_map_size(oPlayer.HitMap) + 1; // +1 for header row
+		var Keys = ds_map_keys_to_array(oPlayer.HitMap);
+		var Damages = array_create(ds_map_size(oPlayer.HitMap), -1);
+		var NumRows = ds_map_size(oPlayer.HitMap) + 1; // +1 for header row
 	
-		for (i = 0; i < ds_map_size(oPlayer.HitMap); i++) {
+		for (var i = 0; i < ds_map_size(oPlayer.HitMap); i++) {
 		    entity_id = Keys[i];
-		    Data = oPlayer.HitMap[? entity_id];
+		    var Data = oPlayer.HitMap[? entity_id];
 		    Damages[i] = Data[? "DamageReceived"];
 		}
 
 		// Sort entities based on damage
-		for (i = 0; i < array_length_1d(Damages) - 1; i++) {
-		    for (j = i + 1; j < array_length_1d(Damages); j++) {
+		for (var i = 0; i < array_length(Damages) - 1; i++) {
+		    for (var j = i + 1; j < array_length(Damages); j++) {
 		        if (Damages[j] > Damages[i]) {
 		            // Swap Damages
 		            TempArray = Damages[i];
@@ -1257,7 +1264,7 @@ if(RespawnMenu == true){
 		}
 
 		#region Draw header
-		for (col = 0; col < NumColumns; col++) {
+		for (var col = 0; col < NumColumns; col++) {
 
 		    TextX = GUIMenuTextX + (CellWidth - string_width(Columns[col])) / 2;
 		    TextY = GUIMenuTextY + (CellHeight - string_height(Columns[col])) / 2;
@@ -1269,7 +1276,7 @@ if(RespawnMenu == true){
 		#endregion
 	
 		#region Draw data
-		for (row = 1; row < NumRows; row++) {
+		for (var row = 1; row < NumRows; row++) {
 		    EntityId = Keys[row - 1];
 		    Data = oPlayer.HitMap[? EntityId];
 			

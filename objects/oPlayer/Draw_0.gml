@@ -12,7 +12,7 @@ if(ToggleInfraVision == true){
 draw_text(x, y - 50, "player rating" + string(convert_back(global.player_elo_struct.Elo))); ///Eggy scale
 draw_text(x, y - 130, "player local volatility" + string(global.player_elo_struct.Local_volatility));
 draw_text(x, y - 180, "player game volatility" + string(global.player_elo_struct.Game_volatility));
-draw_text(x, y - 250, "player played games" + string(global.player_elo_struct.Played_games));
+//draw_text(x, y - 250, "headshots " + string(oEggyEloRatingSystem.headshots));
 //draw_text(x, y - 300, "enemy rd" + string(enemy_elo_struct.rd));
 //draw_text(x, y - 350, "player volatility" + string(global.player_elo_struct.volatility));
 //draw_text(x, y - 35, application_surface_is_enabled());
@@ -27,12 +27,6 @@ if(HP > 0){
 
 	
 	#region Field of view
-	var cx = Weapon.FlashLightX;
-	var cy = Weapon.FlashLightY;
-	var ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-	var ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-	var bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);
-	var by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
 	draw_set_alpha(.1);
 	draw_set_color(global.GoldColor);
 	draw_triangle(ax, ay, bx, by, cx, cy, false);

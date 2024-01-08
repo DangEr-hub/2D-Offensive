@@ -11,19 +11,19 @@ function tri_direction(argument0, argument1, argument2) {
 
 	// Validate arguments
 	if(__LIGHTING_ERROR_CHECKS) {
-		if(!is_array(a) || array_length_1d(a) != eVertex.Count) {
+		if(!is_array(a) || array_length(a) != eVertex.Count) {
 			// This array is not a vertex
 			show_debug_message("tri_direction(a, b, c): argument `a` is not a vertex array");
 			return undefined;
 		}
 	
-		if(!is_array(b) || array_length_1d(b) != eVertex.Count) {
+		if(!is_array(b) || array_length(b) != eVertex.Count) {
 			// This array is not a vertex
 			show_debug_message("tri_direction(a, b, c): argument `b` is not a vertex array");
 			return undefined;
 		}
 	
-		if(!is_array(c) || array_length_1d(c) != eVertex.Count) {
+		if(!is_array(c) || array_length(c) != eVertex.Count) {
 			// This array is not a vertex
 			show_debug_message("tri_direction(a, b, c): argument `c` is not a vertex array");
 			return undefined;

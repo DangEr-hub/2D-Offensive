@@ -12,7 +12,7 @@ function polygon_create(argument0) {
 	}
 
 	// Get the length of the 1-dimensional array
-	var length = array_length_1d(set);
+	var length = array_length(set);
 
 	// Validate array
 	if(__LIGHTING_ERROR_CHECKS && length <= 0) {

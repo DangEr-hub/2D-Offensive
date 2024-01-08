@@ -15,13 +15,13 @@ function point_in_polygon(argument0, argument1) {
 
 	// Validate arguments
 	if(__LIGHTING_ERROR_CHECKS) {
-		if(!is_array(polygon) || array_length_1d(polygon) <= 3) {
+		if(!is_array(polygon) || array_length(polygon) <= 3) {
 			// This array is not a polygon
 			show_debug_message("point_in_polygon(polygon, point): argument `polygon` is not a polygon array, or has less than 3 polygon");
 			return undefined;
 		}
 	
-		if(!is_array(point) || array_length_1d(point) != eVertex.Count) {
+		if(!is_array(point) || array_length(point) != eVertex.Count) {
 			// This array is not a vertex
 			show_debug_message("point_in_polygon(polygon, point): argument `point` is not a vertex array");
 			return undefined;

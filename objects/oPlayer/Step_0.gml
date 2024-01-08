@@ -239,6 +239,12 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	Weapon.FlashLightX = FlashLightX;
 	Weapon.FlashLightY = FlashLightY;
+	cx = Weapon.FlashLightX;
+	cy = Weapon.FlashLightY;
+	ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
+	ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
+	bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);
+	by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
 	#endregion
 	
 	#region Texture
@@ -1583,6 +1589,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	    camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
 	    true
 	);
+	instance_activate_object(oEggyEloRatingSystem);
 	instance_activate_object(Legs);
 	instance_activate_object(oCrosshair);
 	instance_activate_object(oDamageIndicator);

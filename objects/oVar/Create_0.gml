@@ -41,6 +41,7 @@ global.UnSkillPoints = 0;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
+global.ranked_game = false;
 global.elo = 0;
 global.hard_mode = false;
 global.player_name = "DangEr";

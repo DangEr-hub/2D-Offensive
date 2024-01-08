@@ -41,8 +41,8 @@ function save_game(){
 	ini_write_real("Vars", "crosshair_color", global.CrosshairColor);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	
-	for (var i = 0; i < array_length_1d(global.weapon_attachments); i++) {
-	    for (var j = 0; j < array_length_1d(global.weapon_attachments[i]); j++) {
+	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
+	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
 	        var key = "weapon_attachment_" + string(i) + "_" + string(j);
 	        ini_write_real("Attachments", key, global.weapon_attachments[i][j]);
 	    }

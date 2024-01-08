@@ -51,7 +51,7 @@ BlendColor = shader_get_uniform(shd_LightGray, "blendColor");
 PopupWindow = "";
 _surface = -1;
 Columns = ["Opponent(alive)", "Hits from", "Damage from", "Hits given", "Damage given"];
-NumColumns = array_length_1d(Columns);
+NumColumns = array_length(Columns);
 ToggleMessage = true;
 Alpha = 0;
 #endregion

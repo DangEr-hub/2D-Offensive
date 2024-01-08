@@ -94,6 +94,12 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 		randomize();
 		if(hit_object.HP <= hit_object.AttackDamage){
 			hit_object.HP = -1;
+			if(global.ranked_game == true){
+				oEggyEloRatingSystem.kills ++;
+				if(BodyPart >= HitBox.Head){
+					oEggyEloRatingSystem.headshots ++;	
+				}
+			}
 			PlaySound(BloodSplashX, BloodSplashY, choose(snd_Death1, snd_Death2), hit_object);
 			hit_object.KilledBy = EnemyID;
 			if(WeaponID != -1){
