@@ -50,6 +50,7 @@ VisibilityTime = 2 * game_get_speed(gamespeed_fps);
 InfraVisionIntensity = 2;
 infra_vision_light = noone;
 EquippedGrenadeID = Item.None;
+xp_value = 1;
 grenade_angle = random(360);
 enemy_aimpunch_direction = 0;
 enemy_aimpunch = 0;
@@ -80,21 +81,17 @@ HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm, Item.Mil
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
-#region Ranks
-elo = random_range(0, 1900);
-#endregion
-
 #region Movement engine
-Acceleration = min(.59 * get_rank_boost(), .75);
+Acceleration = min(.59 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .75);
 Friction = .75;
-MaxSpeed = min(3.5 * get_rank_boost(), 5.75);
+MaxSpeed = min(3.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 5.75);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(512 * get_rank_boost(), 1024);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
+ChasingDistance = min(512 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 1024);
 
 #endregion
 

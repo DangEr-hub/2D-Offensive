@@ -105,14 +105,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	if(instance_exists(oBulletTracer)){
 		var BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
 		if(BulletTracerNearby.Object != id && distance_to_object(BulletTracerNearby) <= 64){
-			PlaySound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), BulletTracerNearby);	
+			play_sound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), BulletTracerNearby);	
 		}
 	}
 	
 	if(instance_exists(oShrapnel)){
 		var ShrapnelNearby = instance_nearest(x, y, oShrapnel);
 		if(distance_to_object(ShrapnelNearby) <= 64){
-			PlaySound(ShrapnelNearby.x, ShrapnelNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), ShrapnelNearby);	
+			play_sound(ShrapnelNearby.x, ShrapnelNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), ShrapnelNearby);	
 		}
 	}
 
@@ -1119,11 +1119,11 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Toggle night vision and infrared vision
 	if(global.ArmourID[1] == Item.None){
 		if(ToggleNightVision == true){
-			PlaySound(x, y, snd_ToggleNightVision);
+			play_sound(x, y, snd_ToggleNightVision);
 			ToggleNightVision = false;	
 		}
 		if(ToggleInfraVision == true){
-			PlaySound(x, y, snd_ToggleNightVision);
+			play_sound(x, y, snd_ToggleNightVision);
 			ToggleInfraVision = false;	
 		}
 	}
@@ -1131,10 +1131,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyToggleNightVision]) && !global.my_console[? "active"]){
 		if(global.ArmourDurability[1] > 0){
 			if(string_pos("night vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
-				PlaySound(x, y, snd_ToggleNightVision);
+				play_sound(x, y, snd_ToggleNightVision);
 				ToggleNightVision = !ToggleNightVision;	
 			}else if(string_pos("Infrared vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
-				PlaySound(x, y, snd_ToggleNightVision);
+				play_sound(x, y, snd_ToggleNightVision);
 				ToggleInfraVision = !ToggleInfraVision;	
 			}
 		}
@@ -1142,10 +1142,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	if(global.ArmourDurability[1] <= 0 && (ToggleNightVision == true || ToggleInfraVision == true)){
 		if(string_pos("night vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
-			PlaySound(x, y, snd_ToggleNightVision);
+			play_sound(x, y, snd_ToggleNightVision);
 			ToggleNightVision = false;	
 		}if(string_pos("Infrared vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
-				PlaySound(x, y, snd_ToggleNightVision);
+				play_sound(x, y, snd_ToggleNightVision);
 				ToggleInfraVision = false;	
 			}
 	}
@@ -1196,6 +1196,15 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		if(instance_exists(infra_vision_light)){
 			instance_destroy(infra_vision_light);
 		}
+	}
+	#endregion
+	
+	#region Level
+	if(global.xp >= global.max_xp){
+		global.Lvl ++;
+		global.MaxStamina *= power(1.25, ln(global.Lvl));
+		global.MaxHP *= power(1.25, ln(global.Lvl));
+		global.max_xp *= 1.1;
 	}
 	#endregion
 
@@ -1623,6 +1632,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 #region Death
 if(HP <= 0 && oDraw.RespawnMenu == false){
+	round_end("Loss");
 	instance_deactivate_object(obj_light_renderer); ///because shadows are visible even with grayscale and blur shader
 	Weapon.image_index = 0;
 	image_index = 3;

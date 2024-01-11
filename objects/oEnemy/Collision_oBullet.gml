@@ -21,5 +21,5 @@ if(State == States.Death){
 	
 	
 	
-	PlaySound(other.x, other.y, choose(snd_BulletHit1, snd_BulletHit2));	
+	play_sound(other.x, other.y, choose(snd_BulletHit1, snd_BulletHit2));	
 }

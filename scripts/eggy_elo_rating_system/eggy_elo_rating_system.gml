@@ -1,6 +1,6 @@
-#macro PLAYER_STARTING_VOLATILITY 0.05
+#macro PLAYER_STARTING_VOLATILITY 1
 #macro PLAYER_STARTING_ELO 0
-#macro SILVERI_ELO 0
+#macro SILVERI_ELO 1
 #macro SILVERII_ELO 20
 #macro SILVERIII_ELO 40
 #macro SILVERIV_ELO 100
@@ -47,26 +47,6 @@ function ini_player_struct_create(){
 	}
 	
 	return player_struct;
-}
-
-function average(array){
-	var array_sum = 0;
-	
-	for(var i=0;i<array_length(array);i++){
-		array_sum += array[i];
-	}
-	
-	return array_sum / array_length(array);
-	
-}
-
-function sum(array){	
-	var array_sum = 0;
-	for(var i = 0;i<array_length(array);i++){
-		array_sum += array[i];	
-	}
-	
-	return array_sum;
 }
 
 function clear_player_statistics(total_rounds){
@@ -122,7 +102,6 @@ function update_player_expected_games(){
 	}
 }
 
-/// @desc Convert Elo to an Eggy scale using a power transformation
 function convert_to_eggy_scale(elo) {
     var elo_offset = 100;
     var max_elo = 1900;
@@ -133,8 +112,6 @@ function convert_to_eggy_scale(elo) {
     return abs(eggy_scale * max_elo);
 }
 
-
-/// @desc Convert an Eggy scale back to the original Elo rating
 function convert_back(eggy_elo) {
     var elo_offset = 100;
     var max_elo = 1900;
@@ -145,14 +122,11 @@ function convert_back(eggy_elo) {
     return abs(normalized_elo * (max_elo - min_elo + elo_offset) - elo_offset + min_elo);
 }
 
-
-/// @desc Calculate the probability of winning based on Elo ratings
 function calculate_probability(player_elo, enemy_elo) {
     var exponent = (enemy_elo - player_elo) / 400;
     return 1 / (1 + power(2, exponent));
 }
 
-/// @desc Calculate the new Elo rating after a game
 function get_elo_current(probability_of_winning, game_result, volatility, game_volatility, player_kills, player_headshots, player_elo_scale, map, enemy_elo_scale, base_k=4) {
     var kill_weight = 0.2;
     var headshot_weight = 0.3;
@@ -168,7 +142,6 @@ function get_elo_current(probability_of_winning, game_result, volatility, game_v
     return K * ((game_result - probability_of_winning) + (1 + total_bonus) + (1 + elo_ratio));
 }
 
-/// @desc Calculate the volatility factor based on recent game outcomes
 function calculate_volatility(player_recent_results, player_recent_expected) {
 	var valid_entries = 0;
     var sum_abs_diff = 0;
@@ -279,15 +252,17 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
     return max(0, min(game_result, 1));
 }
 
-// @desc Shift an array
-function array_shift_left(array, new_value) {
-	///Shift all elements in an array to the left
-    for (var i = 1; i < array_length(array); i++) {
-        array[i - 1] = array[i];
-    }
-    
-    array[array_length(array) - 1] = new_value;
-    return array;
+function round_end(round_result){
+	if(global.ranked_game == true){
+		oEggyEloRatingSystem.round_ended = true;
+		if(round_result == "Win"){
+			oEggyEloRatingSystem.player_win = true;
+		}else{
+			oEggyEloRatingSystem.player_win = false;
+		}
+	}else{
+		return false;
+	}
 }
 
 
@@ -320,6 +295,7 @@ function RankStats(RankID, LessMod, BoostMod, RankName, MinElo){
 
 function rank_database(){
 	enum RankType{
+		Unranked, 
 		SilverI, SilverII, SilverIII, SilverIV, SilverV, SilverMaster,
 		GoldI, GoldII, GoldIII, GoldIV, GoldMaster,
 		DiamondI, DiamondII, DiamondIII, DiamondMaster,
@@ -334,6 +310,7 @@ function rank_database(){
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 	
+	RankStats(RankType.Unranked, 1.05, 0.9, "Unranked", PLAYER_STARTING_ELO);
 	RankStats(RankType.SilverI, 1.05, 0.9, "Silver I", SILVERI_ELO);	
 	RankStats(RankType.SilverII, 1.04, 0.91, "Silver II", SILVERII_ELO);
 	RankStats(RankType.SilverIII, 1, 0.92, "Silver III", SILVERIII_ELO);
@@ -358,13 +335,17 @@ function rank_database(){
 	RankStats(RankType.GlobalMaster, 0.45, 1.75, "Global master", GLOBAL_MASTER_ELO);
 }
 
-function get_rank(Object){
+function get_rank(Object = noone){
 	var highest_rank = -1;
 	var object_elo = -1;
-	if(Object.object_index == oPlayer){
+	if(Object != noone){
+		if(Object.object_index == oPlayer){
+			object_elo = convert_back(global.player_elo_struct.Elo);
+		}else if(Object.object_index == oEnemy){
+			object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
+		}
+	}else{
 		object_elo = convert_back(global.player_elo_struct.Elo);
-	}else if(Object.object_index == oEnemy){
-		object_elo = Object.elo;	
 	}
 	
     for(var i = 0; i < RankType.Total; i++){
@@ -376,7 +357,7 @@ function get_rank(Object){
     return highest_rank;
 }
 
-function get_rank_boost(){
+function get_rank_boost(elo){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
         if(elo >= global.RankIndex[#i, RankStat.Elo]){
@@ -387,7 +368,7 @@ function get_rank_boost(){
     return global.RankIndex[#highest_rank, RankStat.BoostModifier];
 }
 
-function get_rank_less(){
+function get_rank_less(elo){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
         if(elo >= global.RankIndex[#i, RankStat.Elo]){

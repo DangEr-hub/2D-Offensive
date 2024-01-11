@@ -2,7 +2,7 @@
 // You can write your code in this editor
 playing_time ++;
 
-if(round_end == true){
+if(round_ended == true){
 		if(player_win == true){
 			global.player_elo_struct.Rounds_win ++;
 		}else{

@@ -12,12 +12,12 @@ image_index = 6;
 //Plays footstep sound when the foot hits the ground during the animation
 if(Object != noone){
 	if (image_index = 10){
-		PlaySound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
+		play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
 		//audio_play_sound(choose(snd_FootStep1, snd_FootStep2), 1, false);
 	}
 
 	if (image_index = 19){
-		PlaySound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
+		play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
 		//audio_play_sound(choose(snd_FootStep1, snd_FootStep2), 1, false);
 	}
 }

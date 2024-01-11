@@ -20,7 +20,7 @@ if(instance_exists(oParentTile)){
 			}
 			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, min(ceil(Damage/5), 10));
 			if(audio_is_playing(snd_BulletConcrete)){
-				PlaySound(x, y, snd_BulletConcrete);
+				play_sound(x, y, snd_BulletConcrete);
 			}
 			WallHit = true;
 		}

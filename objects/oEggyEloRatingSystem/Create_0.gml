@@ -5,7 +5,7 @@ headshots = 0;
 kills = 0;
 current_round = 0;
 playing_time = 0;
-round_end = false;
+round_ended = false;
 
 
 

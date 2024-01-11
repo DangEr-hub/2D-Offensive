@@ -42,7 +42,7 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 	Explosion.Angle = random(360);	
 	Explosion.ExplosionWidth = bbox_right - bbox_left;
 	Explosion.ExplosionHeight = bbox_bottom - bbox_top;
-	PlaySound(PositionX, PositionY, snd_Explosion, Explosion, 100, 2500, .75);
+	play_sound(PositionX, PositionY, snd_Explosion, Explosion, 100, 2500, .75);
 	for(i=0;i<ShrapnelNumber;i++){
 		Shrapnel = instance_create_depth(
 			random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower),

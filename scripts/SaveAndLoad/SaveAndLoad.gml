@@ -1,6 +1,8 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 function save_game(){
+	
+	#region Save game
 	if(file_exists("save_game.ini")){
 		file_delete("save_game.ini");
 	}
@@ -9,8 +11,8 @@ function save_game(){
 	ini_write_real("Vars", "max_stamina", global.MaxStamina);
 	ini_write_real("Vars", "max_weight", global.MaxWeight);
 	ini_write_real("Vars", "weight", global.Weight);
-	ini_write_real("Vars", "xp", global.XP);
-	ini_write_real("Vars", "max_xp", global.MaxXP);
+	ini_write_real("Vars", "xp", global.xp);
+	ini_write_real("Vars", "max_xp", global.max_xp);
 	ini_write_real("Vars", "player_lvl", global.Lvl);
 	ini_write_real("Vars", "skill_points", global.SkillPoints);
 	ini_write_real("Vars", "money", global.Money);
@@ -47,42 +49,53 @@ function save_game(){
 	        ini_write_real("Attachments", key, global.weapon_attachments[i][j]);
 	    }
 	}
-
 	ini_close();
-
-
-	ini_close();
+	#endregion
 	
+	#region Save keyboard input
 	if(file_exists("save_keyboard_input.ini")){
 		file_delete("save_keyboard_input.ini");	
 	}
-	
 	ini_open("save_keyboard_input.ini");
 	ini_write_real("keyboard_inputs", "ds_list_key_binds_size", ds_list_size(global.KeyBinds));
 	for (var i = 0; i < ds_list_size(global.KeyBinds); i++){
 		ini_write_string("keyboard_inputs", "ds_list_key_bind_" + string(i), string(global.KeyBinds[| i]));
 	}	
 	ini_close();
+	#endregion
 	
+	#region Save inventory
 	if(file_exists("save_inventory,ini")){
 		file_delete("save_inventory.ini");
 	}
 	ini_open("save_inventory.ini");
 	ini_write_string("Inventory", "0", ds_grid_write(global.Inventory));
-	//ini_write_string("Inventory", "1", ds_grid_write(global.ItemIndex));
 	ini_write_string("Inventory", "2", ds_grid_write(global.MouseSlot));
 	ini_close();
+	#endregion
+	
+	#region Save player stats
+	if(file_exists("player_stats.json")){
+		file_delete("player_stats.json");
+	}
+	var json_string = json_stringify(global.player_elo_struct);
+	var file = file_text_open_write("player_stats.json");
+	file_text_write_string(file, json_string);
+	file_text_close(file);
+	#endregion
 }
 
 function load_game(){
+	
+	#region Load game
 	if(file_exists("save_game.ini")){
 		ini_open("save_game.ini");
 		global.MaxHP = ini_read_real("Vars", "max_hp", global.MaxHP);
 		global.MaxStamina = ini_read_real("Vars", "max_stamina", global.MaxStamina);
 		global.MaxWeight = ini_read_real("Vars", "MaxWeight", global.MaxWeight);
 		global.Weight = ini_read_real("Vars", "max_weight", global.Weight);
-		global.XP = ini_read_real("Vars", "xp", global.XP);
-		global.MaxXP = ini_read_real("Vars", "max_xp", global.MaxXP);
+		global.xp = ini_read_real("Vars", "xp", global.xp);
+		global.max_xp = ini_read_real("Vars", "max_xp", global.max_xp);
 		global.Lvl = ini_read_real("Vars", "player_lvl", global.Lvl);
 		global.SkillPoints = ini_read_real("Vars", "skill_points", global.SkillPoints);
 		global.Money = ini_read_real("Vars", "money", global.Money);
@@ -121,10 +134,11 @@ function load_game(){
 		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None); // Default value is 0
 		    }
 		}
-
 		ini_close();
 	}
+	#endregion
 	
+	#region Load keyboard input
 	if(file_exists("save_keyboard_input.ini")){
 		ini_open("save_keyboard_input.ini");
 		ds_list_clear(global.KeyBinds);
@@ -135,12 +149,24 @@ function load_game(){
 		}		
 		ini_close();
 	}
+	#endregion
 	
+	#region Load inventory
 	if(file_exists("save_inventory.ini")){
 	    ini_open("save_inventory.ini");
 	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "0", "None"));
-	    //ds_grid_read(global.ItemIndex, ini_read_string("Inventory", "1", "None"));
 	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "2", "None"));
 	    ini_close();	
 	}
+	#endregion
+	
+	#region Load player stats
+	if (file_exists("player_stats.json")) {
+	    var file = file_text_open_read("player_stats.json");
+	    var json_string = file_text_read_string(file);
+	    file_text_close(file);
+	    global.player_elo_struct = json_parse(json_string);
+	}
+	#endregion
+	
 }

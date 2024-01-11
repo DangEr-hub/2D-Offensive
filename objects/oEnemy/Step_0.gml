@@ -76,8 +76,8 @@ if(State != States.Death){
 		switch(State){
 			case States.MoveAway:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -85,8 +85,8 @@ if(State != States.Death){
 		
 			case States.MoveShoot:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -94,8 +94,8 @@ if(State != States.Death){
 		
 			case States.Move:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -103,8 +103,8 @@ if(State != States.Death){
 		
 			case States.MoveToward:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -112,8 +112,8 @@ if(State != States.Death){
 		
 			case States.MoveAwayFromGrenade:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -121,8 +121,8 @@ if(State != States.Death){
 		
 			case States.Chase:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -130,8 +130,8 @@ if(State != States.Death){
 		
 			case States.MoveFlashed:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -139,8 +139,8 @@ if(State != States.Death){
 		
 			case States.MoveInSmoke:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(), 100);
-					if(PercentChance(shooting_chance)){
+					shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
 				}
@@ -426,7 +426,7 @@ if(State != States.Death){
 		    var should_reload = true;
 
 		    if (Ammo[1 - WeaponPositionID] > 0) {
-		        if (PercentChance(50) || WeaponID[1 - WeaponPositionID] == Item.None) {
+		        if (percent_chance(50) || WeaponID[1 - WeaponPositionID] == Item.None) {
 		            should_reload = true;
 		        } else {
 		            WeaponPositionID = 1 - WeaponPositionID;
@@ -499,9 +499,9 @@ if(State != States.Death){
 	if(instance_exists(oBulletTracer)){
 		var ChasingObjectBullet = instance_nearest(x, y, oBulletTracer);
 		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
-			if(PercentChance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost()));
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 				}
 			}
 		}
@@ -621,7 +621,7 @@ if(State != States.Death){
 
 		if(NearestDangerObject != noone){
 		    if (!ChasingObjectSpotted) {
-		        ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost()));
+		        ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 		    }
 		}
 	}

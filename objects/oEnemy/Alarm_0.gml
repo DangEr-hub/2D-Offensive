@@ -8,9 +8,9 @@ function decide_movement() {
 }
 
 function handle_basic_movement() {
-    if (PercentChance(25 * get_rank_boost()) && State != States.MoveAway) {
+    if (percent_chance(25 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
         State = States.MoveAway;
-    } else if (PercentChance(50 * get_rank_less()) && State != States.MoveShoot) {
+    } else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveShoot) {
         State = States.MoveShoot;
     } else {
         choose_offensive_action();
@@ -18,9 +18,9 @@ function handle_basic_movement() {
 }
 
 function handle_smoke_movement() {
-    if (PercentChance(75 * get_rank_boost()) && State != States.MoveInSmoke) {
+    if (percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveInSmoke) {
         State = States.MoveInSmoke;
-    } else if (PercentChance(50 * get_rank_less()) && State != States.MoveAway) {
+    } else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
         State = States.MoveAway;
     } else if (State != States.MoveShoot) {
         State = States.MoveShoot;
@@ -28,7 +28,7 @@ function handle_smoke_movement() {
 }
 
 function choose_offensive_action() {
-    if (PercentChance(50)) {
+    if (percent_chance(50)) {
         ThrowGrenadeAI();
     } else {
         LayDownLandMineAI();
@@ -39,12 +39,12 @@ function choose_offensive_action() {
 
 if(instance_exists(ChasingObject) && State != States.Death){
     randomize();
-    alarm[0] = random_range(15, 25) * get_rank_less();
+    alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	
 	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
 		if(ChasingObjectSpotted == false){
 			ReactionTimer = ReactionTime;
-			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost()));
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 		}
 		if(ReactionTimer <= 0){
 			if(State != States.Chase){	
@@ -56,7 +56,7 @@ if(instance_exists(ChasingObject) && State != States.Death){
 						if (HP <= MaxHP / 3) {
 						    if (Ammo[WeaponPositionID] <= 0 && Reloading == false) {
 						        reload_ai();
-						    } else if (healing == false && PercentChance(50 * get_rank_boost())) {
+						    } else if (healing == false && percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))) {
 						        if (health_packs > 0) {
 									healing_ai();
 						            healing = true;
@@ -81,20 +81,20 @@ if(instance_exists(ChasingObject) && State != States.Death){
 								if(InSmoke == false){
 					
 								#region Basic movement
-								if(PercentChance(50 * get_rank_less())){
+								if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 									if(State != States.Move){
 										State = States.Move;
 									}
-								}else if(PercentChance(75 * get_rank_boost())){
+								}else if(percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 									if(State != States.MoveShoot){
 										State = States.MoveShoot;	
 									}
-								}else if(PercentChance(25 * get_rank_less())){
+								}else if(percent_chance(25 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 									if(State != States.MoveToward){
 										State = States.MoveToward;	
 									}
 								}else{
-									if(PercentChance(50)){
+									if(percent_chance(50)){
 										ThrowGrenadeAI();
 									}else{
 										LayDownLandMineAI();
@@ -105,11 +105,11 @@ if(instance_exists(ChasingObject) && State != States.Death){
 								}else{
 								
 									#region In smoke movement
-									if(PercentChance(50 * get_rank_boost())){
+									if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 										if(State != States.MoveInSmoke){
 											State = States.MoveInSmoke;
 										}
-									}else if(PercentChance(50 * get_rank_less())){
+									}else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 										if(State != States.MoveAway){
 											State = States.MoveAway;	
 										}
@@ -136,16 +136,16 @@ if(instance_exists(ChasingObject) && State != States.Death){
 							
 								#region Basic movement
 								if(NearestDangerObject != id){
-									if(PercentChance(50 * get_rank_boost())){
+									if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 										if(State != States.MoveAwayFromGrenade){
 											State = States.MoveAwayFromGrenade;
 										}
-									}else if (PercentChance(50 * get_rank_less())){
+									}else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 										if(State != States.MoveShoot){
 											State = States.MoveShoot;	
 										}
 									}else{
-										if(PercentChance(50)){
+										if(percent_chance(50)){
 											ThrowGrenadeAI();
 										}else{
 											LayDownLandMineAI();
@@ -233,7 +233,7 @@ if(global.EnemyCanMove == true){
 		break;
 		
 		case States.Idle:
-			if(PercentChance(10)){
+			if(percent_chance(10)){
 				MoveIdle();
 			}
 		break;
@@ -270,7 +270,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				if(PercentChance(50 * get_rank_boost())){
+				if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
 			}
@@ -278,7 +278,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				if(PercentChance(10 * get_rank_less())){
+				if(percent_chance(10 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 					MoveIdle();
 				}
 			}

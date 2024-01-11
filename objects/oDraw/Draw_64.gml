@@ -158,8 +158,18 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	
 	#region Draw ranked score
 	if(global.ranked_game == true && !instance_exists(oInventory)){
-		//draw_set_font(set_font("Title"));
-		//draw_text_outlined();
+		draw_set_font(set_font("Title"));
+		var player_score = string(global.player_elo_struct.Rounds_win);
+		var enemy_score = string(global.player_elo_struct.Rounds_lost);
+		var separator = "/";
+		var score_string_width = string_width(player_score + enemy_score + separator);
+		var player_score_string_width = string_width(player_score);
+		var position_y = oDraw.HUDShift*2;
+		var position_x = global.GuiW/2 - score_string_width/2; 
+		draw_text_outlined(position_x, position_y, player_score, global.GoldColor, c_black, 1);
+		draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
+		draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
+		draw_set_font(set_font("Console"));
 	}
 	#endregion
 	
@@ -359,7 +369,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	if (oPlayer.ScopeIn == true) {
 		var scope_zoom_value = 2;
 		if(oPlayer.player_has_scope == 0){
-			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*5), 0.175);
+			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*5), 0.175);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 			var ScopeRadius = sprite_get_width(spr_SniperScope) * 2;
 			if (!surface_exists(BlackoutSurface)) {
@@ -414,7 +424,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			#endregion
 			
 		}else if(oPlayer.player_has_scope == 1){
-			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)), 0.175);
+			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)), 0.175);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 		    shader_set(shd_Blur);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
@@ -517,7 +527,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		    xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 		    yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 		    draw_text_outlined(xx, yy, Damage_Indicator, Color, c_black, 1);
-		    draw_sprite_ext(Sprite, SpriteID, xx + string_width(Damage_Indicator), yy - sprite_get_width(Sprite)*.5, 1, 1, 0, c_white, 1);
+		    draw_sprite_ext(Sprite, SpriteID, xx + string_width(Damage_Indicator), yy, 1, 1, 0, c_white, 1);
 		}
 		#endregion
 	
@@ -626,7 +636,11 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				default_yy -= bar_spacing;
 			}
 			
-			draw_sprite_ext(spr_ranks, get_rank(id), xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+			var rank_position = 0;
+			if(global.player_elo_struct.Played_games >= 5){
+				rank_position = get_rank(id);	
+			}
+			draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 		}
 		#endregion
 	
@@ -1155,9 +1169,16 @@ if(instance_exists(oPlayer)){
 		draw_text_outlined(AdminHUDX - string_width(KBString), AdminHUDY + TextHeightSmall*2, KBString, c_white, c_black, 1);	
 				
 		//Inaccuracy
-		var player_inaccuracy = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer);
+		var player_inaccuracy = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer);
 		var inaccuracy_string = "Inaccuracy: " + string_format(player_inaccuracy, 0, 1) + " Units";
 		draw_text_outlined(AdminHUDX - string_width(inaccuracy_string), AdminHUDY + TextHeightSmall*3, inaccuracy_string, c_white, c_black, 1);	
+		
+		//Elo
+		var player_elo = global.player_elo_struct.Elo;
+		var elo_string = "Eggy points: " + string_format(convert_back(player_elo), 0, 1);
+		var elo_string_eggy_scale = "Eggy points (Eggy scale): " + string_format(player_elo, 0, 1);
+		draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
+		draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
 	}
 }
 #endregion
@@ -1443,7 +1464,7 @@ with(oCrosshair){
 				draw_sprite_ext(
 					spr_DynamicCrosshair, 
 					0, 
-					xx - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
+					xx - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
 					y_scale, 
 					x_scale, 
@@ -1454,7 +1475,7 @@ with(oCrosshair){
 				draw_sprite_ext(
 					spr_DynamicCrosshair, 
 					0, 
-					xx + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
+					xx + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
 					y_scale, 
 					x_scale, 
@@ -1466,7 +1487,7 @@ with(oCrosshair){
 					spr_DynamicCrosshair, 
 					0, 
 					xx, 
-					yy - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
+					yy - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
 					y_scale, 
 					x_scale, 
 					90, 
@@ -1477,7 +1498,7 @@ with(oCrosshair){
 					spr_DynamicCrosshair, 
 					0, 
 					xx, 
-					yy + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*InaccuracyFormula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
+					yy + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
 					y_scale, 
 					x_scale, 
 					90, 

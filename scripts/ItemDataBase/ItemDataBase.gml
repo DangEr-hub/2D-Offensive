@@ -85,7 +85,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.AKM, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 900, 45, 270, 30, "Main", 1, 2.5, 6, snd_AKM, 5, 2, true,
-	10, 20, 10, 5.9, 30, .03, 10, 3.5, .007, 1, 9, .25, 1, "Assault rifle", .81, .89, .00015, .5 * game_get_speed(gamespeed_fps));
+	10, 20, 10, 5.9, 30, .03, 10, 3.5, .007, 1, 7, .25, 1, "Assault rifle", .81, .89, .00015, .5 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
 	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = $FF16C3E5; ///orange
@@ -172,7 +172,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 3, true,
-	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 10, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps));
+	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
 	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\-High damage";
 	global.ItemIndex[#Item.SG550, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -241,7 +241,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 38, 760, 30, "Main", 1, 2, 5.5, snd_m4_carbine, 2.5, 1, true,
-	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 9, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps));
+	10, 20, -5, 3.9, 30, .01, 25, 3.5, .0025, 1, 7, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.m4_carbine, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.advantages] = "-Good mobility\n-Low bullet spread\n-Low recoil";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.has_suppressor] = Item.military_suppressor; ///Military suppressor

@@ -9,13 +9,7 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-draw_text(x, y - 50, "player rating" + string(convert_back(global.player_elo_struct.Elo))); ///Eggy scale
-draw_text(x, y - 130, "player local volatility" + string(global.player_elo_struct.Local_volatility));
-draw_text(x, y - 180, "player game volatility" + string(global.player_elo_struct.Game_volatility));
-//draw_text(x, y - 250, "headshots " + string(oEggyEloRatingSystem.headshots));
-//draw_text(x, y - 300, "enemy rd" + string(enemy_elo_struct.rd));
-//draw_text(x, y - 350, "player volatility" + string(global.player_elo_struct.volatility));
-//draw_text(x, y - 35, application_surface_is_enabled());
+//draw_text(x, y - 50, "enemy elo" + string(global.player_elo_struct.Enemy_elo));
 
 if(HP > 0){
 	if (equipped_item("Grenade")) {

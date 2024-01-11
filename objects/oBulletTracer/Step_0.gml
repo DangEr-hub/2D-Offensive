@@ -59,13 +59,13 @@ if(image_index == 1){
 		var NearestTargetX, NearestTargetY;
 		if(instance_exists(Object) && Object != noone){
 			RandomX = random_range(
-				ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object), 
-				ShotX + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object)
+				ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object), 
+				ShotX + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object)
 			);
 			
 			RandomY = random_range(
-				ShotY - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object), 
-				ShotY + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object)
+				ShotY - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object), 
+				ShotY + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object)
 			);
 		}else{
 			RandomX = ShotX;
@@ -133,13 +133,13 @@ if(image_index == 0){
 		if(distance_to_point(BulletTracerX, BulletTracerY) >= PointDistance){
 			if(instance_exists(Object) && Object != noone){
 				RandomX = random_range(
-					ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object), 
-					ShotX + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object)
+					ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object), 
+					ShotX + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object)
 				);
 			
 				RandomY = random_range(
-					ShotY - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object), 
-					ShotY + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*InaccuracyFormula(Weapon, Object)
+					ShotY - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object), 
+					ShotY + global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object)
 				);
 			}else{
 				RandomX = ShotX;
@@ -212,13 +212,13 @@ if(instance_exists(oParentTile)){
 					y
 				);
 				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
-				PlaySound(x, y, snd_BulletConcrete);
+				play_sound(x, y, snd_BulletConcrete);
 				WallHit = true;
 			}
 		}else{
 			ExplosionCreate(30, x, y, global.ItemIndex[#Weapon, ItemStat.Damage], false, Object, global.ItemIndex[#Weapon, ItemStat.PenetrationPower], global.ItemIndex[#Weapon, ItemStat.DamageDrop], Item.None, 128);	
 			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
-			PlaySound(x, y, snd_BulletConcrete);
+			play_sound(x, y, snd_BulletConcrete);
 			instance_destroy(self);
 		}
 	}else{

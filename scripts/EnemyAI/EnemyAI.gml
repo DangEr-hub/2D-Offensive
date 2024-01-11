@@ -2,7 +2,7 @@
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 	
-	EnemyInaccuracyMultiplier = InaccuracyFormula(WeaponID[WeaponPositionID], id) * get_rank_less() * 0.5;
+	EnemyInaccuracyMultiplier = inaccuracy_formula(WeaponID[WeaponPositionID], id) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]) * 0.5;
 	EnemyShotX = random_range(
 					DangerShotX - global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier, 
 					DangerShotX + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier);
@@ -52,36 +52,36 @@ function MoveShooting(DangerX, DangerY){
 	randomize();
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		SideStepMin = 45;
-		SideStepMax = 180 * get_rank_less();
+		SideStepMax = 180 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(50, 90) * get_rank_less();
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		SideStepMin = 0;
-		SideStepMax = 180 * get_rank_less();
+		SideStepMax = 180 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(100, 180) * get_rank_less();	
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		SideStepMin = 90;
-		SideStepMax = 90 * get_rank_less();
+		SideStepMax = 90 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(100, 180) * get_rank_less();	
-		alarm[0] = MoveTime * get_rank_less();
+		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Submachine gun"){
 		SideStepMin = 0;
-		SideStepMax = 30 * get_rank_less();
+		SideStepMax = 30 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		XSpeed += lengthdir_x(Acceleration*2, MoveDirection);
 		YSpeed += lengthdir_y(Acceleration*2, MoveDirection);
-		MoveTime = random_range(50, 90) * get_rank_less();	
-		alarm[0] = MoveTime * get_rank_less();
+		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	}
 }
 
@@ -119,7 +119,7 @@ function EnemyShooting(DangerX, DangerY){
 		
 		}
 		
-		PlaySound(x, y, sound_id);
+		play_sound(x, y, sound_id);
 		ParticleCreate(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
 		0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BulletCasingID], x, y, 1, 60);
 		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.KickBackPower];
@@ -150,26 +150,26 @@ function MoveRandom(){
 	randomize();
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		MoveDirection = random(360);
-		MoveTime = random_range(50, 90) * get_rank_less();
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(); ///zmenit pri vyssim ranku
+		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		MoveDirection = random(360);
-		MoveTime = random_range(100, 180) * get_rank_less();
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(); ///zmenit pri vyssim ranku
+		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
-		MoveTime = random_range(100, 180) * get_rank_less();
-		alarm[0] = MoveTime * get_rank_less(); ///zmenit pri vyssim ranku
+		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
-		MoveTime = random_range(50, 90) * get_rank_less();
-		alarm[0] = MoveTime * get_rank_less(); ///zmenit pri vyssim ranku
+		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
 		XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
@@ -178,8 +178,8 @@ function MoveRandom(){
 function MoveIdle(){
 	randomize();
 	MoveDirection = random(360);
-	MoveTime = random_range(50, 90) * get_rank_less();
-	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+	MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
@@ -197,7 +197,7 @@ function MoveTowards(DangerX, DangerY, Accel){
 		SideStepMax = 90;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(25, 45);
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
@@ -205,7 +205,7 @@ function MoveTowards(DangerX, DangerY, Accel){
 		SideStepMax = 30;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(50, 90);
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
@@ -213,7 +213,7 @@ function MoveTowards(DangerX, DangerY, Accel){
 		SideStepMax = 90;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(100, 180);
-		alarm[0] = MoveTime * get_rank_less();
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Submachine gun"){
@@ -221,14 +221,14 @@ function MoveTowards(DangerX, DangerY, Accel){
 		SideStepMax = 15;
 		MoveDirection = point_direction(x, y, ChasingObject.x, ChasingObject.y) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(100, 180);
-		alarm[0] = MoveTime * get_rank_less();
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
 
 function healing_ai(){
-	if(PercentChance(75 * get_rank_boost())){
+	if(percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 		if(State != States.MoveAway){
 			SetReactionTimer(ceil(ReactionTime*.5));
 			State = States.MoveAway;
@@ -242,12 +242,12 @@ function healing_ai(){
 }
 
 function reload_ai(){
-	if(PercentChance(75 * get_rank_boost())){
+	if(percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 		if(State != States.MoveAway){
 			SetReactionTimer(ceil(ReactionTime*.5));
 			State = States.MoveAway;
 		}
-	}else if(PercentChance(50 * get_rank_boost())){
+	}else if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 		if(State != States.MoveShoot){
 			SetReactionTimer(ceil(ReactionTime*.5));
 			State = States.MoveShoot;	
@@ -266,7 +266,7 @@ function EnemyThrowGrenade(DangerX, DangerY){
 	SideStepMax = 30;
 	MoveDirection = point_direction(x, y, DangerX, DangerY) - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(50, 90);
-	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	XSpeed += lengthdir_x(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
@@ -277,7 +277,7 @@ function EnemyLayDownLandMine(){
 	SideStepMax = 30;
 	MoveDirection = MoveDirection - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(50, 90);
-	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less();
+	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
@@ -380,6 +380,10 @@ function LayDownLandMineAI(){
 			State = States.MoveShoot;	
 		}
 	}
+}
+
+function get_xp(value, type){
+	return value * type;	
 }
 
 
