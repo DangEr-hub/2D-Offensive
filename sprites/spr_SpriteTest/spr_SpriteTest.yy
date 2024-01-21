@@ -2,10 +2,10 @@
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
   "name": "spr_SpriteTest",
-  "bbox_bottom": 119,
-  "bbox_left": 0,
-  "bbox_right": 247,
-  "bbox_top": 0,
+  "bbox_bottom": 47,
+  "bbox_left": 3,
+  "bbox_right": 49,
+  "bbox_top": 3,
   "bboxMode": 0,
   "collisionKind": 1,
   "collisionTolerance": 0,
@@ -13,14 +13,14 @@
   "edgeFiltering": false,
   "For3D": false,
   "frames": [
-    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"a8dab585-1c11-43f6-98ae-fc1b75709fed",},
+    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"a5224274-85da-4be9-a1cd-b3d71f96dab7",},
   ],
   "gridX": 0,
   "gridY": 0,
-  "height": 120,
+  "height": 50,
   "HTile": false,
   "layers": [
-    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"3bdeb254-beb4-4b25-b723-4ea205ceb12c","blendMode":0,"displayName":"default","isLocked":false,"opacity":100.0,"visible":true,},
+    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"d25dcfdb-0a5a-4960-95ad-44c285d3cd91","blendMode":0,"displayName":"default","isLocked":false,"opacity":100.0,"visible":true,},
   ],
   "nineSlice": null,
   "origin": 0,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"a8dab585-1c11-43f6-98ae-fc1b75709fed","path":"sprites/spr_SpriteTest/spr_SpriteTest.yy",},},},"Disabled":false,"id":"44522c2c-1507-452d-8dc9-4c428e5108ae","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"a5224274-85da-4be9-a1cd-b3d71f96dab7","path":"sprites/spr_SpriteTest/spr_SpriteTest.yy",},},},"Disabled":false,"id":"84782f27-213c-4044-a08a-04187274c886","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,
@@ -70,5 +70,5 @@
   },
   "type": 0,
   "VTile": false,
-  "width": 248,
+  "width": 52,
 }

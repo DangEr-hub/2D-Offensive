@@ -37,123 +37,6 @@ with(oSlot){
 }
 #endregion
 
-#region Pause menu
-if(PauseMenu == true && RespawnMenu == false){
-	if(Alpha >= 0 && Alpha < 1){
-		Alpha += .01;
-	}	
-	if (BackGround != -1) {
-		shader_set(shd_Blur);
-		shader_set_uniform_f(usize, 32, 32, 0.1);
-	    draw_sprite_ext(BackGround, 0, 0, 0, global.GuiW/sprite_get_width(BackGround), global.GuiH/sprite_get_height(BackGround), 0, c_white, 1);
-	    shader_reset();		
-	}	
-	
-	draw_set_alpha(0.17);
-	draw_set_color(global.GoldColor);
-	draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
-	draw_set_color(c_white);
-	draw_set_alpha(1);
-	
-	if(ToggleMessage == true){
-		var ButtonOffset = 32 * global.GUIMultiplier;
-		var ButtonWidth = 64 * global.GUIMultiplier;
-		var MenuTitleHeight = 64 * global.GUIMultiplier;
-		var MenuMiddleHeight = 256 * global.GUIMultiplier;
-		var MenuEndHeight = 64 * global.GUIMultiplier;	
-		var MenuTabWidth = 512 * global.GUIMultiplier;
-		var ButtonHeight = MenuEndHeight - ButtonOffset;
-		var MenuTabX = display_get_gui_width()/2 - MenuTabWidth/2;
-		var MenuTabY = display_get_gui_height()/2 - (MenuTitleHeight + MenuMiddleHeight + MenuEndHeight)/2;
-	
-		#region Draw main tab
-		draw_menu_tab(
-			MenuTabX, 
-			MenuTabY, 
-			MenuTabWidth, 
-			MenuMiddleHeight, 
-			MenuTitleHeight, 
-			MenuEndHeight, 
-			c_black, 
-			c_dkgray, 
-			c_black, 
-			min(Alpha, global.GUIHUDAlpha), 
-			4, 
-			global.GoldColor, 
-			"Pause"
-		);
-		#endregion
-	
-		#region Draw exit button
-		draw_button_ext(
-			MenuTabX + MenuTabWidth/2 - ButtonWidth/2, 
-			MenuTabY + MenuTitleHeight + MenuMiddleHeight + ButtonOffset/2, 
-			ButtonWidth, 
-			ButtonHeight, 
-			"Exit", 
-			c_dkgray, 
-			global.GoldColor,
-			"pause_exit"
-		);
-		#endregion
-	
-		#region Draw exit popup window
-		if(PopupWindow == "game_end"){
-			ButtonWidth = 32 * global.GUIMultiplier;
-			var PopupWindowX = MenuTabX + MenuTabWidth/4;
-			var PopupWindowY = MenuTabY + (MenuTitleHeight + MenuMiddleHeight + MenuEndHeight)/4;
-			var PopupWindowWidth = MenuTabWidth/2;
-			var PopupWindowTitleHeight = MenuTitleHeight/2;
-			var PopupWindowMiddleHeight = MenuMiddleHeight/2;
-			var PopupWindowEndHeight = MenuEndHeight/2;
-			draw_menu_tab(
-				PopupWindowX,
-				PopupWindowY, 
-				PopupWindowWidth, 
-				PopupWindowMiddleHeight, 
-				PopupWindowTitleHeight, 
-				PopupWindowEndHeight, 
-				c_black, 
-				c_dkgray, 
-				c_black, 
-				min(Alpha, global.GUIHUDAlpha), 
-				1, 
-				global.GoldColor, 
-				"Exit the game?"
-			);
-			
-			var ExitTheGameString = "See you later, we will miss you!";
-			draw_text_outlined(PopupWindowX + PopupWindowWidth/2 - string_width(ExitTheGameString)/2, PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight/2, ExitTheGameString, c_white, c_black, 1);
-			
-			draw_button_ext(
-				PopupWindowX + PopupWindowWidth/4 - ButtonWidth/2, 
-				PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight + ButtonOffset/4, 
-				ButtonWidth, 
-				ButtonHeight/2, 
-				"Yes", 
-				c_dkgray, 
-				global.GoldColor,
-				"pause_exit_yes"
-			);
-			
-			draw_button_ext(
-				PopupWindowX + PopupWindowWidth*(3/4) - ButtonWidth/2, 
-				PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight + ButtonOffset/4, 
-				ButtonWidth, 
-				ButtonHeight/2, 
-				"No", 
-				c_dkgray, 
-				global.GoldColor,
-				"pause_exit_no"
-			);
-			
-		}
-		#endregion
-	
-	}
-}
-#endregion
-
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	
 	#region Draw ranked score
@@ -480,10 +363,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		}
 		#endregion
 
-		#region Draw enemy HP
+		#region Draw enemy health
 		with(oEnemy){
 			if(State != States.Death){
-				if(HP > 0 && Visible == true){
+				if(stats.Health_points > 0 && Visible == true){
 				    var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				    var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 					var default_xx = HealthX - sprite_width/2;
@@ -492,8 +375,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					draw_set_font(set_font("Console"));
 					draw_set_color(c_black);
 					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (DamageHP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (HP/MaxHP) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 
 					if(healing == true){
 					    draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
@@ -567,10 +450,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		#endregion
 
 		#region Draw player healtbars and mags
+		var bar_gap = (sprite_get_height(spr_HealthBar)*1.1*global.GUIMultiplier);
 		var HealthX = HUDShift;
-		var HealthY = global.GuiH - HUDShift - (sprite_get_height(spr_HealthBar)*global.GUIMultiplier);
+		var HealthY = global.GuiH - HUDShift - bar_gap;
 		var StaminaX = HUDShift;
-		var StaminaY = HealthY - (sprite_get_height(spr_HealthBar)*2.1*global.GUIMultiplier);
+		var StaminaY = HealthY - bar_gap*2;
+		var xp_x = HUDShift;
+		var xp_y = StaminaY - bar_gap*2;
 		var MagX = HealthX + sprite_get_width(spr_HealthBar) * 2 * global.GUIMultiplier + HUDShift;
 		var MagY = StaminaY;
 		var AmmoSpriteWidth = sprite_get_width(spr_AmmoType)/1.5*global.GUIMultiplier;
@@ -590,19 +476,22 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 
 		draw_set_color(c_black);
 		
-		#region HP bar
+		#region Health bar
 		draw_sprite_ext(spr_HealthBar, 0, HealthX, HealthY, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
-		draw_sprite_ext(spr_HealthBar, 3, HealthX, HealthY, (oPlayer.DamageHP/global.MaxHP) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
-		draw_sprite_ext(spr_HealthBar, 2, HealthX, HealthY, (oPlayer.HP/global.MaxHP) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+		draw_sprite_ext(spr_HealthBar, 3, HealthX, HealthY, (oPlayer.stats.Damage_health_points/global.player_stats_struct.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
+		draw_sprite_ext(spr_HealthBar, 2, HealthX, HealthY, (oPlayer.stats.Health_points/global.player_stats_struct.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 		#endregion
 			
 		#region Stamina bar
 		draw_sprite_ext(spr_HealthBar, 0, StaminaX, StaminaY, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
-		draw_sprite_ext(spr_HealthBar, 3, StaminaX, StaminaY, (oPlayer.DamageStamina/global.MaxStamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
-		draw_sprite_ext(spr_HealthBar, 6, StaminaX, StaminaY, (oPlayer.Stamina/global.MaxStamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+		draw_sprite_ext(spr_HealthBar, 3, StaminaX, StaminaY, (oPlayer.stats.Damage_stamina_points/global.player_stats_struct.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
+		draw_sprite_ext(spr_HealthBar, 6, StaminaX, StaminaY, (oPlayer.stats.Stamina_points/global.player_stats_struct.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 		#endregion
 		
-		
+		#region Experience bar
+		draw_sprite_ext(spr_HealthBar, 0, xp_x, xp_y, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
+		draw_sprite_ext(spr_HealthBar, 8, xp_x, xp_y, (global.player_stats_struct.Xp/global.player_stats_struct.Max_xp) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+		#endregion
 			
 		#endregion
 	
@@ -637,7 +526,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			}
 			
 			var rank_position = 0;
-			if(global.player_elo_struct.Played_games >= 5){
+			if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 				rank_position = get_rank(id);	
 			}
 			draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -716,7 +605,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 								global.weapon_id[1 - i], 
 								x, 
 								y, 
-								100, 
+								100,
 								global.Ammo[1 - i], 
 								global.ClipAmmo[1 - i], 
 								0, 
@@ -1231,7 +1120,7 @@ if(RespawnMenu == true){
 		var GUIMenuShiftX = (sprite_get_width(spr_GUITab) * global.GUIMultiplier - CellWidth*NumColumns)/2;
 		var GUIMenuTextX = global.GuiW/2 - (sprite_get_width(spr_GUITab) * global.GUIMultiplier)/2 + GUIMenuShiftX;
 		var GUIMenuTextY = global.GuiH/2 - (sprite_get_height(spr_GUITab) * global.GUIMultiplier)/2 + GUIMenuShiftY*2;
-		var KilledByString = "Killed by: " + string(KilledBy.Name) + " by " + string(KilledBy.KilledByWeapon);
+		var KilledByString = "Killed by: " + string(KilledBy.stats.Name) + " by " + string(KilledBy.KilledByWeapon);
 		
 		#region Draw respawn menu tab
 		draw_menu_tab(
@@ -1458,7 +1347,7 @@ with(oCrosshair){
 			draw_sprite_ext(spr_HitMarker, HitMarker, xx, yy, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	
 		}
 		if(oPlayer.player_can_shoot == true && !global.my_console[? "active"] && oPlayer.ScopeIn == false){
-			draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
+			draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
 			if(global.DynamicCrosshair == true){
 				Gap = 25;
 				draw_sprite_ext(
@@ -1469,7 +1358,7 @@ with(oCrosshair){
 					y_scale, 
 					x_scale, 
 					0, 
-					global.CrosshairColor, 
+					global.crosshair_color, 
 					global.CrosshairAlpha
 				); ///Left
 				draw_sprite_ext(
@@ -1480,7 +1369,7 @@ with(oCrosshair){
 					y_scale, 
 					x_scale, 
 					0, 
-					global.CrosshairColor, 
+					global.crosshair_color, 
 					global.CrosshairAlpha
 				); ///Right
 				draw_sprite_ext(
@@ -1491,7 +1380,7 @@ with(oCrosshair){
 					y_scale, 
 					x_scale, 
 					90, 
-					global.CrosshairColor, 
+					global.crosshair_color, 
 					global.CrosshairAlpha
 				); ///Top
 				draw_sprite_ext(
@@ -1502,19 +1391,19 @@ with(oCrosshair){
 					y_scale, 
 					x_scale, 
 					90, 
-					global.CrosshairColor, 
+					global.crosshair_color, 
 					global.CrosshairAlpha
 				); ///Down
 			}
 		}
 	}else{
-		draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.CrosshairColor, global.CrosshairAlpha * AlphaMul);
+		draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
 		if(global.DynamicCrosshair == true){
 			Gap = 25;
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx - Gap - 1 + x_offset, yy, y_scale, x_scale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Left
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx + Gap + 1 + x_offset, yy, y_scale, x_scale, 0, global.CrosshairColor, global.CrosshairAlpha); ///Right
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy - Gap - 1 + y_offset, y_scale, x_scale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Top
-			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy + Gap + 1 + y_offset, y_scale, x_scale, 90, global.CrosshairColor, global.CrosshairAlpha); ///Down
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx - Gap - 1 + x_offset, yy, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Left
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx + Gap + 1 + x_offset, yy, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Right
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy - Gap - 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Top
+			draw_sprite_ext(spr_DynamicCrosshair, 0, xx, yy + Gap + 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Down
 		}
 	}
 }

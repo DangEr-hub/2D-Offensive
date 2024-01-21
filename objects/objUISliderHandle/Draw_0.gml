@@ -5,4 +5,4 @@ else if (zui_get_hover())
 else
 	draw_set_color($ffffff);
 
-draw_sprite_ext(sprSliderCell, 0, 9, 8, 1, 1, 0, draw_get_color(), 1);
+draw_sprite_ext(sprSliderCell, 0, 9, 8, 1, 1, 0, draw_get_color(), alpha * objZUIMain.Alpha);

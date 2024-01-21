@@ -1,3 +1,4 @@
+application_surface_draw_enable(true);
 draw_set_valign(1);
 window_set_fullscreen(true);
 

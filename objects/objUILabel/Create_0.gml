@@ -1,3 +1,4 @@
+alpha = global.GUIHUDAlpha * 3;
 icon_sprite_index = -1;
 icon_image_index = -1;
 outline_color = c_black;

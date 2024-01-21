@@ -1,4 +1,5 @@
 randomize();
+PushForce = 0;
 scope_attachment = -1;
 barrel_attachment = -1;
 grip_attachment = -1;
@@ -6,7 +7,6 @@ suppressor_attachment = -1;
 image_speed = 0;
 image_angle = random(360);
 Amount = 1;
-//PickedUp = false;
 z = 0;
 zgravity = 4;
 zmaxspeed = 20;

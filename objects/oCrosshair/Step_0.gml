@@ -20,13 +20,13 @@ if(instance_exists(oPlayer)){
 	}
 	
 	if(oPlayer.ScopeIn == true){
-	    WobbleX += max(100/(oPlayer.Stamina + 1), 3);
-	    WobbleY += max(100/(oPlayer.Stamina + 1), 3) * 1.5;
-		WobbleScopeInMultiplier = clamp(100/(oPlayer.Stamina + 1), 3, 10);		
+	    WobbleX += max(100/(oPlayer.stats.Stamina_points + 1), 3);
+	    WobbleY += max(100/(oPlayer.stats.Stamina_points + 1), 3) * 1.5;
+		WobbleScopeInMultiplier = clamp(100/(oPlayer.stats.Stamina_points + 1), 3, 10);		
 	}else{
-	    WobbleX += max(ceil((100/(oPlayer.Stamina + 1)) - 1)*2, 0);
-	    WobbleY += max(ceil((100/(oPlayer.Stamina + 1)) - 1)*2, 0) * 1.5;
-		WobbleScopeInMultiplier = clamp(ceil((100/(oPlayer.Stamina + 1)) - 1)*5, 0, 10);		
+	    WobbleX += max(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*2, 0);
+	    WobbleY += max(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
+		WobbleScopeInMultiplier = clamp(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*5, 0, 10);		
 	}
 	
 	if(oPlayer.AimPunchTimer > -1){

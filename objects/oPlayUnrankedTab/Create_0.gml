@@ -1,3 +1,5 @@
+event_inherited();
+global.ranked_game = false;
 play_unranked_tab_width = 720 * global.GUIMultiplier;
 play_unranked_tab_height = 405 * global.GUIMultiplier;
 

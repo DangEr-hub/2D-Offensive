@@ -6,9 +6,6 @@ global.DynamicCrosshair = false;
 global.CrosshairAlpha = 1;
 global.weapon_id = [Item.None, Item.None, Item.None];
 global.InventorySize = 26;
-global.Weight = 0;
-global.MaxWeight = 15;
-global.MaxHP = 100;
 global.Ammo = [0, 0, 0];
 global.MaxAmmo = [0, 0, 0];
 global.ClipAmmo = [0, 0, 0];
@@ -16,7 +13,6 @@ global.BulletSpeed = 75;
 global.DrawBulletImpact = false;
 global.AdminHUD = false;
 global.HitBoxAlpha = .1;
-global.RankMultiplier = 1;
 global.EnemyCanMove = true;
 global.GodMode = false;
 global.Hostage = false;
@@ -28,29 +24,48 @@ global.ArmourDurability = [0, 0];
 global.ArmourID = [Item.None, Item.None];
 global.CameraWidth = 960;
 global.CameraHeight = 540;
-global.MaxStamina = 100;
 global.FieldOfView = 15;
 global.BloomShader = true;
 global.TimeSpeed = 15;
-global.Lvl = 1;
-global.SkillPoints = 0;
-global.Money = 0;
-global.UnSkillPoints = 0;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
-global.xp = 0;
-global.max_xp = 50;
+global.sound_gain = 100;
 global.ranked_game = false;
-global.elo = 0;
 global.hard_mode = false;
-global.player_name = "DangEr";
 global.window_width = 1920;
 global.window_height = 1080;
 global.draw_other_models = false;
 global.Weather = "sun";
-global.CrosshairColor = c_white;
+global.crosshair_color = c_white;
 
+global.player_stats_struct = {
+	All_shots: 0,
+	Headshots: 0,
+	Kills: 0,
+	Deaths: 0,
+    Get_KD: function() {
+        return (Deaths != 0) ? (Kills / Deaths) : 0;
+    },
+	Get_headshot_percentage: function() {
+		return (Kills != 0) ? (Headshots / Kills) * 100 : 0;
+	},
+	Get_accuracy: function() {
+		return (All_shots != 0) ? Hit_shots / All_shots * 100 : 0;
+	},
+	Xp: 0,
+	Max_xp: 50,
+	Max_health: 100,
+	Max_stamina: 100,
+	Lvl: 1,
+	Skill_points: 0,
+	Unskill_points: 0,
+	Money: 0,
+	Weight: 0,
+	Max_weight: 15,
+	Armour: 0
+	
+};
 global.player_elo_struct = ini_player_struct_create();
 
 
@@ -64,6 +79,10 @@ global.player_elo_struct = ini_player_struct_create();
 
 global.GUIMultiplier = display_get_width()/global.CameraWidth;
 camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
+
+enum icons{
+	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, total	
+}
 
 enum weapon_attachments{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total

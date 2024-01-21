@@ -1,3 +1,5 @@
+event_inherited();
+global.ranked_game = true;
 play_unranked_tab_width = 720 * global.GUIMultiplier;
 play_unranked_tab_height = 405 * global.GUIMultiplier;
 
@@ -19,14 +21,34 @@ map_image_gap = map_image_sprite_width * 1.1;
 
 
 map_callbacks = [
-    function() { global.ranked_game = true; room_goto(rm_Test); },
-    function() { global.ranked_game = true; room_goto(rm_Test); },
-    function() { global.ranked_game = true; room_goto(rm_Test); },
-    function() { global.ranked_game = true; room_goto(rm_Test); }
+    function() { 
+		if(global.player_elo_struct.Played_games <= 0){
+			update_player_expected_games();
+		} 
+		room_goto(rm_Test); 
+	},
+    function() { 
+		if(global.player_elo_struct.Played_games <= 0){
+			update_player_expected_games();
+		} 
+		room_goto(rm_Test); 
+	},
+    function() { 
+		if(global.player_elo_struct.Played_games <= 0){
+			update_player_expected_games();
+		} 
+		room_goto(rm_Test); 
+	},
+    function() { 
+		if(global.player_elo_struct.Played_games <= 0){
+			update_player_expected_games();
+		} 
+		room_goto(rm_Test); 
+	}
 ];
 
 with (zui_create(0, 0, objUIWindowCaption)) {
-	caption = "Play unranked game";
+	caption = "Play ranked game";
 	draggable = 1;
 }
 

@@ -28,7 +28,7 @@ ReloadTimer = -1;
 FlashedAlpha = 0;
 FlashedBackGround = -1;
 ToggleNightVision = false;
-BaseHealingPower = ceil(global.MaxHP/50);
+BaseHealingPower = ceil(global.player_stats_struct.Max_health/50);
 HealingTime = -1;
 HealingItemId = Item.None;
 Healing = false;
@@ -60,7 +60,7 @@ WX = 8;
 WY = 8;
 
 global.Hostage = false;
-global.Weight = 0;
+global.player_stats_struct.Weight = 0;
 
 #region Burstfire
 burst_fire = false;
@@ -70,14 +70,11 @@ burst_fire_timer = 0;
 #endregion
 
 #region Statistics
+stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina);
 HealingTimer = game_get_speed(gamespeed_fps);
 HPHealingTimer = -1;
-HP = global.MaxHP;
-DamageHP = HP;
 HPTimer = -1;
 StaminaHealingTimer = -1;
-Stamina = global.MaxStamina;
-DamageStamina = Stamina;
 #endregion
 
 #region Crosshair vars
@@ -86,13 +83,15 @@ crosshair_position = [mouse_x, mouse_y];
 #endregion
 
 #region Create objects
+if(global.ranked_game == true){
+	instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
+}
 instance_create_layer(x, y, "OtherO", oDraw);
 instance_create_layer(x, y, "OtherO", oConsole);
 instance_create_layer(x, y, "OtherO", oCamera);
 instance_create_layer(x, y, "OtherO", oCrosshair);
 instance_create_layer(x, y, "ItemsO", oParticleSurface);
 instance_create_layer(x, y, "OtherO", oParticleSystem);
-instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 #endregion
 

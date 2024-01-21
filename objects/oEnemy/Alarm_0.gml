@@ -52,8 +52,8 @@ if(instance_exists(ChasingObject) && State != States.Death){
 				if(Flashed == false){
 					if(SpottedDanger == false){
 			
-						#region Move away when low HP
-						if (HP <= MaxHP / 3) {
+						#region Move away when low health
+						if (stats.Health_points <= stats.Max_health_points / 3) {
 						    if (Ammo[WeaponPositionID] <= 0 && Reloading == false) {
 						        reload_ai();
 						    } else if (healing == false && percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))) {
@@ -70,8 +70,8 @@ if(instance_exists(ChasingObject) && State != States.Death){
 						}
 						#endregion
 		
-						#region Moving when not low HP
-						if(HP > MaxHP/3){
+						#region Moving when not low health
+						if(stats.Health_points > stats.Max_health_points/3){
 				
 							if(Ammo[WeaponPositionID] <= 0){
 								if(Reloading == true){

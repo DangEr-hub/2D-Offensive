@@ -110,7 +110,7 @@ function InventoryInit() {
 	enum Item{
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
-		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4_carbine, awm, MolotovGrenade, Total
+		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4_carbine, awm, usp, MolotovGrenade, Total
 	}
 
 	enum ItemStat{
@@ -164,6 +164,8 @@ function ItemDeclare(){
 	if(suppressor_attachment == -1){
 		if(image_index == Item.m4_carbine){
 			suppressor_attachment = Item.military_suppressor;
+		}else if(image_index == Item.usp){
+			suppressor_attachment = Item.military_suppressor;
 		}
 	}
 	
@@ -182,12 +184,12 @@ function ItemAmountSubstract(ID, Amount){
 }
 
 function ItemAddWeight(ID){
-	if(global.Weight <= global.MaxWeight - global.ItemIndex[#global.Inventory[#ID, InventoryIndex.SlotID], ItemStat.Weight]){
-		global.Weight += global.ItemIndex[#global.Inventory[#ID, InventoryIndex.SlotID], ItemStat.Weight];
+	if(global.player_stats_struct.Weight <= global.player_stats_struct.Max_weight - global.ItemIndex[#global.Inventory[#ID, InventoryIndex.SlotID], ItemStat.Weight]){
+		global.player_stats_struct.Weight += global.ItemIndex[#global.Inventory[#ID, InventoryIndex.SlotID], ItemStat.Weight];
 	}	
 }
 
-function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAmmo = 0, ObjectDurability = 0, ObjectAmount = 1, OWSA = Item.None, OWBA = Item.None, OWGA = Item.None, OWsuppressorA = Item.None){
+function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAmmo = 0, ObjectDurability = 0, ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
 	if(percent_chance(Chance)){
 		ItemDropped = instance_create_layer(PositionX, PositionY, "ItemsO", oItems);
 		ItemDropped.Amount = ObjectAmount;
@@ -233,7 +235,7 @@ function ArmourDrop(ID, ObjectType){
 		if(oPlayer.ToggleNightVision == true){
 			oPlayer.ToggleNightVision = false;
 		}
-		global.Weight -= global.ItemIndex[#global.ArmourID[ID], ItemStat.Weight];
+		global.player_stats_struct.Weight -= global.ItemIndex[#global.ArmourID[ID], ItemStat.Weight];
 		global.ArmourID[ID] = Item.None;
 		global.ArmourDurability[ID] = 0;
 	}else{

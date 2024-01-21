@@ -1,7 +1,7 @@
 {
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
-  "name": "DamageIndicator",
+  "name": "damage_indicator",
   "isCompatibility": false,
   "isDnD": false,
   "parent": {

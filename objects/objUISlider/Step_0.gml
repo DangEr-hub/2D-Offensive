@@ -4,6 +4,12 @@ if (pvalue != value) {
 
 	handle.__x = scroll_x;
 	pvalue = value;
+	
+	switch(type){
+		case "Volume":
+			global.sound_gain = value;
+		break;
+	}
  
 	if (is_callable(callback))
 		callback(id, value);

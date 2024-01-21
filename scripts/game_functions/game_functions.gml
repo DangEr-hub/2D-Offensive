@@ -48,22 +48,21 @@ function percent_chance(argument0) {
 	return (random(100) <= argument0);
 }
 	
-function statistics_hit(Type, Damage){
+function statistics_hit(Type, Damage, ObjectType){
 	switch(Type){
-		case "HP":
-			HP -= Damage;
-			if(HPTimer == -1){
-				HPTimer = game_get_speed(gamespeed_fps)*.5;
+		case "Health":
+			ObjectType.stats.Health_points -= Damage;
+			if(ObjectType.HPTimer == -1){
+				ObjectType.HPTimer = game_get_speed(gamespeed_fps)*.5;
 			}
 		break;
 		
 		case "Stamina":
-		StaminaDamage = Damage;
-		Stamina -= StaminaDamage;
-		Stamina = max(Stamina, 0);
-		if(StaminaTimer == -1){
-			StaminaTimer = game_get_speed(gamespeed_fps)*.5;	
-		}
+			ObjectType.StaminaDamage = Damage;
+			ObjectType.stats.Stamina_points -= StaminaDamage;
+			if(ObjectType.StaminaTimer == -1){
+				ObjectType.StaminaTimer = game_get_speed(gamespeed_fps)*.5;	
+			}
 		break;
 	}
 }
@@ -117,7 +116,7 @@ function player_shooting(){
 	#endregion
 				
 	#region Create flash effect
-	if(HP > 0){
+	if(stats.Health_points > 0){
 		MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight);
 		MuzzleFlashLight.Object = Weapon;
 		MuzzleFlashLight.DestroyTimer = ShootTimer - 1;
@@ -304,4 +303,72 @@ function array_shift_left(array, new_value) {
     
     array[array_length(array) - 1] = new_value;
     return array;
+}
+	
+function drop_experience(number, value, xx, yy, position_range){
+	for(var i=0;i<number;i++){
+		var random_x = random_range(xx - position_range, xx + position_range);
+		var random_y = random_range(yy - position_range, yy + position_range);
+		var xp_object = instance_create_layer(random_x, random_y, "ItemsO", oExp);
+		xp_object.value = value;
+	}
+}
+	
+function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBaseStamina) {
+    var height = EnemyPhysical[0];
+    var weight = EnemyPhysical[1];
+    var age = EnemyAge;
+	
+	var Stamina = ceil(EnemyBaseStamina * 1.1*exp(-(power(age - 40, 2)/2)));
+    var Health = ceil(EnemyBaseHP + height / 10 + weight / 10 * 1.1 * exp(-(power(age - 40, 2) / 2)));
+
+    var enemy_struct = {
+        Health_points: Health,
+        Height: height,
+        Weight: weight,
+        Age: age,
+        Name: EnemyName, 
+        Damage_health_points: Health,
+        Max_health_points: Health,
+		Stamina_points: Stamina,
+		Damage_stamina_points: Stamina,
+		Max_stamina_points: Stamina
+    };
+	
+    return enemy_struct;
+}
+
+function create_player(PlayerHP, PlayerStamina){
+    var player_struct = {
+        Health_points: PlayerHP,
+		Damage_health_points: PlayerHP,
+		Stamina_points: PlayerStamina,
+		Damage_stamina_points: PlayerStamina
+    };
+	
+    return player_struct;
+}
+
+function pause(ObjectType){
+	with(zui_main()){
+		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
+			alpha = global.GUIHUDAlpha * 2.25;
+			window_id = id;
+		}
+	}
+	ObjectType.alarm[0] = 1;
+}
+
+function unpause(ObjectType){
+	with(objZUIMain){
+		zui_destroy();
+	}
+	with(ObjectType){
+		PopupWindow = "";
+		Alpha = 0;
+		BackGround = -1;
+		surface_free(_surface);
+		if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
+		instance_activate_all();
+	}
 }

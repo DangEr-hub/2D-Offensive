@@ -1,9 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 if(State == States.Death){
-	other.Object.AttackDamage = global.ItemIndex[#other.Weapon, ItemStat.Damage];
-	BloodSplashNumber = ceil(other.Object.AttackDamage / 5);
-	BloodParticleNumber = ceil(other.Object.AttackDamage / 2);
+	other.Object.attack_damage = global.ItemIndex[#other.Weapon, ItemStat.Damage];
+	BloodSplashNumber = ceil(other.Object.attack_damage / 5);
+	BloodParticleNumber = ceil(other.Object.attack_damage / 2);
 
 
 

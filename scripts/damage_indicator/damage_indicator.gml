@@ -1,4 +1,4 @@
-function DamageIndicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID) {
+function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID) {
 	Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
 	Indicator.Damage_Indicator = DamageIndicatorString;
 	Indicator.Color = DamageIndicatorColor;

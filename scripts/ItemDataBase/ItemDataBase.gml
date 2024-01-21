@@ -76,6 +76,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.Glock, ["Semi", "Burst", "Safety"]);
 	add_shooting_modes(Item.m4_carbine, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.awm, ["Semi", "Safety"]);
+	add_shooting_modes(Item.usp, ["Semi", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -90,7 +91,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
 	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = $FF16C3E5; ///orange
 	global.ItemIndex[#Item.AKM, ItemStat.AmmoSpriteID] = 0;
-	global.ItemIndex[#Item.AKM, ItemStat.Description] = "The AKM was designed to succeed the AK-47. This assault rifle uses the 7.62x39mm Soviet intermediate round.It features a gas-operated mechanism with a rotating bolt and can be set to fire in either semi-automatic or automatic modes.";
+	global.ItemIndex[#Item.AKM, ItemStat.Description] = "The AKM was designed to succeed the AK-47. This assault rifle uses the 7.62x39mm Soviet intermediate round. It features a gas-operated mechanism with a rotating bolt and can be set to fire in either semi-automatic or automatic modes.";
 	
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .9);
@@ -258,6 +259,16 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.awm, ItemStat.AmmoSpriteID] = 9;
 	global.ItemIndex[#Item.awm, ItemStat.ScopeInaccuracyResetTimer] = 15;
 	global.ItemIndex[#Item.awm, ItemStat.Description] = "The bolt-action sniper rifle crafted by Accuracy International is purpose-built for magnum rifle cartridges.";
+	
+	global.ItemIndex[#Item.usp, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 750, 35, 350, 15, "Secondary", 1, 3, 7, snd_usp, 2, 1, false,
+	0, 0, 7, 5, 15, .5, 5.5, 5, .0025, 0, 0, .93, 0, "Pistol", .93, .505, .00025, 0.15 * game_get_speed(gamespeed_fps));
+	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
+	global.ItemIndex[#Item.usp, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
+	global.ItemIndex[#Item.usp, ItemStat.has_suppressor] = Item.military_suppressor;
+	global.ItemIndex[#Item.usp, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.usp, ItemStat.AmmoSpriteID] = 7;
+	global.ItemIndex[#Item.usp, ItemStat.Description] = "usp handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
 	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Name] = "High-explosion landmine";

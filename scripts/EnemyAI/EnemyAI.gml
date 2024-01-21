@@ -132,7 +132,6 @@ function EnemyShooting(DangerX, DangerY){
 		MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight);
 		MuzzleFlashLight.Object = Weapon;
 		MuzzleFlashLight.DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] - 1);
-		show_debug_message(MuzzleFlashLight.DestroyTimer);
 		with(MuzzleFlashLight){
 			light[| eLight.Intensity] = 1.3;
 			light[| eLight.Color] = $FF0000FF;

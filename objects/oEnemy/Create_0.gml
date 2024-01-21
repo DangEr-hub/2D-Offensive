@@ -2,14 +2,8 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
+stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
 Visible = false;
-Age = irandom_range(15, 70);
-Height = random_range(150, 200);
-Weight = random_range(70, 170);
-MaxHP = ceil(80 + Height/10 + Weight/10 * 1.1*exp(-(power(Age - 40, 2)/2)));
-Name = choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo");
-HP = MaxHP;
-DamageHP = MaxHP;
 WeaponID = [0, 0];
 Ammo = [0, 0];
 ClipAmmo = [0, 0];
@@ -40,9 +34,6 @@ SpottedDanger = false;
 EquippedGrenade = Item.None;
 EquippedGrenadeTimer = -1;
 EquippedGrenadeTime = .25 * game_get_speed(gamespeed_fps);
-MaxStamina = ceil(80 * 1.1*exp(-(power(Age - 40, 2)/2)));
-Stamina = MaxStamina;
-DamageStamina = Stamina;
 FacingX = ChasingObject.x;
 FacingY = ChasingObject.y;
 VisibilityTimer = -1;
@@ -84,7 +75,7 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #region Movement engine
 Acceleration = min(.59 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .75);
 Friction = .75;
-MaxSpeed = min(3.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 5.75);
+MaxSpeed = min(2.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 5.75);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
@@ -92,7 +83,6 @@ YSpeed = 0;
 ReactionTimer = -1;
 ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
 ChasingDistance = min(512 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 1024);
-
 #endregion
 
 #region Legs
@@ -103,8 +93,8 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine);
-WeaponID[1] = choose(Item.DesertEagle, Item.Glock);
+WeaponID[0] = Item.None;//choose(Item.Glock, Item.usp, Item.DesertEagle);//choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine);
+WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
 MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];

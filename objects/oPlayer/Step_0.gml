@@ -2,19 +2,19 @@ event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Timers
-	HP = clamp(HP, -1, global.MaxHP);
-	DamageHP = clamp(DamageHP, 0, global.MaxHP);
-	Stamina = clamp(Stamina, 0, global.MaxStamina);
-	DamageStamina = clamp(DamageStamina, 0, global.MaxStamina);
+	stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
+	stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
+	stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
+	stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);
 	headshot_x = x - 10;
 	headshot_y = y - 18;
 	audio_listener_position(x, y, 0);
 	
-	#region HP timer
+	#region Health timer
 	if(HPTimer == 0){
-		var Health = HP - AttackDamage;
-	    if(DamageHP > Health){
-	        DamageHP -= max(global.MaxHP/100, .25);
+		var Health = stats.Health_points - attack_damage;
+	    if(stats.Damage_health_points > Health){
+	        stats.Damage_health_points -= max(global.player_stats_struct.Max_health/100, .25);
 	    }else{
 	        HPTimer = -1;
 	    }
@@ -27,9 +27,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Stamina timer
 	if(StaminaTimer == 0){
-		var Health = Stamina - StaminaDamage;
-	    if(DamageStamina > Health){
-	        DamageStamina -= max(global.MaxStamina/100, .25);
+		var Health = stats.Stamina_points - StaminaDamage;
+	    if(stats.Damage_stamina_points > Health){
+	        stats.Damage_stamina_points -= max(global.player_stats_struct.Max_stamina/100, .25);
 	    }else{
 	        StaminaTimer = -1;
 	    }
@@ -44,9 +44,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	var HealingPower = BaseHealingPower;
 	if(HPHealingTimer == -1){
 		if(HPTimer == -1){
-			if(HP >= 0 && HP < global.MaxHP){
-				HP += HealingPower;	
-				DamageHP = HP;
+			if(stats.Health_points >= 0 && stats.Health_points < global.player_stats_struct.Max_health){
+				stats.Health_points += HealingPower;	
+				stats.Damage_health_points = stats.Health_points;
 				HPHealingTimer = HealingTimer;
 			}
 		}
@@ -59,13 +59,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Stamina healing timer
 	if(StaminaHealingTimer == -1){
 		if(moving_state != player_states.running_state){
-			if(Stamina >= 0 && Stamina < global.MaxStamina){
-				var stamina_healing_power = ceil(global.MaxStamina/50);
+			if(stats.Stamina_points >= 0 && stats.Stamina_points < global.player_stats_struct.Max_stamina){
+				var stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/50);
 				if(moving_state == player_states.prone_state){
-					stamina_healing_power = ceil(global.MaxStamina/10);
+					stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/10);
 				}
-				Stamina += stamina_healing_power;
-				DamageStamina = Stamina;
+				stats.Stamina_points += stamina_healing_power;
+				stats.Damage_stamina_points = stats.Stamina_points;
 				StaminaHealingTimer = HealingTimer;
 			}
 		}
@@ -135,7 +135,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Camera shake
-	if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && HP > 0 && global.ViewShake == true){
+	if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && stats.Health_points > 0 && global.ViewShake == true){
+		var ViewShakeMagnitude = 0;
 		var LowHPViewAngleFrequency = 0;
 		var ExplosionViewAngleFrequency = 0;
 		var AimPunchStrength = 5;
@@ -175,9 +176,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			}
 		}
 		
-		if(HP <= ceil(global.MaxHP/3)){
-			LowHPCrossShake = 5;
-			ViewAngleAmplitude += 5;
+		if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/3)){
+			LowHPCrossShake = 1;
+			ViewAngleAmplitude += 1;
 			LowHPViewAngleFrequency = 100;
 		}
 		
@@ -290,6 +291,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			case "AWM":
 				Weapon.image_index = 10;
+			break;
+			
+			case "USP":
+				Weapon.image_index = 11;
 			break;
 			
 			default:
@@ -417,7 +422,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					#endregion
 				}
 	
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .8;
 			break;
 			#endregion
 			
@@ -909,15 +914,15 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 		var moving_speed_multiplier = 1;	
 		if(moving_state == player_states.running_state){
-			if(Stamina > 0){
-				statistics_hit("Stamina", .1);
+			if(stats.Stamina_points > 0){
+				statistics_hit("Stamina", .1, id);
 				moving_speed_multiplier = 1.25;	
 			}
 		}else if(moving_state == player_states.prone_state){
 			moving_speed_multiplier	= .135;
 		}
 	
-		var WeightSpeedMultiplier = 1 / (global.Weight/50 + 1);
+		var WeightSpeedMultiplier = 1 / (global.player_stats_struct.Weight/50 + 1);
 	
 		var WeaponSpeedMultiplier = 1;
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.MovingSpdMul] != 0){
@@ -1173,10 +1178,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		HealingTime ++;
 	}
 	if(HealingTime >= global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]){
-		DamageIndicator("+" + string(global.ItemIndex[#HealingItemId, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, 0);
+		damage_indicator("+" + string(global.ItemIndex[#HealingItemId, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, icons.health);
 		CanShoot = true;
-		HP += global.ItemIndex[#HealingItemId, ItemStat.Damage];
-		DamageHP = HP;
+		stats.Health_points += global.ItemIndex[#HealingItemId, ItemStat.Damage];
+		stats.Damage_health_points = stats.Health_points;
 		Healing = false;
 		HealingTime = -1;
 	}
@@ -1200,11 +1205,18 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Level
-	if(global.xp >= global.max_xp){
-		global.Lvl ++;
-		global.MaxStamina *= power(1.25, ln(global.Lvl));
-		global.MaxHP *= power(1.25, ln(global.Lvl));
-		global.max_xp *= 1.1;
+	if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
+		damage_indicator("Level up!", x, y - sprite_height/2, global.GoldColor, spr_Icons, icons.xp
+);
+		var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
+		var particle_y = random_range(y - sprite_height/2, y + sprite_height/2);
+		part_particles_create(global.ParticleSystem, particle_x, particle_y, oParticleSystem.level_up_particle, 50);
+		global.player_stats_struct.Xp = 0;
+		global.player_stats_struct.Lvl ++;
+		global.player_stats_struct.Armour += .01;
+		global.player_stats_struct.Max_stamina *= power(1.25, ln(global.player_stats_struct.Lvl));
+		global.player_stats_struct.Max_health *= power(1.25, ln(global.player_stats_struct.Lvl));
+		global.player_stats_struct.Max_xp *= 2;
 	}
 	#endregion
 
@@ -1361,7 +1373,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					var Id = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
 					switch(Id){
 						case Item.HealingKit:
-							if(Healing == false && HP < global.MaxHP){
+							if(Healing == false && stats.Health_points < global.player_stats_struct.Max_health){
 								HealingItemId = Item.HealingKit;
 								Healing = true;
 								ItemAmountSubstract(ItemUsePosition, 1);
@@ -1631,7 +1643,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 }
 
 #region Death
-if(HP <= 0 && oDraw.RespawnMenu == false){
+if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
 	round_end("Loss");
 	instance_deactivate_object(obj_light_renderer); ///because shadows are visible even with grayscale and blur shader
 	Weapon.image_index = 0;

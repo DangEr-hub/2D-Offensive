@@ -7,16 +7,6 @@ function save_game(){
 		file_delete("save_game.ini");
 	}
 	ini_open("save_game.ini");
-	ini_write_real("Vars", "max_hp", global.MaxHP);
-	ini_write_real("Vars", "max_stamina", global.MaxStamina);
-	ini_write_real("Vars", "max_weight", global.MaxWeight);
-	ini_write_real("Vars", "weight", global.Weight);
-	ini_write_real("Vars", "xp", global.xp);
-	ini_write_real("Vars", "max_xp", global.max_xp);
-	ini_write_real("Vars", "player_lvl", global.Lvl);
-	ini_write_real("Vars", "skill_points", global.SkillPoints);
-	ini_write_real("Vars", "money", global.Money);
-	ini_write_real("Vars", "unskill_points", global.UnSkillPoints);
 	ini_write_real("Vars", "time_speed", global.TimeSpeed);
 	ini_write_real("Vars", "godmode", global.GodMode);
 	ini_write_real("Vars", "map_id", global.MapID);
@@ -40,8 +30,9 @@ function save_game(){
 	ini_write_real("Vars", "camera_crosshair_shake", global.ViewShake);
 	ini_write_real("Vars", "admin_hud", global.AdminHUD);
 	ini_write_real("Vars", "draw_particles", global.DrawParticles);
-	ini_write_real("Vars", "crosshair_color", global.CrosshairColor);
+	ini_write_real("Vars", "crosshair_color", global.crosshair_color);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
+	ini_write_real("Vars", "sound_gain", global.sound_gain);
 	
 	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
@@ -74,12 +65,22 @@ function save_game(){
 	ini_close();
 	#endregion
 	
+	#region Save player elo stats
+	if(file_exists("player_elo_stats.json")){
+		file_delete("player_elo_stats.json");
+	}
+	var json_string = json_stringify(global.player_elo_struct);
+	var file = file_text_open_write("player_elo_stats.json");
+	file_text_write_string(file, json_string);
+	file_text_close(file);
+	#endregion
+	
 	#region Save player stats
 	if(file_exists("player_stats.json")){
 		file_delete("player_stats.json");
 	}
-	var json_string = json_stringify(global.player_elo_struct);
-	var file = file_text_open_write("player_stats.json");
+	json_string = json_stringify(global.player_stats_struct);
+	file = file_text_open_write("player_stats.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
 	#endregion
@@ -90,16 +91,6 @@ function load_game(){
 	#region Load game
 	if(file_exists("save_game.ini")){
 		ini_open("save_game.ini");
-		global.MaxHP = ini_read_real("Vars", "max_hp", global.MaxHP);
-		global.MaxStamina = ini_read_real("Vars", "max_stamina", global.MaxStamina);
-		global.MaxWeight = ini_read_real("Vars", "MaxWeight", global.MaxWeight);
-		global.Weight = ini_read_real("Vars", "max_weight", global.Weight);
-		global.xp = ini_read_real("Vars", "xp", global.xp);
-		global.max_xp = ini_read_real("Vars", "max_xp", global.max_xp);
-		global.Lvl = ini_read_real("Vars", "player_lvl", global.Lvl);
-		global.SkillPoints = ini_read_real("Vars", "skill_points", global.SkillPoints);
-		global.Money = ini_read_real("Vars", "money", global.Money);
-		global.UnSkillPoints = ini_read_real("Vars", "unskill_points", global.UnSkillPoints);	
 		global.TimeSpeed = ini_read_real("Vars", "time_speed", global.TimeSpeed);
 		global.GodMode = ini_read_real("Vars", "godmode", global.GodMode);
 		global.MapID = ini_read_real("Vars", "map_id", global.MapID);	
@@ -123,8 +114,9 @@ function load_game(){
 		global.ViewShake = ini_read_real("Vars", "camera_crosshair_shake", global.ViewShake);
 		global.AdminHUD = ini_read_real("Vars", "admin_hud", global.AdminHUD);
 		global.DrawParticles = ini_read_real("Vars", "draw_particles", global.DrawParticles);
-		global.CrosshairColor = ini_read_real("Vars", "crosshair_color", global.CrosshairColor);
+		global.crosshair_color = ini_read_real("Vars", "crosshair_color", global.crosshair_color);
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
+		global.sound_gain = ini_read_real("Vars", "sound_gain", global.sound_gain);
 
 		global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 2; i++) {
@@ -160,12 +152,31 @@ function load_game(){
 	}
 	#endregion
 	
+	#region Load player elo stats
+	if (file_exists("player_elo_stats.json")) {
+	    var file = file_text_open_read("player_elo_stats.json");
+	    var json_string = file_text_read_string(file);
+	    file_text_close(file);
+	    global.player_elo_struct = json_parse(json_string);
+	}
+	#endregion
+	
 	#region Load player stats
 	if (file_exists("player_stats.json")) {
 	    var file = file_text_open_read("player_stats.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
-	    global.player_elo_struct = json_parse(json_string);
+	    global.player_stats_struct = json_parse(json_string);
+		
+	    global.player_stats_struct.Get_KD = function() {
+	        return (global.player_stats_struct.Deaths != 0) ? (global.player_stats_struct.Kills / global.player_stats_struct.Deaths) : 0;
+	    }
+		global.player_stats_struct.Get_headshot_percentage = function() {
+			return (global.player_stats_struct.Kills != 0) ? (global.player_stats_struct.Headshots / global.player_stats_struct.Kills) * 100 : 0;
+		}
+		global.player_stats_struct.Get_accuracy = function() {
+			return (global.player_stats_struct.All_shots != 0) ? global.player_stats_struct.Hit_shots / global.player_stats_struct.All_shots * 100 : 0;
+		}
 	}
 	#endregion
 	

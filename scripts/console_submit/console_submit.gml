@@ -222,9 +222,6 @@ function console_submit(argument0) {
 					case "hostage":
 						if(no == 1 && string_digits(c[1]) != "") then global.Hostage = real(c[1]);
 					break;
-					case "rank_modifier":
-						if(no == 1 && string_digits(c[1]) != "") then global.RankMultiplier = real(c[1]);
-					break;
 					case "enemy_can_move":
 						if(no == 1 && string_digits(c[1]) != "") then global.EnemyCanMove = real(c[1]);
 					break;
@@ -333,7 +330,7 @@ function console_submit(argument0) {
 					            b = clamp(b, 0, 255);
 
 					            // Set crosshair color
-					            global.CrosshairColor = make_color_rgb(r, g, b);
+					            global.crosshair_color = make_color_rgb(r, g, b);
 					        }
 					    }
 					break;
@@ -359,69 +356,6 @@ function console_submit(argument0) {
 							global.player_elo_struct.Elo = convert_to_eggy_scale(real(c[1]));	
 						}
 					break;
-					
-	                /*
-	                case "infinite_ammo":
-	                    if no == 1 then global.InfiniteAmmo = real(c[1]);
-	                break;
-	                case "draw_damage":
-	                    if no == 1 then global.ShowDamage = real(c[1]);
-	                break;
-	                case "blackness_value":
-	                    if(no == 1) then global.Blackness_Value = real(c[1]);
-	                break;
-	                case "r_drawparticles":if(no == 1) then global.DrawParticles = real(c[1]);break;
-	                case "r_drawtracers":if(no == 1) then global.DrawTracers = real(c[1]);break;
-	                case "net_graph_position_x":if(no == 1) then global.AdminHUDPositionX = real(c[1]);break;
-	                case "net_graph_position_y":if(no == 1) then global.AdminHUDPositionY = real(c[1]);break;
-	                case "airplane_chance":if(no == 1) then global.AirPlaneChance = real(c[1]);break;
-	                case "bullet_impact_type":if(no == 1) then global.BulletImpactType = real(c[1]);break;
-	                case "no_sway":if(no == 1) then global.NoGunSway = real(c[1]);break;
-	                case "draw_headhitbox":if(no == 1) then global.DrawHeadHitBox = real(c[1]);break;
-	                case "draw_ui":if(no == 1) then global.DrawUI = real(c[1]);break;
-	                case "one_taps_sound":if(no == 1) then global.OneTaps = real(c[1]);break;
-	                case "rain":if(no == 1) then global.Rain = real(c[1]);break;
-	                case "snow":if(no == 1) then global.Snow = real(c[1]);break;
-	                case "hp":if(no == 1) then global.HP = real(c[1]);break;
-	                case "timer":if(no == 1) then obj_Alarms.alarm[6] = real(c[1]);break;
-	                case "buy_time":if(no == 1) then global.BuyTimer = real(c[1]);break;
-	                case "money":if(no == 1) then global.Money = real(c[1]);break;
-	                case "bullet_time":if(no == 1) then global.SlowMotion = real(c[1]);break;
-	                case "gems":if(no == 1) then global.Gems = real(c[1]);break;
-	                case "declare_guns":GunDeclare();break;
-	                case "enemy_canshoot":if no == 1 then global.EnemyCanShoot = real(c[1]);break;
-	                case "skill_points":if(no == 1) then global.SkillPoints = real(c[1]);break;
-	                case "r_drawblood":if(no == 1) then global.DrawBlood = real(c[1]);break;
-	                case "player_solid_collision":if(no == 1) then global.PlayerSolid = real(c[1]);break;
-	                case "draw_bloom_shader":if(no == 1) then global.DrawBloom = real(c[1]);break;
-	                case "crosshair_alpha":if(no == 1) then global.CrosshairAlpha = real(c[1]);break;
-	                case "crosshair_color":if(no == 1) then global.CrosshairColor = real(c[1]);break;
-	                case "crosshair_scale":if(no == 1) then global.CrosshairSize = real(c[1]);break;
-	                case "set_elo":if(no == 1) then global.Elo = real(c[1]);break;
-	                case "player_min_speed":if(no == 1) then global.MinSpeed = round(real(c[1])/60);break;
-	                case "player_max_speed":if(no == 1) then global.MaxSpeed = round(real(c[1])/60);break;
-	                case "complex_recoil":if(no == 1) then global.ComplexRecoil = real(c[1]);break;
-	                case "draw_bodyhitbox":if(no == 1) then global.DrawBodyHitBox = real(c[1]);break;
-	                case "draw_solid_collision":if(no == 1) then global.DrawSolidCollision = real(c[1]);break;
-	                case "temperature":if(no==1)then global.Temperature = real(c[1]);break;
-	                case "temperature_min":if(no==1)then global.TemperatureMin = real(c[1]);break;
-	                case "temperature_max":if(no==1)then global.TemperatureMax = real(c[1]);break;
-	                case "spawn_terrorist":instance_create(obj_Crosshair.x, obj_Crosshair.y, obj_Terrorist);break;
-	                case "spawn_obstacle":instance_create(obj_Crosshair.x, obj_Crosshair.y, obj_WoodenBox);break;
-	                case "draw_gun_inaccuracy":global.DrawGunInaccuracy = real(c[1]);break;
-	                case "enemy_unlimited_hp":if(no==1)then global.EnemyUnlimitedHP = real(c[1]);break;
-	                case "competetive_games":if(no==1)then global.CompetetiveGames = real(c[1]);break;
-	                case "max_hp":if(no==1) then global.MaxHP = real(c[1]);break;
-	                case "developer_mode":global.Money = 100000; global.BuyTimer = 50000;obj_Alarms.alarm[6] = 100000 * game_get_speed(gamespeed_fps);for(i=0;i<ds_grid_width(global.WeaponDic);i++){global.WeaponDic[#i, WeaponStats.Unlocked] = true;}global.God = true;break;
-	                //case "bind
-	                case "unlock_all_weapons":
-	                    if(no == 1){
-	                        for(i=0;i<ds_grid_width(global.WeaponDic);i++){
-	                            global.WeaponDic[#i, WeaponStats.Unlocked] = true;
-	                        }
-	                    }
-	                break;
-					*/
 	            } 
 	        }
 	        global.console[? "string"] = "";

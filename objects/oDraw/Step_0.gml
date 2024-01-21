@@ -35,15 +35,10 @@ if(RespawnMenu == true){
 
 if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false){
 	if(PauseMenu == false){
-		alarm[0] = 1;
+		pause(id);
 		PauseMenu = true;	
 	}else{
-		PopupWindow = "";
-		Alpha = 0;
-		BackGround = -1;
-		surface_free(_surface);
-		if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
-		instance_activate_all();
+		unpause(id);
 		PauseMenu = false;
 	}
 }

@@ -40,7 +40,7 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
     if(instance_exists(oPlayer)){
 	
         // Previous conditionals for blurring and grayscale effects
-        if(oPlayer.HP > ceil(global.MaxHP/3)){
+        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3)){
             if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
                 if (!surface_exists(BlurSurface)){
                     BlurSurface = surface_create(global.GuiW, global.GuiH);
@@ -107,7 +107,7 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
         }
 
         // Player effects and application_surface drawing
-        if(oPlayer.HP > ceil(global.MaxHP/3)){
+        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3)){
             if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true) {
                 draw_surface_stretched(BlurSurface, 0, 0, global.GuiW, global.GuiH);
             } else {
@@ -156,7 +156,7 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
         if(oPlayer.AimPunchTimer <= -1 && oPlayer.near_explosion == false && surface_exists(BlurSurface)){
             surface_free(BlurSurface);
         }
-        if(oPlayer.HP > ceil(global.MaxHP/3) && surface_exists(BlurGrayScaleSurface)){
+        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3) && surface_exists(BlurGrayScaleSurface)){
             surface_free(BlurGrayScaleSurface);
         }
 		if((oPlayer.ToggleNightVision == false || oPlayer.ToggleInfraVision) && surface_exists(NightVisionSurface)){

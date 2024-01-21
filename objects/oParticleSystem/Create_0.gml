@@ -87,3 +87,14 @@ part_type_life(snow_particle,180,360);
 part_type_speed(snow_particle, 1, 5, 0, 0);
 part_type_size(snow_particle, 1, 2, 0, 0);
 part_type_color2(snow_particle, c_white, c_white);
+
+//Level up particle
+level_up_particle = part_type_create();
+part_type_shape(level_up_particle, pt_shape_flare);
+part_type_size(level_up_particle, .5, 1, 0, 0);
+part_type_color2(level_up_particle, global.GoldColor, c_white);
+part_type_speed(level_up_particle, 15, 30, 0, 0);
+part_type_direction(level_up_particle, 0, 360, 0, 0);
+part_type_blend(level_up_particle, 1);
+part_type_life(level_up_particle, 20, 40);
+part_type_alpha2(level_up_particle, .5, 1);

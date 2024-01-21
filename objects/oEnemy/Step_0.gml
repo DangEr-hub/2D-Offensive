@@ -1,7 +1,7 @@
 event_inherited();
 
 #region Death
-if(HP <= 0 && State != States.Death){
+if(stats.Health_points <= 0 && State != States.Death){
     if (ChasingObject.HitMap[? id]) {
         ds_map_delete(ChasingObject.HitMap, id);
     }
@@ -17,11 +17,12 @@ if(HP <= 0 && State != States.Death){
 	instance_destroy(BodyHitBox);
 	instance_destroy(ArmHitBox);
 	instance_destroy(Legs);
+	drop_experience(1, xp_value, x, y, sqrt(power(sprite_width, 2) + power(sprite_height, 2))/4);
 	ItemDrop(
 		WeaponID[WeaponPositionID], 
 		x + lengthdir_x(WeaponDistance, RotationAngle), 
 		y + lengthdir_y(WeaponDistance, RotationAngle), 
-		10, 
+		/*10, */100,
 		Ammo[WeaponPositionID],
 		ClipAmmo[WeaponPositionID]
 	);
@@ -61,11 +62,11 @@ if(State != States.Death){
 		healing_time ++;
 	}
 	if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
-		DamageIndicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, 0);
+		damage_indicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, icons.health);
 		healing = false;
 		CanShoot = true;
-		HP += global.ItemIndex[#Item.HealingKit, ItemStat.Damage];
-		DamageHP = HP;
+		stats.Health_points += global.ItemIndex[#Item.HealingKit, ItemStat.Damage];
+		stats.Damage_health_points = stats.Health_points;
 		healing_time = -1;
 	}
 	#endregion
@@ -76,7 +77,7 @@ if(State != States.Death){
 		switch(State){
 			case States.MoveAway:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -85,7 +86,7 @@ if(State != States.Death){
 		
 			case States.MoveShoot:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -94,7 +95,7 @@ if(State != States.Death){
 		
 			case States.Move:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -103,7 +104,7 @@ if(State != States.Death){
 		
 			case States.MoveToward:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -112,7 +113,7 @@ if(State != States.Death){
 		
 			case States.MoveAwayFromGrenade:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -121,7 +122,7 @@ if(State != States.Death){
 		
 			case States.Chase:
 				if(ReactionTimer <= 0){
-					shooting_chance = min(25 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+					shooting_chance = min(/*25*/ 10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 					if(percent_chance(shooting_chance)){
 						EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 					}
@@ -151,10 +152,10 @@ if(State != States.Death){
 	
 	#region Timers
 	enemy_aimpunch = lerp(enemy_aimpunch, 0, .5);
-	HP = clamp(HP, 0, MaxHP);
-	DamageHP = clamp(DamageHP, 0, MaxHP);
-	Stamina = clamp(Stamina, 0, MaxStamina);
-	DamageStamina = clamp(DamageStamina, 0, MaxStamina);
+	stats.Health_points = clamp(stats.Health_points, 0, stats.Max_health_points);
+	stats.Damage_health_points = clamp(stats.Damage_health_points, 0, stats.Max_health_points);
+	stats.Stamina_points = clamp(stats.Stamina_points, 0, stats.Max_stamina_points);
+	stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, stats.Max_stamina_points);
 	WeaponPositionID = min(WeaponNumber, 1);
 	FacingX = ChasingObject.x;
 	FacingY = ChasingObject.y;
@@ -163,11 +164,11 @@ if(State != States.Death){
 	Weapon.x = x;
 	Weapon.y = y;
 
-	#region HP timer
+	#region Health timer
 	if(HPTimer == 0){
-		var Health = HP - AttackDamage;
-	    if(DamageHP > Health){
-	        DamageHP -= MaxHP/100;
+		var Health = stats.Health_points - attack_damage;
+	    if(stats.Damage_health_points > Health){
+	        stats.Damage_health_points -= stats.Max_health_points/100;
 	    }else{
 	        HPTimer = -1;
 	    }
@@ -180,9 +181,9 @@ if(State != States.Death){
 
 	#region Stamina timer
 	if(StaminaTimer == 0){
-		var Health = Stamina - AttackDamage;
-	    if(DamageStamina > Health){
-	        DamageStamina -= MaxStamina/100;
+		var Stamina = stats.Stamina_points - attack_damage;
+	    if(stats.Damage_stamina_points > Stamina){
+	        stats.Damage_stamina_points -= stats.Max_stamina/100;
 	    }else{
 	        StaminaTimer = -1;
 	    }
@@ -507,7 +508,7 @@ if(State != States.Death){
 		}
 	}
 	
-	if(ChasingObject.HP <= 0 && instance_exists(oPlayer)){
+	if(ChasingObject.stats.Health_points <= 0 && instance_exists(oPlayer)){
 		ChasingObject = oPlayer;	
 	}
 	#endregion
@@ -668,6 +669,10 @@ if(State != States.Death){
 			
 			case "AWM":
 				Weapon.image_index = 10;
+			break;
+			
+			case "USP":
+				Weapon.image_index = 11;
 			break;
 			
 			default:

@@ -1,4 +1,4 @@
-#macro PLAYER_STARTING_VOLATILITY 1
+ #macro PLAYER_STARTING_VOLATILITY 1
 #macro PLAYER_STARTING_ELO 0
 #macro SILVERI_ELO 1
 #macro SILVERII_ELO 20
@@ -25,8 +25,6 @@
 #macro MAX_ROUNDS 10
 #macro TRACKING_GAMES 10
 
-global.player_elo_struct = ini_player_struct_create();
-
 function ini_player_struct_create(){
 	var player_struct = {
 		"Game_volatility": PLAYER_STARTING_VOLATILITY,
@@ -43,7 +41,6 @@ function ini_player_struct_create(){
 		"Kills_per_round": array_create(MAX_ROUNDS, -1),
 		"Headshots_per_round": array_create(MAX_ROUNDS, -1),
 		"Enemy_elo": array_create(TRACKING_GAMES/2, -1),
-		"Rank": "Silver I"
 	}
 	
 	return player_struct;

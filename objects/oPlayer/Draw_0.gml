@@ -9,9 +9,9 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-//draw_text(x, y - 50, "enemy elo" + string(global.player_elo_struct.Enemy_elo));
+draw_text(x, y - 50, "enemy elo" + string(global.player_stats_struct.Max_health));
 
-if(HP > 0){
+if(stats.Health_points > 0){
 	if (equipped_item("Grenade")) {
 	    var distance = sqrt(power(45, 2) + power(15, 2));
 	    var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
