@@ -1,3 +1,4 @@
+callback = -1;
 alpha = global.GUIHUDAlpha * 3;
 value = 0;
 pressed = 0;

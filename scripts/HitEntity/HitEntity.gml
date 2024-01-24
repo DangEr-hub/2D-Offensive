@@ -96,12 +96,10 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 			hit_object.stats.Health_points = -1;
 			if(hit_object.object_index == oEnemy){
 				if(BodyPart >= HitBox.Head){
-					global.player_stats_struct.Xp += get_xp(hit_object.xp_value, 2);
 					if(global.ranked_game == true){
 						oEggyEloRatingSystem.headshots ++;
 					}
 				}else{
-					global.player_stats_struct.Xp += get_xp(hit_object.xp_value, 1);
 					if(global.ranked_game == true){
 						oEggyEloRatingSystem.kills ++;
 					}
@@ -150,7 +148,9 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 					hit_object.ArmourDurability[0] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];
 					hit_object.ArmourDurability[0] = max(hit_object.ArmourDurability[0], 0);
 				}
-				part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
+				if(instance_exists(oParticleSystem)){
+					part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
+				}
 				var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
 				if!(audio_is_playing(sound_effect)){
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, hit_object);
@@ -170,7 +170,9 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 					hit_object.ArmourDurability[1] -= hit_object.attack_damage/5010/global.ItemIndex[#HelmetID, ItemStat.Defense];
 					hit_object.ArmourDurability[1] = max(hit_object.ArmourDurability[1], 0);
 				}
-				part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
+				if(instance_exists(oParticleSystem)){
+					part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
+				}
 				var sound_effect = snd_HeadShotHelmet;
 				if!(audio_is_playing(sound_effect)){
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, hit_object);

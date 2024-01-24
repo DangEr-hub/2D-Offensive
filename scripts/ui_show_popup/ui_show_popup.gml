@@ -12,7 +12,7 @@ function ui_show_popup(_caption, popup_caption, button_caption_positive, button_
 				draggable = 1;
 			}
   
-			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5 - 8, objUILabel)) {
+			with (zui_create(zui_get_width() * 0.5 - string_width(_caption)/2, zui_get_height() * 0.5 - 8, objUILabel)) {
 				caption = _caption;
 			}
 			

@@ -1,0 +1,9 @@
+draw_set_font(set_font("Menu_small"));
+zui_set_size(128 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+cursor_position = 0;
+callback = -1;
+pressed = 0;
+max_string_length = floor(__width / string_width("a")) - 1;
+alpha = global.GUIHUDAlpha*2.25;
+text = "";
+active = false;

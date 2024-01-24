@@ -33,6 +33,7 @@ function save_game(){
 	ini_write_real("Vars", "crosshair_color", global.crosshair_color);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	ini_write_real("Vars", "sound_gain", global.sound_gain);
+	ini_write_real("Vars", "toggle_bloom_shader", global.BloomShader);
 	
 	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
@@ -117,6 +118,7 @@ function load_game(){
 		global.crosshair_color = ini_read_real("Vars", "crosshair_color", global.crosshair_color);
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
 		global.sound_gain = ini_read_real("Vars", "sound_gain", global.sound_gain);
+		global.BloomShader = ini_read_real("Vars", "toggle_bloom_shader", global.BloomShader);
 
 		global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 2; i++) {

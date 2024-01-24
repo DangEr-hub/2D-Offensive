@@ -83,6 +83,10 @@ crosshair_position = [mouse_x, mouse_y];
 #endregion
 
 #region Create objects
+if(global.DrawParticles == true){
+	instance_create_layer(x, y, "ItemsO", oParticleSurface);
+	instance_create_layer(x, y, "OtherO", oParticleSystem);
+}
 if(global.ranked_game == true){
 	instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
 }
@@ -90,8 +94,6 @@ instance_create_layer(x, y, "OtherO", oDraw);
 instance_create_layer(x, y, "OtherO", oConsole);
 instance_create_layer(x, y, "OtherO", oCamera);
 instance_create_layer(x, y, "OtherO", oCrosshair);
-instance_create_layer(x, y, "ItemsO", oParticleSurface);
-instance_create_layer(x, y, "OtherO", oParticleSystem);
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 #endregion
 

@@ -3,4 +3,4 @@
 event_inherited();
 Type = "Concrete";
 polygon = polygon_from_instance(id);
-flags |= eShadowCasterFlags.Dirty;
+flags |= eShadowCasterFlags.Static;

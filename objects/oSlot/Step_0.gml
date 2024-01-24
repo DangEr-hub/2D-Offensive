@@ -33,3 +33,18 @@ if(VarSlot == oPlayer.ItemUsePosition){
 if(global.Inventory[#VarSlot, InventoryIndex.SlotID] == Item.None){
 	DrawItemInfo = false;
 }
+
+if(DrawItemInfo == true){
+	if(oDraw.DrawInfo == false){
+		var Id = global.Inventory[#VarSlot, InventoryIndex.SlotID];
+		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour"){
+			oDraw.var_slot = VarSlot;
+			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			with(zui_main()){
+				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
+				}
+			}
+		}
+		oDraw.DrawInfo = true;	
+	}
+}				

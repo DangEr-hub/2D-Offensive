@@ -367,8 +367,63 @@ function unpause(ObjectType){
 		PopupWindow = "";
 		Alpha = 0;
 		BackGround = -1;
-		surface_free(_surface);
 		if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
 		instance_activate_all();
+	}
+}
+
+function set_crosshair_color(ColorString){
+	if (string_length(ColorString) == 9) {
+		var r = string_copy(ColorString, 1, 3);
+		var g = string_copy(ColorString, 4, 3);
+		var b = string_copy(ColorString, 7, 3);
+
+		r = real(r);
+		g = real(g);
+		b = real(b);
+
+		r = clamp(r, 0, 255);
+		g = clamp(g, 0, 255);
+		b = clamp(b, 0, 255);
+
+		global.crosshair_color = make_color_rgb(r, g, b);
+	}
+}
+	
+function reset_gui(){
+	if(instance_exists(oInventory)){
+		instance_destroy(oInventory);
+		instance_destroy(oSlot);
+		InventoryCreate();
+	}
+	if(instance_exists(oController)){
+		instance_destroy(oController);	
+		instance_create_depth(0, 0, -1000, oController);
+	}
+	if(instance_exists(oDraw)){
+		with(oDraw){
+			if(PauseMenu == true){
+				instance_destroy(objZUIMain);
+				pause(id);
+			}else if(RespawnMenu == true){
+				instance_destroy(objZUIMain);
+				with(zui_main()){
+					with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
+						alpha = global.GUIHUDAlpha * 2.25;
+						window_id = id;
+					}
+				}
+				alarm[0] = 1;
+			}
+			
+			if(oDraw.DrawInfo == true){
+				instance_destroy(objZUIMain);
+				with(zui_main()){
+					with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
+						
+					}
+				}
+			}
+		}
 	}
 }

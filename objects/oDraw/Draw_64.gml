@@ -722,7 +722,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	
 		#region Item description
 		if(instance_exists(oInventory)){
-			with(oSlot){
+				
+			/*with(oSlot){
 				if(DrawItemInfo == true){
 					oDraw.DrawInfo = true;
 					var Id = global.Inventory[#VarSlot, InventoryIndex.SlotID];
@@ -1013,7 +1014,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					draw_set_font(set_font("Console"));
 					#endregion
 						
-						#region Draw drop button
+					#region Draw drop button
 					draw_button_ext(
 						DescriptionX + string_width(DescriptionString)/4,
 						DescriptionY + DescriptionStringHeight*1.1 + ButtonHeight,
@@ -1029,7 +1030,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					}
 				
 				}
-			}
+			}*/
 		}
 		#endregion
 	
@@ -1082,238 +1083,6 @@ if(RespawnMenu == false){
 			draw_set_alpha(1);
 		}
 	}
-}
-#endregion
-
-#region Respawn menu 
-if(RespawnMenu == true){
-	PauseMenu = false;
-	if(Alpha >= 0 && Alpha < 1){
-		Alpha += .01;
-	}	
-	if (BackGround != -1) {
-		shader_set(shd_BlurGrayScale);
-		shader_set_uniform_f(usize, 8, 8, .05);
-	    draw_sprite_ext(BackGround, 0, 0, 0, global.GuiW/sprite_get_width(BackGround), global.GuiH/sprite_get_height(BackGround), 0, c_white, 1);
-	    shader_reset();		
-	}
-	
-
-	draw_set_alpha(min(Alpha, global.GUIHUDAlpha));
-	draw_set_color(c_ltgray);
-	draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
-	draw_set_alpha(Alpha);
-	if(ToggleMessage == true){
-		var RespawnMenuWidth = 732 * global.GUIMultiplier;
-		var RespawnMenuTitleHeight = 32 * global.GUIMultiplier;
-		var RespawnMenuMiddleHeight = 448 * global.GUIMultiplier;
-		var RespawnMenuEndHeight = 32 * global.GUIMultiplier;		
-		var RespawnMenuX = global.GuiW/2 - RespawnMenuWidth/2;
-		var RespawnMenuY = global.GuiH/2 - (RespawnMenuTitleHeight + RespawnMenuMiddleHeight + RespawnMenuEndHeight)/2;
-		var ButtonWidth = 128 * global.GUIMultiplier;
-		var ButtonHeight = 32 * global.GUIMultiplier;
-		
-		
-		var CellWidth = string_width("Opponent(alive)");
-		var CellHeight = 32 * global.GUIMultiplier;
-		var GUIMenuShiftY = 25 * global.GUIMultiplier;
-		var GUIMenuShiftX = (sprite_get_width(spr_GUITab) * global.GUIMultiplier - CellWidth*NumColumns)/2;
-		var GUIMenuTextX = global.GuiW/2 - (sprite_get_width(spr_GUITab) * global.GUIMultiplier)/2 + GUIMenuShiftX;
-		var GUIMenuTextY = global.GuiH/2 - (sprite_get_height(spr_GUITab) * global.GUIMultiplier)/2 + GUIMenuShiftY*2;
-		var KilledByString = "Killed by: " + string(KilledBy.stats.Name) + " by " + string(KilledBy.KilledByWeapon);
-		
-		#region Draw respawn menu tab
-		draw_menu_tab(
-			RespawnMenuX,
-			RespawnMenuY,
-			RespawnMenuWidth,
-			RespawnMenuMiddleHeight,
-			RespawnMenuTitleHeight,
-			RespawnMenuEndHeight,
-			c_black,
-			c_dkgray,
-			c_black,
-			min(Alpha, global.GUIHUDAlpha),
-			4,
-			global.GoldColor,
-			"You died - " + string(KilledByString)
-		
-		);
-		#endregion
-		
-		
-		draw_set_valign(fa_middle);
-		draw_set_font(set_font("Console"));
-		
-		#region Draw grid
-		var Keys = ds_map_keys_to_array(oPlayer.HitMap);
-		var Damages = array_create(ds_map_size(oPlayer.HitMap), -1);
-		var NumRows = ds_map_size(oPlayer.HitMap) + 1; // +1 for header row
-	
-		for (var i = 0; i < ds_map_size(oPlayer.HitMap); i++) {
-		    entity_id = Keys[i];
-		    var Data = oPlayer.HitMap[? entity_id];
-		    Damages[i] = Data[? "DamageReceived"];
-		}
-
-		// Sort entities based on damage
-		for (var i = 0; i < array_length(Damages) - 1; i++) {
-		    for (var j = i + 1; j < array_length(Damages); j++) {
-		        if (Damages[j] > Damages[i]) {
-		            // Swap Damages
-		            TempArray = Damages[i];
-		            Damages[i] = Damages[j];
-		            Damages[j] = TempArray;
-
-		            // Swap corresponding Keys
-		            TempArray = Keys[i];
-		            Keys[i] = Keys[j];
-		            Keys[j] = TempArray;
-		        }
-		    }
-		}
-
-		#region Draw header
-		for (var col = 0; col < NumColumns; col++) {
-
-		    TextX = GUIMenuTextX + (CellWidth - string_width(Columns[col])) / 2;
-		    TextY = GUIMenuTextY + (CellHeight - string_height(Columns[col])) / 2;
-	
-			draw_text_outlined(TextX + col * CellWidth, TextY + CellHeight/4, Columns[col], c_white, c_black, 1);
-			draw_set_color(global.GoldColor);
-		    draw_rectangle(GUIMenuTextX + col * CellWidth, GUIMenuTextY, GUIMenuTextX + (col + 1) * CellWidth, GUIMenuTextY + CellHeight, true);
-		}
-		#endregion
-	
-		#region Draw data
-		for (var row = 1; row < NumRows; row++) {
-		    EntityId = Keys[row - 1];
-		    Data = oPlayer.HitMap[? EntityId];
-			
-			if(EntityId != oPlayer.id){
-				EntityName = EntityId.Name;
-			}else{
-				EntityName = EntityId.Name + string(" (You)");
-			}
-    
-		    RowData = [string(EntityName), 
-		                    string(Data[? "HitsReceived"]), 
-		                    string(Data[? "DamageReceived"]), 
-		                    string(Data[? "HitsGiven"]), 
-		                    string(Data[? "DamageGiven"])];
-    
-		    for (col = 0; col < NumColumns; col++) {
-			
-			    TextX = GUIMenuTextX + (CellWidth - string_width(RowData[col])) / 2;
-			    TextY = GUIMenuTextY + (CellHeight - string_height(RowData[col])) / 2;
-	
-				draw_text_outlined(TextX + col * CellWidth, TextY + row * CellHeight + CellHeight/4, RowData[col], c_white, c_black, 1);
-				draw_set_color(global.GoldColor);
-		        draw_rectangle(GUIMenuTextX + col * CellWidth, GUIMenuTextY + row * CellHeight, GUIMenuTextX + (col + 1) * CellWidth, GUIMenuTextY + (row + 1) * CellHeight, true);
-		    }
-		}
-		#endregion
-	
-		#endregion
-		
-		#region Draw continue button
-		draw_button_ext(
-			GUIMenuTextX + (NumColumns*CellWidth)/2 - ButtonWidth/2, 
-			GUIMenuTextY + NumRows*CellHeight + 64, 
-			ButtonWidth, 
-			ButtonHeight, 
-			"Continue",
-			c_dkgray,
-			global.GoldColor,
-			"player_death_screen_continue"
-		);
-		#endregion
-		
-		#region Draw toggle message button
-		draw_button_ext(
-			GUIMenuTextX + (NumColumns*CellWidth)/2 - ButtonWidth/2, 
-			GUIMenuTextY + NumRows*CellHeight + 64 + ButtonHeight*1.25, 
-			ButtonWidth, 
-			ButtonHeight, 
-			"Toggle message",
-			c_dkgray,
-			global.GoldColor,
-			"player_death_screen_toggle_message"
-		);
-		#endregion
-		
-		#region Draw exit button
-		draw_button_ext(
-			GUIMenuTextX + (NumColumns*CellWidth)/2 - ButtonWidth/2, 
-			GUIMenuTextY + NumRows*CellHeight + 64 + ButtonHeight*2.5, 
-			ButtonWidth, 
-			ButtonHeight, 
-			"Exit", 
-			c_dkgray, 
-			global.GoldColor,
-			"pause_exit"
-		);
-		#endregion
-	
-		#region Draw exit popup window
-		if(PopupWindow == "game_end"){
-			var ButtonOffset = 8;
-			var ButtonWidth = 32 * global.GUIMultiplier;
-			var PopupWindowX = RespawnMenuX + RespawnMenuWidth/4;
-			var PopupWindowY = RespawnMenuY + (RespawnMenuTitleHeight + RespawnMenuMiddleHeight + RespawnMenuEndHeight)/4;
-			var PopupWindowWidth = RespawnMenuWidth/2;
-			var PopupWindowTitleHeight = RespawnMenuTitleHeight/2;
-			var PopupWindowMiddleHeight = RespawnMenuMiddleHeight/2;
-			var PopupWindowEndHeight = RespawnMenuEndHeight/2;
-			var ButtonHeight = PopupWindowEndHeight - ButtonOffset;
-			draw_menu_tab(
-				PopupWindowX,
-				PopupWindowY, 
-				PopupWindowWidth, 
-				PopupWindowMiddleHeight, 
-				PopupWindowTitleHeight, 
-				PopupWindowEndHeight, 
-				c_black, 
-				c_dkgray, 
-				c_black, 
-				1, 
-				1, 
-				global.GoldColor, 
-				"Exit the game?"
-			);
-			
-			var ExitTheGameString = "See you later, we will miss you!";
-			draw_text_outlined(PopupWindowX + PopupWindowWidth/2 - string_width(ExitTheGameString)/2, PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight/2, ExitTheGameString, c_white, c_black, 1);
-			
-			draw_button_ext(
-				PopupWindowX + PopupWindowWidth/4 - ButtonWidth/2, 
-				PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight + ButtonOffset/2, 
-				ButtonWidth, 
-				ButtonHeight, 
-				"Yes", 
-				c_dkgray, 
-				global.GoldColor,
-				"pause_exit_yes"
-			);
-			
-			draw_button_ext(
-				PopupWindowX + PopupWindowWidth*(3/4) - ButtonWidth/2, 
-				PopupWindowY + PopupWindowTitleHeight + PopupWindowMiddleHeight + ButtonOffset/2, 
-				ButtonWidth, 
-				ButtonHeight, 
-				"No", 
-				c_dkgray, 
-				global.GoldColor,
-				"pause_exit_no"
-			);
-		}
-		#endregion
-			
-	}else{
-		draw_set_font(set_font("Console"));
-		draw_text_outlined(global.GuiW/2 - string_width("Toggle message [MB right]")/2, global.GuiH - string_height("a"), "Toggle message [MB right]", c_white, c_black, 1);	
-	}
-	draw_set_alpha(1);
 }
 #endregion
 

@@ -12,5 +12,5 @@ if (pvalue != value) {
 	}
  
 	if (is_callable(callback))
-		callback(id, value);
+		callback(value);
 }

@@ -27,9 +27,14 @@ if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
 }
 
 if(RespawnMenu == true){
-	if(mouse_check_button_pressed(mb_right) && ToggleMessage == false){
-		Alpha = 0;
-		ToggleMessage = true;	
+	if!(instance_exists(objZUIMain)){
+		with(zui_main()){
+			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
+				alpha = global.GUIHUDAlpha * 2.25;
+				window_id = id;
+			}
+		}
+		alarm[0] = 1;
 	}
 }
 
@@ -41,12 +46,4 @@ if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu ==
 		unpause(id);
 		PauseMenu = false;
 	}
-}
-
-if(PauseMenu == true){
-	if(mouse_check_button_pressed(mb_right)){
-		PopupWindow = "";
-		Alpha = 0;
-		ToggleMessage = !ToggleMessage;	
-	}	
 }

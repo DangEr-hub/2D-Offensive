@@ -41,10 +41,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Healing timer
-	var HealingPower = BaseHealingPower;
 	if(HPHealingTimer == -1){
 		if(HPTimer == -1){
 			if(stats.Health_points >= 0 && stats.Health_points < global.player_stats_struct.Max_health){
+				var HealingPower = BaseHealingPower;
 				stats.Health_points += HealingPower;	
 				stats.Damage_health_points = stats.Health_points;
 				HPHealingTimer = HealingTimer;
@@ -1208,9 +1208,11 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
 		damage_indicator("Level up!", x, y - sprite_height/2, global.GoldColor, spr_Icons, icons.xp
 );
-		var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
-		var particle_y = random_range(y - sprite_height/2, y + sprite_height/2);
-		part_particles_create(global.ParticleSystem, particle_x, particle_y, oParticleSystem.level_up_particle, 50);
+		if(instance_exists(oParticleSystem)){
+			var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
+			var particle_y = random_range(y - sprite_height/2, y + sprite_height/2);
+			part_particles_create(global.ParticleSystem, particle_x, particle_y, oParticleSystem.level_up_particle, 50);
+		}
 		global.player_stats_struct.Xp = 0;
 		global.player_stats_struct.Lvl ++;
 		global.player_stats_struct.Armour += .01;

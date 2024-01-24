@@ -19,7 +19,7 @@ rank_image_size_width = sprite_get_width(spr_ranks)/2 * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks)/2 * global.GUIMultiplier;
 rank_image_gap = rank_image_size_height * 1.1;
 rank_callbacks = [];
-rank_title_x = rank_image_position_x + rank_image_size_width/2 - string_width("Rank")/8;
+rank_title_x = rank_image_position_x - rank_image_size_width/2;
 rank_title_y = rank_image_position_y - rank_image_gap;
 armour_string = "Armour: " + string(global.player_stats_struct.Armour*100) + "%";
 xp_string = "Experience: " + string(global.player_stats_struct.Xp) + "/" + string(global.player_stats_struct.Max_xp);
@@ -181,7 +181,7 @@ with (zui_create(rank_image_position_x + label_gap - sprite_get_width(spr_Health
 	healthbar = true;
 }
 
-with (zui_create(rank_title_x + label_gap + string_width(xp_string)*.8, rank_title_y + rank_image_gap*2, objUILabel)) {
+with (zui_create(rank_title_x + label_gap + string_width(xp_string), rank_title_y + rank_image_gap*2, objUILabel)) {
 	var bonus_xp = (global.player_stats_struct.Max_xp * 2) - global.player_stats_struct.Max_xp;
 	color = c_red;
 	caption = "(+" + string(bonus_xp) + ")";

@@ -235,12 +235,7 @@ function console_submit(argument0) {
 						if(no == 1 && string_digits(c[1]) != ""){
 							if(real(c[1]) != global.GUIMultiplier){
 								global.GUIMultiplier = real(c[1]);
-								if(instance_exists(oInventory)){
-									instance_destroy(oInventory);
-									instance_destroy(oSlot);
-									InventoryCreate();
-								}
-
+								reset_gui();
 							}
 						}
 					break;
@@ -286,7 +281,19 @@ function console_submit(argument0) {
 					break;
 					
 					case "draw_particles":
-						if(no == 1 && string_digits(c[1]) != "") then global.DrawParticles = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != ""){
+							var submit_value = real(c[1]);
+							if(submit_value == 0){
+								if(instance_exists(oParticleSystem)){
+									instance_destroy(oParticleSystem);
+								}
+							}else{
+								if!(instance_exists(oParticleSystem)){
+									instance_create_layer(oPlayer.x, oPlayer.y, "OtherO", oParticleSystem);
+								}
+							}
+							global.DrawParticles = real(c[1]);
+						}
 					break;	
 					
 					case "set_weather":
@@ -313,6 +320,7 @@ function console_submit(argument0) {
 					
 					case "set_crosshair_color":
 					    if (no == 1 && string_digits(c[1]) != "") {
+							set_crosshair_color(string_digits(c[1]));
 					        var colorString = string_digits(c[1]);
 					        if (string_length(colorString) == 9) {
 					            var r = string_copy(colorString, 1, 3);
@@ -351,7 +359,7 @@ function console_submit(argument0) {
 					    }
 					break;
 					
-					case "set_elo":
+					case "set_eggy_points":
 						if(no == 1 && string_digits(c[1]) != ""){
 							global.player_elo_struct.Elo = convert_to_eggy_scale(real(c[1]));	
 						}

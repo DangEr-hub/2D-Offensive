@@ -1,3 +1,4 @@
+gpu_set_tex_filter(true);
 display_set_gui_size(1920, 1080);
 with (objZUIMain) {
 	if (id != other.id) {

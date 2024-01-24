@@ -2,6 +2,8 @@
 // You can write your code in this editor
 application_surface_draw_enable(false);
 draw_texture_flush();
+var_slot = 0;
+item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
 UseString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyUse])) + "]";
 CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] --";
@@ -48,12 +50,7 @@ BlendColor = shader_get_uniform(shd_LightGray, "blendColor");
 #endregion
 
 #region Respawn and pause menu
-PopupWindow = "";
-_surface = -1;
-Columns = ["Opponent(alive)", "Hits from", "Damage from", "Hits given", "Damage given"];
-NumColumns = array_length(Columns);
-ToggleMessage = true;
-Alpha = 0;
+KilledBy = noone;
 #endregion
 
 #region GUI menu

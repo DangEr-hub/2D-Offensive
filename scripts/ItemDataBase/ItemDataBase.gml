@@ -100,7 +100,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.DesertEagle, "IMI Desert eagle", 1.75 * game_get_speed(gamespeed_fps), 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
-	0, 0, 10, 30, 7, .5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .0001, .1 * game_get_speed(gamespeed_fps));
+	0, 0, 10, 30, 7, 2.5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .0001, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.DesertEagle, ItemStat.disadvantages] = "-High recoil\n-Low magazine capacity";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.advantages] = "-High damage\n-High range\n-High armour penetration";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.ItemColor] = $FFB2B2B2; ///ltgray

@@ -42,7 +42,7 @@ play_ranked_callback = function(){
 			}
 		}
 	}
-}
+};
 
 statistics_callback = function(){
 	if!(instance_exists(oStatisticsTab)){
@@ -58,7 +58,23 @@ statistics_callback = function(){
 			}
 		}
 	}
-}
+};
+
+settings_callback = function(){
+	if!(instance_exists(oSettings)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oSettings, -1)) {
+				window_id = id;
+			}
+		}
+	}
+};
 
 
 with (zui_main()) {
@@ -100,8 +116,8 @@ with (zui_main()) {
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
-		caption = "Options";
-		callback = oController.exit_callback;
+		caption = "Settings";
+		callback = oController.settings_callback;
 	}
 	
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*7.5, objUIButton)){
@@ -119,27 +135,5 @@ with (zui_main()) {
 		caption = "Exit";
 		callback = oController.exit_callback;
 	}
-
-	with (zui_create(zui_get_width() * 0.5, zui_get_height() - 80, objUISlider)) {
-		zui_set_anchor(0.5, 0);
-		zui_set_width(256);
-
-		minimum = 50;
-		maximum = 100;
-		value = 100;
-
-		/*_window_id = window_id;
-		callback = function (_id, _value) {
-			with (_window_id)
-				zui_set_scale(_value / 100, _value / 100);
-		};*/
-	}
-	
-	/*
- 
-	with (zui_create(zui_get_width() * 0.5, zui_get_height() - 50, objUILabel)) {
-		caption = "Scale";
-		color = $ffffff;
-	}*/
 }
 

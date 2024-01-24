@@ -42,9 +42,11 @@ if(instance_exists(oEnemy)){
 #region Homing anti-tank missile bullet tracer
 if(image_index == 1){
 	var MotorAngle = direction - 180;
-	part_type_orientation(oParticleSystem.FlameParticle, MotorAngle, MotorAngle, 0, 0, 0);
-	part_type_direction(oParticleSystem.FlameParticle,MotorAngle,MotorAngle,0,0);
-	part_particles_create(global.ParticleSystem, x, y, oParticleSystem.FlameParticle, 50);
+	if(instance_exists(oParticleSystem)){
+		part_type_orientation(oParticleSystem.FlameParticle, MotorAngle, MotorAngle, 0, 0, 0);
+		part_type_direction(oParticleSystem.FlameParticle,MotorAngle,MotorAngle,0,0);
+		part_particles_create(global.ParticleSystem, x, y, oParticleSystem.FlameParticle, 50);
+	}
 	if(PointDistance <= global.ItemIndex[#Weapon, ItemStat.Range]){
 		var NearestTargetX = ShotX;
 		var NearestTargetY = ShotY;
@@ -125,7 +127,9 @@ if(image_index == 0){
 				ShotX,
 				ShotY
 			);
-			part_particles_create(global.ParticleSystem, ShotX, ShotY, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			if(instance_exists(oParticleSystem)){
+				part_particles_create(global.ParticleSystem, ShotX, ShotY, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			}
 			instance_destroy(self);
 		}
 	}else{
@@ -173,7 +177,9 @@ if(image_index == 0){
 				BX,
 				BY
 			);
-			part_particles_create(global.ParticleSystem, BX, BY, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			if(instance_exists(oParticleSystem)){
+				part_particles_create(global.ParticleSystem, BX, BY, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			}
 			instance_destroy(self);
 		}	
 	}
@@ -211,13 +217,17 @@ if(instance_exists(oParentTile)){
 					x,
 					y
 				);
-				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+				if(instance_exists(oParticleSystem)){
+					part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+				}
 				play_sound(x, y, snd_BulletConcrete);
 				WallHit = true;
 			}
 		}else{
 			ExplosionCreate(30, x, y, global.ItemIndex[#Weapon, ItemStat.Damage], false, Object, global.ItemIndex[#Weapon, ItemStat.PenetrationPower], global.ItemIndex[#Weapon, ItemStat.DamageDrop], Item.None, 128);	
-			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			if(instance_exists(oParticleSystem)){
+				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			}
 			play_sound(x, y, snd_BulletConcrete);
 			instance_destroy(self);
 		}

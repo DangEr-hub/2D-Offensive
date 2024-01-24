@@ -9,7 +9,7 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-draw_text(x, y - 50, "enemy elo" + string(global.player_stats_struct.Max_health));
+draw_text(x, y - 50, global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 
 if(stats.Health_points > 0){
 	if (equipped_item("Grenade")) {
@@ -19,7 +19,6 @@ if(stats.Health_points > 0){
 	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
 	}
 
-	
 	#region Field of view
 	draw_set_alpha(.1);
 	draw_set_color(global.GoldColor);

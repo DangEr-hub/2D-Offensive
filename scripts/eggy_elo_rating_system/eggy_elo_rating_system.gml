@@ -1,30 +1,3 @@
- #macro PLAYER_STARTING_VOLATILITY 1
-#macro PLAYER_STARTING_ELO 0
-#macro SILVERI_ELO 1
-#macro SILVERII_ELO 20
-#macro SILVERIII_ELO 40
-#macro SILVERIV_ELO 100
-#macro SILVERV_ELO 150
-#macro SILVER_MASTER_ELO 200
-#macro GOLDI_ELO 250
-#macro GOLDII_ELO 300
-#macro GOLDIII_ELO 350
-#macro GOLDIV_ELO 450
-#macro GOLD_MASTER_ELO 500
-#macro DIAMONDI_ELO 550
-#macro DIAMONDII_ELO 590
-#macro DIAMONDIII_ELO 650
-#macro DIAMOND_MASTER_ELO 700
-#macro ASSAULT_ELITEI_ELO 800
-#macro ASSAULT_ELITEII_ELO 850
-#macro ASSAULT_MASTER_ELO 950
-#macro VERSATILE_MASTER_ELO 1150
-#macro EXPERIENCED_VERSATILE_MASTER_ELO 1400
-#macro SUPREME_MASTER_ELO 1700
-#macro GLOBAL_MASTER_ELO 1900
-#macro MAX_ROUNDS 10
-#macro TRACKING_GAMES 10
-
 function ini_player_struct_create(){
 	var player_struct = {
 		"Game_volatility": PLAYER_STARTING_VOLATILITY,
@@ -77,6 +50,7 @@ function update_eggy_rating_system(game_result, enemy_elo, map){
 		map,
 		enemy_elo
 	);
+	show_debug_message(elo_bonus);
 	global.player_elo_struct.Tracking_game ++;
 	
 	if(global.player_elo_struct.Played_games % (TRACKING_GAMES/2) == 0 || global.player_elo_struct.Played_games == 1){
@@ -125,8 +99,8 @@ function calculate_probability(player_elo, enemy_elo) {
 }
 
 function get_elo_current(probability_of_winning, game_result, volatility, game_volatility, player_kills, player_headshots, player_elo_scale, map, enemy_elo_scale, base_k=4) {
-    var kill_weight = 0.2;
-    var headshot_weight = 0.3;
+    var kill_weight = 1;//0.2;
+    var headshot_weight = 1;//0.3;
     var average_kills = get_average_kills(map);
     var average_headshots = get_average_headshots(player_elo_scale, average_kills * 0.1, average_kills, convert_to_eggy_scale(GLOBAL_MASTER_ELO)); ///Eggy scale
     var kill_ratio = get_performance_ratio(player_kills, average_kills);
@@ -136,7 +110,10 @@ function get_elo_current(probability_of_winning, game_result, volatility, game_v
 	var elo_ratio = enemy_elo_scale/(player_elo_scale + 1);
     var total_bonus = kill_bonus + headshot_bonus;
     var K = base_k * (1 + volatility) * (1 + game_volatility);
-    return K * ((game_result - probability_of_winning) + (1 + total_bonus) + (1 + elo_ratio));
+	show_debug_message("K" + string(K));
+	show_debug_message("volatility" + string(volatility));
+	show_debug_message("game_volatility" + string(game_volatility));
+    return K * ((game_result + total_bonus - probability_of_winning) * elo_ratio);
 }
 
 function calculate_volatility(player_recent_results, player_recent_expected) {
@@ -261,27 +238,6 @@ function round_end(round_result){
 		return false;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function RankStats(RankID, LessMod, BoostMod, RankName, MinElo){
 	global.RankIndex[#RankID, RankStat.LessModifier] = LessMod;
