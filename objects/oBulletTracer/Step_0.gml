@@ -187,6 +187,56 @@ if(image_index == 0){
 #endregion
 
 #region Bullet wall hit
+var next_x = x + speed * cos(direction * pi / 180);
+var next_y = y + speed * sin(direction * pi / 180);
+
+if (collision_line(x, y, next_x, next_y, oParentTile, true, false)) {
+	if(image_index == 0){
+		PenetrationDamage ++;
+		if(WallHit == false){
+			randomize();
+			var Wall = instance_nearest(x, y, oParentTile);
+			var WallParticles = irandom_range(global.ItemIndex[#Weapon, ItemStat.Damage], global.ItemIndex[#Weapon, ItemStat.Damage]*2);
+			if(Wall.Type == "Concrete"){
+				var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
+				ParticleCreate(WallParticles, 0.8, random(360), ParticleTexture, 
+				random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, false, false, 0, x, y);
+				ParticleCreate(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 
+				random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
+			}
+			ParticleCreate(
+				global.ItemIndex[#Weapon, ItemStat.Damage]/5, 
+				.8, 
+				random(360), 
+				spr_MovementParticle, 
+				global.ItemIndex[#Weapon, ItemStat.Damage]/5, 
+				random_range(-90, 90),
+				random(360),
+				1,
+				choose(true, false),
+				false,
+				0,
+				x,
+				y
+			);
+			if(instance_exists(oParticleSystem)){
+				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+			}
+			play_sound(x, y, snd_BulletConcrete);
+			WallHit = true;
+		}
+	}else{
+		ExplosionCreate(30, x, y, global.ItemIndex[#Weapon, ItemStat.Damage], false, Object, global.ItemIndex[#Weapon, ItemStat.PenetrationPower], global.ItemIndex[#Weapon, ItemStat.DamageDrop], Item.None, 128);	
+		if(instance_exists(oParticleSystem)){
+			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#Weapon, ItemStat.Damage]/5));
+		}
+		play_sound(x, y, snd_BulletConcrete);
+		instance_destroy(self);
+	}
+}else{
+	WallHit = false;
+}
+/*
 if(instance_exists(oParentTile)){
 	if(collision_line(xprevious, yprevious, x, y, oParentTile, true, false)){
 		if(image_index == 0){
@@ -235,4 +285,5 @@ if(instance_exists(oParentTile)){
 		WallHit = false;
 	}
 }
+*/
 #endregion

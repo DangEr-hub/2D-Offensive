@@ -1,4 +1,8 @@
-// Check for mouse click within the text box boundaries
+if(alpha_value < 1){
+	alpha_value += ALPHA_SPEED;
+}
+
+
 if (mouse_check_button_pressed(mb_left)) {
     if(zui_get_hover()){
 		pressed = 1;

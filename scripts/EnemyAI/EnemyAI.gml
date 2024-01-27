@@ -177,8 +177,8 @@ function MoveRandom(){
 function MoveIdle(){
 	randomize();
 	MoveDirection = random(360);
-	MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-	alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	MoveTime = random_range(50, 90) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	//alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }

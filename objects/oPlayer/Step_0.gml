@@ -480,7 +480,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					#endregion
 				}
 				
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon));
+				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .9;
 			break;
 			#endregion
 	
@@ -721,7 +721,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	var Shoot = -1;
 	var shooting_mode = ds_list_find_value(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootingMode], weapon_shooting_mode);
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyChangeMode])){
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyChangeMode]) && shooting == false){
 		var list_size = ds_list_size(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootingMode]);
 		if(weapon_shooting_mode < list_size){
 			weapon_shooting_mode = (weapon_shooting_mode + 1) % list_size;
@@ -1233,12 +1233,16 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Legs.image_speed = 0;
 				RelativeSpeedX = 0;
 				RelativeSpeedY = 0;
-				window_set_cursor(cr_default);
 			}else{
 				if(oDraw.show_weapon_attachments == false){
 					player_can_shoot = true;
 				}
-				//window_set_cursor(cr_none);
+				with(oItemDescription){
+					zui_destroy();
+				}
+				with(oArmourDescription){
+					zui_destroy();
+				}
 			    with(oInventory){
 			        instance_destroy();
 			    }
@@ -1491,7 +1495,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	
 	// Handle weapon switching logic
-	if (equip_timer == -1 && player_can_shoot) {
+	if (equip_timer == -1 && player_can_shoot == true && shooting == false) {
 	    var changeDetected = false;
 
 	    if (mouse_wheel_up()) {
@@ -1612,6 +1616,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	    camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
 	    true
 	);
+	instance_activate_object(oRespawnMenu);
+	instance_activate_object(oItemDescription);
+	instance_activate_object(objUIWindowCaption);
+	instance_activate_object(objZUIMain);
+	instance_activate_object(objUIButton);
+	instance_activate_object(objUILabel);
+	instance_activate_object(objUIGrid);
+	instance_activate_object(oArmourDescription);
 	instance_activate_object(oEggyEloRatingSystem);
 	instance_activate_object(Legs);
 	instance_activate_object(oCrosshair);
@@ -1653,7 +1665,6 @@ if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
 	oDraw.KilledBy = KilledBy;
 	oDraw.RespawnMenu = true;
 	oDraw.alarm[0] = 5;
-	window_set_cursor(cr_default);
 	camera_set_view_angle(view_camera[0], 0);
 }
 #endregion

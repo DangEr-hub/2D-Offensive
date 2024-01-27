@@ -225,9 +225,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	#region Draw shooting mode
 	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None){ 
 		var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootingMode], oPlayer.weapon_shooting_mode) + 
-									"[" + 
-									keycode_to_string(global.KeyBinds[| KeyBind.KeyChangeMode]) + 
-									"]";
+									"[" + keycode_to_string(global.KeyBinds[| KeyBind.KeyChangeMode]) + "]";
 		var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
 		var shooting_mode_y = display_get_gui_height() - HUDShift*2;
 		draw_text_outlined(shooting_mode_x, shooting_mode_y, shooting_mode_string, c_white, c_black, 1);
@@ -399,7 +397,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						default_yy -= bar_spacing;
 					}
 					
-					draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+					if!(instance_exists(oInventory)){
+						draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+					}
 				}
 			}
 		}
@@ -529,7 +529,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 				rank_position = get_rank(id);	
 			}
-			draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+			if!(instance_exists(oInventory)){
+				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+			}
 		}
 		#endregion
 	
@@ -893,84 +895,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						);
 						#endregion	
 						
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
-					
-						#region Variables
-						var rows = 1;
-						var columns = 3;
-						var cell_width = (TabWidth - 2*oDraw.HUDShift)/columns/1.75;
-						var cell_height = (MiddleHeight - 2*oDraw.HUDShift)/5;
-						var statTitles = [
-							"Weight: ", "Defense modifier: ", "Durability: "
-						];
-						#endregion
-						
-						#region Draw grid
-					    for (var i = 0; i < rows; i++) {
-					        for (var j = 0; j < columns; j++) {
-					            var cell_x = TabX + oDraw.HUDShift + j * cell_width;
-					            var cell_y = TabY + TitleHeight + oDraw.HUDShift + i * cell_height;
-								draw_set_color(global.GoldColor);
-					            draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
-								draw_set_color(c_white);
-							
-								draw_set_font(set_font("GUI_grid"));
-						        var text = "";
-						        var statIndex = ItemStat.Weight + i * columns + j;
-						        if (statIndex - ItemStat.Weight <= array_length(statTitles)){
-								
-									#region Specific cases
-									switch(statIndex){
-										
-										case ItemStat.BaseDurability:
-											text = 
-												statTitles[statIndex - ItemStat.Weight] + 
-												string(global.Inventory[#VarSlot, InventoryIndex.SlotDurability]) + 
-												"/" + 
-												string(global.ItemIndex[#Id, ItemStat.BaseDurability]) +
-												" (" +
-												string(global.Inventory[#VarSlot, InventoryIndex.SlotDurability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
-												"%" +
-												")";
-										break;
-										default:
-											text = statTitles[statIndex - ItemStat.Weight] + string(global.ItemIndex[#Id, statIndex]);
-										break;
-									}
-									#endregion
-								
-						        }
-						        var text_x = cell_x + cell_width / 2 - string_width(text) / 2;
-						        var text_y = cell_y + cell_height/2;
-						        draw_text_outlined(text_x, text_y, text, c_white, c_black, 1);
-								//}
-					        }
-					    }		
-						#endregion
-						
-						#region Draw description
-						draw_set_font(set_font("GUI_grid"));
-						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
-						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
-						var DescriptionX = TabX + oDraw.HUDShift + columns*cell_width + oDraw.HUDShift;
-						var DescriptionY = TabY + TitleHeight - oDraw.HUDShift/2 + DescriptionStringHeight;
-						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
-						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-						draw_set_font(set_font("Console"));
-						#endregion
-						
-						#region Draw drop button
-						draw_button_ext(
-							DescriptionX + string_width(DescriptionString)/4,
-							DescriptionY + DescriptionStringHeight*1.1 + ButtonHeight,
-							ButtonWidth,
-							ButtonHeight,
-							"Drop item",
-							c_dkgray,
-							global.GoldColor,
-							"description_drop"
-						);
-						#endregion	
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){		
 					
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
 						
@@ -1063,12 +988,27 @@ if(instance_exists(oPlayer)){
 		var inaccuracy_string = "Inaccuracy: " + string_format(player_inaccuracy, 0, 1) + " Units";
 		draw_text_outlined(AdminHUDX - string_width(inaccuracy_string), AdminHUDY + TextHeightSmall*3, inaccuracy_string, c_white, c_black, 1);	
 		
-		//Elo
-		var player_elo = global.player_elo_struct.Elo;
-		var elo_string = "Eggy points: " + string_format(convert_back(player_elo), 0, 1);
-		var elo_string_eggy_scale = "Eggy points (Eggy scale): " + string_format(player_elo, 0, 1);
-		draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
-		draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
+		if(global.ranked_game == true){
+			//Elo
+			var player_elo = global.player_elo_struct.Elo;
+			var elo_string = "Eggy points: " + string_format(convert_back(player_elo), 0, 1);
+			var elo_string_eggy_scale = "Eggy points (Eggy scale): " + string_format(player_elo, 0, 1);
+			draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
+			draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
+		
+			//Volatility
+			var player_game_volatility = global.player_elo_struct.Local_volatility;
+			var player_volatility = global.player_elo_struct.Game_volatility;
+			var volatility_string = "Global volatility: " + string_format(player_volatility, 0, 1);
+			var game_volatility_string = "Local volatility: " + string_format(player_game_volatility, 0, 1);
+			draw_text_outlined(AdminHUDX - string_width(volatility_string), AdminHUDY + TextHeightSmall*6, volatility_string, c_white, c_black, 1);	
+			draw_text_outlined(AdminHUDX - string_width(game_volatility_string), AdminHUDY + TextHeightSmall*7, game_volatility_string, c_white, c_black, 1);
+			
+			//Enemy elos
+			var enemy_elos_string = "Enemy EP (eggy scale): " + string(global.player_elo_struct.Enemy_elo);
+			draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*8, enemy_elos_string, c_white, c_black, 1);		
+		}
+		
 	}
 }
 #endregion
@@ -1115,7 +1055,7 @@ with(oCrosshair){
 		if(HitMarker > -1){
 			draw_sprite_ext(spr_HitMarker, HitMarker, xx, yy, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	
 		}
-		if(oPlayer.player_can_shoot == true && !global.my_console[? "active"] && oPlayer.ScopeIn == false){
+		if(oPlayer.player_can_shoot == true && !global.my_console[? "active"] && global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.WeaponTypeClass] != "Sniper rifle"){
 			draw_sprite_ext(spr_StaticCrosshair, 0, xx, yy, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
 			if(global.DynamicCrosshair == true){
 				Gap = 25;

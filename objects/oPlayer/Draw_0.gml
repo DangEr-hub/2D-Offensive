@@ -9,7 +9,7 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-draw_text(x, y - 50, global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+draw_text(x, y - 50, WeaponID);
 
 if(stats.Health_points > 0){
 	if (equipped_item("Grenade")) {
@@ -27,18 +27,20 @@ if(stats.Health_points > 0){
 	draw_set_alpha(1);
 	#endregion
 	
-	if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None && !equipped_item("Grenade")){
-		draw_sprite_ext(
-			spr_Items,
-			global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor],
-			Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-			Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
-			.5,
-			.5,
-			RotationAngle,
-			c_white, 
-			1
-		);
+	if!(WeaponID >= 2){
+		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_item("Grenade")){
+			draw_sprite_ext(
+				spr_Items,
+				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],
+				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
+				.5,
+				.5,
+				RotationAngle,
+				c_white, 
+				1
+			);
+		}
 	}
 	
 	var armour_sprite_index = 1;

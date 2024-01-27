@@ -4,7 +4,7 @@
   "name": "spr_DustTiles",
   "bbox_bottom": 255,
   "bbox_left": 0,
-  "bbox_right": 223,
+  "bbox_right": 312,
   "bbox_top": 0,
   "bboxMode": 0,
   "collisionKind": 1,
@@ -15,8 +15,8 @@
   "frames": [
     {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"2e8c1def-29b4-45b3-b562-4fe42438c35d",},
   ],
-  "gridX": 0,
-  "gridY": 0,
+  "gridX": 32,
+  "gridY": 32,
   "height": 1024,
   "HTile": false,
   "layers": [

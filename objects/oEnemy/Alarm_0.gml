@@ -233,7 +233,7 @@ if(global.EnemyCanMove == true){
 		break;
 		
 		case States.Idle:
-			if(percent_chance(10)){
+			if(percent_chance(10 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 				MoveIdle();
 			}
 		break;

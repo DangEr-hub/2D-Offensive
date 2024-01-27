@@ -97,6 +97,7 @@ function ItemDataBase(){
 	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .9);
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.ItemColor] = $FF007F02; ///green
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.BaseDurability] = 100;
+	global.ItemIndex[#Item.KevlarHelm, ItemStat.Description] = "This basic helmet provides 10% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained.";
 	
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.DesertEagle, "IMI Desert eagle", 1.75 * game_get_speed(gamespeed_fps), 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
@@ -111,6 +112,7 @@ function ItemDataBase(){
 	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .9);
 	global.ItemIndex[#Item.KevlarVest, ItemStat.ItemColor] = $FF4D4D4D; ///gray
 	global.ItemIndex[#Item.KevlarVest, ItemStat.BaseDurability] = 100;
+	global.ItemIndex[#Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic 10% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
 	
 	global.ItemIndex[#Item.Spas, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 500, 33, 120, 12, "Main", 5, 5, 30, snd_Spas, 15, 2, false,
@@ -124,18 +126,21 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Spas, ItemStat.Description] = "A battle shotgun produced by the Italian gunmaker Franchi between 1979 and 2000. The SPAS-12 can be set to either semi-automatic or manual pump-action.";
 	
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.MilitaryHelm, "Military helmet", 5, .75);
+	ArmourStats(Item.MilitaryHelm, "Military helmet", 3, .75);
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.ItemColor] = $FF007F02; ///green
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.BaseDurability] = 100;
+	global.ItemIndex[#Item.MilitaryHelm, ItemStat.Description] = "With a 25% damage reduction, the Military Helmet offers enhanced head protection against moderate threats. A balanced choice for defense and comfort.";
 	
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.Type] = "Armour";
 	ArmourStats(Item.MilitaryVest, "Military vest", 7, .75);
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.ItemColor] = $FF007F02; ///green
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.BaseDurability] = 100; 
+	global.ItemIndex[#Item.MilitaryVest, ItemStat.Description] = "Enhanced with 25% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 3, 30, snd_SSG08, 15, 5, false,
 	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * game_get_speed(gamespeed_fps));
+	global.ItemIndex[#Item.SSG08, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
 	global.ItemIndex[#Item.SSG08, ItemStat.advantages] = "\n-High damage\-High range";
 	global.ItemIndex[#Item.SSG08, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -161,6 +166,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.HEGrenade, ItemStat.DamageDrop] = .001;
 	global.ItemIndex[#Item.HEGrenade, ItemStat.BulletCasingID] = 0;
 	global.ItemIndex[#Item.HEGrenade, ItemStat.ItemColor] = $FF007F02; ///green
+	global.ItemIndex[#Item.HEGrenade, ItemStat.Description] = "Designed for maximum impact, it delivers lethal damage over a broad radius, perfect for neutralizing enemy clusters or securing critical spaces. Handle with care; its potent blast is as swift as it is fierce.";
 	
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Name] = "Flashbang grenade";
@@ -170,10 +176,12 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.DamageDrop] = .001;
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.BulletCasingID] = 1;
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.ItemColor] = $FFFFFFFF; ///white
+	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Description] = "Disorient foes with this non-lethal flashbang. Its blinding flash and deafening bang disrupt enemy senses, ideal for stealthy advances.";
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 3, true,
 	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps));
+	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
 	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\-High damage";
 	global.ItemIndex[#Item.SG550, ItemStat.ItemColor] = $FF4D4D4D; ///gray
@@ -185,11 +193,13 @@ function ItemDataBase(){
 	ArmourStats(Item.SpecOpsHelm, "Spec ops helmet", 5, .59);
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.ItemColor] = $FF343434; ///dkgray
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.BaseDurability] = 50;
+	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Description] = "The Spec Ops Helmet, featuring a 41% damage reduction, is designed for intense combat situations but has lower durability. Its heavier construction focuses on maximal protection, demanding strategic use to compensate for its shorter lifespan.";
 	
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.Type] = "Armour";
 	ArmourStats(Item.SpecOpsVest, "Spec ops vest", 8, .59);
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.ItemColor] = $FF343434; ///dkgray
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.BaseDurability] = 50; 
+	global.ItemIndex[#Item.SpecOpsVest, ItemStat.Description] = "Equipped with 41% damage reduction, the Spec Ops Vest offers advanced protection but with lower durability. Ideal for high-risk scenarios, its heavier build prioritizes maximum defense, requiring careful management due to its limited lifespan.";
 	
 	global.ItemIndex[#Item.MilitaryNightVision, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.MilitaryNightVision, "Military night vision", 3, .975);
@@ -221,6 +231,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ReloadSpeed] = 2.5;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.BulletCasingID] = 2;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.SmokeGrenade, ItemStat.Description] = "Upon impact, smoke grenade blankets the surrounding area with dense smoke, perfect for obscuring vision, enabling stealthy movements, or disorienting opponents.";
 
 	global.ItemIndex[#Item.Javelin, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Javelin, "FGM-148 Javelin", 1.5 * game_get_speed(gamespeed_fps), 590, 138, 50, 1, "Main", 1, 25, 15, snd_Javelin, 15, 5, false,
@@ -253,6 +264,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.awm, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 1150, 118, 50, 5, "Main", 1, 2, 30, snd_awm, 30, 5, false,
 	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps));
+	global.ItemIndex[#Item.awm, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n-High damage\-High range\n-Neglidible damage drop";
 	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = $FF007F02; ///green

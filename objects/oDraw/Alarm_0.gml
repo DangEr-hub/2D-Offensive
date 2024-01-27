@@ -1,6 +1,7 @@
 /// @description Create background image
 BackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
 instance_deactivate_all(true);
+instance_activate_object(oWeapon);
 instance_activate_object(objUIGrid);
 instance_activate_object(oRespawnMenu);
 instance_activate_object(objUILabel);

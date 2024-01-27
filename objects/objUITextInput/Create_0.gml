@@ -1,5 +1,6 @@
 draw_set_font(set_font("Menu_small"));
 zui_set_size(128 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+alpha_value = 0;
 cursor_position = 0;
 callback = -1;
 pressed = 0;

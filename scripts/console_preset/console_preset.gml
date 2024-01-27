@@ -33,7 +33,9 @@ function console_preset(argument0) {
 	console_add(c, "set_crosshair_color " + string(r) + string(g) + string(b));
 	console_add(c, "draw_other_models " + string(global.draw_other_models));
 	console_add(c, "set_window_size " + string(global.window_width) + " " + string(global.window_height));
-	console_add(c, "set_eggy_points " + string(convert_back(global.player_elo_struct.Elo)));
+	console_add(c, "set_player_eggy_points " + string(convert_back(global.player_elo_struct.Elo)));
+	console_add(c, "set_enemy_visibility " + string(global.enemy_visibility));
+	console_add(c, "set_enemy_eggy_points " + string(convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 	c[? "preset"] = true;
 
 

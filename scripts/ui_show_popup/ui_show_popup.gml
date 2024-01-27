@@ -1,5 +1,6 @@
 function ui_show_popup(_caption, popup_caption, button_caption_positive, button_caption_negative, popup_width, popup_height, popup_callback_positive, popup_callback_negative) 
 	{
+		popup_height = max(popup_height, 128);
 	with (objZUIMain) {
 		var _black = zui_create(0, 0, objUIBlack, -1000);
 

@@ -30,6 +30,7 @@ global.TimeSpeed = 15;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
+global.enemy_visibility = false;
 global.anti_aliasing = 0;
 global.sound_gain = 100;
 global.ranked_game = false;
@@ -41,6 +42,7 @@ global.Weather = "sun";
 global.crosshair_color = c_white;
 
 global.player_stats_struct = {
+	Name: "DangEr",
 	All_shots: 0,
 	Headshots: 0,
 	Kills: 0,

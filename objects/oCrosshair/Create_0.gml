@@ -1,6 +1,5 @@
 /// @description Insert description here
 // You can write your code in this editor
-//window_set_cursor(cr_none);
 xx = 0;
 yy = 0;
 DeltaX = 0; DeltaY = 0;

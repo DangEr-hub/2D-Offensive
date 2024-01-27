@@ -99,21 +99,20 @@ function calculate_probability(player_elo, enemy_elo) {
 }
 
 function get_elo_current(probability_of_winning, game_result, volatility, game_volatility, player_kills, player_headshots, player_elo_scale, map, enemy_elo_scale, base_k=4) {
-    var kill_weight = 1;//0.2;
-    var headshot_weight = 1;//0.3;
+	var game_result_weight = 7;
+	var elo_ratio_weight = 5;
+    var kill_weight = 0.2;
+    var headshot_weight = 0.3;
     var average_kills = get_average_kills(map);
     var average_headshots = get_average_headshots(player_elo_scale, average_kills * 0.1, average_kills, convert_to_eggy_scale(GLOBAL_MASTER_ELO)); ///Eggy scale
     var kill_ratio = get_performance_ratio(player_kills, average_kills);
     var headshot_ratio = get_performance_ratio(player_headshots, average_headshots);
     var kill_bonus = kill_ratio * kill_weight;
     var headshot_bonus = headshot_ratio * headshot_weight;
-	var elo_ratio = enemy_elo_scale/(player_elo_scale + 1);
+	var elo_ratio = enemy_elo_scale/player_elo_scale * elo_ratio_weight;
     var total_bonus = kill_bonus + headshot_bonus;
     var K = base_k * (1 + volatility) * (1 + game_volatility);
-	show_debug_message("K" + string(K));
-	show_debug_message("volatility" + string(volatility));
-	show_debug_message("game_volatility" + string(game_volatility));
-    return K * ((game_result + total_bonus - probability_of_winning) * elo_ratio);
+    return K * ((game_result * game_result_weight + total_bonus - probability_of_winning) * elo_ratio);
 }
 
 function calculate_volatility(player_recent_results, player_recent_expected) {

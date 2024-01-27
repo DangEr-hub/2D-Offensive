@@ -1,3 +1,4 @@
+draw_set_alpha(alpha * alpha_value);
 if(type == "Respawn menu"){
 	
 	#region Respawn menu
@@ -78,8 +79,8 @@ if(type == "Respawn menu"){
 		var EntityId = Keys[row - 1];
 		var Data = oPlayer.HitMap[? EntityId];
 	
-		var EntityName = EntityId.stats.Name + string(" (You)");
-		if(EntityId != oPlayer.id){
+		var EntityName = global.player_stats_struct.Name + string(" (You)");
+		if(EntityId.object_index != oPlayer){
 			EntityName = EntityId.stats.Name;
 		}
     
@@ -112,7 +113,6 @@ if(type == "Respawn menu"){
 	#region Armour description
 	var rows = 1;
 	var columns = 3;
-	var cell_width = min(192 * global.GUIMultiplier, 256);
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
 	var statTitles = ["Weight: ", "Defense modifier: ", "Durability: "];
 						
@@ -137,13 +137,8 @@ if(type == "Respawn menu"){
 					case ItemStat.BaseDurability:
 						text = 
 							statTitles[statIndex - ItemStat.Weight] + 
-							string(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotDurability]) + 
-							"/" + 
-							string(global.ItemIndex[#Id, ItemStat.BaseDurability]) +
-							" (" +
 							string(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotDurability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
-							"%" +
-							")";
+							"%";
 					break;
 					default:
 						text = statTitles[statIndex - ItemStat.Weight] + string(global.ItemIndex[#Id, statIndex]);
@@ -161,4 +156,10 @@ if(type == "Respawn menu"){
 	
 	#endregion
 	
+}else if(type == "Item description"){
+
+	#region Item description
+	
+	#endregion
+
 }

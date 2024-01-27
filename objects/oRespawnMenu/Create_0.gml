@@ -9,8 +9,14 @@ offset_position_x = 32;
 offset_position_y = 64;
 grid_height = min((ds_map_size(oPlayer.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
 
+
+
+var killed_by_name = global.player_stats_struct.Name;
+if(oDraw.KilledBy.object_index == oEnemy){
+	killed_by_name = oDraw.KilledBy.stats.Name;
+}
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-	var KilledByString = "killed by: " + string(oDraw.KilledBy.stats.Name) + " by " + string(oDraw.KilledBy.KilledByWeapon);
+	var KilledByString = "killed by: " + string(killed_by_name) + " by " + string(oDraw.KilledBy.KilledByWeapon);
 	caption = "You died - " + KilledByString;
 	draggable = 1;
 }

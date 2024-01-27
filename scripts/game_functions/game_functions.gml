@@ -352,7 +352,7 @@ function create_player(PlayerHP, PlayerStamina){
 function pause(ObjectType){
 	with(zui_main()){
 		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
-			alpha = global.GUIHUDAlpha * 2.25;
+			alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
 			window_id = id;
 		}
 	}
@@ -394,7 +394,7 @@ function reset_gui(){
 	if(instance_exists(oInventory)){
 		instance_destroy(oInventory);
 		instance_destroy(oSlot);
-		InventoryCreate();
+		instance_create_layer(oPlayer.x, oPlayer.y, "OtherO", oInventory);
 	}
 	if(instance_exists(oController)){
 		instance_destroy(oController);	
@@ -409,7 +409,7 @@ function reset_gui(){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
 					with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-						alpha = global.GUIHUDAlpha * 2.25;
+						alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
 						window_id = id;
 					}
 				}
@@ -419,8 +419,11 @@ function reset_gui(){
 			if(oDraw.DrawInfo == true){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
-					with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
-						
+					var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+						zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription);
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
+						zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription);
 					}
 				}
 			}

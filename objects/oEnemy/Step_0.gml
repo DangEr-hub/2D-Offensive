@@ -24,7 +24,14 @@ if(stats.Health_points <= 0 && State != States.Death){
 		y + lengthdir_y(WeaponDistance, RotationAngle), 
 		/*10, */100,
 		Ammo[WeaponPositionID],
-		ClipAmmo[WeaponPositionID]
+		ClipAmmo[WeaponPositionID],
+		0,
+		-1,
+		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_scope],
+		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_barrel],
+		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_grip],
+		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor]
+		
 	);
 	if(ArmourID != Item.None){
 		ItemDrop(
@@ -350,28 +357,36 @@ if(State != States.Death){
 	#endregion
 	
 	#region Visibility
-	if(instance_exists(oPlayer)){
-		if (
-			point_in_triangle(bbox_left, bbox_top, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_right, bbox_top, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_left, bbox_bottom, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_right, bbox_bottom, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy)
-		|| 
-			State == States.ThrowGrenade
-		|| 
-			HPTimer != -1
-		){
-			if(InSmoke == false){
-				if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
-					Visible = true;
+	if(global.enemy_visibility == false){
+		if(instance_exists(oPlayer)){
+			if (
+				point_in_triangle(bbox_left, bbox_top, oPlayer.ax, oPlayer.ay, 
+				oPlayer.bx, oPlayer.by, 
+				oPlayer.cx, oPlayer.cy) || 
+				point_in_triangle(bbox_right, bbox_top, oPlayer.ax, oPlayer.ay, 
+				oPlayer.bx, oPlayer.by, 
+				oPlayer.cx, oPlayer.cy) || 
+				point_in_triangle(bbox_left, bbox_bottom, oPlayer.ax, oPlayer.ay, 
+				oPlayer.bx, oPlayer.by, 
+				oPlayer.cx, oPlayer.cy) || 
+				point_in_triangle(bbox_right, bbox_bottom, oPlayer.ax, oPlayer.ay, 
+				oPlayer.bx, oPlayer.by, 
+				oPlayer.cx, oPlayer.cy)
+			|| 
+				State == States.ThrowGrenade
+			|| 
+				HPTimer != -1
+			){
+				if(InSmoke == false){
+					if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
+						Visible = true;
+					}else{
+						if(Visible == true){
+							if(VisibilityTimer == -1){
+								VisibilityTimer = VisibilityTime;
+							}
+						}
+					}
 				}else{
 					if(Visible == true){
 						if(VisibilityTimer == -1){
@@ -386,13 +401,9 @@ if(State != States.Death){
 					}
 				}
 			}
-		}else{
-			if(Visible == true){
-				if(VisibilityTimer == -1){
-					VisibilityTimer = VisibilityTime;
-				}
-			}
 		}
+	}else{
+		Visible = true;
 	}
 	
 	if(Visible == false){

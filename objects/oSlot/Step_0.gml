@@ -37,12 +37,29 @@ if(global.Inventory[#VarSlot, InventoryIndex.SlotID] == Item.None){
 if(DrawItemInfo == true){
 	if(oDraw.DrawInfo == false){
 		var Id = global.Inventory[#VarSlot, InventoryIndex.SlotID];
-		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour"){
+		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			with(oItemDescription){
+				zui_destroy();
+			}
+			with(oArmourDescription){
+				zui_destroy();
+			}
 			with(zui_main()){
-				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
-				}
+				zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription);
+			}
+		}else{
+			oDraw.var_slot = VarSlot;
+			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			with(oArmourDescription){
+				zui_destroy();
+			}
+			with(oItemDescription){
+				zui_destroy();	
+			}
+			with(zui_main()){
+				zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription);
 			}
 		}
 		oDraw.DrawInfo = true;	

@@ -359,9 +359,21 @@ function console_submit(argument0) {
 					    }
 					break;
 					
-					case "set_eggy_points":
+					case "set_player_eggy_points":
 						if(no == 1 && string_digits(c[1]) != ""){
 							global.player_elo_struct.Elo = convert_to_eggy_scale(real(c[1]));	
+						}
+					break;
+					
+					case "set_enemy_visibility":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.enemy_visibility = real(c[1]);
+						}
+					break;
+					
+					case "set_enemy_eggy_points":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game] = convert_to_eggy_scale(real(c[1]));
 						}
 					break;
 	            } 

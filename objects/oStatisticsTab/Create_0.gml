@@ -12,6 +12,7 @@ if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 	rank_position = get_rank();
 }
 
+text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 label_gap = 256 * global.GUIMultiplier;
 rank_image_position_x = 96;
 rank_image_position_y = 96;
@@ -129,14 +130,14 @@ with (zui_create(rank_title_x + label_gap*2, rank_title_y, objUILabel)) {
 	caption = "Statistics";
 }
 
-with (zui_create(rank_title_x + label_gap*2, rank_title_y + rank_image_gap*2, objUILabel)) {
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.kills;
 	color = c_white;
 	caption = "Kills: " + string(global.player_stats_struct.Kills);
 }
 
-with (zui_create(rank_title_x + label_gap*2, rank_title_y + rank_image_gap*3, objUILabel)) {
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.deaths;
 	color = c_dkgray;
@@ -147,21 +148,21 @@ kd_ratio_color = c_green;
 if(global.player_stats_struct.Get_KD() < 1 && global.player_stats_struct.Get_KD() > 0){
 	kd_ratio_color = c_red;
 }
-with (zui_create(rank_title_x + label_gap*2, rank_title_y + rank_image_gap*4, objUILabel)) {
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*3, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.kd;
 	color = other.kd_ratio_color;
 	caption = "K/D ratio: " + string(global.player_stats_struct.Get_KD());
 }
 
-with (zui_create(rank_title_x + label_gap*2, rank_title_y + rank_image_gap*5, objUILabel)) {
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*4, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.headshot_percentage;
 	color = c_white;
 	caption = "Headshot percentage: " + string(global.player_stats_struct.Get_headshot_percentage()) + "%";
 }
 
-with (zui_create(rank_title_x + label_gap*2, rank_title_y + rank_image_gap*6, objUILabel)) {
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*5, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.accuracy;
 	color = c_white;
@@ -175,59 +176,59 @@ with (zui_create(rank_title_x + label_gap, rank_title_y, objUILabel)) {
 	caption = "Level: " + string(global.player_stats_struct.Lvl);
 }
 
-with (zui_create(rank_image_position_x + label_gap - sprite_get_width(spr_HealthBar)/4 * global.GUIMultiplier, rank_title_y + rank_image_gap, objUIImage)) {
+with (zui_create(rank_image_position_x + label_gap - sprite_get_width(spr_HealthBar)/4 * global.GUIMultiplier, rank_title_y + text_gap, objUIImage)) {
 	zui_set_anchor(0, 0);
 	sprite_image_index = 8;
 	healthbar = true;
 }
 
-with (zui_create(rank_title_x + label_gap + string_width(xp_string), rank_title_y + rank_image_gap*2, objUILabel)) {
+with (zui_create(rank_title_x + label_gap + string_width(xp_string), rank_title_y + text_gap*2, objUILabel)) {
 	var bonus_xp = (global.player_stats_struct.Max_xp * 2) - global.player_stats_struct.Max_xp;
 	color = c_red;
 	caption = "(+" + string(bonus_xp) + ")";
 }
 
-with (zui_create(rank_title_x + label_gap, rank_title_y + rank_image_gap*2, objUILabel)) {
+with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.xp;
 	color = c_white;
 	caption = other.xp_string;
 }
 
-with (zui_create(rank_title_x + label_gap, rank_title_y + rank_image_gap*3, objUILabel)) {
+with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*3, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.health;
 	color = c_white;
 	caption = other.health_string;
 }
 
-with (zui_create(rank_title_x + label_gap + string_width(health_string), rank_title_y + rank_image_gap*3, objUILabel)) {
+with (zui_create(rank_title_x + label_gap + string_width(health_string), rank_title_y + text_gap*3, objUILabel)) {
 	var bonus_health = (global.player_stats_struct.Max_health * power(1.25, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_health;
 	color = c_green;
 	caption = "(+" + string(bonus_health) + ")";
 }
 
-with (zui_create(rank_title_x + label_gap, rank_title_y + rank_image_gap*4, objUILabel)) {
+with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*4, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.stamina;
 	color = c_white;
 	caption = other.stamina_string;
 }
 
-with (zui_create(rank_title_x + label_gap + string_width(stamina_string), rank_title_y + rank_image_gap*4, objUILabel)) {
+with (zui_create(rank_title_x + label_gap + string_width(stamina_string), rank_title_y + text_gap*4, objUILabel)) {
 	var bonus_stamina = (global.player_stats_struct.Max_stamina * power(1.25, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_stamina;
 	color = c_green;
 	caption = "(+" + string(bonus_stamina) + ")";
 }
 
-with (zui_create(rank_title_x + label_gap, rank_title_y + rank_image_gap*5, objUILabel)) {
+with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*5, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.armour;
 	color = c_white;
 	caption = other.armour_string;
 }
 
-with (zui_create(rank_title_x + label_gap + string_width(armour_string), rank_title_y + rank_image_gap*5, objUILabel)) {
+with (zui_create(rank_title_x + label_gap + string_width(armour_string), rank_title_y + text_gap*5, objUILabel)) {
 	var bonus_armour = .01;
 	color = c_green;
 	caption = "(+" + string(bonus_armour*100) + "%)";

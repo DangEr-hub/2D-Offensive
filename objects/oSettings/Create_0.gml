@@ -6,7 +6,7 @@ setting_tab_height = 512 * global.GUIMultiplier;
 draw_set_font(set_font("Menu_small"));
 zui_set_size(setting_tab_width, setting_tab_height);
 
-gap = 128 * global.GUIMultiplier;
+gap = 256 * global.GUIMultiplier;
 position_x = 32 + global.GUIMultiplier;
 position_y = 64 + global.GUIMultiplier;
 toggle_particles_string = "Particles: ";
@@ -14,7 +14,7 @@ crosshair_color_string = "Crosshair color (rgb): ";
 toggle_bloom_string = "Bloom shader: ";
 anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
-text_height = string_height("a")*1.5;
+text_height = string_height("a")*2;
 
 toggle_particles_callback = function(){
 	with(toggle_particles_button){
@@ -94,7 +94,7 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 	draggable = 1;
 }
 
-with (zui_create(position_x + gap*1.15, position_y - text_height/4, objUISlider)) {
+with (zui_create(position_x + gap, position_y - text_height/4, objUISlider)) {
 	zui_set_anchor(0.5, 0);
 	zui_set_width(256);
 
@@ -182,7 +182,7 @@ with(zui_create(position_x, position_y + text_height*4, objUILabel)){
 	caption = other.crosshair_color_string;
 }
 
-with(zui_create(position_x + gap*1.15, position_y + text_height*4 - text_height/3, objUITextInput)){
+with(zui_create(position_x + gap*.75, position_y + text_height*4 - text_height/3, objUITextInput)){
 	zui_set_anchor(0, 0);
 	var r = (global.crosshair_color >> 16) & 0xFF;
 	var g = (global.crosshair_color >> 8) & 0xFF;
@@ -215,6 +215,23 @@ with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, 
 	callback = function(){
 		value = !value;
 		window_set_fullscreen(value);
+	};
+}
+#endregion
+
+#region Player name
+player_name_string = "Player’s name: ";
+with(zui_create(position_x, position_y + text_height*6, objUILabel)){
+	color = c_white;
+	caption = other.player_name_string;
+}
+
+with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3, objUITextInput)){
+	zui_set_anchor(0, 0);
+	text = global.player_stats_struct.Name;
+	max_string_length = 32;
+	callback = function(InputText){
+		global.player_stats_struct.Name = InputText;
 	};
 }
 #endregion

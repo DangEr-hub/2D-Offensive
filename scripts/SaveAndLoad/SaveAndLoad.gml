@@ -34,6 +34,8 @@ function save_game(){
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	ini_write_real("Vars", "sound_gain", global.sound_gain);
 	ini_write_real("Vars", "toggle_bloom_shader", global.BloomShader);
+	ini_write_real("Vars", "enemy_visibility", global.enemy_visibility);
+	ini_write_real("Vars", "gui_scale", global.GUIMultiplier);
 	
 	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
@@ -119,6 +121,8 @@ function load_game(){
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
 		global.sound_gain = ini_read_real("Vars", "sound_gain", global.sound_gain);
 		global.BloomShader = ini_read_real("Vars", "toggle_bloom_shader", global.BloomShader);
+		global.enemy_visibility = ini_read_real("Vars", "enemy_visibility", global.enemy_visibility);
+		global.GUIMultiplier = ini_read_real("Vars", "gui_scale", global.GUIMultiplier);
 
 		global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 2; i++) {

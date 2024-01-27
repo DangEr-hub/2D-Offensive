@@ -2,7 +2,9 @@ application_surface_draw_enable(true);
 draw_set_valign(1);
 window_set_fullscreen(true);
 
-instance_create_layer(x, y, "OtherO", oConsole);
+if!(instance_exists(oConsole)){
+	instance_create_layer(x, y, "OtherO", oConsole);
+}
 
 popup_exit_callback_positive = function () {
 	game_end();
