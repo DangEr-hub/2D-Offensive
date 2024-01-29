@@ -40,7 +40,7 @@ DrawInfo = false;
 #endregion
 
 #region Aimpunch
-BlurGrayScaleSurface = -1;
+GrayScaleSurface = -1;
 BlurSurface = -1;
 #endregion
 
@@ -54,6 +54,8 @@ KilledBy = noone;
 #endregion
 
 #region GUI menu
+GameEndMenu = false;
+RoundEndMenu = false;
 PauseMenu = false;
 RespawnMenu = false;
 BackGround = -1;
@@ -63,7 +65,7 @@ BackGround = -1;
 BlackoutSurface = -1;
 SurfaceWidth = display_get_gui_width();
 SurfaceHeight = display_get_gui_height();
-usize = shader_get_uniform(shd_Blur, "size");
+usize = shader_get_uniform(shd_Blur1Pass, "size");
 BlurValue = 0;
 #endregion
 

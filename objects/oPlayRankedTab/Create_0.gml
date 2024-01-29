@@ -92,7 +92,6 @@ with (zui_create(play_unranked_tab_width * .85 + hard_mode_checkbox_width + chec
 }
 
 with (zui_create(play_unranked_tab_width * .5, zui_get_height() - 16 - string_count_lines(unranked_description_string)*string_height("a"), objUILabel)) {
-	outline_color = c_black;
 	color = c_white;
 	caption = other.unranked_description_string;
 }

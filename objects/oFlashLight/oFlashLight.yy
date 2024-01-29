@@ -23,8 +23,8 @@
     "path": "folders/Objects/Lighting.yy",
   },
   "parentObjectId": {
-    "name": "obj_light_demo",
-    "path": "objects/obj_light_demo/obj_light_demo.yy",
+    "name": "obj_light",
+    "path": "objects/obj_light/obj_light.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,

@@ -50,7 +50,6 @@ function update_eggy_rating_system(game_result, enemy_elo, map){
 		map,
 		enemy_elo
 	);
-	show_debug_message(elo_bonus);
 	global.player_elo_struct.Tracking_game ++;
 	
 	if(global.player_elo_struct.Played_games % (TRACKING_GAMES/2) == 0 || global.player_elo_struct.Played_games == 1){
@@ -99,20 +98,40 @@ function calculate_probability(player_elo, enemy_elo) {
 }
 
 function get_elo_current(probability_of_winning, game_result, volatility, game_volatility, player_kills, player_headshots, player_elo_scale, map, enemy_elo_scale, base_k=4) {
-	var game_result_weight = 7;
-	var elo_ratio_weight = 5;
     var kill_weight = 0.2;
-    var headshot_weight = 0.3;
+    var headshot_weight = 0.3;	
     var average_kills = get_average_kills(map);
     var average_headshots = get_average_headshots(player_elo_scale, average_kills * 0.1, average_kills, convert_to_eggy_scale(GLOBAL_MASTER_ELO)); ///Eggy scale
     var kill_ratio = get_performance_ratio(player_kills, average_kills);
     var headshot_ratio = get_performance_ratio(player_headshots, average_headshots);
     var kill_bonus = kill_ratio * kill_weight;
     var headshot_bonus = headshot_ratio * headshot_weight;
-	var elo_ratio = enemy_elo_scale/player_elo_scale * elo_ratio_weight;
-    var total_bonus = kill_bonus + headshot_bonus;
+    var total_bonus = kill_bonus + headshot_bonus;	
+	show_debug_message("Elo total bonus: " + string(total_bonus));
+
+
+	var elo_ratio_weight = 5;
+	var elo_difference = enemy_elo_scale - player_elo_scale;
+	var elo_scale_factor = 1 / (1 + exp(-abs(elo_difference) / 400));
+	var elo_ratio;
+
+	if (elo_difference > 0) {
+	    elo_ratio = elo_ratio_weight * elo_scale_factor;
+	} else {
+	    elo_ratio = elo_ratio_weight / elo_scale_factor;
+	}
+	show_debug_message("Elo scale factor: " + string(elo_scale_factor));
+	show_debug_message("Elo ratio: " + string(elo_ratio));
+	
+	
+	var game_result_weight = 7;
+	var elo_game_result = (game_result - probability_of_winning) * game_result_weight;
+	show_debug_message("Elo game result: " + string(elo_game_result));
+	
+	
     var K = base_k * (1 + volatility) * (1 + game_volatility);
-    return K * ((game_result * game_result_weight + total_bonus - probability_of_winning) * elo_ratio);
+	show_debug_message("Elo bonus: " + string(K * ((elo_game_result + total_bonus) * elo_ratio)));
+    return K * ((elo_game_result + total_bonus) * elo_ratio);
 }
 
 function calculate_volatility(player_recent_results, player_recent_expected) {
@@ -226,15 +245,15 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 }
 
 function round_end(round_result){
+	oEggyEloRatingSystem.round_ended = true;
 	if(global.ranked_game == true){
-		oEggyEloRatingSystem.round_ended = true;
 		if(round_result == "Win"){
 			oEggyEloRatingSystem.player_win = true;
 		}else{
 			oEggyEloRatingSystem.player_win = false;
 		}
 	}else{
-		return false;
+		oDraw.RespawnMenu = true;
 	}
 }
 
@@ -290,14 +309,18 @@ function rank_database(){
 function get_rank(Object = noone){
 	var highest_rank = -1;
 	var object_elo = -1;
-	if(Object != noone){
-		if(Object.object_index == oPlayer){
+	if(Object != oEnemy){
+		if(Object != noone){
+			if(Object.object_index == oPlayer){
+				object_elo = convert_back(global.player_elo_struct.Elo);
+			}else if(Object.object_index == oEnemy){
+				object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
+			}
+		}else{
 			object_elo = convert_back(global.player_elo_struct.Elo);
-		}else if(Object.object_index == oEnemy){
-			object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
 		}
 	}else{
-		object_elo = convert_back(global.player_elo_struct.Elo);
+		object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	}
 	
     for(var i = 0; i < RankType.Total; i++){

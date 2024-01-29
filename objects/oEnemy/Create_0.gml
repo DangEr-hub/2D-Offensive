@@ -2,6 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
+FlashLight = noone;
 stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
 Visible = false;
 WeaponID = [0, 0];

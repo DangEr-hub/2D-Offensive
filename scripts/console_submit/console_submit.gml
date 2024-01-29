@@ -208,7 +208,7 @@ function console_submit(argument0) {
 								surface_free(oDraw.Surface1); 
 								surface_free(oDraw.Surface2); 
 								surface_free(oDraw.NightVisionSurface); 
-								surface_free(oDraw.BlurGrayScaleSurface); 
+								surface_free(oDraw.GrayScaleSurface); 
 								surface_free(oDraw.BlurSurface);*/
 							
 								//show_debug_message(display_aa);

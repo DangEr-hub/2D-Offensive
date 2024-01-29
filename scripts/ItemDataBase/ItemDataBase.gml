@@ -282,7 +282,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.usp, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.usp, ItemStat.Description] = "usp handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
-	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Item";
+	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Name] = "High-explosion landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.BulletCasingID] = 0;
 	global.ItemIndex[#Item.HELandMine, ItemStat.Damage] = 98;
@@ -291,7 +291,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.HELandMine, ItemStat.AmmoSpriteID] = 50; ///Shrapnel number
 	global.ItemIndex[#Item.HELandMine, ItemStat.ItemColor] = $FF0000FF; ///red
 	
-	global.ItemIndex[#Item.CELandMine, ItemStat.Type] = "Item";
+	global.ItemIndex[#Item.CELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.CELandMine, ItemStat.Name] = "Cluster-explosion landmine";
 	global.ItemIndex[#Item.CELandMine, ItemStat.BulletCasingID] = 4;
 	global.ItemIndex[#Item.CELandMine, ItemStat.Damage] = 75;
@@ -300,7 +300,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.CELandMine, ItemStat.AmmoSpriteID] = 10; ///Shrapnel number
 	global.ItemIndex[#Item.CELandMine, ItemStat.ItemColor] = $FFFF00FF; ///yellow
 	
-	global.ItemIndex[#Item.LELandMine, ItemStat.Type] = "Item";
+	global.ItemIndex[#Item.LELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.LELandMine, ItemStat.Name] = "Low-explosion landmine";
 	global.ItemIndex[#Item.LELandMine, ItemStat.BulletCasingID] = 8;
 	global.ItemIndex[#Item.LELandMine, ItemStat.Damage] = 46;

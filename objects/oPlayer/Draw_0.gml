@@ -9,10 +9,10 @@ if(ToggleInfraVision == true){
 }else{
 	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 }
-draw_text(x, y - 50, WeaponID);
+draw_text(x, y - 50, oDraw.RoundEndMenu);
 
 if(stats.Health_points > 0){
-	if (equipped_item("Grenade")) {
+	if (equipped_item("Grenade") || equipped_item("Landmine")) {
 	    var distance = sqrt(power(45, 2) + power(15, 2));
 	    var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
 	    var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
@@ -28,7 +28,7 @@ if(stats.Health_points > 0){
 	#endregion
 	
 	if!(WeaponID >= 2){
-		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_item("Grenade")){
+		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_item("Grenade") && !equipped_item("Landmine")){
 			draw_sprite_ext(
 				spr_Items,
 				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],

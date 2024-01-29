@@ -129,13 +129,13 @@ function EnemyShooting(DangerX, DangerY){
 		}
 		
 		#region Create flash effect
-		MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight);
+		/*MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight); LIHGTING
 		MuzzleFlashLight.Object = Weapon;
 		MuzzleFlashLight.DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] - 1);
 		with(MuzzleFlashLight){
 			light[| eLight.Intensity] = 1.3;
 			light[| eLight.Color] = $FF0000FF;
-		}
+		}*/
 		#endregion
 		
 		Ammo[WeaponPositionID] --;

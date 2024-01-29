@@ -9,7 +9,7 @@
 polygon = undefined;
 
 // Default shadow caster flags
-flags = eShadowCasterFlags.None;
+flags = eShadowCasterFlags.Static;
 
 // The maximum length of shadows cast by this shadow caster
 // shadow_length -- this is an object variable

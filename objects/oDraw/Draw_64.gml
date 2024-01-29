@@ -298,7 +298,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			#endregion
 			
 			#region Draw scope
-		    shader_set(shd_Blur);
+		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
 			draw_sprite_ext(spr_SniperScope, oPlayer.player_has_scope, oCrosshair.xx + oCrosshair.x_offset, oCrosshair.yy + oCrosshair.y_offset, 4.2, 4.2, 0, c_white, 0.75);
 			shader_reset();
@@ -307,7 +307,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		}else if(oPlayer.player_has_scope == 1){
 			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)), 0.175);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
-		    shader_set(shd_Blur);
+		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
 			draw_sprite_ext(spr_SniperScope, oPlayer.player_has_scope, oCrosshair.xx + oCrosshair.x_offset, oCrosshair.yy + oCrosshair.y_offset, 2.1, 2.1, 0, c_white, 0.5);
 			shader_reset();
@@ -352,7 +352,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				    var py = bokehProperties[i, 1];
 				    var size = bokehProperties[i, 2];
 				    var alpha = clamp(0.05, 0, bokehProperties[i, 3] * oSunLight.intensity);
-					shader_set(shd_Blur);
+					shader_set(shd_Blur1Pass);
 					shader_set_uniform_f(usize, 128, 128, .5);
 				    draw_sprite_ext(spr_FlareEffect, 0, px, py, size, size, 0, c_white, alpha);
 					shader_reset();
@@ -398,7 +398,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					}
 					
 					if!(instance_exists(oInventory)){
-						draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+						draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 					}
 				}
 			}
@@ -530,7 +530,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				rank_position = get_rank(id);	
 			}
 			if!(instance_exists(oInventory)){
-				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, .5 * global.GUIMultiplier, .5 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 			}
 		}
 		#endregion

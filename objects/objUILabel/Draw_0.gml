@@ -51,4 +51,5 @@ if(item_description == false){
 		}
 	}
 }
+draw_set_alpha(1);
 

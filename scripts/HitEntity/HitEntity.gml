@@ -1,6 +1,6 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
-function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetrationPower, ObjectPenetrationDamage, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
+function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetrationPower, ObjectPenetrationDamage, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer)){
 		if(BodyPart >= HitBox.LegProne){
 			DamageMultiplier = .7;
@@ -93,9 +93,9 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 		
 		randomize();
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
-			hit_object.stats.Health_points = -1;
 			if(hit_object.object_index == oEnemy){
-				if(BodyPart >= HitBox.Head){
+				show_debug_message(BodyPart);
+				if(BodyPart <= HitBox.HeadProne){
 					if(global.ranked_game == true){
 						oEggyEloRatingSystem.headshots ++;
 					}
@@ -115,6 +115,7 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 			}else if(other.object_index == oShrapnel){
 				hit_object.KilledBy.KilledByWeapon = "shrapnel";
 			}
+			hit_object.stats.Health_points = -1;
 		}else{
 			statistics_hit("Health", hit_object.attack_damage, hit_object);
 		}
@@ -123,6 +124,10 @@ function HitEntity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetr
 
 	
 		if(hit_object.object_index == oPlayer){
+			if(global.ranked_game == true){
+				global.player_stats_struct.Hit_shots ++;
+				oEggyEloRatingSystem.hit_shots ++;
+			}
 			hit_object.AimPunchDir = irandom(3);
 		}
 

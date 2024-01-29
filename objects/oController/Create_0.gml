@@ -2,6 +2,9 @@ application_surface_draw_enable(true);
 draw_set_valign(1);
 window_set_fullscreen(true);
 
+surf_horizontal = -1;
+surf_vertical = -1;
+
 if!(instance_exists(oConsole)){
 	instance_create_layer(x, y, "OtherO", oConsole);
 }

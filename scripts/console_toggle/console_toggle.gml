@@ -9,14 +9,14 @@ function console_toggle(argument0) {
 	    var sfc_h = surface_get_height(application_surface);
 	    var sfc = surface_create(sfc_w,sfc_h);
 	    surface_set_target(sfc);
-	    draw_set_colour_write_enable(false,false,false,true);
+	    gpu_set_colourwriteenable(false,false,false,true);
 	    draw_clear(c_black);
 	    draw_rectangle_colour(0,0,sfc_w,sfc_h,c_black,c_black,c_black,c_black,false);
-	    draw_set_colour_write_enable(true,true,true,false);
+	    gpu_set_colourwriteenable(true,true,true,false);
 	    draw_surface(application_surface,0,0);
 	    var bg = sprite_create_from_surface(sfc,0,0,sfc_w,sfc_h,false,false, 0, 0);
 	    surface_reset_target();
-	    draw_set_colour_write_enable(true,true,true,true);
+	    gpu_set_colourwriteenable(true,true,true,true);
 	    surface_free(sfc);
 	    c[? "bg"] = bg;
 	    c[? "active"] = true;

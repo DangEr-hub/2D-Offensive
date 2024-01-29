@@ -8,7 +8,7 @@ if(oPlayer.ToggleInfraVision == true){
 	bloom_threshold = .35;
 }
 
-if(PauseMenu == true || RespawnMenu == true || instance_exists(oInventory) || global.my_console[? "active"]){
+if(PauseMenu == true || RespawnMenu == true || RoundEndMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
 	window_set_cursor(cr_default);
 }else{
 	window_set_cursor(cr_none);	
@@ -32,17 +32,9 @@ if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
 	}
 }
 
-if(RespawnMenu == true){
-	if!(instance_exists(objZUIMain)){
-		with(zui_main()){
-			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-				alpha_value = 0;
-				alpha = global.GUIHUDAlpha * 2.25; 
-				window_id = id;
-			}
-		}
-		alarm[0] = 1;
-	}
+
+if(RespawnMenu == true && BackGround == -1){
+	alarm[0] = 1;
 }
 
 if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false){

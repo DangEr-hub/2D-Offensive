@@ -1,5 +1,4 @@
 event_inherited();
-
 #region Death
 if(stats.Health_points <= 0 && State != States.Death){
     if (ChasingObject.HitMap[? id]) {
@@ -414,7 +413,7 @@ if(State != States.Death){
 		Legs.Visible = false;
 		with(FlashLight){
 			light[| eLight.Intensity] = 0;	
-		}
+		} 
 	}else{
 		HeadHitBox.Visible = true;
 		BodyHitBox.Visible = true;
@@ -478,7 +477,7 @@ if(State != States.Death){
 		}else{
 			with(FlashLight){
 				light[| eLight.Intensity] = 1.3;
-			}		
+			}
 		}
 	}
 	#endregion

@@ -37,7 +37,7 @@
         "GMTimeLine",
         "GMObject",
         "GMRoom",
-      ],"listItems":null,"multiselect":false,"rangeEnabled":true,"rangeMax":65536.0,"rangeMin":0.0,"value":"128","varType":1,},
+      ],"listItems":null,"multiselect":false,"rangeEnabled":true,"rangeMax":65536.0,"rangeMin":0.0,"value":"64","varType":1,},
   ],
   "solid": false,
   "spriteId": null,

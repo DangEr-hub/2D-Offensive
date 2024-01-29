@@ -46,6 +46,7 @@ global.player_stats_struct = {
 	All_shots: 0,
 	Headshots: 0,
 	Kills: 0,
+	Hit_shots: 0,
 	Deaths: 0,
     Get_KD: function() {
         return (Deaths != 0) ? (Kills / Deaths) : 0;
@@ -84,7 +85,7 @@ global.GUIMultiplier = display_get_width()/global.CameraWidth;
 camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
 
 enum icons{
-	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, total	
+	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, total	
 }
 
 enum weapon_attachments{

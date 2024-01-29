@@ -45,7 +45,7 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
                 if (!surface_exists(BlurSurface)){
                     BlurSurface = surface_create(global.GuiW, global.GuiH);
                 }
-                shader_set(shd_Blur);
+                shader_set(shd_Blur1Pass);
                 shader_set_uniform_f(usize, 8, 8, .05);
                 surface_set_target(BlurSurface);
                 draw_surface(application_surface, 0, 0);
@@ -53,12 +53,11 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
                 shader_reset();
             }
         } else {
-            if (!surface_exists(BlurGrayScaleSurface)){
-                BlurGrayScaleSurface = surface_create(global.GuiW, global.GuiH);
+            if (!surface_exists(GrayScaleSurface)){
+                GrayScaleSurface = surface_create(global.GuiW, global.GuiH);
             }
-            shader_set(shd_BlurGrayScale);
-            shader_set_uniform_f(usize, 8, 8, .05);
-            surface_set_target(BlurGrayScaleSurface);
+            shader_set(shd_GrayScale);
+            surface_set_target(GrayScaleSurface);
             draw_surface(application_surface, 0, 0);
             surface_reset_target();
             shader_reset();
@@ -114,7 +113,7 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
                 draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
             }
         } else {
-            draw_surface_stretched(BlurGrayScaleSurface, 0, 0, global.GuiW, global.GuiH);
+            draw_surface_stretched(GrayScaleSurface, 0, 0, global.GuiW, global.GuiH);
         }
         
 		if(global.BloomShader == true){
@@ -156,8 +155,8 @@ if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.Sco
         if(oPlayer.AimPunchTimer <= -1 && oPlayer.near_explosion == false && surface_exists(BlurSurface)){
             surface_free(BlurSurface);
         }
-        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3) && surface_exists(BlurGrayScaleSurface)){
-            surface_free(BlurGrayScaleSurface);
+        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3) && surface_exists(GrayScaleSurface)){
+            surface_free(GrayScaleSurface);
         }
 		if((oPlayer.ToggleNightVision == false || oPlayer.ToggleInfraVision) && surface_exists(NightVisionSurface)){
 			surface_free(NightVisionSurface);

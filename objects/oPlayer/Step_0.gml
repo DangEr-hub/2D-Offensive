@@ -75,7 +75,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	if(equipped_item("Grenade")){
+	if(equipped_item("Grenade") || equipped_item("Landmine")){
 		if(Reloading == true){
 			Reloading = false;
 			ReloadTime = 0;
@@ -231,7 +231,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Flashlight
-	if(Weapon != noone && (global.weapon_id[min(WeaponID, 2)] != Item.None || equipped_item("Grenade"))){
+	if(Weapon != noone && (global.weapon_id[min(WeaponID, 2)] != Item.None || equipped_item("Grenade") || equipped_item("Landmine"))){
 		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance, RotationAngle); 
 		FlashLightY = Weapon.y + lengthdir_y(WeaponDistance, RotationAngle);
 	}else{
@@ -249,7 +249,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Texture
-	if!(equipped_item("Grenade")){
+	if(!equipped_item("Grenade") && !equipped_item("Landmine")){
 		
 		#region Weapon texture
 		switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Name]){
@@ -797,7 +797,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Shooting
-	if(global.weapon_id[min(WeaponID, 2)] != Item.None && !(equipped_item("Grenade"))){
+	if(global.weapon_id[min(WeaponID, 2)] != Item.None && !equipped_item("Grenade") && !equipped_item("Landmine")){
 		if (player_can_shoot == true && !global.my_console[? "active"]) {
 			if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Ammo[WeaponID] <= 0){
 				audio_play_sound(snd_empty_magazine, 0, false);	
@@ -1386,33 +1386,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 							}
 						break;
 						
-						case Item.HELandMine:
-							LandMineCreate(
-								x, 
-								y, 
-								Id
-							);
-							ItemAmountSubstract(ItemUsePosition, 1);
-						break;
-						
-						case Item.CELandMine:
-							LandMineCreate(
-								x, 
-								y, 
-								Id
-							);
-							ItemAmountSubstract(ItemUsePosition, 1);
-						break;
-						
-						case Item.LELandMine:
-							LandMineCreate(
-								x, 
-								y, 
-								Id
-							);
-							ItemAmountSubstract(ItemUsePosition, 1);
-						break;
-						
 						case Item.red_dot_scope:
 							weapon_attachment_equip(Id, weapon_attachments.weapon_scope);
 						break;
@@ -1454,6 +1427,43 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					}
 					#endregion
 					
+				break;
+				
+				case "Landmine":
+				
+					#region Landmine use
+					var Id = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
+					switch(Id){
+						case Item.LELandMine:
+							LandMineCreate(
+								x, 
+								y, 
+								Id
+							);
+							ItemAmountSubstract(ItemUsePosition, 1);
+						break;
+						
+						case Item.HELandMine:
+							LandMineCreate(
+								x, 
+								y, 
+								Id
+							);
+							ItemAmountSubstract(ItemUsePosition, 1);
+						break;
+						
+						case Item.CELandMine:
+							LandMineCreate(
+								x, 
+								y, 
+								Id
+							);
+							ItemAmountSubstract(ItemUsePosition, 1);
+						break;
+					}
+					#endregion
+					
+				
 				break;
 				
 			}
@@ -1583,7 +1593,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	  }
 	  global.AmmoNeeded = global.MaxAmmo[WeaponID] - global.Ammo[WeaponID];
 
-	  if (global.Ammo[WeaponID] < global.MaxAmmo[WeaponID] && global.ClipAmmo[WeaponID] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && !(equipped_item("Grenade"))){
+	  if (global.Ammo[WeaponID] < global.MaxAmmo[WeaponID] && global.ClipAmmo[WeaponID] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && !equipped_item("Grenade") && !equipped_item("Landmine")){
 	    Reloading = true;
 	    ReloadTimer = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed];
 	  }
@@ -1658,13 +1668,12 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 #region Death
 if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
-	round_end("Loss");
-	instance_deactivate_object(obj_light_renderer); ///because shadows are visible even with grayscale and blur shader
+	//instance_deactivate_object(obj_light_renderer); ///because shadows are visible even with grayscale and blur shader
 	Weapon.image_index = 0;
 	image_index = 3;
 	oDraw.KilledBy = KilledBy;
-	oDraw.RespawnMenu = true;
 	oDraw.alarm[0] = 5;
+	round_end("Loss");
 	camera_set_view_angle(view_camera[0], 0);
 }
 #endregion

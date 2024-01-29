@@ -89,6 +89,11 @@ function sum(array){
 
 function player_shooting(){
 	
+	if(global.ranked_game == true){
+		global.player_stats_struct.All_shots ++;
+		oEggyEloRatingSystem.all_shots ++;
+	}
+	
 	#region Create smoke effect
 	Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
 	Fog.moving = true;
@@ -408,9 +413,21 @@ function reset_gui(){
 			}else if(RespawnMenu == true){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
-					with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-						alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
-						window_id = id;
+					if(other.RoundEndMenu == false && other.GameEndMenu == false){
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
+							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+							window_id = id;
+						}
+					}else if(other.RoundEndMenu == true && other.GameEndMenu == false){
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
+							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+							window_id = id;
+						}
+					}else{
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
+							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+							window_id = id;
+						}
 					}
 				}
 				alarm[0] = 1;
@@ -429,4 +446,12 @@ function reset_gui(){
 			}
 		}
 	}
+}
+	
+function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID) {
+	Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
+	Indicator.Damage_Indicator = DamageIndicatorString;
+	Indicator.Color = DamageIndicatorColor;
+	Indicator.Sprite = DamageIndicatorSprite;
+	Indicator.SpriteID = DamageIndicatorSpriteID;
 }
