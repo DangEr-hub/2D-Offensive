@@ -27,9 +27,9 @@ if(place_meeting(x, y, oPlayer)){
 	instance_destroy(self);
 }
 
-if(instance_exists(LightObject)){
-	LightObject.light[| eLight.X] = x;
-	LightObject.light[| eLight.Y] = y - z;
+if(LightObject != undefined){
+	LightObject.x = x;
+	LightObject.y = y - z;
 }
 
 if(PushTimer > -1){

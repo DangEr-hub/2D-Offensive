@@ -2,9 +2,8 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
-FlashLight = noone;
+EquippedLandMine = Item.None;
 stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
-Visible = false;
 WeaponID = [0, 0];
 Ammo = [0, 0];
 ClipAmmo = [0, 0];
@@ -39,8 +38,6 @@ FacingX = ChasingObject.x;
 FacingY = ChasingObject.y;
 VisibilityTimer = -1;
 VisibilityTime = 2 * game_get_speed(gamespeed_fps);
-InfraVisionIntensity = 2;
-infra_vision_light = noone;
 EquippedGrenadeID = Item.None;
 xp_value = 1;
 grenade_angle = random(360);

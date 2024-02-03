@@ -1,3 +1,4 @@
-LightObject = instance_create_depth(x, y, depth, oObjectLightCircle);
-LightObject.light[| eLight.Range] = sprite_width*2;
-LightObject.light[| eLight.Color] = $FF008080;
+LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
+LightObject.blend = c_green;
+LightObject.xscale = .5;
+LightObject.yscale = .5;

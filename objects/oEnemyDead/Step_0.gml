@@ -1,0 +1,1 @@
+InfraVisionIntensity = lerp(InfraVisionIntensity, 0, .005);

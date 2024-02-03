@@ -1,4 +1,9 @@
 event_inherited();
-instance_destroy(infra_vision_light);
+if(infra_vision_light != undefined){
+	infra_vision_light.Destroy();
+	infra_vision_light = undefined;
+}
+LightObject.Destroy();
+LightObject = undefined;
 ds_list_destroy(HitList);
 

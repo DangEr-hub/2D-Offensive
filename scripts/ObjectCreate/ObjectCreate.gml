@@ -37,13 +37,16 @@ function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness,
 
 function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, ObjectPenetrationPower, ObjectDamageDrop, Id = Item.None, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
 	randomize();
-	var Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
+	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
 	Explosion.Angle = random(360);	
 	Explosion.ExplosionWidth = bbox_right - bbox_left;
 	Explosion.ExplosionHeight = bbox_bottom - bbox_top;
+	Explosion.LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, PositionX, PositionY);
+	Explosion.LightObject.xscale = ExplosionDamage/10;
+	Explosion.LightObject.yscale = ExplosionDamage/10;
 	if!(audio_is_playing(snd_Explosion)){
-		play_sound(PositionX, PositionY, snd_Explosion, Explosion, 100, 2500, .75);
+		play_sound(PositionX, PositionY, snd_Explosion, 100, 2500, .75, Explosion);
 	}
 	for(i=0;i<ShrapnelNumber;i++){
 		Shrapnel = instance_create_depth(

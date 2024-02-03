@@ -1,4 +1,5 @@
 event_inherited();
+Visible = true;
 RotationAngle = 0;
 AccelX = 0;
 AccelY = 0;
@@ -15,7 +16,6 @@ ShootTimer = -1;
 WeaponID = 0;
 WeaponDistance = 0;
 Weapon = noone;
-MuzzleFlashLight = noone;
 XSpeed = 0;
 YSpeed = 0;
 ScopeIn = false;
@@ -33,7 +33,6 @@ HealingTime = -1;
 HealingItemId = Item.None;
 Healing = false;
 ToggleInfraVision = false;
-infra_vision_light = noone;
 AimPunchDir = 0;
 KickBack = 0;
 KickBackAngle = 0;
@@ -90,6 +89,7 @@ if(global.DrawParticles == true){
 if(global.ranked_game == true){
 	instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
 }
+instance_create_layer(x, y, "OtherO", oHazeController);
 instance_create_layer(x, y, "OtherO", oDraw);
 instance_create_layer(x, y, "OtherO", oConsole);
 instance_create_layer(x, y, "OtherO", oCamera);

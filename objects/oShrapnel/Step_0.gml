@@ -1,11 +1,17 @@
 /// @description Insert description here
 // You can write your code in this editor
-if(distance_to_point(StartingPointX, StartingPointY) > Distance){
+LightObject.x = x;
+LightObject.y = y;
+LightObject.angle = image_angle;
+
+if(distance_to_point(StartingX, StartingY) > Distance){
 	instance_destroy(id);
 }
 
 if(instance_exists(oParentTile)){
-	if(collision_line(xprevious, yprevious, x, y, oParentTile, true, false)){
+	var next_x = x + speed * dcos(direction);
+	var next_y = y + speed * dsin(direction);
+	if(collision_line(x, y, next_x, next_y, oParentTile, true, false)){
 		PenetrationDamage ++;
 		if(WallHit == false){
 			randomize();

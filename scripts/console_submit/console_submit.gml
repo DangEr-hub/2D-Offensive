@@ -247,9 +247,9 @@ function console_submit(argument0) {
 					break;
 					case "set_time":
 						if(no == 1 && string_digits(c[1]) != ""){
-							if(instance_exists(oSunLight)){
-								oSunLight.CurrentHour = floor(real(c[1])/60);
-								oSunLight.CurrentMinute = real(c[1]) % 60;
+							if(instance_exists(oLightRenderer)){
+								oLightRenderer.CurrentHour = floor(real(c[1])/60);
+								oLightRenderer.CurrentMinute = real(c[1]) % 60;
 							}
 						}
 					break;			

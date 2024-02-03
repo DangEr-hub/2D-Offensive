@@ -1,0 +1,7 @@
+InfraVisionIntensity = 2;
+RotationAngle = 0;
+image_speed = 0;
+image_index = 3;
+
+
+

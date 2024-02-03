@@ -1,5 +1,5 @@
 global.ParticleSystem = part_system_create();
-part_system_depth(global.ParticleSystem, -100);
+part_system_depth(global.ParticleSystem, -1000);
 
 FlameParticle = part_type_create();
 part_type_shape(FlameParticle,pt_shape_line);

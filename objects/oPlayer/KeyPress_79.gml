@@ -1,4 +1,6 @@
-if!(global.my_console[? "active"]){
-	round_end("Win");
-}
+AimPunchTimer = AimPunchTime;
+
+//if!(global.my_console[? "active"]){
+//	round_end("Win");
+//}
 

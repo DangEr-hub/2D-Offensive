@@ -1,5 +1,5 @@
-function equipped_item(item_type){
-	return (global.ItemIndex[#global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], ItemStat.Type] == item_type)	
+function equipped_usable_item(){
+	return (global.ItemIndex[#global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], ItemStat.usable] == true);
 }
 
 function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, Destroy = true) {
@@ -122,7 +122,7 @@ function InventoryInit() {
 		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, MaxKickBack, SniperScope, ShootSpdMul, has_barrel, EquipTime, has_suppressor,
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
 		EnemyInaccuracyCompensation, MaxAmmo, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
-		advantages, disadvantages, Total
+		advantages, disadvantages, usable, Total
 	}
 	
 	enum InventoryIndex{

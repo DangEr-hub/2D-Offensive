@@ -1,11 +1,11 @@
 event_inherited();
-pause_width_tab = 512 * global.GUIMultiplier;
+pause_width_tab = 768 * global.GUIMultiplier;
 pause_height_tab = max(512 * global.GUIMultiplier, 768);
 
 zui_set_size(pause_width_tab, pause_height_tab);
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-	caption = "Round end";
+	caption = "Game end";
 	draggable = 1;
 }
 
@@ -90,22 +90,11 @@ rank_callbacks = [
 
 #region Callbacks
 
-popup_continue_callback_positive = function(){
-	with(objZUIMain){
-		zui_destroy();	
-	}
-	save_game();
-	room_restart();	
-};
-
-continue_callback = function(){
-	ui_show_popup("Continue to next round?", "Continue", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_continue_callback_positive, -1);		
-};
-
 popup_exit_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
 	}
+	clear_player_statistics(global.player_elo_struct.Rounds_win + global.player_elo_struct.Rounds_lost);
 	save_game();
 	game_end();	
 };
@@ -118,6 +107,7 @@ popup_main_menu_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();
 	}
+	clear_player_statistics(global.player_elo_struct.Rounds_win + global.player_elo_struct.Rounds_lost);
 	save_game();
 	room_goto(rm_main_menu);
 };
@@ -127,13 +117,21 @@ main_menu_callback = function(){
 };
 #endregion
 
+#region Title
 draw_set_font(set_font("Title"));
-with (zui_create(title_position_x - string_width("Round won")/2, title_position_y, objUILabel)) {
+title_string = "Win";
+if(global.player_elo_struct.Rounds_lost > global.player_elo_struct.Rounds_win){
+	title_string = "Loss";	
+}else if(global.player_elo_struct.Rounds_lost == global.player_elo_struct.Rounds_win){
+	title_string = "Draw";
+}
+with (zui_create(title_position_x - string_width(title_string)/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
 	color = global.GoldColor;
-	caption = "Round won";
+	caption = other.title_string;
 }
 draw_set_font(set_font("Menu_small"));
+#endregion
 
 #region Current player rank
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
@@ -179,6 +177,9 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y + ran
 #endregion
 
 #region Statistics
+average_playing_time = average(global.player_elo_struct.Playing_time_per_round);
+total_headshots = sum(global.player_elo_struct.Headshots_per_round);
+total_kills = sum(global.player_elo_struct.Kills_per_round);
 offset_y = 96;
 statistics_x = zui_get_width() * .25;
 statistics_y = base_position_y + rank_image_size_height*1.5 + string_height("a") + offset_y;
@@ -202,20 +203,31 @@ with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
 	color = c_white;
 	caption = "Time alive: " + string(oEggyEloRatingSystem.playing_time/game_get_speed(gamespeed_fps)) + " s";
 }
-#endregion
+with (zui_create(statistics_x + gap*2, statistics_y, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.kills;
+	color = c_white;
+	caption = "Total kills: " + string(other.total_kills);
+}
 
+with (zui_create(statistics_x + gap*2, statistics_y + text_gap, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.headshot_percentage;
+	color = c_white;
+	caption = "Total headshots: " + string(other.total_headshots);
+}
+with (zui_create(statistics_x + gap*2, statistics_y + text_gap*2, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.time;
+	color = c_white;
+	caption = "Average playing time: " + string(other.average_playing_time) + "s";
+}
+#endregion
 
 #region Main menu and exit button
 offset_y = 64;
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIButton)){
-	zui_set_anchor(0.5, 0);
-	zui_set_width(other.button_width);
-	zui_set_height(other.button_height);
-	caption = "Continue";
-	callback = other.continue_callback;
-}
 
 with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton)){
 	zui_set_anchor(0.5, 0);

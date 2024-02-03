@@ -1,13 +1,3 @@
-function shouldExplode(obj) {
-	if(instance_exists(oEnemy)){
-	    if (obj == oEnemy && oEnemy.State == States.Death) {
-	        return false;
-	    }
-	}
-
-    return (distance_to_object(obj) <= explosion_distance && (Object == noone || Object.object_index != obj));
-}
-
 if (alpha_timer > -1) {
     alpha_timer--;
 } else {
@@ -16,7 +6,7 @@ if (alpha_timer > -1) {
 }
 
 if (!explode) {
-    explode = shouldExplode(oPlayer) || shouldExplode(oEnemy) || shouldExplode(oGrenade);
+    explode = shouldExplode(oPlayer, Object) || shouldExplode(oEnemy, Object) || shouldExplode(oGrenade, Object);
 }
 
 if(explode == true){

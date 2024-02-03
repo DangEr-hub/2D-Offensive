@@ -1,26 +1,7 @@
-with(zui_main()){
-	if(other.RoundEndMenu == false && other.GameEndMenu == false){
-		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-			alpha_value = 0;
-			alpha = global.GUIHUDAlpha * 2.25; 
-			window_id = id;
-		}
-	}else if(other.RoundEndMenu == true){
-		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
-			alpha_value = 0;
-			alpha = global.GUIHUDAlpha * 2.25; 
-			window_id = id;
-		}
-	}else if(other.GameEndMenu == true){
-		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
-			alpha_value = 0;
-			alpha = global.GUIHUDAlpha * 2.25; 
-			window_id = id;
-		}
-	}
-}
-instance_deactivate_object(obj_light_renderer);
+//instance_deactivate_object(obj_light_renderer);
 BackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
+instance_deactivate_object(oCrosshair);
+instance_deactivate_object(oCamera);
 instance_deactivate_all(true);
 instance_activate_object(oGameEndMenu);
 instance_activate_object(oEggyEloRatingSystem);

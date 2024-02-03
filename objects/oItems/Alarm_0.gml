@@ -1,5 +1,6 @@
 /// @description Post-create event
 ItemDeclare();
-LightObject = instance_create_depth(x, y, depth, oObjectLightCircle);
-LightObject.light[| eLight.Range] = sprite_width;
-LightObject.light[| eLight.Color] = global.ItemIndex[#image_index, ItemStat.ItemColor];
+LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
+LightObject.xscale = .5;
+LightObject.yscale = .5;
+LightObject.blend = global.ItemIndex[#image_index, ItemStat.ItemColor];

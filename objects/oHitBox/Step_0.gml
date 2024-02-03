@@ -9,9 +9,7 @@ if(instance_exists(MainObject)){
 	if(MainObject.object_index != oPlayer){
 		if(instance_exists(MainObject.ChasingObject)){
 			if(MainObject.ChasingObject.object_index != oPlayer){
-				if(MainObject.ChasingObject.State == States.Death){
-					MainObject.ChasingObject = oPlayer;
-				}
+				MainObject.ChasingObject = oPlayer;
 			}
 		}
 	}

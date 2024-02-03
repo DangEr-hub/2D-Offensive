@@ -75,7 +75,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	if(equipped_item("Grenade") || equipped_item("Landmine")){
+	if(equipped_usable_item()){
 		if(Reloading == true){
 			Reloading = false;
 			ReloadTime = 0;
@@ -159,7 +159,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		
 		if(AimPunchTimer > -1){
 			AimPunchCrossShake = AimPunchStrength*5 * AimPunchMultiplier;
-			ViewAngleAmplitude += AimPunchStrength*2 * AimPunchMultiplier;
+			ViewAngleAmplitude += AimPunchStrength * AimPunchMultiplier;
 			AimPunchViewAngleFrequency = AimPunchStrength*.5 * AimPunchMultiplier;
 		}
 		
@@ -169,8 +169,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			if(HEGrenade.Id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.Speed < .1){
 				if(distance_to_object(HEGrenade) <= 1024){
 					near_explosion = true;
-					ExplosionCrossShake = max(25 * (1 - distance_to_object(HEGrenade)/1024), 10);
-					ViewAngleAmplitude += max(25 * (1 - distance_to_object(HEGrenade)/1024), 10);
+					ExplosionCrossShake = max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
+					ViewAngleAmplitude += max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
 					ExplosionViewAngleFrequency = 1;
 				}
 			}
@@ -231,12 +231,17 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Flashlight
-	if(Weapon != noone && (global.weapon_id[min(WeaponID, 2)] != Item.None || equipped_item("Grenade") || equipped_item("Landmine"))){
+	if(Weapon != noone && (global.weapon_id[min(WeaponID, 2)] != Item.None && !equipped_usable_item())){
 		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance, RotationAngle); 
 		FlashLightY = Weapon.y + lengthdir_y(WeaponDistance, RotationAngle);
 	}else{
 		FlashLightX = x;
 		FlashLightY = y;
+	}
+	if(FlashLight != undefined){
+		FlashLight.angle = RotationAngle;
+		FlashLight.x = FlashLightX;
+		FlashLight.y = FlashLightY;
 	}
 	Weapon.FlashLightX = FlashLightX;
 	Weapon.FlashLightY = FlashLightY;
@@ -249,7 +254,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Texture
-	if(!equipped_item("Grenade") && !equipped_item("Landmine")){
+	if!(equipped_usable_item()){
 		
 		#region Weapon texture
 		switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Name]){
@@ -797,7 +802,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Shooting
-	if(global.weapon_id[min(WeaponID, 2)] != Item.None && !equipped_item("Grenade") && !equipped_item("Landmine")){
+	if(global.weapon_id[min(WeaponID, 2)] != Item.None && !equipped_usable_item()){
 		if (player_can_shoot == true && !global.my_console[? "active"]) {
 			if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Ammo[WeaponID] <= 0){
 				audio_play_sound(snd_empty_magazine, 0, false);	
@@ -1037,13 +1042,11 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Enemy collision
 	if(place_meeting(x, y, oEnemy)) {
 	    var Enemy = instance_nearest(x, y, oEnemy); // Get nearest Enemy
-		if(Enemy.State != States.Death){
-		    var dir = point_direction(Enemy.x, Enemy.y, x, y); // Direction from Enemy to player
+		var dir = point_direction(Enemy.x, Enemy.y, x, y); // Direction from Enemy to player
     
-			// Bounce player smoothly by setting acceleration
-			AccelX = 5 * cos(degtorad(dir));
-			AccelY = -5 * sin(degtorad(dir));  // Negative because GM's Y axis is inverted
-		}
+		// Bounce player smoothly by setting acceleration
+		AccelX = 5 * cos(degtorad(dir));
+		AccelY = -5 * sin(degtorad(dir));
 	}
 
 	// Apply physics
@@ -1184,23 +1187,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		stats.Damage_health_points = stats.Health_points;
 		Healing = false;
 		HealingTime = -1;
-	}
-	#endregion
-	
-	#region Infra vision
-	if(ToggleInfraVision == true){
-		if!(instance_exists(infra_vision_light)){
-			infra_vision_light = instance_create_depth(headshot_x, headshot_y, depth, oObjectLightCircle);
-			infra_vision_light.Object = self;
-			
-			with(infra_vision_light){
-				light[| eLight.Color] = $FF0000FF;
-			}
-		}
-	}else{
-		if(instance_exists(infra_vision_light)){
-			instance_destroy(infra_vision_light);
-		}
 	}
 	#endregion
 	
@@ -1593,7 +1579,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	  }
 	  global.AmmoNeeded = global.MaxAmmo[WeaponID] - global.Ammo[WeaponID];
 
-	  if (global.Ammo[WeaponID] < global.MaxAmmo[WeaponID] && global.ClipAmmo[WeaponID] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && !equipped_item("Grenade") && !equipped_item("Landmine")){
+	  if (global.Ammo[WeaponID] < global.MaxAmmo[WeaponID] && global.ClipAmmo[WeaponID] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && !equipped_usable_item()){
 	    Reloading = true;
 	    ReloadTimer = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed];
 	  }
@@ -1610,22 +1596,24 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 	// Deactivate instances outside view + DeactivateMargin
 	instance_deactivate_region(
-	    camera_get_view_x(view_camera[0]) - DeactivateMargin,
-	    camera_get_view_y(view_camera[0]) - DeactivateMargin,
-	    camera_get_view_width(view_camera[0]) + 2 * DeactivateMargin,
-	    camera_get_view_height(view_camera[0]) + 2 * DeactivateMargin,
-	    false, 
-	    true
+		camera_get_view_x(view_camera[0]) - DeactivateMargin,
+		camera_get_view_y(view_camera[0]) - DeactivateMargin,
+		camera_get_view_width(view_camera[0]) + 2 * DeactivateMargin,
+		camera_get_view_height(view_camera[0]) + 2 * DeactivateMargin,
+		false, 
+		true
 	);
 
 	// Activate instances within view + ActivateMargin
 	instance_activate_region(
-	    camera_get_view_x(view_camera[0]) - ActivateMargin,
-	    camera_get_view_y(view_camera[0]) - ActivateMargin,
-	    camera_get_view_width(view_camera[0]) + 2 * ActivateMargin,
-	    camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
-	    true
+		camera_get_view_x(view_camera[0]) - ActivateMargin,
+		camera_get_view_y(view_camera[0]) - ActivateMargin,
+		camera_get_view_width(view_camera[0]) + 2 * ActivateMargin,
+		camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
+		true
 	);
+	instance_activate_object(oLightRenderer);
+	instance_activate_object(oHazeController);
 	instance_activate_object(oRespawnMenu);
 	instance_activate_object(oItemDescription);
 	instance_activate_object(objUIWindowCaption);
@@ -1646,18 +1634,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(oConsole);
 	instance_activate_object(oCamera);
 	instance_activate_object(oInventory);
-	instance_activate_object(obj_shadow_caster);
-	instance_activate_object(obj_lighting_init);
-	instance_activate_object(obj_light_renderer);
-	instance_activate_object(obj_light);
-	instance_activate_object(oFlashLight);
-	instance_activate_object(oSunLight);	
-	instance_activate_object(oObjectLightCircle);	
-	instance_activate_object(obj_area_light_demo);	
-	instance_activate_object(obj_light_ball);
-	instance_activate_object(obj_light_demo);
-	instance_activate_object(obj_line_light_demo);
-	instance_activate_object(obj_spot_light_rotate);
 	instance_activate_object(oItems);
 	instance_activate_object(oShrapnel);
 	instance_activate_object(oGrenade);
@@ -1668,11 +1644,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 #region Death
 if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
-	//instance_deactivate_object(obj_light_renderer); ///because shadows are visible even with grayscale and blur shader
 	Weapon.image_index = 0;
 	image_index = 3;
 	oDraw.KilledBy = KilledBy;
-	oDraw.alarm[0] = 5;
 	round_end("Loss");
 	camera_set_view_angle(view_camera[0], 0);
 }

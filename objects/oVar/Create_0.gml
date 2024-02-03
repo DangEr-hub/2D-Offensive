@@ -24,7 +24,7 @@ global.ArmourDurability = [0, 0];
 global.ArmourID = [Item.None, Item.None];
 global.CameraWidth = 960;
 global.CameraHeight = 540;
-global.FieldOfView = 15;
+global.FieldOfView = 10;
 global.BloomShader = true;
 global.TimeSpeed = 15;
 global.ViewShake = true;
@@ -107,11 +107,11 @@ enum MapIndex{
 
 global.MapID = MapIndex.Desert;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = $FFFFFFFF;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = c_black;//make_color_rgb(192, 108, 0);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = $FF00FFFF;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = 0.75;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0.1;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1.3;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .1;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 

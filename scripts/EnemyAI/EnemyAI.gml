@@ -22,6 +22,7 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 	EnemyBulletTracer.ShotX = EnemyShotX;
 	EnemyBulletTracer.ShotY = EnemyShotY;
 	EnemyBulletTracer.image_angle = point_direction(EnemyBulletTracer.x, EnemyBulletTracer.y, EnemyShotX, EnemyShotY);
+	EnemyBulletTracer.LightObject.angle = EnemyBulletTracer.image_angle;
 	EnemyBulletTracer.direction = EnemyBulletTracer.image_angle;
 	EnemyBulletTracer.Weapon = EnemyWeaponID;
 	EnemyBulletTracer.Object = id;
@@ -29,7 +30,7 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 
 function CheckIfAvailable(ObjectType){
 	return 
-	(!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && State != States.Death && oPlayer.InSmoke == false)
+	(!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && oPlayer.InSmoke == false)
 }
 
 function MoveRunAway(DangerX, DangerY){
@@ -87,7 +88,7 @@ function MoveShooting(DangerX, DangerY){
 
 function EnemyShooting(DangerX, DangerY){
 	
-	if(CanShoot == true && ChasingObjectSpotted == true && !collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) && distance_to_object(ChasingObject) <= ChasingDistance && State != States.Death && Ammo[WeaponPositionID] > 0){
+	if(CanShoot == true && ChasingObjectSpotted == true && !collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0){
 		
 		var sound_id = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.SoundID];
 		if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
@@ -129,13 +130,13 @@ function EnemyShooting(DangerX, DangerY){
 		}
 		
 		#region Create flash effect
-		/*MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight); LIHGTING
-		MuzzleFlashLight.Object = Weapon;
-		MuzzleFlashLight.DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] - 1);
-		with(MuzzleFlashLight){
-			light[| eLight.Intensity] = 1.3;
-			light[| eLight.Color] = $FF0000FF;
-		}*/
+		if(DestroyTimer == -1){
+			DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * .75);
+			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
+			MuzzleFlashLight.angle = RotationAngle;
+			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
+			MuzzleFlashLight.blend = c_red;
+		}
 		#endregion
 		
 		Ammo[WeaponPositionID] --;

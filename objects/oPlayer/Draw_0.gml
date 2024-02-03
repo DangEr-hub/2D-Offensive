@@ -1,34 +1,16 @@
 /// @description Drawing
-///Draw Player
-gpu_set_tex_filter(true);
-if(ToggleInfraVision == true){
-	shader_set(shd_InfraVision);
-	shader_set_uniform_f(shader_get_uniform(shd_InfraVision, "u_intensity"), 2.0);
-	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	shader_reset();
-}else{
-	draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-}
-draw_text(x, y - 50, oDraw.RoundEndMenu);
-
+//draw_text(x, y - 50, InfraVisionIntensity);
+event_inherited();
 if(stats.Health_points > 0){
-	if (equipped_item("Grenade") || equipped_item("Landmine")) {
+	if (equipped_usable_item()) {
 	    var distance = sqrt(power(45, 2) + power(15, 2));
 	    var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
 	    var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
 	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
 	}
-
-	#region Field of view
-	draw_set_alpha(.1);
-	draw_set_color(global.GoldColor);
-	draw_triangle(ax, ay, bx, by, cx, cy, false);
-	draw_set_color(c_white);
-	draw_set_alpha(1);
-	#endregion
 	
 	if!(WeaponID >= 2){
-		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_item("Grenade") && !equipped_item("Landmine")){
+		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_usable_item()){
 			draw_sprite_ext(
 				spr_Items,
 				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],
@@ -81,5 +63,3 @@ if(stats.Health_points > 0){
 	}
 	
 }
-
-gpu_set_tex_filter(false);

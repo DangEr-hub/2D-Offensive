@@ -1,0 +1,2 @@
+LightObject.Destroy();
+LightObject = undefined;

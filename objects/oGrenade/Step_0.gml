@@ -210,8 +210,8 @@ if(stuck == false){
 
 	x += lengthdir_x(Speed, Direction);
 	if (place_meeting(x, y, oEnemy)) {
-		EnemyNearest = instance_nearest(x, y, oEnemy);
-		if (place_meeting(x, y, EnemyNearest) && EnemyNearest.State != States.Death && Object != EnemyNearest) {
+		var EnemyNearest = instance_nearest(x, y, oEnemy);
+		if (place_meeting(x, y, EnemyNearest) && Object != EnemyNearest) {
 			Speed *= .75;
 		    Direction = -Direction * random_range(.75, 1);
 		    x -= lengthdir_x(Speed, Direction);  // Move out of collision
@@ -220,8 +220,8 @@ if(stuck == false){
 
 	y += lengthdir_y(Speed, Direction);
 	if(instance_exists(oEnemy)){
-		EnemyNearest = instance_nearest(x, y, oEnemy);
-		if (place_meeting(x, y, EnemyNearest) && EnemyNearest.State != States.Death && Object != EnemyNearest) {
+		var EnemyNearest = instance_nearest(x, y, oEnemy);
+		if (place_meeting(x, y, EnemyNearest) && Object != EnemyNearest) {
 			Speed *= .75;
 		    Direction = (180 - Direction) * random_range(.75, 1);
 		    y -= lengthdir_y(Speed, Direction);  // Move out of collision

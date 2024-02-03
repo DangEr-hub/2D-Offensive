@@ -84,25 +84,24 @@
 		    break;
 		}
 	}
-if(State != States.Death){
-	// Stay away from walls
-	if (place_meeting(x + 1, y, oParentTile)) {
-	    MoveTime = random_range(9, 18);
-	    MoveDirection  = 180 + random_range(-45, 45);
-	}
+	
+// Stay away from walls
+if (place_meeting(x + 1, y, oParentTile)) {
+	MoveTime = random_range(9, 18);
+	MoveDirection  = 180 + random_range(-45, 45);
+}
 
-	if (place_meeting(x - 1, y, oParentTile)) {
-	    MoveTime = random_range(9, 18);
-	    MoveDirection  = 0 + random_range(-45, 45);
-	}
+if (place_meeting(x - 1, y, oParentTile)) {
+	MoveTime = random_range(9, 18);
+	MoveDirection  = 0 + random_range(-45, 45);
+}
 
-	if (place_meeting(x, y - 1, oParentTile)) {
-	    MoveTime = random_range(9, 18);
-	    MoveDirection  = 270 + random_range(-45, 45);
-	}
+if (place_meeting(x, y - 1, oParentTile)) {
+	MoveTime = random_range(9, 18);
+	MoveDirection  = 270 + random_range(-45, 45);
+}
 
-	if (place_meeting(x, y + 1, oParentTile)) {
-	    MoveTime = random_range(9, 18);
-	    MoveDirection  = 90 + random_range(-45, 45);
-	}
+if (place_meeting(x, y + 1, oParentTile)) {
+	MoveTime = random_range(9, 18);
+	MoveDirection  = 90 + random_range(-45, 45);
 }

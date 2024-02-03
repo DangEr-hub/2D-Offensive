@@ -37,7 +37,7 @@ function choose_offensive_action() {
 
 
 
-if(instance_exists(ChasingObject) && State != States.Death){
+if(instance_exists(ChasingObject)){
     randomize();
     alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	

@@ -1,41 +1,48 @@
+var next_x = x + speed * dcos(direction);
+var next_y = y + speed * dsin(direction);
 var MaxDistanceToTarget = 256;
 var PointDistance = point_distance(ShotX, ShotY, BulletTracerX, BulletTracerY);
 
+LightObject.x = x;
+LightObject.y = y;
+LightObject.angle = image_angle;
+
 #region Infra vision
-if(oPlayer.ToggleInfraVision == true){
-	if!(instance_exists(infra_vision_light)){
-		infra_vision_light = instance_create_depth(x, y, depth, oObjectLightCircle);
-		infra_vision_light.Object = self;		
-		with(infra_vision_light){
-			light[| eLight.Range] = 128;
-			light[| eLight.Intensity] = 1.5;	
-			light[| eLight.Color] = $FF0000FF;
+if(oPlayer.ToggleInfraVision == true || oPlayer.ToggleNightVision == true){
+	if(infra_vision_light == undefined){
+		infra_vision_light = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
+		if(oPlayer.ToggleNightVision == true){
+			infra_vision_light.blend = c_green;
+		}else{
+			infra_vision_light.blend = c_red;	
 		}
-	}	
+	}
 }else{
-	if(instance_exists(infra_vision_light)){
-		instance_destroy(infra_vision_light);
+	if(infra_vision_light != undefined){
+		infra_vision_light.Destroy();
+		infra_vision_light = undefined;
 	}
 }
 #endregion
 
 #region Bullet enemy penetration
-if(instance_exists(oEnemy)){
-	var Enemy = instance_nearest(x, y, oEnemy);
-	if(instance_exists(Enemy)){
-		if(instance_exists(Enemy.HeadHitBox) && instance_exists(Enemy.BodyHitBox) && instance_exists(Enemy.ArmHitBox)){
-			if(collision_line(xprevious, yprevious, x, y, Enemy.HeadHitBox, true, false) || 
-			collision_line(xprevious, yprevious, x, y, Enemy.BodyHitBox, true, false) || 
-			collision_line(xprevious, yprevious, x, y, Enemy.ArmHitBox, true, false)){	
-		        if(ds_list_find_index(HitList, Enemy.id) == -1){
-				   if(ds_list_size(HitList) != 0){
-		                PenetrationDamage += 0.1 / global.ItemIndex[#Weapon, ItemStat.PenetrationPower];
-				   }
-		            ds_list_add(HitList, Enemy.id);
-		        }
-			}
-		}
-	}
+if (instance_exists(oEnemy)) {
+    var Enemy = instance_nearest(x, y, oEnemy);
+    
+    if (instance_exists(Enemy)) {
+        if (instance_exists(Enemy.HeadHitBox) && instance_exists(Enemy.BodyHitBox) && instance_exists(Enemy.ArmHitBox)) {
+            if (collision_line(x, y, next_x, next_y, Enemy.HeadHitBox, true, false) ||
+                collision_line(x, y, next_x, next_y, Enemy.BodyHitBox, true, false) ||
+                collision_line(x, y, next_x, next_y, Enemy.ArmHitBox, true, false)) { 
+                if (ds_list_find_index(HitList, Enemy.id) == -1) {
+                    if (ds_list_size(HitList) != 0) {
+                        PenetrationDamage += 0.1 / global.ItemIndex[#Weapon, ItemStat.PenetrationPower];
+                    }
+                    ds_list_add(HitList, Enemy.id);
+                }
+            }
+        }
+    }
 }
 #endregion
 
@@ -48,17 +55,15 @@ if(image_index == 1){
 		part_particles_create(global.ParticleSystem, x, y, oParticleSystem.FlameParticle, 50);
 	}
 	if(PointDistance <= global.ItemIndex[#Weapon, ItemStat.Range]){
+		if(instance_exists(NearestEnemy) && NearestEnemy != noone){
 		var NearestTargetX = ShotX;
 		var NearestTargetY = ShotY;
-		if(instance_exists(NearestEnemy) && NearestEnemy != noone){
-			if(distance_to_object(NearestEnemy) <= MaxDistanceToTarget && NearestEnemy.State != States.Death && NearestEnemy.Visible == true){
+			if(distance_to_object(NearestEnemy) <= MaxDistanceToTarget && NearestEnemy.Visible == true){
 				NearestTargetX = NearestEnemy.x;
 				NearestTargetY = NearestEnemy.y;
 			}
 		}
 	}else{
-		var RandomX, RandomY;
-		var NearestTargetX, NearestTargetY;
 		if(instance_exists(Object) && Object != noone){
 			RandomX = random_range(
 				ShotX - global.ItemIndex[#Weapon, ItemStat.Inaccuracy]*inaccuracy_formula(Weapon, Object), 
@@ -187,9 +192,6 @@ if(image_index == 0){
 #endregion
 
 #region Bullet wall hit
-var next_x = x + speed * cos(direction * pi / 180);
-var next_y = y + speed * sin(direction * pi / 180);
-
 if (collision_line(x, y, next_x, next_y, oParentTile, true, false)) {
 	if(image_index == 0){
 		PenetrationDamage ++;

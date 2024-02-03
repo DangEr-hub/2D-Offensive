@@ -2,7 +2,7 @@ randomize();
 alarm[0] = 1;
 value = 0;
 PushForce = 0;
-LightObject = noone;
+LightObject = undefined;
 PushTimer = -1;
 PushDirection = 0;
 image_index = 0;

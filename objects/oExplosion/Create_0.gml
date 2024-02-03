@@ -2,6 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
+LightObject = noone;
 infra_vision_light = noone;
 image_speed = .75;
 Angle = 0;

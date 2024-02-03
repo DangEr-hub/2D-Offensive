@@ -14,9 +14,9 @@ var scale = 1 + (z/100);
 image_xscale = scale;
 image_yscale = scale;
 
-if(instance_exists(LightObject)){
-	LightObject.light[| eLight.X] = x;
-	LightObject.light[| eLight.Y] = y - z;
+if(LightObject != undefined){
+	LightObject.x = x;
+	LightObject.y = y - z;
 }
 
 if(PushTimer > -1){

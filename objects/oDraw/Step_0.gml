@@ -3,46 +3,70 @@
 ViewX = camera_get_view_x(view_camera[0]);
 ViewY = camera_get_view_y(view_camera[0]);
 
-bloom_threshold = .29;
-if(oPlayer.ToggleInfraVision == true){
-	bloom_threshold = .35;
-}
+if(instance_exists(oPlayer)){
+	bloom_threshold = .29;
+	if(oPlayer.ToggleInfraVision == true){
+		bloom_threshold = .35;
+	}
 
-if(PauseMenu == true || RespawnMenu == true || RoundEndMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
-	window_set_cursor(cr_default);
-}else{
-	window_set_cursor(cr_none);	
-}
+	if(PauseMenu == true || RespawnMenu == true || RoundEndMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
+		window_set_cursor(cr_default);
+	}else{
+		window_set_cursor(cr_none);	
+	}
 
-if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
-	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
-		if(show_weapon_attachments == false){
-			oPlayer.Moving = false;
-			oPlayer.Legs.image_speed = 0;
-			oPlayer.RelativeSpeedX = 0;
-			oPlayer.RelativeSpeedY = 0;
-			oPlayer.player_can_shoot = false;
-			show_weapon_attachments = true;
-		}else{
-			show_weapon_attachments = false;
-			if!(instance_exists(oInventory)){
-				oPlayer.player_can_shoot = true;	
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
+		if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
+			if(show_weapon_attachments == false){
+				oPlayer.Moving = false;
+				oPlayer.Legs.image_speed = 0;
+				oPlayer.RelativeSpeedX = 0;
+				oPlayer.RelativeSpeedY = 0;
+				oPlayer.player_can_shoot = false;
+				show_weapon_attachments = true;
+			}else{
+				show_weapon_attachments = false;
+				if!(instance_exists(oInventory)){
+					oPlayer.player_can_shoot = true;	
+				}
 			}
 		}
 	}
-}
 
 
-if(RespawnMenu == true && BackGround == -1){
-	alarm[0] = 1;
-}
+	if(RespawnMenu == true && BackGround == -1 && alarm[0] == -1){
+		with(zui_main()){
+			if(other.RoundEndMenu == false && other.GameEndMenu == false){
+				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
+					alpha_value = 0;
+					alpha = global.GUIHUDAlpha * 2.25; 
+					window_id = id;
+				}
+			}else if(other.RoundEndMenu == true){
+				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
+					alpha_value = 0;
+					alpha = global.GUIHUDAlpha * 2.25; 
+					window_id = id;
+				}
+			}else if(other.GameEndMenu == true){
+				show_debug_message(global.player_elo_struct.Headshots_per_round);
+				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
+					alpha_value = 0;
+					alpha = global.GUIHUDAlpha * 2.25; 
+					window_id = id;
+				}
+			}
+		}
+		alarm[0] = 1;
+	}
 
-if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false){
-	if(PauseMenu == false){
-		pause(id);
-		PauseMenu = true;	
-	}else{
-		unpause(id);
-		PauseMenu = false;
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false){
+		if(PauseMenu == false){
+			pause(id);
+			PauseMenu = true;	
+		}else{
+			unpause(id);
+			PauseMenu = false;
+		}
 	}
 }

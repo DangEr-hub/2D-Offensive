@@ -1,3 +1,16 @@
+function shouldExplode(ObjectType, Placer) {
+    var instance_to_check = instance_nearest(x, y, ObjectType);
+
+    if (instance_exists(instance_to_check)) {
+        var isWithinExplosionDistance = distance_to_object(instance_to_check) <= explosion_distance;
+        var isNotPlacer = (Placer == noone || instance_to_check != Placer);
+
+        return isWithinExplosionDistance && isNotPlacer;
+    }
+
+    return false;
+}
+
 function ds_list_to_array(list) {
     var array = [];
     for (var i = 0; i < ds_list_size(list); i++) {
@@ -122,13 +135,12 @@ function player_shooting(){
 				
 	#region Create flash effect
 	if(stats.Health_points > 0){
-		MuzzleFlashLight = instance_create_depth(FlashLightX, FlashLightY, depth, oFlashLight);
-		MuzzleFlashLight.Object = Weapon;
-		MuzzleFlashLight.DestroyTimer = ShootTimer - 1;
-		with(MuzzleFlashLight){
-			light[| eLight.Direction] = other.RotationAngle;
-			light[| eLight.Intensity] = 1.3;
-			light[| eLight.Color] = $FF0000FF;
+		if(DestroyTimer == -1){
+			DestroyTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * .75);
+			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
+			MuzzleFlashLight.angle = RotationAngle;
+			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
+			MuzzleFlashLight.blend = c_red;
 		}
 	}
 	#endregion
@@ -193,6 +205,7 @@ function player_shooting(){
 		BulletTracer.ShotX = ShotX;
 		BulletTracer.ShotY = ShotY;
 		BulletTracer.image_angle = point_direction(BulletTracer.x, BulletTracer.y, ShotX, ShotY);
+		BulletTracer.LightObject.angle = BulletTracer.image_angle;
 		BulletTracer.direction = BulletTracer.image_angle;
 		BulletTracer.Weapon = global.weapon_id[min(WeaponID, 2)];
 		BulletTracer.Object = id;

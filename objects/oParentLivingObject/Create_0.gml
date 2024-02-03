@@ -1,0 +1,27 @@
+/// @description Insert description here
+// You can write your code in this editor
+DestroyTimer = -1;
+MuzzleFlashLight = undefined;
+RotationAngle = 0;
+FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
+FlashLight.alpha = FLASHLIGHT_ALPHA;
+FlashLight.penumbraSize = 30;
+FlashLight.xscale = 2;
+FlashLight.yscale = 2;
+FlashLight.blend = c_white;
+InfraVisionIntensity = 2;
+headshot_x = x - 20;
+headshot_y = y - 18;
+Visible = false;
+infra_vision_light = undefined;
+InSmoke = false;
+AimPunchTimer = -1;
+AimPunchTime = .25 * game_get_speed(gamespeed_fps);
+AimPunchMultiplier = 1;
+ArmourDurability = [0, 0];
+StaminaTimer= -1;
+KilledBy = noone;
+Emitter = -1; 
+KickBackAngle = 0;
+Flashed = false;
+HitMap = ds_map_create();

@@ -1,5 +1,6 @@
 function ini_player_struct_create(){
 	var player_struct = {
+		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
 		"Game_volatility": PLAYER_STARTING_VOLATILITY,
 		"Local_volatility": PLAYER_STARTING_VOLATILITY,
 		"Elo": convert_to_eggy_scale(PLAYER_STARTING_ELO), ///Eggy scale
@@ -10,9 +11,8 @@ function ini_player_struct_create(){
 		"Played_games": 0,
 		"Recent_games": array_create(TRACKING_GAMES/2, -1),
 		"Expected_games": array_create(TRACKING_GAMES/2, -1),
-		"Playing_time_per_round": array_create(MAX_ROUNDS, -1),
-		"Kills_per_round": array_create(MAX_ROUNDS, -1),
-		"Headshots_per_round": array_create(MAX_ROUNDS, -1),
+		"Kills_per_round": array_create(MAX_ROUNDS, 0),
+		"Headshots_per_round": array_create(MAX_ROUNDS, 0),
 		"Enemy_elo": array_create(TRACKING_GAMES/2, -1),
 	}
 	
@@ -24,15 +24,15 @@ function clear_player_statistics(total_rounds){
 	global.player_elo_struct.Rounds_lost = 0;
 	global.player_elo_struct.Current_round = 0;
 	for(var i=0;i<total_rounds;i++){
-		global.player_elo_struct.Headshots_per_round[i] = -1;
-		global.player_elo_struct.Kills_per_round[i] = -1;
-		global.player_elo_struct.Playing_time_per_round[i] = -1;
+		global.player_elo_struct.Headshots_per_round[i] = 0
+		global.player_elo_struct.Kills_per_round[i] = 0;
+		global.player_elo_struct.Playing_time_per_round[i] = 0;
 	}
 }
 
 function update_eggy_rating_system(game_result, enemy_elo, map){
 	global.player_elo_struct.Played_games ++;
-	global.player_elo_struct.Local_volatility = calculate_local_volatility(global.player_elo_struct.Headshots_per_round, global.player_elo_struct.Kills_per_round, global.player_elo_struct.Playing_time_per_round);
+	global.player_elo_struct.Local_volatility = calculate_local_volatility(global.player_elo_struct.Headshots_per_round, global.player_elo_struct.Kills_per_round);
 	global.player_elo_struct.Game_volatility = calculate_volatility(global.player_elo_struct.Recent_games, global.player_elo_struct.Expected_games);
 	global.player_elo_struct.Recent_games = array_shift_left(global.player_elo_struct.Recent_games, game_result);
 
@@ -192,13 +192,11 @@ function calculate_expected_results(player_elo, enemy_elos) {
 }
 
 /// @desc Calculate local volatility
-function calculate_local_volatility(headshots_per_round, kills_per_round, playing_time_per_round) {
+function calculate_local_volatility(headshots_per_round, kills_per_round) {
     var sum_headshot_variances = 0;
     var sum_kill_variances = 0;
-    var sum_playing_time_variances = 0;
     var valid_headshots = 0;
     var valid_kills = 0;
-    var valid_playing_times = 0;
 
     // Calculate variance for headshots
     for (var i = 0; i < array_length(headshots_per_round); i++) {
@@ -218,21 +216,11 @@ function calculate_local_volatility(headshots_per_round, kills_per_round, playin
         }
     }
 
-    // Calculate variance for playing time
-    for (var i = 0; i < array_length(playing_time_per_round); i++) {
-        if (playing_time_per_round[i] != -1) {
-            var diff_playing_time = playing_time_per_round[i] - average(playing_time_per_round);
-            sum_playing_time_variances += diff_playing_time * diff_playing_time;
-            valid_playing_times++;
-        }
-    }
-
     // Calculate volatilities
     var headshot_volatility = valid_headshots > 0 ? sqrt(sum_headshot_variances / valid_headshots) : PLAYER_STARTING_VOLATILITY;
     var kill_volatility = valid_kills > 0 ? sqrt(sum_kill_variances / valid_kills) : PLAYER_STARTING_VOLATILITY;
-    var playing_time_volatility = valid_playing_times > 0 ? (sqrt(sum_playing_time_variances / valid_playing_times)/1000) : PLAYER_STARTING_VOLATILITY;
 
-    return (headshot_volatility + kill_volatility + playing_time_volatility) / 3;
+    return (headshot_volatility + kill_volatility) / 2;
 }
 
 

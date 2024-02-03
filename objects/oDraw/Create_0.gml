@@ -1,6 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
-application_surface_draw_enable(false);
+//application_surface_draw_enable(false);
 draw_texture_flush();
 var_slot = 0;
 item_description = "";
