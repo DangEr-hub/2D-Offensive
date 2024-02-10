@@ -20,7 +20,7 @@ with(oSlot){
 	    draw_sprite_ext(spr_Items, global.MouseSlot[# 0, InventoryIndex.SlotID], xx2, yy2, scale, scale, 0, c_white, 1);
 	}  
 	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
-		image_blend = global.GoldColor;
+		image_blend = MAIN_COLOR;
 		if(mouse_check_button_pressed(mb_left) && global.Inventory[#VarSlot, InventoryIndex.SlotID] != Item.None){
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;
@@ -73,7 +73,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		var player_score_string_width = string_width(player_score);
 		var position_y = oDraw.HUDShift*2;
 		var position_x = global.GuiW/2 - score_string_width/2; 
-		draw_text_outlined(position_x, position_y, player_score, global.GoldColor, c_black, 1);
+		draw_text_outlined(position_x, position_y, player_score, MAIN_COLOR, c_black, 1);
 		draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
 		draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
 		draw_set_font(set_font("Console"));
@@ -112,7 +112,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Dequip",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"weapon_scope_dequip"
 			);
 		}else{
@@ -123,7 +123,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Empty",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"None"
 			);
 		}
@@ -150,7 +150,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Dequip",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"weapon_barrel_dequip"
 			);
 		}else{
@@ -161,7 +161,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Empty",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"None"
 			);
 		}
@@ -188,7 +188,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Dequip",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"weapon_grip_dequip"
 			);
 		}else{
@@ -199,7 +199,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Empty",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"None"
 			);
 		}
@@ -226,7 +226,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Dequip",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"weapon_suppressor_dequip"
 			);
 		}else{
@@ -237,7 +237,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				16 * global.GUIMultiplier, 
 				"Empty",
 				c_dkgray,
-				global.GoldColor,
+				MAIN_COLOR,
 				"None"
 			);
 		}
@@ -429,8 +429,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 
 		#region Draw damage indicator
 		with(oDamageIndicator){
-		    xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-		    yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+		    var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+		    var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 		    draw_text_outlined(xx, yy, Damage_Indicator, Color, c_black, 1);
 		    draw_sprite_ext(Sprite, SpriteID, xx + string_width(Damage_Indicator), yy, 1, 1, 0, c_white, 1);
 		}
@@ -486,7 +486,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		var AmmoRemain = ceil(global.ClipAmmo[oPlayer.WeaponID]/global.MaxAmmo[oPlayer.WeaponID]) - AmmoDrawValue;
 		var Value = 0;
 		
-		for(i=0;i<AmmoDrawValue;i++){
+		for(var i=0;i<AmmoDrawValue;i++){
 			draw_sprite_ext(spr_AmmoType, global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.AmmoSpriteID], MagX + (i*AmmoSpriteWidth), MagY, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
 			Value ++;
 		}
@@ -519,8 +519,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 	
 		#region Player
 		with(oPlayer){
-			xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-			yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+			var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+			var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 			draw_set_font(set_font("Console"));
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
@@ -576,7 +576,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				c_black, 
 				EquipmentAlpha, 
 				1, 
-				global.GoldColor, 
+				MAIN_COLOR, 
 				"Equipment"
 			);
 			#endregion
@@ -676,7 +676,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			#endregion
 				
 			#region Draw HUD armour and helmet
-			var Value = 0;
+			Value = 0;
 			var ArmourHotBarX = HotBarX - sprite_get_width(spr_Items)/1.25*global.GUIMultiplier;
 			var ArmourHotBarY = HotBarY;
 			for(var i=0;i<2;i++){
@@ -774,7 +774,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						c_black, 
 						global.GUIHUDAlpha*1.5, 
 						2, 
-						global.GoldColor, 
+						MAIN_COLOR, 
 						global.ItemIndex[#Id, ItemStat.Name], 
 					);
 				
@@ -785,7 +785,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						ButtonHeight, 
 						"Exit", 
 						c_dkgray, 
-						global.GoldColor,
+						MAIN_COLOR,
 						"description_exit"
 					);
 					#endregion				
@@ -808,7 +808,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 					        for (var j = 0; j < columns; j++) {
 					            var cell_x = TabX + oDraw.HUDShift + j * cell_width;
 					            var cell_y = TabY + TitleHeight + oDraw.HUDShift + i * cell_height;
-								draw_set_color(global.GoldColor);
+								draw_set_color(MAIN_COLOR);
 					            draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
 								draw_set_color(c_white);
 							
@@ -912,7 +912,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 							ButtonHeight,
 							"Drop item",
 							c_dkgray,
-							global.GoldColor,
+							MAIN_COLOR,
 							"description_drop"
 						);
 						#endregion	
@@ -969,7 +969,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 						ButtonHeight,
 						"Drop item",
 						c_dkgray,
-						global.GoldColor,
+						MAIN_COLOR,
 						"description_drop"
 					);
 					#endregion
@@ -1013,8 +1013,8 @@ if(instance_exists(oPlayer)){
 		if(global.ranked_game == true){
 			//Elo
 			var player_elo = global.player_elo_struct.Elo;
-			var elo_string = "Eggy points: " + string_format(convert_back(player_elo), 0, 1);
-			var elo_string_eggy_scale = "Eggy points (Eggy scale): " + string_format(player_elo, 0, 1);
+			var elo_string = "EP: " + string_format(convert_back(player_elo), 0, 1);
+			var elo_string_eggy_scale = "EP (eggy scale): " + string_format(player_elo, 0, 1);
 			draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
 			draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
 		
@@ -1027,8 +1027,16 @@ if(instance_exists(oPlayer)){
 			draw_text_outlined(AdminHUDX - string_width(game_volatility_string), AdminHUDY + TextHeightSmall*7, game_volatility_string, c_white, c_black, 1);
 			
 			//Enemy elos
-			var enemy_elos_string = "Enemy EP (eggy scale): " + string(global.player_elo_struct.Enemy_elo);
-			draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*8, enemy_elos_string, c_white, c_black, 1);		
+			var enemy_elos_string = "Enemy EP: [ ";
+			var enemy_elos_string_eggy_scale = "Enemy EP (eggy scale): " + string(global.player_elo_struct.Enemy_elo);
+			
+			for (var i = 0; i < array_length(global.player_elo_struct.Enemy_elo); i++) {
+			    var converted_elo = convert_back(global.player_elo_struct.Enemy_elo[i]);
+			    enemy_elos_string += string(converted_elo) + (i < array_length(global.player_elo_struct.Enemy_elo) - 1 ? "," : "");
+			}
+			enemy_elos_string += " ]";
+			draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*8, enemy_elos_string, c_white, c_black, 1);	
+			draw_text_outlined(AdminHUDX - string_width(enemy_elos_string_eggy_scale), AdminHUDY + TextHeightSmall*9, enemy_elos_string_eggy_scale, c_white, c_black, 1);	
 		}
 		
 	}
@@ -1071,8 +1079,8 @@ console_draw(global.my_console, global.ConsoleHeight * global.GUIMultiplier,c_gr
 with(oCrosshair){
 	var x_scale = image_xscale * .5;
 	var y_scale = image_yscale * .5;
-	xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-	yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+	var xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+	var yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 	if(instance_exists(oPlayer)){
 		if(HitMarker > -1){
 			draw_sprite_ext(spr_HitMarker, HitMarker, xx, yy, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	

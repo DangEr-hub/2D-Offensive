@@ -1,3 +1,5 @@
+#macro AMBIENT_OFFSET 1.25
+#macro MAIN_COLOR make_color_rgb(255, 215, 0)
 #macro FLASHLIGHT_ALPHA 0.1
 #macro ALPHA_SPEED 0.01
 #macro PLAYER_STARTING_VOLATILITY 1

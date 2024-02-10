@@ -18,18 +18,18 @@ global.GodMode = false;
 global.Hostage = false;
 global.ConsoleHeight = 256;
 global.ConsoleWidth = 512;
-global.GoldColor = make_color_rgb(255, 215, 0);
 global.GUIHUDAlpha = .33;
 global.ArmourDurability = [0, 0];
 global.ArmourID = [Item.None, Item.None];
-global.CameraWidth = 960;
-global.CameraHeight = 540;
 global.FieldOfView = 10;
 global.BloomShader = true;
 global.TimeSpeed = 15;
 global.ViewShake = true;
 global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
+global.CameraWidth = 1920/2;
+global.CameraHeight = 1080/2;
+global.GUIMultiplier = display_get_width()/global.CameraWidth;
 global.enemy_visibility = false;
 global.anti_aliasing = 0;
 global.sound_gain = 100;
@@ -40,6 +40,9 @@ global.window_height = 1080;
 global.draw_other_models = false;
 global.Weather = "sun";
 global.crosshair_color = c_white;
+display_set_gui_size(1920, 1080);
+global.GuiW = display_get_gui_width();
+global.GuiH = display_get_gui_height();
 
 global.player_stats_struct = {
 	Name: "DangEr",
@@ -72,20 +75,8 @@ global.player_stats_struct = {
 };
 global.player_elo_struct = ini_player_struct_create();
 
-
-
-
-
-
-
-
-
-
-global.GUIMultiplier = display_get_width()/global.CameraWidth;
-camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
-
 enum icons{
-	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, total	
+	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, total
 }
 
 enum weapon_attachments{
@@ -107,7 +98,7 @@ enum MapIndex{
 
 global.MapID = MapIndex.Desert;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = c_black;//make_color_rgb(192, 108, 0);
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(192, 108, 0);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = $FF00FFFF;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .1;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
@@ -190,12 +181,7 @@ enum Hit{
 	Hits, Damage, Total
 }
 
-display_set_gui_size(1920, 1080);
-global.GuiW = display_get_gui_width();
-global.GuiH = display_get_gui_height();
-
 rank_database();
-window_set_fullscreen(true);
 InventoryInit();
 load_game();
 console_settings(global.my_console," ",false);

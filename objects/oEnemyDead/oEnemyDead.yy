@@ -11,8 +11,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Objects",
-    "path": "folders/Objects.yy",
+    "name": "Other",
+    "path": "folders/Objects/Other.yy",
   },
   "parentObjectId": null,
   "persistent": false,
@@ -30,13 +30,7 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": {
-    "name": "spr_EnemyBasic",
-    "path": "sprites/spr_EnemyBasic/spr_EnemyBasic.yy",
-  },
-  "spriteMaskId": {
-    "name": "spr_EnemyBasicDead",
-    "path": "sprites/spr_EnemyBasicDead/spr_EnemyBasicDead.yy",
-  },
+  "spriteId": null,
+  "spriteMaskId": null,
   "visible": true,
 }

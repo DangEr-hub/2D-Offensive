@@ -92,7 +92,7 @@ part_type_color2(snow_particle, c_white, c_white);
 level_up_particle = part_type_create();
 part_type_shape(level_up_particle, pt_shape_flare);
 part_type_size(level_up_particle, .5, 1, 0, 0);
-part_type_color2(level_up_particle, global.GoldColor, c_white);
+part_type_color2(level_up_particle, MAIN_COLOR, c_white);
 part_type_speed(level_up_particle, 15, 30, 0, 0);
 part_type_direction(level_up_particle, 0, 360, 0, 0);
 part_type_blend(level_up_particle, 1);

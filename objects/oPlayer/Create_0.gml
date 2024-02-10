@@ -1,4 +1,11 @@
 event_inherited();
+MoveDirection = 0;
+ax = 0;
+ay = 0;
+bx = 0;
+by = 0;
+cx = 0;
+cy = 0;
 Visible = true;
 RotationAngle = 0;
 AccelX = 0;
@@ -69,7 +76,7 @@ burst_fire_timer = 0;
 #endregion
 
 #region Statistics
-stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina);
+stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina, global.player_stats_struct.Name);
 HealingTimer = game_get_speed(gamespeed_fps);
 HPHealingTimer = -1;
 HPTimer = -1;
@@ -89,10 +96,10 @@ if(global.DrawParticles == true){
 if(global.ranked_game == true){
 	instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
 }
-instance_create_layer(x, y, "OtherO", oHazeController);
+//instance_create_layer(x, y, "OtherO", oHazeController);
 instance_create_layer(x, y, "OtherO", oDraw);
 instance_create_layer(x, y, "OtherO", oConsole);
-instance_create_layer(x, y, "OtherO", oCamera);
+//instance_create_layer(x, y, "OtherO", oCamera);
 instance_create_layer(x, y, "OtherO", oCrosshair);
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 #endregion

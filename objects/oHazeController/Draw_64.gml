@@ -14,7 +14,7 @@ var pos = application_get_position();
 var pointSurf = surface_create(surfW, surfH);
 
 surface_set_target(pointSurf);
-//haze_surf_clear(pointSurf);
+haze_surf_clear(pointSurf);
 draw_clear_alpha(0, 0);
 
 draw_clear(c_black);
@@ -37,10 +37,6 @@ for(var i=0; i<ds_list_size(hazePoints); i++){
     sX = Arr[0] - (cam_x*cameraUsed);
     sY = Arr[1] - (cam_y*cameraUsed);
     sR = Arr[2];
-    
-    //subtract app coord
-    //sX -= pos[0]/2;
-    //sY -= pos[1]/2;
     
     //scale
     if (cameraUsed){
@@ -136,14 +132,4 @@ surface_free(pointSurf);
 
 //Draw haze surface
 draw_surface(hazeSurf, 0, 0);
-
-//Debug
-if (debugMode){
-    draw_set_color(c_red);
-
-    draw_text(5, 5, "App surf: " + string(surfW) + ", " + string(surfH) + "\nGUI layer: "
-        + string(display_get_gui_width()) + ", " + string(display_get_gui_height()));
-        
-    draw_set_color(c_white);
-}
 

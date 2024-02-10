@@ -34,42 +34,6 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 				}
 			break;
 			
-			case "pause_exit":
-				if(instance_exists(oDraw)){
-					oDraw.PopupWindow = "game_end";
-				}
-			break;
-			
-			case "pause_exit_yes":
-				save_game();
-				game_end();
-			break;
-			
-			case "pause_exit_no":
-				if(instance_exists(oDraw)){
-					oDraw.PopupWindow = "";
-				}
-			break;
-			
-			case "player_death_screen_continue":
-				if(instance_exists(oDraw)){
-					if(oDraw.PopupWindow == ""){
-						if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
-						save_game();
-						room_restart();
-					}
-				}
-			break;
-			
-			case "player_death_screen_toggle_message":
-				if(instance_exists(oDraw)){
-					if(oDraw.PopupWindow == ""){
-						oDraw.Alpha = 0;
-						oDraw.ToggleMessage = !oDraw.ToggleMessage;
-					}
-				}
-			break;
-			
 			case "description_drop":
 				if(instance_exists(oDraw) && instance_exists(oSlot)){
 					ItemDrop(global.Inventory[#VarSlot, InventoryIndex.SlotID], oPlayer.x, oPlayer.y, 100, global.Inventory[#VarSlot, InventoryIndex.SlotAmmo], global.Inventory[#VarSlot, InventoryIndex.SlotClipAmmo], global.Inventory[#VarSlot, InventoryIndex.SlotDurability], 1);	

@@ -1,5 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
+FlashLightX = 0;
+FlashLightY = 0;
+KilledByName = "No one";
+KilledByWeapon = "Nothing";
 DestroyTimer = -1;
 MuzzleFlashLight = undefined;
 RotationAngle = 0;

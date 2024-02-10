@@ -1,6 +1,6 @@
 event_inherited();
 pause_width_tab = 512 * global.GUIMultiplier;
-pause_height_tab = max(512 * global.GUIMultiplier, 768);
+pause_height_tab = max(512 * global.GUIMultiplier, 896);
 
 zui_set_size(pause_width_tab, pause_height_tab);
 
@@ -9,10 +9,17 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	draggable = 1;
 }
 
+title_color = MAIN_COLOR;
+title_string = "Round won";
 title_position_x = zui_get_width() * .5;
 title_position_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
 base_position_y = zui_get_height() * .2 + 24/global.GUIMultiplier;
 gap = 128;
+
+if(oEggyEloRatingSystem.player_win == false){
+	title_color = c_silver;
+	title_string = "Round lost";	
+}
 
 #region Rank callbacks
 rank_callbacks = [    
@@ -94,19 +101,17 @@ popup_continue_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
 	}
-	save_game();
 	room_restart();	
 };
 
 continue_callback = function(){
-	ui_show_popup("Continue to next round?", "Continue", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_continue_callback_positive, -1);		
+	ui_show_popup("Continue to the next round?", "Continue", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_continue_callback_positive, -1);		
 };
 
 popup_exit_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
 	}
-	save_game();
 	game_end();	
 };
 
@@ -128,10 +133,10 @@ main_menu_callback = function(){
 #endregion
 
 draw_set_font(set_font("Title"));
-with (zui_create(title_position_x - string_width("Round won")/2, title_position_y, objUILabel)) {
+with (zui_create(title_position_x - string_width(other.title_string)/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
-	color = global.GoldColor;
-	caption = "Round won";
+	color = other.title_color;
+	caption = other.title_string;
 }
 draw_set_font(set_font("Menu_small"));
 
@@ -158,7 +163,7 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y, objU
 
 with (zui_create(current_rank_x - string_width("VS")/2, base_position_y + rank_image_size_height*1.5, objUILabel)) {
 	font = set_font("Console");
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = "VS";
 }
 
@@ -204,12 +209,27 @@ with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
 }
 #endregion
 
-
-#region Main menu and exit button
-offset_y = 64;
+#region Buttons
+offset_y = min(96 * global.GUIMultiplier, 192);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
 with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Damage table";
+	callback = function(){
+		with(zui_main()){
+			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oDamageTable, -1000)) {
+				alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+				window_id = id;
+			}
+		}
+	};
+}
+
+
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -217,7 +237,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIBut
 	callback = other.continue_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*3, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -225,7 +245,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*3, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*4.5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

@@ -15,6 +15,11 @@ image_xscale = scale;
 image_yscale = scale;
 
 if(LightObject != undefined){
+	var camera = view_camera[0];
+	LightObject.visible = true;
+	if!(LightObject.__IsOnScreen(camera_get_view_x(camera), camera_get_view_y(camera), camera_get_view_x(camera) + camera_get_view_width(camera), camera_get_view_y(camera) + camera_get_view_height(camera))){
+		LightObject.visible = false;
+	}
 	LightObject.x = x;
 	LightObject.y = y - z;
 }

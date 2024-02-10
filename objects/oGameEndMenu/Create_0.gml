@@ -1,6 +1,6 @@
 event_inherited();
 pause_width_tab = 768 * global.GUIMultiplier;
-pause_height_tab = max(512 * global.GUIMultiplier, 768);
+pause_height_tab = max(512 * global.GUIMultiplier, 896);
 
 zui_set_size(pause_width_tab, pause_height_tab);
 
@@ -94,8 +94,8 @@ popup_exit_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
 	}
+	update_tracking_games();
 	clear_player_statistics(global.player_elo_struct.Rounds_win + global.player_elo_struct.Rounds_lost);
-	save_game();
 	game_end();	
 };
 
@@ -107,8 +107,8 @@ popup_main_menu_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();
 	}
+	update_tracking_games();
 	clear_player_statistics(global.player_elo_struct.Rounds_win + global.player_elo_struct.Rounds_lost);
-	save_game();
 	room_goto(rm_main_menu);
 };
 
@@ -127,7 +127,7 @@ if(global.player_elo_struct.Rounds_lost > global.player_elo_struct.Rounds_win){
 }
 with (zui_create(title_position_x - string_width(title_string)/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = other.title_string;
 }
 draw_set_font(set_font("Menu_small"));
@@ -156,7 +156,7 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y, objU
 
 with (zui_create(current_rank_x - string_width("VS")/2, base_position_y + rank_image_size_height*1.5, objUILabel)) {
 	font = set_font("Console");
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = "VS";
 }
 
@@ -203,20 +203,20 @@ with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
 	color = c_white;
 	caption = "Time alive: " + string(oEggyEloRatingSystem.playing_time/game_get_speed(gamespeed_fps)) + " s";
 }
-with (zui_create(statistics_x + gap*2, statistics_y, objUILabel)) {
+with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.kills;
 	color = c_white;
 	caption = "Total kills: " + string(other.total_kills);
 }
 
-with (zui_create(statistics_x + gap*2, statistics_y + text_gap, objUILabel)) {
+with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.headshot_percentage;
 	color = c_white;
 	caption = "Total headshots: " + string(other.total_headshots);
 }
-with (zui_create(statistics_x + gap*2, statistics_y + text_gap*2, objUILabel)) {
+with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.time;
 	color = c_white;
@@ -225,11 +225,25 @@ with (zui_create(statistics_x + gap*2, statistics_y + text_gap*2, objUILabel)) {
 #endregion
 
 #region Main menu and exit button
-offset_y = 64;
+offset_y = min(96 * global.GUIMultiplier, 192);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Damage table";
+	callback = function(){
+		with(zui_main()){
+			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oDamageTable, -1000)) {
+				alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+				window_id = id;
+			}
+		}
+	};
+}
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -237,11 +251,12 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*3, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*3, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
 	caption = "Exit";
 	callback = other.exit_callback;
 }
+
 #endregion

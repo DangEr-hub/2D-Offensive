@@ -55,8 +55,9 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
     static SetSurfaceDimensionsFromCamera = function(_camera)
     {
         var _projMatrix = camera_get_proj_mat(_camera);
-        var _width  = round(abs(2/_projMatrix[0]))*1.25;
-        var _height = round(abs(2/_projMatrix[5]))*1.25;
+        var _width  = round(abs(2/_projMatrix[0]))*AMBIENT_OFFSET;
+        var _height = round(abs(2/_projMatrix[5]))*AMBIENT_OFFSET*1.25
+;
         
         return SetSurfaceDimensions(_width, _height);
     }
@@ -111,10 +112,10 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
         
         var _cameraX          = -_viewMatrix[12];
         var _cameraY          = -_viewMatrix[13];
-        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*1.25;
-        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*1.25;
-        var _cameraLeft       = _cameraX - _cameraViewWidth/2;
-        var _cameraTop        = _cameraY - _cameraViewHeight/2;
+        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*AMBIENT_OFFSET;
+        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*AMBIENT_OFFSET*1.25;
+        var _cameraLeft       = _cameraX - (_cameraViewWidth/2);
+        var _cameraTop        = _cameraY - (_cameraViewHeight/2);
         
         return Update(_cameraLeft, _cameraTop, _cameraViewWidth, _cameraViewHeight);
     }
@@ -185,10 +186,11 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
         //Deploy PROPER MATHS in case the dev is using matrices
         var _cameraX          = -_viewMatrix[12];
         var _cameraY          = -_viewMatrix[13];
-        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*1.25;
-        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*1.25
-        var _cameraLeft       = _cameraX - _cameraViewWidth/2;
-        var _cameraTop        = _cameraY - _cameraViewHeight/2;
+        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*AMBIENT_OFFSET;
+        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*AMBIENT_OFFSET*1.25
+;
+        var _cameraLeft       = _cameraX - (_cameraViewWidth/2);
+        var _cameraTop        = _cameraY - (_cameraViewHeight/2);
         
         return Draw(_cameraLeft, _cameraTop, _cameraViewWidth, _cameraViewHeight, _alpha);
     }
@@ -333,10 +335,11 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
         
         var _cameraX          = -_viewMatrix[12];
         var _cameraY          = -_viewMatrix[13];
-        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*1.25;
-        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*1.25
-        var _cameraLeft       = _cameraX - _cameraViewWidth/2;
-        var _cameraTop        = _cameraY - _cameraViewHeight/2;
+        var _cameraViewWidth  = round(abs(2/_projMatrix[0]))*AMBIENT_OFFSET;
+        var _cameraViewHeight = round(abs(2/_projMatrix[5]))*AMBIENT_OFFSET*1.25
+;
+        var _cameraLeft       = _cameraX - (_cameraViewWidth/2);
+        var _cameraTop        = _cameraY - (_cameraViewHeight/2);
         
         return GetSurfacePixel(_worldX, _worldY, _cameraLeft, _cameraTop,  _cameraViewWidth, _cameraViewHeight);
     }
@@ -444,7 +447,8 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
         }
         
         //Refresh the dynamic occluder geometry
-        if (__dynamicVBuffer == undefined) __dynamicVBuffer = vertex_create_buffer();
+        //if (__dynamicVBuffer == undefined) __dynamicVBuffer = vertex_create_buffer();
+		__dynamicVBuffer = __dynamicVBuffer ?? vertex_create_buffer();
         var _dynamicVBuffer = __dynamicVBuffer;
         
         //Add dynamic occluder vertices to the relevant vertex buffer

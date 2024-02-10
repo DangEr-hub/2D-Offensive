@@ -9,7 +9,7 @@ instance_activate_object(objUIImage);
 instance_activate_object(oRoundEndMenu);
 instance_activate_object(oWeapon);
 instance_activate_object(objUIGrid);
-instance_activate_object(oRespawnMenu);
+instance_activate_object(oDamageTable);
 instance_activate_object(objUILabel);
 instance_activate_object(objUISliderHandle);
 instance_activate_object(objUISlider);

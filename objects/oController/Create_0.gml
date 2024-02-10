@@ -1,7 +1,7 @@
 application_surface_draw_enable(true);
 draw_set_valign(1);
-window_set_fullscreen(true);
 
+alarm[0] = 1;
 surf_horizontal = -1;
 surf_vertical = -1;
 
@@ -58,7 +58,7 @@ statistics_callback = function(){
 				zui_destroy();
 			}
 			
-			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oStatisticsTab, -1)) {
+			with (zui_create(zui_get_width() * .55, zui_get_height() * 0.5, oStatisticsTab, -1)) {
 				window_id = id;
 			}
 		}

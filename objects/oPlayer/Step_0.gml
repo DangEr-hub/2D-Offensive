@@ -901,8 +901,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		var xpos = Right - Left;
 		var ypos = Down - Up;
 		MoveDirection = point_direction(Left, Up, Right, Down);
-		move_xpos = abs(xpos);
-		move_ypos = abs(ypos);
+		var move_xpos = abs(xpos);
+		var move_ypos = abs(ypos);
 	
 		#region Move speed multiplier
 		var AimPunchSpeedMultiplier = 1;
@@ -1112,7 +1112,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Facing
 	if(instance_exists(oCrosshair)){
 		if(player_can_shoot == true){
-			pointdir = point_direction(x,y,oCrosshair.x,oCrosshair.y);
+			var pointdir = point_direction(x,y,oCrosshair.x,oCrosshair.y);
 			Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 			Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
 			Weapon.y = y + lengthdir_y(WY, RotationAngle) - lengthdir_y(Weapon.KickBackEffect, RotationAngle);
@@ -1192,7 +1192,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Level
 	if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
-		damage_indicator("Level up!", x, y - sprite_height/2, global.GoldColor, spr_Icons, icons.xp
+		damage_indicator("Level up!", x, y - sprite_height/2, MAIN_COLOR, spr_Icons, icons.xp
 );
 		if(instance_exists(oParticleSystem)){
 			var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
@@ -1271,6 +1271,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 		#region Item use
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyUse])){
+			if(global.Inventory[# ItemUsePosition, InventoryIndex.SlotAmount] <= 1){
+				with(oItemDescription){
+					zui_destroy();
+				}
+				with(oArmourDescription){
+					zui_destroy();
+				}
+			}
 			Id = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
 			switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
@@ -1457,7 +1465,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 		
 		#region Scope
-		ScopeButton = mouse_check_button(mb_right);
+		var ScopeButton = mouse_check_button(mb_right);
 		if!(instance_exists(oInventory)){
 			if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_scope] != Item.None && CanShoot == true){
 				if(ScopeButton){
@@ -1591,18 +1599,22 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Deactivate out of view
-	var DeactivateMargin = 256;  // Margin for deactivation
-	var ActivateMargin = 128;  // Margin for activation
+	var DeactivateMargin = 256;
+	var ActivateMargin = 128;
+	var deactivateLeft = camera_get_view_x(view_camera[0]) - DeactivateMargin;
+	var deactivateTop = camera_get_view_y(view_camera[0]) - DeactivateMargin;
+	var deactivateRight = deactivateLeft + camera_get_view_width(view_camera[0]) + 2 * DeactivateMargin;
+	var deactivateBottom = deactivateTop + camera_get_view_height(view_camera[0]) + 2 * DeactivateMargin;
 
-	// Deactivate instances outside view + DeactivateMargin
-	instance_deactivate_region(
-		camera_get_view_x(view_camera[0]) - DeactivateMargin,
-		camera_get_view_y(view_camera[0]) - DeactivateMargin,
-		camera_get_view_width(view_camera[0]) + 2 * DeactivateMargin,
-		camera_get_view_height(view_camera[0]) + 2 * DeactivateMargin,
-		false, 
-		true
-	);
+	with (oEnemy) {
+	    if (x < deactivateLeft || x > deactivateRight || y < deactivateTop || y > deactivateBottom) {
+	        Visible = false;
+			FlashLight.visible = false;
+	    }
+	}
+
+	instance_deactivate_region(deactivateLeft, deactivateTop, deactivateRight - deactivateLeft, deactivateBottom - deactivateTop, false, true);
+	
 
 	// Activate instances within view + ActivateMargin
 	instance_activate_region(
@@ -1614,7 +1626,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	);
 	instance_activate_object(oLightRenderer);
 	instance_activate_object(oHazeController);
-	instance_activate_object(oRespawnMenu);
+	instance_activate_object(oDamageTable);
 	instance_activate_object(oItemDescription);
 	instance_activate_object(objUIWindowCaption);
 	instance_activate_object(objZUIMain);
@@ -1644,9 +1656,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 #region Death
 if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
+	oDraw.KilledByWeapon = KilledByWeapon;
+	oDraw.KilledByName = KilledByName;
 	Weapon.image_index = 0;
 	image_index = 3;
-	oDraw.KilledBy = KilledBy;
 	round_end("Loss");
 	camera_set_view_angle(view_camera[0], 0);
 }

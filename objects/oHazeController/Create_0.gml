@@ -10,36 +10,17 @@ viewN = 0; //View number, if using views
 //-----------END----------------------------
 
 //vars
-cameraUsed = true;
+cameraUsed = false;
 coverScreen = false;
 debugMode = false;
 
-//surf
-/*if (cameraUsed){
-    surfW = view_wview[viewN];
-    surfH = view_hview[viewN];
-}
-else{
-    surfW = room_width;
-    surfH = room_height;
-}*/
-
 //surface
 surfW = surface_get_width(application_surface);
+show_debug_message("SurfW: " + string(surfW));
 surfH = surface_get_height(application_surface);
 
 hazeSurf = surface_create(surfW, surfH);
 haze_surf_clear(hazeSurf);
-
-var guiW = display_get_gui_width();
-var guiH = display_get_gui_height();
-
-//Aspect Ratio
-var rW = surfW/surfH;
-
-//Set app surf size to GUI layer
-surface_resize(application_surface, guiH * rW,
-    guiH);
 
 //points
 hazePoints = ds_list_create();

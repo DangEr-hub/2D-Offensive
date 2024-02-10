@@ -2,6 +2,9 @@
 // You can write your code in this editor
 //application_surface_draw_enable(false);
 draw_texture_flush();
+//haze_start(true, false);
+KilledByWeapon = "Nothing";
+KilledByName = "No one";
 var_slot = 0;
 item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
@@ -55,7 +58,6 @@ KilledBy = noone;
 
 #region GUI menu
 GameEndMenu = false;
-RoundEndMenu = false;
 PauseMenu = false;
 RespawnMenu = false;
 BackGround = -1;

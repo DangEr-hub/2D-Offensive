@@ -1,5 +1,5 @@
-function console_submit(argument0) {
-	global.console=argument0;
+function console_submit(Console) {
+	global.console= Console;
 
 	if global.console[? "active"] {
 
@@ -201,19 +201,8 @@ function console_submit(argument0) {
 							window_set_fullscreen(real(c[1])); 
 							
 							if(real(c[1]) == 0){
-								/*global.GuiW = global.window_width*(1920/global.window_width);
-								global.GuiH = global.window_height*(1080/global.window_height);
-								application_surface_draw_enable(false);
-								surface_resize(application_surface, global.GuiW, global.GuiH);
-								surface_free(oDraw.Surface1); 
-								surface_free(oDraw.Surface2); 
-								surface_free(oDraw.NightVisionSurface); 
-								surface_free(oDraw.GrayScaleSurface); 
-								surface_free(oDraw.BlurSurface);*/
-							
-								//show_debug_message(display_aa);
-								display_reset(0, false);
 								window_set_size(global.window_width, global.window_height);
+								surface_resize(application_surface, global.window_width, global.window_height);
 								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
 								
 							}

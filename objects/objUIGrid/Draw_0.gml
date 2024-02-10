@@ -69,7 +69,7 @@ if(type == "Respawn menu"){
 		var TextY = y + (CellHeight - string_height(Columns[col])) / 2;
 	
 		draw_text_outlined(TextX + col * CellWidth, TextY + CellHeight/4, Columns[col], c_white, c_black, 1);
-		draw_set_color(global.GoldColor);
+		draw_set_color(MAIN_COLOR);
 		draw_rectangle(cell_x + col * CellWidth, cell_y, cell_x + (col + 1) * CellWidth, cell_y + CellHeight, true);
 	}
 	#endregion
@@ -77,14 +77,8 @@ if(type == "Respawn menu"){
 	#region Draw data
 	for (var row = 1; row < NumRows; row++) {
 		var EntityId = Keys[row - 1];
-		var Data = oPlayer.HitMap[? EntityId];
-	
-		var EntityName = global.player_stats_struct.Name + string(" (You)");
-		if(EntityId.object_index != oPlayer){
-			EntityName = EntityId.stats.Name;
-		}
-    
-		var RowData = [string(EntityName), 
+		var Data = oPlayer.HitMap[? EntityId];   
+		var RowData = [string(Data[? "Name"]), 
 			            string(Data[? "HitsReceived"]), 
 			            string(Data[? "DamageReceived"]), 
 			            string(Data[? "HitsGiven"]), 
@@ -96,7 +90,7 @@ if(type == "Respawn menu"){
 			var TextY = y + (CellHeight - string_height(RowData[col])) / 2;
 	
 			draw_text_outlined(TextX + col * CellWidth, TextY + row * CellHeight + CellHeight/4, RowData[col], c_white, c_black, 1);
-			draw_set_color(global.GoldColor);
+			draw_set_color(MAIN_COLOR);
 			draw_rectangle(cell_x + col * CellWidth, cell_y + row * CellHeight, cell_x + (col + 1) * CellWidth, cell_y + (row + 1) * CellHeight, true);
 		}
 	}
@@ -121,7 +115,7 @@ if(type == "Respawn menu"){
 		for (var j = 0; j < columns; j++) {
 			var cell_x = x + j * cell_width;
 			var cell_y = y + i * cell_height;
-			draw_set_color(global.GoldColor);
+			draw_set_color(MAIN_COLOR);
 			draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
 			draw_set_color(c_white);
 							

@@ -9,10 +9,6 @@ if(instance_exists(oPlayer)){
 				MousePositionY = y + y_offset;
 			}
 		}
-		//Camera(Object.x, Object.y, oCrosshair.MousePositionX, oCrosshair.MousePositionY, Speed);		
-		Camera(Object.x, Object.y, mouse_x, mouse_y, Speed);			
+		camera_set_xy(Object.x, Object.y, mouse_x, mouse_y, Speed);			
 	}
-}else{
-	Camera(room_width/2, room_height/2, mouse_x, mouse_y, Speed);	
-	//Camera(room_width/2, room_height/2, mouse_x, mouse_y, Speed);	
 }

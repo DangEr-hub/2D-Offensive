@@ -1,5 +1,3 @@
-/// @description Insert description here
-// You can write your code in this editor
 ViewX = camera_get_view_x(view_camera[0]);
 ViewY = camera_get_view_y(view_camera[0]);
 
@@ -9,7 +7,7 @@ if(instance_exists(oPlayer)){
 		bloom_threshold = .35;
 	}
 
-	if(PauseMenu == true || RespawnMenu == true || RoundEndMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
+	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
 		window_set_cursor(cr_default);
 	}else{
 		window_set_cursor(cr_none);	
@@ -36,21 +34,15 @@ if(instance_exists(oPlayer)){
 
 	if(RespawnMenu == true && BackGround == -1 && alarm[0] == -1){
 		with(zui_main()){
-			if(other.RoundEndMenu == false && other.GameEndMenu == false){
-				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-					alpha_value = 0;
-					alpha = global.GUIHUDAlpha * 2.25; 
-					window_id = id;
-				}
-			}else if(other.RoundEndMenu == true){
-				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
-					alpha_value = 0;
-					alpha = global.GUIHUDAlpha * 2.25; 
-					window_id = id;
-				}
-			}else if(other.GameEndMenu == true){
+			if(other.GameEndMenu == true){
 				show_debug_message(global.player_elo_struct.Headshots_per_round);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
+					alpha_value = 0;
+					alpha = global.GUIHUDAlpha * 2.25; 
+					window_id = id;
+				}
+			}else{
+				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 					alpha_value = 0;
 					alpha = global.GUIHUDAlpha * 2.25; 
 					window_id = id;

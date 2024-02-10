@@ -26,7 +26,6 @@ map_callbacks = [
 			update_player_expected_games();
 		}
 		room_goto(rm_Test);
-		//room_goto(rm_Test); 
 	},
     function() { 
 		if(global.player_elo_struct.Played_games <= 0){

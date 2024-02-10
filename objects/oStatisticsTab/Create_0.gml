@@ -1,5 +1,5 @@
 event_inherited();
-tab_width = 720 * global.GUIMultiplier;
+tab_width = 768 * global.GUIMultiplier;
 tab_height = 512 * global.GUIMultiplier;
 
 
@@ -126,7 +126,7 @@ with (zui_create(rank_image_position_x, rank_image_position_y + rank_position*ra
 
 #region Statistics
 with (zui_create(rank_title_x + label_gap*2, rank_title_y, objUILabel)) {
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = "Statistics";
 }
 
@@ -168,11 +168,40 @@ with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*5, objUILab
 	color = c_white;
 	caption = "Accuracy: " + string(global.player_stats_struct.Get_accuracy()) + "%";
 }
+
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*6, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.game;
+	color = c_white;
+	caption = "Finished games: " + string(global.player_elo_struct.Played_games);
+}
+
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*7, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.tracking;
+	color = c_white;
+	caption = "Past period: " + string(TRACKING_GAMES/2) + " games";
+}
+
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*8, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.tracking;
+	color = c_white;
+	caption = "Predictive period: " + string(TRACKING_GAMES/2) + " games";
+}
+
+with (zui_create(rank_title_x + label_gap*2, rank_title_y + text_gap*9, objUILabel)) {
+	icon_sprite_index = spr_Icons;
+	icon_image_index = icons.tracking;
+	color = c_white;
+	caption = "Predictive period percentage: " + string(global.player_elo_struct.Tracking_game/(TRACKING_GAMES/2)*100) + "%";
+}
+
 #endregion
 
 #region Level
 with (zui_create(rank_title_x + label_gap, rank_title_y, objUILabel)) {
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = "Level: " + string(global.player_stats_struct.Lvl);
 }
 
@@ -237,7 +266,7 @@ with (zui_create(rank_title_x + label_gap + string_width(armour_string), rank_ti
 
 
 with (zui_create(rank_title_x, rank_title_y, objUILabel)) {
-	color = global.GoldColor;
+	color = MAIN_COLOR;
 	caption = "Rank: " + string(global.RankIndex[#other.rank_position, RankStat.Name]);
 }
 

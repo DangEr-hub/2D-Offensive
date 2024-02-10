@@ -5,7 +5,6 @@ if(round_ended == false){
 if(round_ended == true && oDraw.RespawnMenu == false){
 	oDraw.RespawnMenu = true;
 	if(player_win == true){
-		oDraw.RoundEndMenu = true;
 		global.player_elo_struct.Rounds_win ++;
 	}else{
 		global.player_elo_struct.Rounds_lost ++;	
@@ -17,7 +16,6 @@ if(round_ended == true && oDraw.RespawnMenu == false){
 		global.player_elo_struct.Current_round ++;
 	}else{
 		///Game end calculating elo
-		oDraw.RoundEndMenu = false;
 		oDraw.GameEndMenu = true;
 		global.player_elo_struct.Kills_per_round[global.player_elo_struct.Current_round] = kills;
 		global.player_elo_struct.Headshots_per_round[global.player_elo_struct.Current_round] = headshots;

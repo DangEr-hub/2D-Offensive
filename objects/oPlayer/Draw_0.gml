@@ -1,5 +1,5 @@
 /// @description Drawing
-//draw_text(x, y - 50, InfraVisionIntensity);
+draw_text(x, y - 50, global.player_stats_struct.All_shots);
 event_inherited();
 if(stats.Health_points > 0){
 	if (equipped_usable_item()) {

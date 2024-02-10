@@ -89,7 +89,7 @@ function ItemDataBase(){
 	10, 20, 10, 5.9, 30, .03, 10, 3.5, .007, 1, 7, .25, 1, "Assault rifle", .81, .89, .00015, .5 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
-	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = c_orange; ///orange
+	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = c_orange;
 	global.ItemIndex[#Item.AKM, ItemStat.AmmoSpriteID] = 0;
 	global.ItemIndex[#Item.AKM, ItemStat.Description] = "The AKM was designed to succeed the AK-47. This assault rifle uses the 7.62x39mm Soviet intermediate round. It features a gas-operated mechanism with a rotating bolt and can be set to fire in either semi-automatic or automatic modes.";
 	
@@ -104,13 +104,13 @@ function ItemDataBase(){
 	0, 0, 10, 30, 7, 2.5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .0001, .1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.DesertEagle, ItemStat.disadvantages] = "-High recoil\n-Low magazine capacity";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.advantages] = "-High damage\n-High range\n-High armour penetration";
-	global.ItemIndex[#Item.DesertEagle, ItemStat.ItemColor] = c_ltgray;//$FFB2B2B2; ///ltgray
+	global.ItemIndex[#Item.DesertEagle, ItemStat.ItemColor] = c_ltgray;
 	global.ItemIndex[#Item.DesertEagle, ItemStat.AmmoSpriteID] = 1;
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Description] = "A semi-automatic pistol powered by gas is recognized for using the .50 Action Express cartridge, the most significant centerfire round for any magazine-loaded, self-firing handgun.";
 	
 	global.ItemIndex[#Item.KevlarVest, ItemStat.Type] = "Armour";
 	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .9);
-	global.ItemIndex[#Item.KevlarVest, ItemStat.ItemColor] = c_gray;//$FF4D4D4D; ///gray
+	global.ItemIndex[#Item.KevlarVest, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.KevlarVest, ItemStat.BaseDurability] = 100;
 	global.ItemIndex[#Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic 10% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
 	
@@ -119,7 +119,7 @@ function ItemDataBase(){
 	0, 0, 20, 10, 12, 1.5, 2, 10, .009, 0, 0, .25, 2, "Shotgun", .89, .575, .00125, .75 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Spas, ItemStat.disadvantages] = "-Low penetration power\n-Low range";
 	global.ItemIndex[#Item.Spas, ItemStat.advantages] = "-Great mobility\n-High damage";
-	global.ItemIndex[#Item.Spas, ItemStat.ItemColor] = c_gray;//$FF4D4D4D; ///gray
+	global.ItemIndex[#Item.Spas, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.Spas, ItemStat.AmmoSpriteID] = 5;
 	global.ItemIndex[#Item.Spas, ItemStat.EnemyInaccuracyCompensation] = 1;
 	global.ItemIndex[#Item.Spas, ItemStat.Defense] = 1; //Fractionating reloading
@@ -138,12 +138,12 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.Description] = "Enhanced with 25% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 3, 30, snd_SSG08, 15, 5, false,
+	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 3, 30, snd_SSG08, 15, 2, false,
 	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.SSG08, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
 	global.ItemIndex[#Item.SSG08, ItemStat.advantages] = "\n-High damage\-High range";
-	global.ItemIndex[#Item.SSG08, ItemStat.ItemColor] = c_gray;//$FF4D4D4D; ///gray
+	global.ItemIndex[#Item.SSG08, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.SSG08, ItemStat.AmmoSpriteID] = 2;
 	global.ItemIndex[#Item.SSG08, ItemStat.ScopeInaccuracyResetTimer] = 15;
 	global.ItemIndex[#Item.SSG08, ItemStat.Description] = "An Austrian-made sniper rifle with a bolt-action mechanism is crafted by Steyr Mannlicher. This rifle is an advanced version of Steyr's prior SSG 04 sniper model. It's known for its exceptional precision as a bolt-action sniper weapon.";
@@ -180,7 +180,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Description] = "Disorient foes with this non-lethal flashbang. Its blinding flash and deafening bang disrupt enemy senses, ideal for stealthy advances.";
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 3, true,
+	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 3, 7, snd_SG550, 7, 1.75, true,
 	10, 17, -9, 7, 40, 0.01, 7, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
@@ -211,7 +211,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.BasicNightVision, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.BasicNightVision, "Basic night vision", 1, .99);
-	global.ItemIndex[#Item.BasicNightVision, ItemStat.ItemColor] = $FF007F02; ///green
+	global.ItemIndex[#Item.BasicNightVision, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.BasicNightVision, ItemStat.BaseDurability] = 150;
 	global.ItemIndex[#Item.BasicNightVision, ItemStat.NightVisionIntensityPower] = 1.5;
 	global.ItemIndex[#Item.BasicNightVision, ItemStat.NightVisionNoisePower] = 2;
@@ -221,11 +221,11 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.HealingKit, ItemStat.usable] = true;
 	global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed] = 3 * game_get_speed(gamespeed_fps);
 	global.ItemIndex[#Item.HealingKit, ItemStat.Damage] = 100;
-	global.ItemIndex[#Item.HealingKit, ItemStat.ItemColor] = $FF0000FF; ///red
+	global.ItemIndex[#Item.HealingKit, ItemStat.ItemColor] = c_red;
 	
 	global.ItemIndex[#Item.InfraredVision, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.InfraredVision, "Infrared vision", 3, .975);
-	global.ItemIndex[#Item.InfraredVision, ItemStat.ItemColor] = $FF0000FF; ///red
+	global.ItemIndex[#Item.InfraredVision, ItemStat.ItemColor] = c_red;
 	global.ItemIndex[#Item.InfraredVision, ItemStat.BaseDurability] = 150;
 	
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.Type] = "Grenade";
@@ -233,7 +233,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.usable] = true;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ReloadSpeed] = 2.5;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.BulletCasingID] = 2;
-	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.Description] = "Upon impact, smoke grenade blankets the surrounding area with dense smoke, perfect for obscuring vision, enabling stealthy movements, or disorienting opponents.";
 
 	global.ItemIndex[#Item.Javelin, ItemStat.Type] = "Weapon";
@@ -241,7 +241,7 @@ function ItemDataBase(){
 	0, 0, 0, 0, 1, 0, 5, 10, .001, 15, 25, .25, -1, "Anti-tank missile", .59, .99, .00075, 1 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Javelin, ItemStat.disadvantages] = "-Very bad mobility\n-Dangerous explosion\n-Only one rocket per shot";
 	global.ItemIndex[#Item.Javelin, ItemStat.advantages] = "-Homing projectiles\n-High damage";
-	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.Javelin, ItemStat.AmmoSpriteID] = 6;
 	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "A man-portable, anti-tank weapon system developed in America, operational since 1996. Its design includes a fire-and-forget mechanism with integrated infrared guidance, enabling the operator to find shelter right after firing.";
 
@@ -250,7 +250,7 @@ function ItemDataBase(){
 	0, 0, 5, 8, 24, .1, 1.75, 4, .008, 0, 0, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps));
 	global.ItemIndex[#Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
 	global.ItemIndex[#Item.Glock, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
-	global.ItemIndex[#Item.Glock, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.Glock, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.Glock, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.Glock, ItemStat.Description] = "Glock handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
@@ -260,7 +260,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4_carbine, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.advantages] = "-Good mobility\n-Low bullet spread\n-Low recoil";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.has_suppressor] = Item.military_suppressor; ///Military suppressor
-	global.ItemIndex[#Item.m4_carbine, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.m4_carbine, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.m4_carbine, ItemStat.AmmoSpriteID] = 8;
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "During the 1980s, a gas-operated, magazine-fed carbine was developed in the United States, which is essentially a compact iteration of the M16A2 assault rifle. It comes with military suppressor.";
 	
@@ -270,7 +270,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.awm, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n-High damage\-High range\n-Neglidible damage drop";
-	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = $FF007F02; ///green
+	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.awm, ItemStat.AmmoSpriteID] = 9;
 	global.ItemIndex[#Item.awm, ItemStat.ScopeInaccuracyResetTimer] = 15;
 	global.ItemIndex[#Item.awm, ItemStat.Description] = "The bolt-action sniper rifle crafted by Accuracy International is purpose-built for magnum rifle cartridges.";
@@ -281,7 +281,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
 	global.ItemIndex[#Item.usp, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
 	global.ItemIndex[#Item.usp, ItemStat.has_suppressor] = Item.military_suppressor;
-	global.ItemIndex[#Item.usp, ItemStat.ItemColor] = $FF007F02; ///gray
+	global.ItemIndex[#Item.usp, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.usp, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.usp, ItemStat.Description] = "usp handgun has emerged as the most lucrative product line for the company, being distributed to military services, security organizations, and law enforcement agencies in no fewer than 48 nations.";
 
@@ -293,7 +293,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.HELandMine, ItemStat.PenetrationPower] = .5;
 	global.ItemIndex[#Item.HELandMine, ItemStat.DamageDrop] = .005;
 	global.ItemIndex[#Item.HELandMine, ItemStat.AmmoSpriteID] = 50; ///Shrapnel number
-	global.ItemIndex[#Item.HELandMine, ItemStat.ItemColor] = $FF0000FF; ///red
+	global.ItemIndex[#Item.HELandMine, ItemStat.ItemColor] = c_red;
 	
 	global.ItemIndex[#Item.CELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.CELandMine, ItemStat.Name] = "Cluster-explosion landmine";
@@ -303,7 +303,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.CELandMine, ItemStat.PenetrationPower] = .99;
 	global.ItemIndex[#Item.CELandMine, ItemStat.DamageDrop] = .01;
 	global.ItemIndex[#Item.CELandMine, ItemStat.AmmoSpriteID] = 10; ///Shrapnel number
-	global.ItemIndex[#Item.CELandMine, ItemStat.ItemColor] = $FFFF00FF; ///yellow
+	global.ItemIndex[#Item.CELandMine, ItemStat.ItemColor] = c_aqua;
 	
 	global.ItemIndex[#Item.LELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.LELandMine, ItemStat.Name] = "Low-explosion landmine";
@@ -313,7 +313,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.LELandMine, ItemStat.PenetrationPower] = .59;
 	global.ItemIndex[#Item.LELandMine, ItemStat.DamageDrop] = .005;
 	global.ItemIndex[#Item.LELandMine, ItemStat.AmmoSpriteID] = 50; ///Shrapnel number
-	global.ItemIndex[#Item.LELandMine, ItemStat.ItemColor] = $0E86D4FF; ///aqua
+	global.ItemIndex[#Item.LELandMine, ItemStat.ItemColor] = c_yellow;
 	
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Name] = "Sticky grenade";
@@ -323,33 +323,33 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.PenetrationPower] = .89;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.DamageDrop] = .005;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.BulletCasingID] = 3;
-	global.ItemIndex[#Item.StickyGrenade, ItemStat.ItemColor] = $FF759A9E; ///camo
+	global.ItemIndex[#Item.StickyGrenade, ItemStat.ItemColor] = make_color_rgb(158, 154, 117);
 	
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Name] = "Red dot sight";
-	global.ItemIndex[#Item.red_dot_scope, ItemStat.ItemColor] = $FF0000FF; ///red
+	global.ItemIndex[#Item.red_dot_scope, ItemStat.ItemColor] = c_red;
 	
 	global.ItemIndex[#Item.two_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.two_scope, ItemStat.Name] = "2x scope";
-	global.ItemIndex[#Item.two_scope, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.two_scope, ItemStat.ItemColor] = c_gray;
 	
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.Name] = "Adaptive chambering";
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.ShootTimer] = .75;
-	global.ItemIndex[#Item.adaptive_chambering, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.adaptive_chambering, ItemStat.ItemColor] = c_gray;
 	
 	global.ItemIndex[#Item.vertical_grip, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.vertical_grip, ItemStat.Name] = "Vertical grip";
 	global.ItemIndex[#Item.vertical_grip, ItemStat.KickBackPower] = 1;
 	global.ItemIndex[#Item.vertical_grip, ItemStat.KickBackInaccuracyMultiplier] = .75;
-	global.ItemIndex[#Item.vertical_grip, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.vertical_grip, ItemStat.ItemColor] = c_gray;
 	
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Name] = "Horizontal grip";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "Reduces horizontal recoil when shooting with firearms.";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackInaccuracyMultiplier] = 1;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackPower] = .75;
-	global.ItemIndex[#Item.horizontal_grip, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.horizontal_grip, ItemStat.ItemColor] = c_gray;
 	
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Name] = "Military suppressor";
@@ -357,5 +357,5 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.military_suppressor, ItemStat.Defense] = .75; ///Damage reduction multiplier
 	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackPower] = .75; ///Inaccuracy multiplier
 	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackInaccuracyMultiplier] = .1; ///Noise reduction multiplier
-	global.ItemIndex[#Item.military_suppressor, ItemStat.ItemColor] = $FF4D4D4D; ///gray
+	global.ItemIndex[#Item.military_suppressor, ItemStat.ItemColor] = c_gray;
 }

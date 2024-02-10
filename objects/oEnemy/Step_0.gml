@@ -376,44 +376,22 @@ if(FlashLight != undefined){
 	Weapon.FlashLightY = FlashLightY;
 		
 	if(Visible == false){
-		FlashLight.alpha = 0;
+		FlashLight.visible = false;
 	}else{
-		FlashLight.alpha = FLASHLIGHT_ALPHA;
+		FlashLight.visible = true;
 	}
-}
-#endregion
-
-#region Facing
-var relative_direction = angle_difference(RotationAngle, enemy_aimpunch_direction);
-var direction_sign = sign(relative_direction);
-var rotation_adjustment = lerp(enemy_aimpunch * direction_sign, 0, .1);
-var RotationSpeed = 9;
-if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true){
-	pointdir = point_direction(x,y,FacingX, FacingY);
-	Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
-	Weapon.x = x;
-	Weapon.y = y;
-	RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
-	Weapon.image_angle = RotationAngle + KickBackAngle * .5;
-	Weapon.RotationAngle = Weapon.image_angle;
-}else{
-	pointdir = MoveDirection;
-	Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
-	Weapon.x = x;
-	Weapon.y = y;
-	RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
-	Weapon.image_angle = RotationAngle + KickBackAngle * .5;
-	Weapon.RotationAngle = Weapon.image_angle;
 }
 #endregion
 
 #region Spot a chasing object
 if(instance_exists(oBulletTracer)){
 	var ChasingObjectBullet = instance_nearest(x, y, oBulletTracer);
-	if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
-		if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
-			if(ChasingObjectSpotted == false){
-				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+	if(instance_exists(ChasingObjectBullet)){
+		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
+			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+				if(ChasingObjectSpotted == false){
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+				}
 			}
 		}
 	}
@@ -503,8 +481,10 @@ if(instance_exists(ChasingObject)){
 #endregion
 
 #region Spot a grenade and landmine
-// Initialize variables to hold nearest instances and their distances
-var nearestGrenade, nearestLandMine;
+NearestDangerX = -1;
+NearestDangerX = -1;
+var nearestGrenade = noone;
+var nearestLandMine = noone;
 var distToGrenade = 10000, distToLandMine = 10000;
 
 if (instance_exists(oGrenade)) {
@@ -761,10 +741,37 @@ if(stats.Health_points <= 0){
 		);
 	}
 	var EnemyDead = instance_create_depth(x, y, depth, oEnemyDead);
+	EnemyDead.mask_index = spr_EnemyBasicDead;
 	EnemyDead.sprite_index = sprite_index;
 	EnemyDead.image_index = 3;
-	EnemyDead.RotationAngle = RotationAngle;
+	EnemyDead.image_angle = RotationAngle % 360;
 	instance_destroy();
 }
 
+#endregion
+
+#region Facing
+var relative_direction = angle_difference(RotationAngle, enemy_aimpunch_direction);
+var direction_sign = sign(relative_direction);
+var rotation_adjustment = lerp(enemy_aimpunch * direction_sign, 0, .1);
+var RotationSpeed = 9;
+if(instance_exists(Weapon)){
+	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true){
+		var pointdir = point_direction(x,y,FacingX, FacingY);
+		Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
+		Weapon.x = x;
+		Weapon.y = y;
+		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
+		Weapon.image_angle = RotationAngle + KickBackAngle * .5;
+		Weapon.RotationAngle = Weapon.image_angle;
+	}else{
+		var pointdir = MoveDirection;
+		Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
+		Weapon.x = x;
+		Weapon.y = y;
+		RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 90) + rotation_adjustment;
+		Weapon.image_angle = RotationAngle + KickBackAngle * .5;
+		Weapon.RotationAngle = Weapon.image_angle;
+	}
+}
 #endregion

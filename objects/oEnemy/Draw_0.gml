@@ -3,7 +3,7 @@
 event_inherited();
 if(Visible == true){
 
-	//draw_text(x, y - 70, InfraVisionIntensity); 
+	//draw_text(x, y - 70, RotationAngle); 
 		
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
 		draw_sprite_ext(

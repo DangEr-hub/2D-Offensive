@@ -50,15 +50,18 @@ function update_eggy_rating_system(game_result, enemy_elo, map){
 		map,
 		enemy_elo
 	);
+	
+	global.player_elo_struct.Elo += elo_bonus;
+	global.player_elo_struct.Elo = max(global.player_elo_struct.Elo, convert_to_eggy_scale(0));
+}
+
+function update_tracking_games(){
 	global.player_elo_struct.Tracking_game ++;
 	
 	if(global.player_elo_struct.Played_games % (TRACKING_GAMES/2) == 0 || global.player_elo_struct.Played_games == 1){
 		global.player_elo_struct.Tracking_game = 0;
 		update_player_expected_games();	
 	}
-	
-	global.player_elo_struct.Elo += elo_bonus;
-	global.player_elo_struct.Elo = max(global.player_elo_struct.Elo, 0);
 }
 
 function get_enemy_elo(player_elo){
@@ -233,6 +236,7 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 }
 
 function round_end(round_result){
+	save_game();
 	oEggyEloRatingSystem.round_ended = true;
 	if(global.ranked_game == true){
 		if(round_result == "Win"){

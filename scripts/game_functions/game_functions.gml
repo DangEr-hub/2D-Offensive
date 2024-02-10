@@ -27,7 +27,7 @@ function Approach(argument0, argument1, argument2) {
 	}
 }
 
-function Camera(argument0, argument1, argument2, argument3, argument4) {
+function camera_set_xy(argument0, argument1, argument2, argument3, argument4) {
 	Dist = point_distance(argument0,argument1,argument2,argument3) * argument4;
 	Dir = point_direction(argument0,argument1,argument2,argument3);
 	x = argument0 + lengthdir_x(Dist,Dir);
@@ -356,8 +356,9 @@ function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBase
     return enemy_struct;
 }
 
-function create_player(PlayerHP, PlayerStamina){
+function create_player(PlayerHP, PlayerStamina, PlayerName){
     var player_struct = {
+		Name: PlayerName,
         Health_points: PlayerHP,
 		Damage_health_points: PlayerHP,
 		Stamina_points: PlayerStamina,
@@ -426,19 +427,17 @@ function reset_gui(){
 			}else if(RespawnMenu == true){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
-					if(other.RoundEndMenu == false && other.GameEndMenu == false){
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRespawnMenu, -1000)) {
-							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
-							window_id = id;
-						}
-					}else if(other.RoundEndMenu == true && other.GameEndMenu == false){
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
-							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+					if(other.GameEndMenu == true){
+						show_debug_message(global.player_elo_struct.Headshots_per_round);
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
+							alpha_value = 0;
+							alpha = global.GUIHUDAlpha * 2.25; 
 							window_id = id;
 						}
 					}else{
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
-							alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
+							alpha_value = 0;
+							alpha = global.GUIHUDAlpha * 2.25; 
 							window_id = id;
 						}
 					}

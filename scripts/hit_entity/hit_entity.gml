@@ -1,5 +1,19 @@
-// Script assets have changed for v2.3.0 see
-// https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function enemy_initalized(hitObj, enemyId) {
+    var enemyStatsMap;
+    if (!ds_map_exists(hitObj.HitMap, enemyId)) {
+        enemyStatsMap = ds_map_create();
+        ds_map_add(enemyStatsMap, "Name", enemyId.stats.Name);
+        ds_map_add(enemyStatsMap, "HitsReceived", 0);
+        ds_map_add(enemyStatsMap, "DamageReceived", 0);
+        ds_map_add(enemyStatsMap, "HitsGiven", 0);
+        ds_map_add(enemyStatsMap, "DamageGiven", 0);
+        hitObj.HitMap[? enemyId] = enemyStatsMap;
+    } else {
+        enemyStatsMap = hitObj.HitMap[? enemyId];
+    }
+    return enemyStatsMap;
+}
+
 function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetrationPower, ObjectPenetrationDamage, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer)){
 		if(BodyPart >= HitBox.LegProne){
@@ -63,33 +77,15 @@ function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenet
 			armour_durability = global.ArmourDurability[0];
 		}
 		
-		// If the Object hasn't interacted with this EnemyID yet, initialize the data
-		if (!hit_object.HitMap[? EnemyID]) {
-		    hit_object.EnemyStatsMap = ds_map_create();
-		    hit_object.EnemyStatsMap[? "HitsReceived"] = 0;
-		    hit_object.EnemyStatsMap[? "DamageReceived"] = 0;
-		    hit_object.EnemyStatsMap[? "HitsGiven"] = 0;
-		    hit_object.EnemyStatsMap[? "DamageGiven"] = 0;
-		    hit_object.HitMap[? EnemyID] = hit_object.EnemyStatsMap;
-		}
+	// When an enemy hits the hit_object
+	var enemyStatsMap = enemy_initalized(hit_object, EnemyID);
+	ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
+	ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
 
-		// Update the data for the damage received
-		hit_object.HitMap[? EnemyID][? "HitsReceived"] += 1;
-		hit_object.HitMap[? EnemyID][? "DamageReceived"] += hit_object.attack_damage;
-
-		// If the EnemyID hasn't interacted with this Object yet, initialize the data
-		if !(EnemyID.HitMap[? hit_object.id]) {
-		    hit_object.EnemyStatsMap = ds_map_create();
-		    hit_object.EnemyStatsMap[? "HitsReceived"] = 0;
-		    hit_object.EnemyStatsMap[? "DamageReceived"] = 0;
-		    hit_object.EnemyStatsMap[? "HitsGiven"] = 0;
-		    hit_object.EnemyStatsMap[? "DamageGiven"] = 0;
-		    EnemyID.HitMap[? hit_object.id] = hit_object.EnemyStatsMap;
-		}
-
-		// Update the data for the damage given by the EnemyID
-		EnemyID.HitMap[? hit_object.id][? "HitsGiven"] += 1;
-		EnemyID.HitMap[? hit_object.id][? "DamageGiven"] += hit_object.attack_damage;
+	// When the hit_object hits back the EnemyID
+	var hitObjectStatsMap = enemy_initalized(EnemyID, hit_object.id);
+	ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
+	ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
 		
 		randomize();
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
@@ -97,10 +93,12 @@ function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenet
 				show_debug_message(BodyPart);
 				if(BodyPart <= HitBox.HeadProne){
 					if(global.ranked_game == true){
+						global.player_stats_struct.Headshots ++;
 						oEggyEloRatingSystem.headshots ++;
 					}
 				}else{
 					if(global.ranked_game == true){
+						global.player_stats_struct.Kills ++;
 						oEggyEloRatingSystem.kills ++;
 					}
 				}
@@ -109,11 +107,11 @@ function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenet
 			if!(audio_is_playing(death_sound_effect)){
 				play_sound(BloodSplashX, BloodSplashY, death_sound_effect, hit_object);
 			}
-			hit_object.KilledBy = EnemyID;
+			hit_object.KilledByName = EnemyID.stats.Name;
 			if(WeaponID != -1){
-				hit_object.KilledBy.KilledByWeapon = global.ItemIndex[#WeaponID, ItemStat.Name];
+				hit_object.KilledByWeapon = global.ItemIndex[#WeaponID, ItemStat.Name];
 			}else if(other.object_index == oShrapnel){
-				hit_object.KilledBy.KilledByWeapon = "shrapnel";
+				hit_object.KilledByWeapon = "shrapnel";
 			}
 			hit_object.stats.Health_points = -1;
 		}else{
@@ -124,11 +122,12 @@ function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenet
 
 	
 		if(hit_object.object_index == oPlayer){
+			hit_object.AimPunchDir = irandom(3);
+		}else{
 			if(global.ranked_game == true){
 				global.player_stats_struct.Hit_shots ++;
 				oEggyEloRatingSystem.hit_shots ++;
 			}
-			hit_object.AimPunchDir = irandom(3);
 		}
 
 		repeat(BloodSplashNumber){

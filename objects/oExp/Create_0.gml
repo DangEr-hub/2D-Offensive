@@ -1,8 +1,11 @@
 randomize();
-alarm[0] = 1;
 value = 0;
 PushForce = 0;
-LightObject = undefined;
+LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
+LightObject.castShadows = false;
+LightObject.blend = c_green;
+LightObject.xscale = .5;
+LightObject.yscale = .5;
 PushTimer = -1;
 PushDirection = 0;
 image_index = 0;

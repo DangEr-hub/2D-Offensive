@@ -10,6 +10,14 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	draggable = 1;
 }
 
+continue_callback = function(){
+	oDraw.PauseMenu = false;
+	unpause(oDraw);
+	with(oPause){
+		zui_destroy();
+	}
+};
+
 popup_exit_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
@@ -36,7 +44,15 @@ main_menu_callback = function(){
 
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5, zui_get_height() * .1, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .1, objUIButton, -999)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Continue";
+	callback = other.continue_callback;
+}
+
+with(zui_create(zui_get_width() * .5, zui_get_height() * .1 + button_height*1.5, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -44,7 +60,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .1, objUIButton)){
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .1 + button_height*1.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .1 + button_height*3, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
