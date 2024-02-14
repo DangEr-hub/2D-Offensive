@@ -36,6 +36,9 @@ function save_game(){
 	ini_write_real("Vars", "toggle_bloom_shader", global.BloomShader);
 	ini_write_real("Vars", "enemy_visibility", global.enemy_visibility);
 	ini_write_real("Vars", "gui_scale", global.GUIMultiplier);
+	ini_write_real("Vars", "window_width", global.window_width);
+	ini_write_real("Vars", "window_height", global.window_height);
+	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	
 	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
@@ -123,13 +126,16 @@ function load_game(){
 		global.BloomShader = ini_read_real("Vars", "toggle_bloom_shader", global.BloomShader);
 		global.enemy_visibility = ini_read_real("Vars", "enemy_visibility", global.enemy_visibility);
 		global.GUIMultiplier = ini_read_real("Vars", "gui_scale", global.GUIMultiplier);
+		global.window_width = ini_read_real("Vars", "window_width", global.window_width);
+		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
+		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 
 		global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 2; i++) {
 		    global.weapon_attachments[i] = array_create(4);
 		    for (var j = 0; j < 4; j++) {
 		        var key = "weapon_attachment_" + string(i) + "_" + string(j);
-		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None); // Default value is 0
+		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None);
 		    }
 		}
 		ini_close();

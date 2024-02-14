@@ -1,4 +1,4 @@
-if(instance_exists(oPlayer)){
+if(instance_exists(oPlayer) && oDraw.PauseMenu == false && oDraw.RespawnMenu == false){
 	if (oPlayer.player_can_shoot == true) {
 		with(oCrosshair){
 			if(distance_to_point(mouse_x, mouse_y) < 4){

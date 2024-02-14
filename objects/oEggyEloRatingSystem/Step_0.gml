@@ -9,7 +9,7 @@ if(round_ended == true && oDraw.RespawnMenu == false){
 	}else{
 		global.player_elo_struct.Rounds_lost ++;	
 	}
-	if(global.player_elo_struct.Rounds_win < MAX_ROUNDS/2 && global.player_elo_struct.Rounds_lost < MAX_ROUNDS/2){
+	if(global.player_elo_struct.Rounds_win < (MAX_ROUNDS/2 + 1) && global.player_elo_struct.Rounds_lost < (MAX_ROUNDS/2 + 1)){
 		global.player_elo_struct.Kills_per_round[global.player_elo_struct.Current_round] = kills;
 		global.player_elo_struct.Headshots_per_round[global.player_elo_struct.Current_round] = headshots;
 		global.player_elo_struct.Playing_time_per_round[global.player_elo_struct.Current_round] = playing_time / game_get_speed(gamespeed_fps);

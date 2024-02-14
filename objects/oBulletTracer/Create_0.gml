@@ -2,6 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y); 
+LightObject.castShadows = false;
 Damage = 0;
 infra_vision_light = undefined;
 image_speed = 0;

@@ -1,3 +1,15 @@
+function item_description_destroy(){
+	with(oItemDescription){
+		zui_destroy();
+	}
+	with(oWeaponDescription){
+		zui_destroy();
+	}	
+	with(oArmourDescription){
+		zui_destroy();
+	}
+}
+
 function shouldExplode(ObjectType, Placer) {
     var instance_to_check = instance_nearest(x, y, ObjectType);
 
@@ -450,9 +462,17 @@ function reset_gui(){
 				with(zui_main()){
 					var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
-						zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription);
+						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
+							alpha = global.GUIHUDAlpha * 3;
+						}
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
-						zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription);
+						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
+							alpha = global.GUIHUDAlpha * 3;
+						}
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
+							alpha = global.GUIHUDAlpha * 3;
+						}
 					}
 				}
 			}

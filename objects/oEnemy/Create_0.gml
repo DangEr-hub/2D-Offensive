@@ -1,6 +1,15 @@
 /// @description Insert description here
 // You can write your code in this editor
-event_inherited();
+event_inherited();		var player_score = string(global.player_elo_struct.Rounds_win);
+		var enemy_score = string(global.player_elo_struct.Rounds_lost);
+		var separator = "/";
+		var score_string_width = string_width(player_score + enemy_score + separator);
+		var player_score_string_width = string_width(player_score);
+		var position_y = oDraw.HUDShift*2;
+		var position_x = global.GuiW/2 - score_string_width/2; 
+		draw_text_outlined(position_x, position_y, player_score, MAIN_COLOR, c_black, 1);
+		draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
+		draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
 randomize();
 EquippedLandMine = Item.None;
 stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
@@ -80,7 +89,7 @@ XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
 ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(512 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 1024);
+ChasingDistance = min(768 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 1024);
 #endregion
 
 #region Legs

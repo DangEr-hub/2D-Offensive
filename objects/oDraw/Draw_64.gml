@@ -22,6 +22,7 @@ with(oSlot){
 	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
 		image_blend = MAIN_COLOR;
 		if(mouse_check_button_pressed(mb_left) && global.Inventory[#VarSlot, InventoryIndex.SlotID] != Item.None){
+			item_description_destroy();
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;
 			}
@@ -32,6 +33,14 @@ with(oSlot){
 			DrawItemInfo = true;	
 		}
 		if(mouse_check_button_pressed(mb_right)){
+			item_description_destroy();
+			if(oDraw.DrawInfo == true){
+				oDraw.DrawInfo = false;
+			}
+			with(oSlot){
+				DrawItemInfo = false;
+			}
+			
 			var Ammo = global.Inventory[# VarSlot, InventoryIndex.SlotAmmo];
 			var ClipAmmo = global.Inventory[# VarSlot, InventoryIndex.SlotClipAmmo];
 			var Durability = global.Inventory[# VarSlot, InventoryIndex.SlotDurability];

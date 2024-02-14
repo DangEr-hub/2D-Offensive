@@ -99,7 +99,93 @@ if(type == "Respawn menu"){
 	
 }else if(type == "Weapon description"){
 	
-	#region Weapon description		
+	#region Weapon description	
+	var rows = 5;
+	var columns = 3;
+	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
+	var statTitles = [
+		"Damage power: ", "Ammo: ", "Clip ammo: ", "Reload time: ", "Max. range: ", "Moving inaccuracy: ", "Inaccuracy: ", "RPM: ", "Inaccuracy/shot: ", "Damage drop: ", "Range drop: ",
+		"Class: ", "Moving speed: ", "Penetration: ", ""
+	];					
+					
+	#region Draw grid
+	for (var i = 0; i < rows; i++) {
+		for (var j = 0; j < columns; j++) {
+			var cell_x = x + j * cell_width;
+			var cell_y = y + i * cell_height;
+			draw_set_color(MAIN_COLOR);
+			draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
+			draw_set_color(c_white);
+							
+			draw_set_font(set_font("GUI_grid"));
+			var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+			var text = "";
+			var statIndex = ItemStat.Damage + i * columns + j;
+			if (statIndex <= array_length(statTitles)){
+								
+				switch(statIndex){
+										
+					case ItemStat.Ammo:
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotAmmo]);
+					break;
+										
+					case ItemStat.ClipAmmo:
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotClipAmmo]);
+					break;
+									
+					case ItemStat.ReloadSpeed:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + "s";
+					break;
+									
+					case ItemStat.DamageDrop:
+						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 5) + "%/Unit";
+					break;
+									
+					case ItemStat.RangeInaccuracyMultiplier:
+						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 4) + "%/Unit";
+					break;
+
+					case ItemStat.MovingSpdMul:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
+					break;
+
+					case ItemStat.PenetrationPower:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
+					break;
+									
+					case ItemStat.ShootTimer:
+						text = statTitles[statIndex] + string(game_get_speed(gamespeed_fps)/global.ItemIndex[#Id, statIndex]*60);
+					break;
+
+					case ItemStat.Range:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
+					break;
+									
+					case ItemStat.Inaccuracy:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
+					break;
+									
+					case ItemStat.MovingInaccuracyMultiplier:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
+					break;
+										
+					case ItemStat.ShootingMode:
+						text = statTitles[statIndex] + get_shooting_modes_string(Id);
+					break;
+									
+					default:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
+					break;
+				}
+								
+			}
+			var text_x = cell_x + cell_width / 2 - string_width(text) / 2;
+			var text_y = cell_y + cell_height/2;
+			draw_text_outlined(text_x, text_y, text, c_white, c_black, 1);
+		}
+	}		
+	#endregion
+	
 	#endregion
 	
 }else if(type == "Armour description"){

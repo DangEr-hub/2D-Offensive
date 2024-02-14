@@ -1,8 +1,8 @@
 //instance_deactivate_object(obj_light_renderer);
 BackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
 instance_deactivate_object(oCrosshair);
-instance_deactivate_object(oCamera);
 instance_deactivate_all(true);
+instance_activate_object(oCamera);
 instance_activate_object(oGameEndMenu);
 instance_activate_object(oEggyEloRatingSystem);
 instance_activate_object(objUIImage);

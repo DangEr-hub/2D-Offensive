@@ -201,8 +201,9 @@ function console_submit(Console) {
 							window_set_fullscreen(real(c[1])); 
 							
 							if(real(c[1]) == 0){
-								window_set_size(global.window_width, global.window_height);
+								display_set_gui_size(global.window_width, global.window_height);
 								surface_resize(application_surface, global.window_width, global.window_height);
+								window_set_size(global.window_width, global.window_height);
 								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
 								
 							}
@@ -342,6 +343,8 @@ function console_submit(Console) {
 					        global.window_height = real(string_digits(c[2]));
 							
 							if(window_get_fullscreen() == false){
+								display_set_gui_size(global.window_width, global.window_height);
+								surface_resize(application_surface, global.window_width, global.window_height);
 								window_set_size(global.window_width, global.window_height);
 								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
 							}

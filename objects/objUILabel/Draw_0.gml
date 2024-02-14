@@ -49,7 +49,28 @@ if(item_description == false){
 			draw_string_line(statistics_x, statistics_y, "Horizontal recoil: ", -horizontal_recoil, c_green, "%");
 			draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, "%");
 		}
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+		draw_set_font(set_font("GUI_grid"));
+		var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
+		var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
+		var StartDescriptionY = y + DescriptionStringHeight/2;
+		draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
+		
+		var offset_y = max(64 * global.GUIMultiplier, 128);
+		var disadvantages_string = global.ItemIndex[#Id, ItemStat.disadvantages];
+		var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
+		var advantages_string = global.ItemIndex[#Id, ItemStat.advantages];
+		var advantages_height = string_count_lines(advantages_string) * font_get_size(draw_get_font());
+		var disadvantages_x = x + string_width(advantages_string)*1.1;
+		var advantages_x = x;
+		var advantages_y = y + offset_y;
+		draw_text_outlined(disadvantages_x, advantages_y, disadvantages_string, c_red, c_black, 1);
+		draw_text_outlined(advantages_x, advantages_y, advantages_string, c_green, c_black, 1);
+						
+						
+		draw_set_font(set_font("Console"));
 	}
 }
+gpu_set_tex_filter(false);
 draw_set_alpha(1);
 

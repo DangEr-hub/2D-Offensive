@@ -1,6 +1,4 @@
-/// @description Insert description here
-// You can write your code in this editor
-//application_surface_draw_enable(false);
+application_surface_draw_enable(false);
 draw_texture_flush();
 //haze_start(true, false);
 KilledByWeapon = "Nothing";
@@ -13,8 +11,7 @@ CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCy
 CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] ++";
 DropString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyDrop])) + "] + " + "[" + 
 string(keycode_to_string(global.KeyBinds[| KeyBind.KeyDropMouse])) + "]";
-HUDShift = 16; //Distance from edge of monitor
-camera_set_view_size(view_camera[0], global.CameraWidth, global.CameraHeight);
+HUDShift = 16;
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;

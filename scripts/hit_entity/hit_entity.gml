@@ -1,17 +1,21 @@
 function enemy_initalized(hitObj, enemyId) {
     var enemyStatsMap;
-    if (!ds_map_exists(hitObj.HitMap, enemyId)) {
-        enemyStatsMap = ds_map_create();
-        ds_map_add(enemyStatsMap, "Name", enemyId.stats.Name);
-        ds_map_add(enemyStatsMap, "HitsReceived", 0);
-        ds_map_add(enemyStatsMap, "DamageReceived", 0);
-        ds_map_add(enemyStatsMap, "HitsGiven", 0);
-        ds_map_add(enemyStatsMap, "DamageGiven", 0);
-        hitObj.HitMap[? enemyId] = enemyStatsMap;
-    } else {
-        enemyStatsMap = hitObj.HitMap[? enemyId];
-    }
-    return enemyStatsMap;
+	if(instance_exists(enemyId)){
+	    if (!ds_map_exists(hitObj.HitMap, enemyId)) {
+	        enemyStatsMap = ds_map_create();
+	        ds_map_add(enemyStatsMap, "Name", enemyId.stats.Name);
+	        ds_map_add(enemyStatsMap, "HitsReceived", 0);
+	        ds_map_add(enemyStatsMap, "DamageReceived", 0);
+	        ds_map_add(enemyStatsMap, "HitsGiven", 0);
+	        ds_map_add(enemyStatsMap, "DamageGiven", 0);
+	        hitObj.HitMap[? enemyId] = enemyStatsMap;
+	    } else {
+	        enemyStatsMap = hitObj.HitMap[? enemyId];
+	    }
+	    return enemyStatsMap;
+	}else{
+		return false;
+	}
 }
 
 function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenetrationPower, ObjectPenetrationDamage, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
@@ -78,14 +82,16 @@ function hit_entity(hit_object, Damage, BodyPart, WeaponID, EnemyID, ObjectPenet
 		}
 		
 	// When an enemy hits the hit_object
-	var enemyStatsMap = enemy_initalized(hit_object, EnemyID);
-	ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
-	ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
+	if(instance_exists(EnemyID) && instance_exists(hit_object)){
+		var enemyStatsMap = enemy_initalized(hit_object, EnemyID);
+		ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
+		ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
 
-	// When the hit_object hits back the EnemyID
-	var hitObjectStatsMap = enemy_initalized(EnemyID, hit_object.id);
-	ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
-	ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
+		// When the hit_object hits back the EnemyID
+		var hitObjectStatsMap = enemy_initalized(EnemyID, hit_object.id);
+		ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
+		ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
+	}
 		
 		randomize();
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){

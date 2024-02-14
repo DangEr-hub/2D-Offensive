@@ -40,26 +40,29 @@ if(DrawItemInfo == true){
 		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
-			with(oItemDescription){
-				zui_destroy();
-			}
-			with(oArmourDescription){
-				zui_destroy();
-			}
+			item_description_destroy();
 			with(zui_main()){
-				zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription);
+				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
+					alpha = global.GUIHUDAlpha * 3;
+				}
 			}
-		}else{
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
-			with(oArmourDescription){
-				zui_destroy();
-			}
-			with(oItemDescription){
-				zui_destroy();	
-			}
+			item_description_destroy();
 			with(zui_main()){
-				zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription);
+				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
+					alpha = global.GUIHUDAlpha * 3;
+				}
+			}
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+			oDraw.var_slot = VarSlot;
+			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			item_description_destroy();
+			with(zui_main()){
+				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
+					alpha = global.GUIHUDAlpha * 3;
+				}
 			}
 		}
 		oDraw.DrawInfo = true;	

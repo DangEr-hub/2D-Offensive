@@ -5,6 +5,11 @@ alarm[0] = 1;
 surf_horizontal = -1;
 surf_vertical = -1;
 
+if(window_get_fullscreen() == false){
+	global.GUIMultiplier *= 1.02;	
+}
+
+
 if!(instance_exists(oConsole)){
 	instance_create_layer(x, y, "OtherO", oConsole);
 }

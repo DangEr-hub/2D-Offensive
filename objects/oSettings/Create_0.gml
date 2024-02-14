@@ -16,6 +16,79 @@ anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
 text_height = string_height("a")*2;
 
+window_width_function = function() {
+    window_sizes = [480, 960, 1920, 3840];
+    current_index = -1;
+    for (i = 0; i < array_length(window_sizes); i++) {
+        if (global.window_width == window_sizes[i]) {
+            current_index = i;
+            break;
+        }
+    }
+
+    var found = false;
+    var next_index = current_index;
+    for (var j = 1; j <= array_length(window_sizes); j++) {
+        next_index = (current_index + j) % array_length(window_sizes); 
+        if (window_sizes[next_index] <= display_get_width()) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        global.window_width = window_sizes[next_index];
+    } else {
+        global.window_width = window_sizes[0];
+    }
+	
+	with(window_width_checkbox){
+		value = 0;
+	}
+
+    with (window_width_button) {
+        caption = string(global.window_width);
+    }
+	save_game();
+};
+
+window_height_function = function() {
+    window_sizes = [270, 540, 1080, 2160];
+    current_index = -1;
+    for (i = 0; i < array_length(window_sizes); i++) {
+        if (global.window_height == window_sizes[i]) {
+            current_index = i;
+            break;
+        }
+    }
+
+    var found = false;
+    var next_index = current_index;
+    for (var j = 1; j <= array_length(window_sizes); j++) {
+        next_index = (current_index + j) % array_length(window_sizes); 
+        if (window_sizes[next_index] <= display_get_height()) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        global.window_height = window_sizes[next_index];
+    } else {
+        global.window_height = window_sizes[0];
+    }
+	
+	with(window_height_checkbox){
+		value = 0;
+	}
+
+    with (window_height_button) {
+        caption = string(global.window_height);
+    }
+	save_game();
+};
+
+
 toggle_particles_callback = function(){
 	with(toggle_particles_button){
 		if(global.DrawParticles == false){
@@ -26,10 +99,12 @@ toggle_particles_callback = function(){
 			caption = "Off";
 		}
 	}
+	save_game();
 };
 
 crosshair_color_text_input_callback = function(InputText){
 	set_crosshair_color(InputText);	
+	save_game();
 };
 
 anti_aliasing_callback = function() {
@@ -74,6 +149,7 @@ anti_aliasing_callback = function() {
         }
         caption = caption_string;
     }
+	save_game();
 };
 
 toggle_bloom_callback = function(){
@@ -86,6 +162,7 @@ toggle_bloom_callback = function(){
 			caption = "Off";
 		}
 	}
+	save_game();
 };
 
 
@@ -105,6 +182,7 @@ with (zui_create(position_x + gap, position_y - text_height/4, objUISlider)) {
 	
 	callback = function(_id, _value){
 		audio_master_gain(value/100);
+		save_game();
 	};
 }
 
@@ -233,6 +311,72 @@ with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3
 	callback = function(InputText){
 		global.player_stats_struct.Name = InputText;
 	};
+}
+#endregion
+
+#region Window width
+window_width_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*7 - checkbox_size*3/4, objUICheckbox);
+with(window_width_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = 1;
+	callback = function(){
+	    if (window_get_fullscreen() == false) {
+			value = 0;
+	        display_set_gui_size(global.window_width, global.window_height);
+	        surface_resize(application_surface, global.window_width, global.window_height);
+	        window_set_size(global.window_width, global.window_height);
+	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
+			room_restart();
+	    }
+	};
+}
+with(zui_create(position_x, position_y + text_height*7, objUILabel)){
+	color = c_white;
+	caption = "Window width: ";
+}
+
+window_width_button = zui_create(position_x + gap, position_y - text_height/2 + text_height*7, objUIButton);
+with(window_width_button){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(64 * global.GUIMultiplier);
+	zui_set_height(16 * global.GUIMultiplier);
+	
+	caption = global.window_width;
+	callback = other.window_width_function;
+}
+#endregion
+
+#region Window height
+window_height_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*8 - checkbox_size*3/4, objUICheckbox);
+with(window_height_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = 1;
+	callback = function(){
+	    if (window_get_fullscreen() == false) {
+			value = 0;
+	        display_set_gui_size(global.window_width, global.window_height);
+	        surface_resize(application_surface, global.window_width, global.window_height);
+	        window_set_size(global.window_width, global.window_height);
+	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
+			room_restart();
+	    }
+	};
+}
+with(zui_create(position_x, position_y + text_height*8, objUILabel)){
+	color = c_white;
+	caption = "Window height: ";
+}
+
+window_height_button = zui_create(position_x + gap, position_y - text_height/2 + text_height*8, objUIButton);
+with(window_height_button){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(64 * global.GUIMultiplier);
+	zui_set_height(16 * global.GUIMultiplier);
+	
+	caption = global.window_height;
+	callback = other.window_height_function;
 }
 #endregion
 

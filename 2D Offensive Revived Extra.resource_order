@@ -213,6 +213,7 @@
     {"name":"sprWindowPanel","order":5,"path":"sprites/sprWindowPanel/sprWindowPanel.yy",},
     {"name":"haze_rect_delete","order":7,"path":"scripts/haze_rect_delete/haze_rect_delete.yy",},
     {"name":"spr_Bullet","order":3,"path":"sprites/spr_Bullet/spr_Bullet.yy",},
+    {"name":"oWeaponDescription","order":24,"path":"objects/oWeaponDescription/oWeaponDescription.yy",},
     {"name":"snd_Death2","order":14,"path":"sounds/snd_Death2/snd_Death2.yy",},
     {"name":"console_settings","order":10,"path":"scripts/console_settings/console_settings.yy",},
     {"name":"objUIBlack","order":7,"path":"objects/objUIBlack/objUIBlack.yy",},

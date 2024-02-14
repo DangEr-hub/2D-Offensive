@@ -1183,7 +1183,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	if(HealingTime >= global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]){
 		damage_indicator("+" + string(global.ItemIndex[#HealingItemId, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, icons.health);
 		CanShoot = true;
-		stats.Health_points += global.ItemIndex[#HealingItemId, ItemStat.Damage];
+		stats.Health_points += min(global.ItemIndex[#HealingItemId, ItemStat.Damage], global.player_stats_struct.Max_health - stats.Health_points);
 		stats.Damage_health_points = stats.Health_points;
 		Healing = false;
 		HealingTime = -1;
@@ -1223,12 +1223,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				if(oDraw.show_weapon_attachments == false){
 					player_can_shoot = true;
 				}
-				with(oItemDescription){
-					zui_destroy();
-				}
-				with(oArmourDescription){
-					zui_destroy();
-				}
+				item_description_destroy();
 			    with(oInventory){
 			        instance_destroy();
 			    }
@@ -1272,6 +1267,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#region Item use
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyUse])){
 			if(global.Inventory[# ItemUsePosition, InventoryIndex.SlotAmount] <= 1){
+				with(oWeaponDescription){
+					zui_destroy();
+				}
 				with(oItemDescription){
 					zui_destroy();
 				}
@@ -1624,6 +1622,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
 		true
 	);
+	instance_activate_object(oWeaponDescription);
 	instance_activate_object(oLightRenderer);
 	instance_activate_object(oHazeController);
 	instance_activate_object(oDamageTable);

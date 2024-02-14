@@ -278,6 +278,7 @@
     {"id":{"name":"sprWindowPanel","path":"sprites/sprWindowPanel/sprWindowPanel.yy",},},
     {"id":{"name":"haze_rect_delete","path":"scripts/haze_rect_delete/haze_rect_delete.yy",},},
     {"id":{"name":"spr_Bullet","path":"sprites/spr_Bullet/spr_Bullet.yy",},},
+    {"id":{"name":"oWeaponDescription","path":"objects/oWeaponDescription/oWeaponDescription.yy",},},
     {"id":{"name":"snd_Death2","path":"sounds/snd_Death2/snd_Death2.yy",},},
     {"id":{"name":"console_settings","path":"scripts/console_settings/console_settings.yy",},},
     {"id":{"name":"objUIBlack","path":"objects/objUIBlack/objUIBlack.yy",},},

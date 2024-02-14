@@ -99,7 +99,7 @@ enum MapIndex{
 global.MapID = MapIndex.Desert;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(192, 108, 0);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = $FF00FFFF;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(255, 192, 0);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .1;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1;

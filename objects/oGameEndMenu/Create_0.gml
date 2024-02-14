@@ -119,16 +119,41 @@ main_menu_callback = function(){
 
 #region Title
 draw_set_font(set_font("Title"));
+player_score = string(global.player_elo_struct.Rounds_win);
+enemy_score = string(global.player_elo_struct.Rounds_lost);
+separator = "/";
+score_string_width = string_width(player_score + enemy_score + separator);
+player_score_string_width = string_width(player_score);
 title_string = "Win";
 if(global.player_elo_struct.Rounds_lost > global.player_elo_struct.Rounds_win){
 	title_string = "Loss";	
 }else if(global.player_elo_struct.Rounds_lost == global.player_elo_struct.Rounds_win){
-	title_string = "Draw";
+	titwith (zui_create(title_position_x - string_width(title_string)/2, title_position_y + string_height("a"), objUILabel)) {
+	font = set_font("Title");
+	color = MAIN_COLOR;
+	caption = player_score;
+}le_string = "Draw";
 }
 with (zui_create(title_position_x - string_width(title_string)/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
 	color = MAIN_COLOR;
 	caption = other.title_string;
+}
+
+with (zui_create(title_position_x - score_string_width/2, title_position_y + string_height("a"), objUILabel)) {
+	font = set_font("Title");
+	color = MAIN_COLOR;
+	caption = other.player_score;
+}
+with (zui_create(title_position_x - score_string_width/2 + player_score_string_width, title_position_y + string_height("a"), objUILabel)) {
+	font = set_font("Title");
+	color = c_dkgray;
+	caption = other.separator;
+}
+with (zui_create(title_position_x - score_string_width/2 + player_score_string_width + string_width(separator), title_position_y + string_height("a"), objUILabel)) {
+	font = set_font("Title");
+	color = c_dkgray;
+	caption = other.enemy_score;
 }
 draw_set_font(set_font("Menu_small"));
 #endregion
