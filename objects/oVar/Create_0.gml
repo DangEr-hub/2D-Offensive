@@ -40,6 +40,7 @@ global.window_height = 1080;
 global.draw_other_models = false;
 global.Weather = "sun";
 global.crosshair_color = c_white;
+global.sound_emitters = ds_map_create();
 display_set_gui_size(1920, 1080);
 global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
@@ -89,15 +90,26 @@ for (var i = 0; i < 2; i++) {
 
 
 enum MapProperty{
-	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Total
+	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, Total
 }
 
 enum MapIndex{
-	Desert, RainForest, Total
+	Desert, RainForest, City, Nuclear, Total
 }
 
-global.MapID = MapIndex.Desert;
+global.map_rounds = [];
+for (var i = 0; i < MapIndex.Total; i++) {
+    global.map_rounds[i] = [];
+    
+    for (var j = 0; j < 3; j++) {
+        global.map_rounds[i][j] = -1;
+    }
+}
+
+
+global.MapID = -1;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
+global.MapProperties[#MapIndex.Desert, MapProperty.Name] = "Desert";
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(192, 108, 0);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(255, 192, 0);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .1;
@@ -106,13 +118,32 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = $FFFFFFFF;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = $FF00FFFF;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = c_white;
+global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = c_orange;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.75;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.5;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 1.5;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
+
+global.MapProperties[#MapIndex.City, MapProperty.MapStartColor] = c_white;
+global.MapProperties[#MapIndex.City, MapProperty.Name] = "City";
+global.MapProperties[#MapIndex.City, MapProperty.MapEndColor] = c_orange;
+global.MapProperties[#MapIndex.City, MapProperty.MapStartIntensity] = 0.75;
+global.MapProperties[#MapIndex.City, MapProperty.MapEndIntensity] = 0.5;
+global.MapProperties[#MapIndex.City, MapProperty.MapPeakIntensity] = 1.5;
+global.MapProperties[#MapIndex.City, MapProperty.MapStartHours] = 10 * 60;
+global.MapProperties[#MapIndex.City, MapProperty.MapEndHours] = 20 * 60;
+
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartColor] = c_white;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.Name] = "Nuclear";
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndColor] = c_orange;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartIntensity] = 0.75;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndIntensity] = 0.5;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapPeakIntensity] = 1.5;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartHours] = 10 * 60;
+global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 
 
 

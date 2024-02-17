@@ -1,3 +1,3 @@
 if(PenetrationDamage > 100){
-	instance_destroy(self);
+	instance_destroy(id);
 }

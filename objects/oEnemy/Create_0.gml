@@ -1,15 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
-event_inherited();		var player_score = string(global.player_elo_struct.Rounds_win);
-		var enemy_score = string(global.player_elo_struct.Rounds_lost);
-		var separator = "/";
-		var score_string_width = string_width(player_score + enemy_score + separator);
-		var player_score_string_width = string_width(player_score);
-		var position_y = oDraw.HUDShift*2;
-		var position_x = global.GuiW/2 - score_string_width/2; 
-		draw_text_outlined(position_x, position_y, player_score, MAIN_COLOR, c_black, 1);
-		draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
-		draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
+event_inherited();
 randomize();
 EquippedLandMine = Item.None;
 stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);

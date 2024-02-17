@@ -1,11 +1,13 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y); 
+LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y);
+LightObject.castShadows = false;
+LightObject.blend = MAIN_COLOR;
 LightObject.xscale = .5;
 LightObject.yscale = .5;
-StartingX = x;
-StartingY = y;
+starting_x = x;
+starting_y = y;
 Id = Item.None;
 Object = noone;
 DamageDrop = 0;

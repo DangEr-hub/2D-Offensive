@@ -12,38 +12,52 @@ hard_mode_checkbox_width = 16 * global.GUIMultiplier;
 hard_mode_checkbox_height = 16 * global.GUIMultiplier;
 map_play_button_width = 64 * global.GUIMultiplier;
 map_play_button_height = 16 * global.GUIMultiplier;
-map_name_array = ["Dust", "Cache", "Nuke", "Mirage"];
 map_image_sprite_height = 64 * global.GUIMultiplier;
 map_image_sprite_width = 128 * global.GUIMultiplier;
 map_image_position_x = 32;
 map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
+if(global.MapID != -1){
+	global.map_rounds[global.MapID][0] = global.player_elo_struct.Rounds_win;
+	global.map_rounds[global.MapID][1] = global.player_elo_struct.Rounds_lost;
+	global.player_elo_struct.Rounds_win = 0;
+	global.player_elo_struct.Rounds_lost = 0;	
+}
+
+for(var j=0;j<MapIndex.Total;j++){
+	map_name_array[j] = global.MapProperties[#j, MapProperty.Name];	
+}
+
 
 map_callbacks = [
     function() { 
+		set_map_rounds(MapIndex.Desert);
 		if(global.player_elo_struct.Played_games <= 0){
 			update_player_expected_games();
 		}
-		room_goto(rm_Test);
+		room_goto(rm_Desert);
 	},
     function() { 
+		set_map_rounds(MapIndex.RainForest);
 		if(global.player_elo_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
-		room_goto(rm_Test); 
+		room_goto(rm_RainForest); 
 	},
     function() { 
+		set_map_rounds(MapIndex.City);
 		if(global.player_elo_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
-		room_goto(rm_Test); 
+		room_goto(rm_Desert); 
 	},
     function() { 
+		set_map_rounds(MapIndex.Nuclear);
 		if(global.player_elo_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
-		room_goto(rm_Test); 
+		room_goto(rm_Desert); 
 	}
 ];
 

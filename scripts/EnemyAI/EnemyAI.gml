@@ -17,8 +17,8 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 	}
 	EnemyBulletTracer = instance_create_depth(x, y, depth, oBulletTracer);
 	EnemyBulletTracer.Damage = global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier;
-	EnemyBulletTracer.BulletTracerX = EnemyBulletTracer.x;
-	EnemyBulletTracer.BulletTracerY = EnemyBulletTracer.y;
+	EnemyBulletTracer.starting_x = EnemyBulletTracer.x;
+	EnemyBulletTracer.starting_y = EnemyBulletTracer.y;
 	EnemyBulletTracer.ShotX = EnemyShotX;
 	EnemyBulletTracer.ShotY = EnemyShotY;
 	EnemyBulletTracer.image_angle = point_direction(EnemyBulletTracer.x, EnemyBulletTracer.y, EnemyShotX, EnemyShotY);
@@ -131,7 +131,7 @@ function EnemyShooting(DangerX, DangerY){
 		
 		#region Create flash effect
 		if(DestroyTimer == -1){
-			DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * .75);
+			DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * 2);
 			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 			MuzzleFlashLight.angle = RotationAngle;
 			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;

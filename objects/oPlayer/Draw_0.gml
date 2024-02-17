@@ -1,7 +1,6 @@
 /// @description Drawing
-//draw_text(x, y - 500, string(window_get_width()) + " " + string(window_get_height()));
-//draw_text(x, y - 150, string(surface_get_width(application_surface)) + " " + string(surface_get_height(application_surface)));
-//draw_text(x, y - 50, string(display_get_gui_width()) + string(display_get_gui_height()));
+draw_text(x, y - 150, global.map_rounds[global.MapID][0]);
+draw_text(x, y - 50, global.map_rounds[global.MapID][2]);
 event_inherited();
 if(stats.Health_points > 0){
 	if (equipped_usable_item()) {

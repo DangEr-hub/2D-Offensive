@@ -46,6 +46,13 @@ function save_game(){
 	        ini_write_real("Attachments", key, global.weapon_attachments[i][j]);
 	    }
 	}
+	
+	for (var i = 0; i < array_length(global.map_rounds); i++) {
+	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
+	        var key = "map_rounds_" + string(i) + "_" + string(j);
+	        ini_write_real("Map_rounds", key, global.map_rounds[i][j]);
+	    }
+	}
 	ini_close();
 	#endregion
 	
@@ -136,6 +143,15 @@ function load_game(){
 		    for (var j = 0; j < 4; j++) {
 		        var key = "weapon_attachment_" + string(i) + "_" + string(j);
 		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None);
+		    }
+		}
+		
+		global.map_rounds = array_create(MapIndex.Total);
+		for (var i = 0; i < MapIndex.Total; i++) {
+		    global.map_rounds[i] = array_create(3);
+		    for (var j = 0; j < 3; j++) {
+		        var key = "map_rounds_" + string(i) + "_" + string(j);
+		        global.map_rounds[i][j] = ini_read_real("Map_rounds", key, -1);
 		    }
 		}
 		ini_close();

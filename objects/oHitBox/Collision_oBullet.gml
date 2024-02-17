@@ -5,12 +5,12 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 		var player_armour = global.player_stats_struct.Armour;
 		var ObjectArmourID = global.ArmourID[0];
 		var ObjectHelmetID = global.ArmourID[1];
-		var attack_damage = other.Damage * power(1 - global.ItemIndex[#other.Weapon, ItemStat.DamageDrop], point_distance(x, y, other.StartingX, other.StartingY));
+		var attack_damage = other.Damage * power(1 - global.ItemIndex[#other.Weapon, ItemStat.DamageDrop], point_distance(x, y, other.starting_x, other.starting_y));
 		if(MainObject.object_index != oPlayer){ ///Pokud to neni hitbox hrace
 			player_armour = 0;
 			ObjectArmourID = MainObject.ArmourID;
 			ObjectHelmetID = MainObject.HelmetID;
-			MainObject.enemy_aimpunch_direction = point_direction(other.StartingX, other.StartingY, other.x, other.y);
+			MainObject.enemy_aimpunch_direction = point_direction(other.starting_x, other.starting_y, other.x, other.y);
 			if(instance_exists(MainObject.ChasingObject)){
 				if(other.Object != oPlayer){
 					if(MainObject.ChasingObject != other.Object){

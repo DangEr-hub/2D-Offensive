@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+Direction = 0;
 stuck_offset_x = 0;
 stuck_offset_y = 0;
 stuck_to = noone;

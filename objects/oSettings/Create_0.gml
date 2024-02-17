@@ -88,6 +88,33 @@ window_height_function = function() {
 	save_game();
 };
 
+gui_scale_callback = function() {
+    var gui_scales = [1, 1.5, 2];
+    var closest_index = 0;
+    var smallest_diff = abs(global.GUIMultiplier - gui_scales[0]);
+    
+    for (var i = 1; i < array_length(gui_scales); i++) {
+        var diff = abs(global.GUIMultiplier - gui_scales[i]);
+        if (diff < smallest_diff) {
+            closest_index = i;
+            smallest_diff = diff;
+        }
+    }
+    
+    if (closest_index + 1 < array_length(gui_scales)) {
+        global.GUIMultiplier = gui_scales[closest_index + 1];
+    } else {
+        global.GUIMultiplier = gui_scales[0];
+    }
+    
+    with(gui_scale_button){
+        caption = string(global.GUIMultiplier);
+    }
+    reset_gui();
+    save_game();
+};
+
+
 
 toggle_particles_callback = function(){
 	with(toggle_particles_button){
@@ -240,7 +267,7 @@ with(zui_create(position_x, position_y + text_height*3, objUILabel)){
 	caption = other.toggle_particles_string;
 }
 
-toggle_particles_button = zui_create(position_x + gap, position_y - text_height/2 + text_height*3, objUIButton);
+toggle_particles_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*3, objUIButton);
 with(toggle_particles_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);
@@ -315,7 +342,7 @@ with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3
 #endregion
 
 #region Window width
-window_width_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*7 - checkbox_size*3/4, objUICheckbox);
+window_width_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*7 - checkbox_size/2, objUICheckbox);
 with(window_width_checkbox){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
@@ -336,7 +363,7 @@ with(zui_create(position_x, position_y + text_height*7, objUILabel)){
 	caption = "Window width: ";
 }
 
-window_width_button = zui_create(position_x + gap, position_y - text_height/2 + text_height*7, objUIButton);
+window_width_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*7, objUIButton);
 with(window_width_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);
@@ -348,7 +375,7 @@ with(window_width_button){
 #endregion
 
 #region Window height
-window_height_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*8 - checkbox_size*3/4, objUICheckbox);
+window_height_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*8 - checkbox_size/2, objUICheckbox);
 with(window_height_checkbox){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
@@ -369,7 +396,7 @@ with(zui_create(position_x, position_y + text_height*8, objUILabel)){
 	caption = "Window height: ";
 }
 
-window_height_button = zui_create(position_x + gap, position_y - text_height/2 + text_height*8, objUIButton);
+window_height_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*8, objUIButton);
 with(window_height_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);
@@ -377,6 +404,23 @@ with(window_height_button){
 	
 	caption = global.window_height;
 	callback = other.window_height_function;
+}
+#endregion
+
+#region GUI scale
+with(zui_create(position_x, position_y + text_height*9, objUILabel)){
+	color = c_white;
+	caption = "GUI scale: ";
+}
+
+gui_scale_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*9, objUIButton);
+with(gui_scale_button){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(64 * global.GUIMultiplier);
+	zui_set_height(16 * global.GUIMultiplier);
+	
+	caption = global.GUIMultiplier;
+	callback = other.gui_scale_callback;
 }
 #endregion
 

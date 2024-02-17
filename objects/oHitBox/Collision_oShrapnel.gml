@@ -4,7 +4,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 	var player_armour = global.player_stats_struct.Armour;
 	var ObjectArmourID = global.ArmourID[0];
 	var ObjectHelmetID = global.ArmourID[1];
-	var attack_damage = other.Damage * power(1 - other.DamageDrop, point_distance(x, y, other.StartingX, other.StartingY));
+	var attack_damage = other.Damage * power(1 - other.DamageDrop, point_distance(x, y, other.starting_x, other.starting_y));
 	if(MainObject.object_index != oPlayer){ ///Pokud to neni hitbox hrace
 		player_armour = 0;
 		ObjectArmourID = MainObject.ArmourID;

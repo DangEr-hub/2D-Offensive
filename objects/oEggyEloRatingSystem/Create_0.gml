@@ -1,5 +1,3 @@
-/// @description Insert description here
-// You can write your code in this editor
 get_accuracy = function(AllShots, HitShots){
 	var accuracy = 0;
 	if(AllShots != 0){

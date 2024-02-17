@@ -4,7 +4,7 @@
   "name": "spr_DustTiles",
   "bbox_bottom": 255,
   "bbox_left": 0,
-  "bbox_right": 312,
+  "bbox_right": 495,
   "bbox_top": 0,
   "bboxMode": 0,
   "collisionKind": 1,

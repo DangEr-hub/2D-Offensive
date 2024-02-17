@@ -1,3 +1,85 @@
+function cleanup_emitter(emitter) {
+    if (ds_map_exists(global.sound_emitters, emitter)) {
+        var sound_id = ds_map_find_value(global.sound_emitters, emitter);
+        if (audio_is_playing(sound_id)) {
+            audio_stop_sound(sound_id);
+        }      
+        audio_emitter_free(emitter);
+        ds_map_delete(global.sound_emitters, emitter);
+    }
+}
+
+function emitter_is_playing(emitter) {
+    if (ds_map_exists(global.sound_emitters, emitter)) {
+        var sound_id = ds_map_find_value(global.sound_emitters, emitter);
+        if (audio_is_playing(sound_id)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
+    var collision_info = find_collision_point(starting_x, starting_y, target_x, target_y, object_type);
+    if (array_length(collision_info) > 0) {
+        var collision_details = {
+            "x": collision_info[0],
+            "y": collision_info[1],
+            "instance_id": collision_info[2]
+        };
+        
+        var bullet_distance = point_distance(starting_x, starting_y, current_x, current_y);
+        var collision_distance = point_distance(starting_x, starting_y, collision_details.x, collision_details.y);
+        
+        // Check collision based on single_hit flag
+        if ((single_hit && point_distance(current_x, current_y, collision_details.x, collision_details.y) <= speed) ||
+            (!single_hit && bullet_distance >= collision_distance)) {
+            return collision_details;
+        }
+    }
+    
+    return noone;
+}
+
+function find_collision_point(x1, y1, x2, y2, object) {
+    var tolerance = 1;
+    var startX = x1;
+    var startY = y1;
+    var endX = x2;
+    var endY = y2;
+    var collidedInstance = noone;
+
+    collidedInstance = collision_line(startX, startY, endX, endY, object, true, false);
+    if (collidedInstance == noone) {
+        return [];
+    }
+
+    // Binary search for the precise collision point
+    while (point_distance(startX, startY, endX, endY) > tolerance) {
+        var midX = (startX + endX) / 2;
+        var midY = (startY + endY) / 2;
+        var midCollision = collision_line(x1, y1, midX, midY, object, true, false);
+
+        if (midCollision != noone) {
+            // Collision detected; narrow down the search to the first half
+            endX = midX;
+            endY = midY;
+            collidedInstance = midCollision; // Update the collided instance
+        } else {
+            // No collision detected; narrow down the search to the second half
+            startX = midX;
+            startY = midY;
+        }
+    }
+
+    // Check if the collided instance still exists
+    if (instance_exists(collidedInstance)) {
+        return [endX, endY, collidedInstance];
+    } else {
+        return [];
+    }
+}
+
 function item_description_destroy(){
 	with(oItemDescription){
 		zui_destroy();
@@ -148,7 +230,7 @@ function player_shooting(){
 	#region Create flash effect
 	if(stats.Health_points > 0){
 		if(DestroyTimer == -1){
-			DestroyTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * .75);
+			DestroyTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * 2);
 			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 			MuzzleFlashLight.angle = RotationAngle;
 			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
@@ -212,8 +294,10 @@ function player_shooting(){
 		#region Tracer
 		BulletTracer = instance_create_depth(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), -99, oBulletTracer);
 		BulletTracer.Damage = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier;
-		BulletTracer.BulletTracerX = BulletTracer.x;
-		BulletTracer.BulletTracerY = BulletTracer.y;
+		BulletTracer.starting_x = BulletTracer.x;
+		BulletTracer.starting_y = BulletTracer.y;
+		BulletTracer.collision_x = BulletTracer.x;
+		BulletTracer.collision_y = BulletTracer.y;
 		BulletTracer.ShotX = ShotX;
 		BulletTracer.ShotY = ShotY;
 		BulletTracer.image_angle = point_direction(BulletTracer.x, BulletTracer.y, ShotX, ShotY);
@@ -293,6 +377,7 @@ function inaccuracy_formula(WID, ObjectType){
 	
 function play_sound(PositionX, PositionY, Sound, falloff_ref_dist = 100, fallof_max_dist = 2500, falloff_factor = 1.5, ObjectType = self, Priority = 0){
     ObjectType.Emitter = audio_emitter_create();
+	ds_map_add(global.sound_emitters, ObjectType.Emitter, Sound);
     audio_emitter_position(ObjectType.Emitter, oPlayer.x - (PositionX - oPlayer.x), PositionY, 0);
     audio_emitter_falloff(ObjectType.Emitter, falloff_ref_dist, fallof_max_dist, falloff_factor);
     audio_play_sound_on(ObjectType.Emitter, Sound, false, Priority);
@@ -421,7 +506,7 @@ function set_crosshair_color(ColorString){
 	}
 }
 	
-function reset_gui(){
+function reset_gui(){		
 	if(instance_exists(oInventory)){
 		instance_destroy(oInventory);
 		instance_destroy(oSlot);

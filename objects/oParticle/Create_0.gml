@@ -1,5 +1,34 @@
-/// @description Insert description here
-// You can write your code in this editor
+index = 0;
+life = 0;
+spin_speed = 0;
+fading = 0;
+fader = 0;
+spd = 0;
+spr = 0;
+size = 0;
+max_life = 0;
+min_life = 0;
+min_speed = 0;
+max_speed = 0;
+spin = 0;
+fade = 0;
+fade_amt = 0;
+fade_to_color = 0;
+end_color = 0;
+color_fader = 0;
+implode = 0;
+center_x = 0;
+center_y = 0
+xx = 0;
+yy = 0;   
+runonce = 0;
+rotation = 0;
+alpha = 1;
+current_color = c_white;
+current_color_fade = 0;
+speed_sub = 0.05;
+current_speed_subtract = speed_sub;
+Breakable = false;
 Stay = true;
 Bounce = false;
 FadeAwayTimer = 1;

@@ -1,4 +1,4 @@
-if(round_ended == false){
+if(round_ended == false && oDraw.PauseMenu == false && oDraw.RespawnMenu == false){
 	playing_time ++;
 }
 

@@ -19,6 +19,17 @@ function ini_player_struct_create(){
 	return player_struct;
 }
 
+function set_map_rounds(Map){
+	global.MapID = Map;
+	if(global.map_rounds[Map][2] == -1){
+		global.map_rounds[Map][2] = global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game];
+	}
+	if(global.map_rounds[Map][0] != -1){
+		global.player_elo_struct.Rounds_win = global.map_rounds[Map][0];
+		global.player_elo_struct.Rounds_lost = global.map_rounds[Map][1];
+	}
+}
+
 function clear_player_statistics(total_rounds){
 	global.player_elo_struct.Rounds_win = 0;
 	global.player_elo_struct.Rounds_lost = 0;

@@ -14,6 +14,7 @@ if(DestroyTimer > -1){
 }
 
 if(MuzzleFlashLight != undefined){
+	MuzzleFlashLight.alpha -= ALPHA_SPEED;
 	MuzzleFlashLight.x = FlashLightX;
 	MuzzleFlashLight.y = FlashLightY;
 	if(DestroyTimer <= -1){
