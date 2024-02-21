@@ -131,7 +131,6 @@
     {"name":"BulbLightOverlay","order":6,"path":"scripts/BulbLightOverlay/BulbLightOverlay.yy",},
     {"name":"shd_Blur2Pass","order":14,"path":"shaders/shd_Blur2Pass/shd_Blur2Pass.yy",},
     {"name":"spr_Leaf","order":22,"path":"sprites/spr_Leaf/spr_Leaf.yy",},
-    {"name":"oShrapnel","order":3,"path":"objects/oShrapnel/oShrapnel.yy",},
     {"name":"shd_BloomBlend","order":2,"path":"shaders/shd_BloomBlend/shd_BloomBlend.yy",},
     {"name":"spr_Items","order":4,"path":"sprites/spr_Items/spr_Items.yy",},
     {"name":"snd_DesertEagle","order":1,"path":"sounds/snd_DesertEagle/snd_DesertEagle.yy",},

@@ -1,6 +1,3 @@
-/// @description Insert description here
-// You can write your code in this editor
-//event_inherited();
 headshot_x = x - 20;
 headshot_y = y - 18;
 

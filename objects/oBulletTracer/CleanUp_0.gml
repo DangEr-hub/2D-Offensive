@@ -1,4 +1,3 @@
-event_inherited();
 if(infra_vision_light != undefined){
 	infra_vision_light.Destroy();
 	infra_vision_light = undefined;

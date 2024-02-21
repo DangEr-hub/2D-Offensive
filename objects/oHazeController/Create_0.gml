@@ -16,7 +16,6 @@ debugMode = false;
 
 //surface
 surfW = surface_get_width(application_surface);
-show_debug_message("SurfW: " + string(surfW));
 surfH = surface_get_height(application_surface);
 
 hazeSurf = surface_create(surfW, surfH);

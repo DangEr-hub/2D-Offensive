@@ -121,30 +121,20 @@ function get_elo_current(probability_of_winning, game_result, volatility, game_v
     var kill_bonus = kill_ratio * kill_weight;
     var headshot_bonus = headshot_ratio * headshot_weight;
     var total_bonus = kill_bonus + headshot_bonus;	
-	show_debug_message("Elo total bonus: " + string(total_bonus));
-
-
 	var elo_ratio_weight = 5;
 	var elo_difference = enemy_elo_scale - player_elo_scale;
 	var elo_scale_factor = 1 / (1 + exp(-abs(elo_difference) / 400));
-	var elo_ratio;
-
+	var elo_ratio = 1;
+	
 	if (elo_difference > 0) {
 	    elo_ratio = elo_ratio_weight * elo_scale_factor;
 	} else {
 	    elo_ratio = elo_ratio_weight / elo_scale_factor;
 	}
-	show_debug_message("Elo scale factor: " + string(elo_scale_factor));
-	show_debug_message("Elo ratio: " + string(elo_ratio));
-	
-	
-	var game_result_weight = 7;
+		
+	var game_result_weight = 7;	
 	var elo_game_result = (game_result - probability_of_winning) * game_result_weight;
-	show_debug_message("Elo game result: " + string(elo_game_result));
-	
-	
     var K = base_k * (1 + volatility) * (1 + game_volatility);
-	show_debug_message("Elo bonus: " + string(K * ((elo_game_result + total_bonus) * elo_ratio)));
     return K * ((elo_game_result + total_bonus) * elo_ratio);
 }
 
@@ -253,6 +243,7 @@ function round_end(round_result){
 		if(round_result == "Win"){
 			oEggyEloRatingSystem.player_win = true;
 		}else{
+			global.player_stats_struct.Deaths ++;
 			oEggyEloRatingSystem.player_win = false;
 		}
 	}else{

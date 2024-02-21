@@ -1,18 +1,20 @@
-// Script assets have changed for v2.3.0 see
-// https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
-function GrenadeCreate(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
-	GrenadeObject = instance_create_depth(PositionX, PositionY, depth + 1, oGrenade);	
-	GrenadeObject.Object = ObjectType;
-	GrenadeObject.Id = ItemID;
-	GrenadeObject.image_index = ID;
-	GrenadeObject.Direction = point_direction(PositionX, PositionY, TargetX, TargetY);				
+function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
 	ObjectSpeed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
 	MoveDirX = dcos(MoveDirection) * ObjectSpeed;
 	MoveDirY = -dsin(MoveDirection) * ObjectSpeed;
-	GrenadeDirX = dcos(GrenadeObject.Direction) * GrenadeSpeed;
-	GrenadeDirY = -dsin(GrenadeObject.Direction) * GrenadeSpeed;
-	DotProduct = dot_product(MoveDirX, MoveDirY, GrenadeDirX, GrenadeDirY);			
-	GrenadeObject.Speed = max(GrenadeSpeed + (DotProduct * 0.1), 1);
+	GrenadeDirX = dcos(point_direction(PositionX, PositionY, TargetX, TargetY)) * GrenadeSpeed;
+	GrenadeDirY = -dsin(point_direction(PositionX, PositionY, TargetX, TargetY)) * GrenadeSpeed;
+	DotProduct = dot_product(MoveDirX, MoveDirY, GrenadeDirX, GrenadeDirY);		
+	GrenadeObject = instance_create_depth(PositionX, PositionY, depth + 1, oGrenade);
+	GrenadeObject.stats = {
+		Object_index: ObjectType.object_index,
+		Object_name: ObjectType.stats.Name,
+		Speed: max(GrenadeSpeed + (DotProduct * .1), 1),
+		Object: ObjectType,
+		Item_id: ItemID,
+		Direction: point_direction(PositionX, PositionY, TargetX, TargetY)
+	};
+	GrenadeObject.image_index = ID;
 }
 
 function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, xPosition, yPosition, Alpha = 1, FadeAwayTime = 1){
@@ -35,7 +37,7 @@ function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness,
 	}
 }
 
-function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, ObjectPenetrationPower, ObjectDamageDrop, Id = Item.None, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
+function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
 	randomize();
 	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
@@ -46,24 +48,26 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 	Explosion.LightObject.xscale = ExplosionDamage/10;
 	Explosion.LightObject.yscale = ExplosionDamage/10;
 	if!(audio_is_playing(snd_Explosion)){
-		play_sound(PositionX, PositionY, snd_Explosion, 100, 2500, .75, Explosion);
+		play_sound(PositionX, PositionY, snd_Explosion, Explosion, 100, 2500, .75);
 	}
 	for(i=0;i<ShrapnelNumber;i++){
-		Shrapnel = instance_create_depth(
+		create_bullet_tracer(
 			random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower),
 			random_range(PositionY - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, PositionY + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower),
-			depth,
-			oShrapnel
+			x + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
+			y + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber)),
+			2,
+			Id,
+			i * (360/ShrapnelNumber),
+			global.BulletSpeed * .75,
+			ExplosionDistance,
+			ObjectType,
+			ExplosionDamage,
+			stats.Object_index,
+			stats.Object_name,
+			noone,
+			0
 		);	
-		Shrapnel.Id = Id;
-		Shrapnel.direction = i * (360/ShrapnelNumber);
-		Shrapnel.image_angle = Shrapnel.direction;
-		Shrapnel.speed = global.BulletSpeed * .75;
-		Shrapnel.Distance = ExplosionDistance;
-		Shrapnel.Object = ObjectType;
-		Shrapnel.DamageDrop = ObjectDamageDrop;
-		Shrapnel.Damage = ExplosionDamage;
-		Shrapnel.PenetrationPower = ObjectPenetrationPower;
 	}
 	
 	Fog = instance_create_layer(x, y, "OtherO", oFog);
@@ -87,12 +91,16 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 	}
 }
 
-function LandMineCreate(PositionX, PositionY, ItemID, ObjectType = id){
+function landmine_create(PositionX, PositionY, ItemID, ObjectType = id){
 	LandMine = instance_create_depth(PositionX, PositionY, ObjectType.depth + 1, oLandMine);
-	LandMine.Id = ItemID;
-	LandMine.ImageIndex = global.ItemIndex[#LandMine.Id, ItemStat.BulletCasingID];
-	LandMine.Object = ObjectType;
+	LandMine.ImageIndex = global.ItemIndex[#ItemID, ItemStat.BulletCasingID];
 	LandMine.image_index = LandMine.ImageIndex;
+	LandMine.stats = {
+		Object_name: ObjectType.stats.Name,
+		Object: ObjectType,
+		Item_id: ItemID,
+		Object_index: ObjectType.object_index
+	};
 }
 
 

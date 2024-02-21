@@ -1,6 +1,6 @@
-draw_text(x, y - 70, ExplosionTimer);
+//draw_text(x, y - 70, ExplosionTimer);
 
-if(Speed > .1){
+if(stats.Speed > .1){
 	//draw_sprite_ext(spr_Shadow, 0, x, y, 16/sprite_get_width(spr_Shadow), 
 	//16/sprite_get_height(spr_Shadow), 0, c_white, 1);	
 	draw_sprite_ext(sprite_index, image_index, x, y, 

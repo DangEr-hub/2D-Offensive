@@ -1,17 +1,17 @@
 /// @description Insert description here
 // You can write your code in this editor
 if(stuck == false){
-	x += lengthdir_x(Speed, Direction);
-	y += lengthdir_y(Speed, Direction);
-	Speed *= .95;
+	x += lengthdir_x(stats.Speed, stats.Direction);
+	y += lengthdir_y(stats.Speed, stats.Direction);
+	stats.Speed *= .95;
 	
 	if!(place_meeting(x, y, oParentTile) && place_meeting(x, y, oEnemy)){
-		image_angle += Speed*2;
+		image_angle += stats.Speed*2;
 	}
 
 }
 
-if(Id == Item.StickyGrenade){
+if(stats.Item_id == Item.StickyGrenade){
 	if (!stuck) {
 		if(instance_exists(oParentTile)){
 		    var collision_instance = instance_place(x, y, oParentTile);
@@ -51,7 +51,7 @@ if(ExplodeTimer > -1){
 }
 
 #region Explode
-if(Speed < .1 && Speed > .0001){
+if(stats.Speed < .1 && stats.Speed > .0001){
 	if(ExplosionTimer == -1){
 		ExplosionTimer = ExplosionTime;
 	}
@@ -62,15 +62,31 @@ if(ExplosionTimer > -1){
 }
 
 if(ExplosionTimer == -1){
-	if(Speed < .1){
-		if(Id == Item.HEGrenade){
+	if(stats.Speed < .1){
+		if(stats.Item_id == Item.HEGrenade){
 			
 			#region Create explosion effect
-			ExplosionCreate(30, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);
+			ExplosionCreate(
+				30, 
+				x, 
+				y, 
+				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				true, 
+				stats.Object, 
+				stats.Item_id
+			);
 			#endregion
 			
-		}else if(Id == Item.FlashBangGrenade){
-			ExplosionCreate(5, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);
+		}else if(stats.Item_id == Item.FlashBangGrenade){
+			ExplosionCreate(
+				5, 
+				x, 
+				y, 
+				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				true, 
+				stats.Object, 
+				stats.Item_id
+			);
 			if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
 				if (point_distance(x, y, oPlayer.x, oPlayer.y) < global.FlashBangMaxDistance) {
 					
@@ -100,27 +116,51 @@ if(ExplosionTimer == -1){
 					
 				}
 			}			
-		}else if(Id == Item.SmokeGrenade){
+		}else if(stats.Item_id == Item.SmokeGrenade){
 				
 			#region Create smoke effect
 				instance_create_layer(x, y, "OtherO", oFog);
 				instance_destroy(self);
 				#endregion
 				
-		}else if(Id == Item.StickyGrenade){
+		}else if(stats.Item_id == Item.StickyGrenade){
 			
 			#region Create explosion effect
-			ExplosionCreate(10, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);
+			ExplosionCreate(
+				30,
+				x, 
+				y, 
+				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				true, 
+				stats.Object, 
+				stats.Item_id
+			);
 			#endregion
 		}
 	}
 }
 
 if(ExplodeTimer == -1){
-	if(Id == Item.HEGrenade){
-		ExplosionCreate(30, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);	
-	}else if(Id == Item.FlashBangGrenade){
-		ExplosionCreate(5, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);
+	if(stats.Item_id == Item.HEGrenade){
+		ExplosionCreate(
+			30, 
+			x, 
+			y, 
+			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+			true, 
+			stats.Object, 
+			stats.Item_id
+		);
+	}else if(stats.Item_id == Item.FlashBangGrenade){
+		ExplosionCreate(
+			5, 
+			x, 
+			y, 
+			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+			true, 
+			stats.Object, 
+			stats.Item_id
+		);
 		if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
 			if (point_distance(x, y, oPlayer.x, oPlayer.y) < global.FlashBangMaxDistance) {
 				
@@ -149,17 +189,25 @@ if(ExplodeTimer == -1){
 				#endregion
 			}
 		}			
-	}else if(Id == Item.SmokeGrenade){
+	}else if(stats.Item_id == Item.SmokeGrenade){
 				
 		#region Create smoke effect
 			instance_create_layer(x, y, "OtherO", oFog);
 			instance_destroy(self);
 			#endregion
 			
-	}else if(Id == Item.StickyGrenade){
+	}else if(stats.Item_id == Item.StickyGrenade){
 			
 		#region Create explosion effect
-		ExplosionCreate(10, x, y, global.ItemIndex[#Id, ItemStat.Damage], true, Object, global.ItemIndex[#Id, ItemStat.PenetrationPower], global.ItemIndex[#Id, ItemStat.DamageDrop]);
+		ExplosionCreate(
+			30,
+			x, 
+			y, 
+			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+			true, 
+			stats.Object, 
+			stats.Item_id
+		);
 		#endregion
 	}
 }
@@ -190,41 +238,41 @@ image_yscale = scale;
 if(stuck == false){
 	
 	#region Collision with wall
-	x += lengthdir_x(Speed, Direction);
+	x += lengthdir_x(stats.Speed, stats.Direction);
 	if (place_meeting(x, y, oParentTile)) {
 		// Reflect off wall
-		Speed *= .75;
-		Direction = -Direction * random_range(.9, 1);
-		x -= lengthdir_x(Speed, Direction);  // Move out of collision
+		stats.Speed *= .75;
+		stats.Direction = -stats.Direction * random_range(.9, 1);
+		x -= lengthdir_x(stats.Speed, stats.Direction);  // Move out of collision
 	}
 
-	y += lengthdir_y(Speed, Direction);
+	y += lengthdir_y(stats.Speed, stats.Direction);
 	if (place_meeting(x, y, oParentTile)) {
-		Speed *= .75;
-		Direction = (180 - Direction) * random_range(.9, 1);
-		y -= lengthdir_y(Speed, Direction);  // Move out of collision
+		stats.Speed *= .75;
+		stats.Direction = (180 - stats.Direction) * random_range(.9, 1);
+		y -= lengthdir_y(stats.Speed, stats.Direction);  // Move out of collision
 	}
 	#endregion
 
 	#region Collision with enemy
 
-	x += lengthdir_x(Speed, Direction);
+	x += lengthdir_x(stats.Speed, stats.Direction);
 	if (place_meeting(x, y, oEnemy)) {
 		var EnemyNearest = instance_nearest(x, y, oEnemy);
-		if (place_meeting(x, y, EnemyNearest) && Object != EnemyNearest) {
-			Speed *= .75;
-		    Direction = -Direction * random_range(.75, 1);
-		    x -= lengthdir_x(Speed, Direction);  // Move out of collision
+		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
+			stats.Speed *= .75;
+		    stats.Direction = -stats.Direction * random_range(.75, 1);
+		    x -= lengthdir_x(stats.Speed, stats.Direction);  // Move out of collision
 		}
 	}
 
-	y += lengthdir_y(Speed, Direction);
+	y += lengthdir_y(stats.Speed, stats.Direction);
 	if(instance_exists(oEnemy)){
 		var EnemyNearest = instance_nearest(x, y, oEnemy);
-		if (place_meeting(x, y, EnemyNearest) && Object != EnemyNearest) {
-			Speed *= .75;
-		    Direction = (180 - Direction) * random_range(.75, 1);
-		    y -= lengthdir_y(Speed, Direction);  // Move out of collision
+		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
+			stats.Speed *= .75;
+		    stats.Direction = (180 - stats.Direction) * random_range(.75, 1);
+		    y -= lengthdir_y(stats.Speed, stats.Direction);  // Move out of collision
 		}
 	}
 

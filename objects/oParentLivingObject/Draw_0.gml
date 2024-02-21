@@ -1,3 +1,4 @@
+event_inherited();
 if(Visible == true){
 	if(oPlayer.ToggleInfraVision == true){
 		shader_set(shd_InfraVision);

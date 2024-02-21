@@ -15,17 +15,24 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 	if(global.ItemIndex[#EnemyWeaponID, ItemStat.has_suppressor] != Item.None){
 		suppressor_multiplier = global.ItemIndex[#global.ItemIndex[#EnemyWeaponID, ItemStat.Defense], ItemStat.Defense];	
 	}
-	EnemyBulletTracer = instance_create_depth(x, y, depth, oBulletTracer);
-	EnemyBulletTracer.Damage = global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier;
-	EnemyBulletTracer.starting_x = EnemyBulletTracer.x;
-	EnemyBulletTracer.starting_y = EnemyBulletTracer.y;
-	EnemyBulletTracer.ShotX = EnemyShotX;
-	EnemyBulletTracer.ShotY = EnemyShotY;
-	EnemyBulletTracer.image_angle = point_direction(EnemyBulletTracer.x, EnemyBulletTracer.y, EnemyShotX, EnemyShotY);
-	EnemyBulletTracer.LightObject.angle = EnemyBulletTracer.image_angle;
-	EnemyBulletTracer.direction = EnemyBulletTracer.image_angle;
-	EnemyBulletTracer.Weapon = EnemyWeaponID;
-	EnemyBulletTracer.Object = id;
+	
+	create_bullet_tracer(
+		Weapon.x + lengthdir_x(32, RotationAngle),
+		Weapon.y + lengthdir_y(32, RotationAngle),
+		EnemyShotX,
+		EnemyShotY,
+		0,
+		EnemyWeaponID,
+		point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), EnemyShotX, EnemyShotY),
+		global.BulletSpeed,
+		-1,
+		id,
+		global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
+		object_index,
+		stats.Name,
+		noone,
+		0
+	);
 }
 
 function CheckIfAvailable(ObjectType){

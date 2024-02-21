@@ -35,7 +35,6 @@ if(instance_exists(oPlayer)){
 	if(RespawnMenu == true && BackGround == -1 && alarm[0] == -1){
 		with(zui_main()){
 			if(other.GameEndMenu == true){
-				show_debug_message(global.player_elo_struct.Headshots_per_round);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
 					alpha_value = 0;
 					alpha = global.GUIHUDAlpha * 2.25; 

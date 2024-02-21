@@ -1,22 +1,41 @@
-function cleanup_emitter(emitter) {
-    if (ds_map_exists(global.sound_emitters, emitter)) {
-        var sound_id = ds_map_find_value(global.sound_emitters, emitter);
-        if (audio_is_playing(sound_id)) {
-            audio_stop_sound(sound_id);
-        }      
-        audio_emitter_free(emitter);
-        ds_map_delete(global.sound_emitters, emitter);
-    }
+function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD){
+	var bullet_tracer = instance_create_layer(BX, BY, "ItemsO", oBulletTracer);
+	bullet_tracer.stats = {
+		"Speed": BS,
+		"Shot_x": BulletShotX,
+		"Shot_y": BulletShotY,
+		"Damage": BulletDamage,
+		"Starting_x": BX,
+		"Starting_y": BY,
+		"Object": BulletObject,
+		"Item_id": BulletItemID,
+		"Penetration_damage": BPD,
+		"Object_index": ObjectIndex,
+		"Object_name": ObjectName,
+		"Distance": BulletDistance,
+		"Nearest_enemy": BNE
+	};
+	with(bullet_tracer){
+		image_index = BulletImage;
+		image_angle = BulletDirection;
+		move_towards_point(stats.Shot_x, stats.Shot_y, stats.Speed);	
+	}
 }
 
-function emitter_is_playing(emitter) {
-    if (ds_map_exists(global.sound_emitters, emitter)) {
-        var sound_id = ds_map_find_value(global.sound_emitters, emitter);
-        if (audio_is_playing(sound_id)) {
-            return true;
-        }
-    }
-    return false;
+function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection){
+	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
+	Bullet.direction = BulletDirection;
+	Bullet.stats = {
+		"Damage": BulletDamage,
+		"Starting_x": BulletStartingX,
+		"Starting_y": BulletStartingY,
+		"Object": BulletObject,
+		"Item_id": BulletItemID,
+		"Penetration_damage": BulletPenetrationDamage,
+		"Tracer_image": TracerImage,
+		"Object_index": ObjectIndex,
+		"Object_name": ObjectName
+	};
 }
 
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
@@ -290,98 +309,120 @@ function player_shooting(){
 			}
 		}
 		#endregion
-					
-		#region Tracer
-		BulletTracer = instance_create_depth(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), -99, oBulletTracer);
-		BulletTracer.Damage = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier;
-		BulletTracer.starting_x = BulletTracer.x;
-		BulletTracer.starting_y = BulletTracer.y;
-		BulletTracer.collision_x = BulletTracer.x;
-		BulletTracer.collision_y = BulletTracer.y;
-		BulletTracer.ShotX = ShotX;
-		BulletTracer.ShotY = ShotY;
-		BulletTracer.image_angle = point_direction(BulletTracer.x, BulletTracer.y, ShotX, ShotY);
-		BulletTracer.LightObject.angle = BulletTracer.image_angle;
-		BulletTracer.direction = BulletTracer.image_angle;
-		BulletTracer.Weapon = global.weapon_id[min(WeaponID, 2)];
-		BulletTracer.Object = id;
-						
+			
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
-			BulletTracer.NearestEnemy = instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy);
-			BulletTracer.direction = BulletTracer.image_angle;
-			BulletTracer.speed = 25;
-			BulletTracer.image_index = 1;
+			create_bullet_tracer(
+				Weapon.x + lengthdir_x(32, RotationAngle),
+				Weapon.y + lengthdir_y(32, RotationAngle),
+				ShotX,
+				ShotY,
+				1,
+				global.weapon_id[min(WeaponID, 2)],
+				point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), ShotX, ShotY),
+				25,
+				-1,
+				id,
+				global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier,
+				object_index,
+				stats.Name,
+				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
+				0
+			);
+		}else{
+			create_bullet_tracer(
+				Weapon.x + lengthdir_x(32, RotationAngle),
+				Weapon.y + lengthdir_y(32, RotationAngle),
+				ShotX,
+				ShotY,
+				0,
+				global.weapon_id[min(WeaponID, 2)],
+				point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), ShotX, ShotY),
+				global.BulletSpeed,
+				-1,
+				id,
+				global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier,
+				object_index,
+				stats.Name,
+				noone,
+				0
+			);
 		}
-		#endregion
 					
 	}	
 	
 }
 	
 function inaccuracy_formula(WID, ObjectType){
-	if(ObjectType.object_index == oPlayer){
-		if(instance_exists(oPlayer)){
-			MovingIn = 1;
-			KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
-			range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
-			moving_state_inaccuracy = 1;
+	if(instance_exists(ObjectType)){
+		if(ObjectType.object_index == oPlayer){
+			if(instance_exists(oPlayer)){
+				MovingIn = 1;
+				KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
+				range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+				moving_state_inaccuracy = 1;
 	
-			if(ObjectType.moving_state == player_states.running_state){
-				moving_state_inaccuracy = 2;
-			}else if(ObjectType.moving_state == player_states.prone_state){
-				moving_state_inaccuracy = .5;	
-			}
+				if(ObjectType.moving_state == player_states.running_state){
+					moving_state_inaccuracy = 2;
+				}else if(ObjectType.moving_state == player_states.prone_state){
+					moving_state_inaccuracy = .5;	
+				}
 	
-			if(ObjectType.Moving == true){
-				MovingIn = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
-			}
-			
-			ScopeTimerInaccuracy = 1;
-			ScopeInaccuracy = 1;
-			if(ObjectType.player_has_scope == 0){
-				if(ObjectType.ScopeIn == false){
-					ScopeTimerInaccuracy = 50;
-				}else{
-					ScopeTimerInaccuracy = ObjectType.ScopeInaccuracyTimer;
+				if(ObjectType.Moving == true){
+					MovingIn = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
 				}
-			}else if(ObjectType.player_has_scope != -1){
-				if(ObjectType.ScopeIn == true){
-					ScopeInaccuracy = .5;
+			
+				ScopeTimerInaccuracy = 1;
+				ScopeInaccuracy = 1;
+				if(ObjectType.player_has_scope == 0){
+					if(ObjectType.ScopeIn == false){
+						ScopeTimerInaccuracy = 50;
+					}else{
+						ScopeTimerInaccuracy = ObjectType.ScopeInaccuracyTimer;
+					}
+				}else if(ObjectType.player_has_scope != -1){
+					if(ObjectType.ScopeIn == true){
+						ScopeInaccuracy = .5;
+					}
 				}
+				return min(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1), 50);
 			}
-			return min(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1), 50);
+		}else if(ObjectType.object_index == oEnemy){
+			if(instance_exists(oEnemy)){
+				FlashedInaccuracy = 1;
+				InSmokeInaccuracy = 1;
+				EnemyMovingInaccuracy = 1;
+				EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
+				global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+			
+				if(oPlayer.InSmoke == true && ObjectType.ChasingObject == oPlayer){
+					InSmokeInaccuracy = 5;
+				}
+			
+				if(ObjectType.Flashed == true){
+					FlashedInaccuracy = 5;
+				}
+			
+				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
+					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
+				}
+				return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
+			}
 		}
-	}else if(ObjectType.object_index == oEnemy){
-		if(instance_exists(oEnemy)){
-			FlashedInaccuracy = 1;
-			InSmokeInaccuracy = 1;
-			EnemyMovingInaccuracy = 1;
-			EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
-			global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
-			
-			if(oPlayer.InSmoke == true && ObjectType.ChasingObject == oPlayer){
-				InSmokeInaccuracy = 5;
-			}
-			
-			if(ObjectType.Flashed == true){
-				FlashedInaccuracy = 5;
-			}
-			
-			if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
-				EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
-			}
-			return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
-		}
+	}else{
+		return 0;	
 	}
 }
-	
-function play_sound(PositionX, PositionY, Sound, falloff_ref_dist = 100, fallof_max_dist = 2500, falloff_factor = 1.5, ObjectType = self, Priority = 0){
-    ObjectType.Emitter = audio_emitter_create();
-	ds_map_add(global.sound_emitters, ObjectType.Emitter, Sound);
-    audio_emitter_position(ObjectType.Emitter, oPlayer.x - (PositionX - oPlayer.x), PositionY, 0);
-    audio_emitter_falloff(ObjectType.Emitter, falloff_ref_dist, fallof_max_dist, falloff_factor);
-    audio_play_sound_on(ObjectType.Emitter, Sound, false, Priority);
-    ObjectType.alarm[5] = audio_sound_length(Sound)*game_get_speed(gamespeed_fps)/1000;
+
+function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
+	if(instance_exists(instance_id)){
+	    //ds_map_add(global.sound_emitters, instance_id.Emitter, Sound);
+	    var playerInstance = instance_find(oPlayer, 0);
+	    audio_emitter_position(instance_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
+	    audio_emitter_falloff(instance_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
+	    audio_play_sound_on(instance_id.Emitter, Sound, Priority, false);
+	    //var alarmTime = audio_sound_length(Sound) * game_get_speed(gamespeed_fps) / 1000;
+		//instance_id.alarm[5] = alarmTime;
+	}
 }
 	
 function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time){

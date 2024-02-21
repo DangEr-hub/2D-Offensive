@@ -1,3 +1,3 @@
 /// @description Insert description here
 // You can write your code in this editor
-Emitter = -1;
+Emitter = audio_emitter_create();

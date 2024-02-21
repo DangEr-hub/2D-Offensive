@@ -13,11 +13,9 @@ image_index = 6;
 if(Object != noone){
 	if (image_index = 10){
 		play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
-		//audio_play_sound(choose(snd_FootStep1, snd_FootStep2), 1, false);
 	}
 
 	if (image_index = 19){
 		play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
-		//audio_play_sound(choose(snd_FootStep1, snd_FootStep2), 1, false);
 	}
 }

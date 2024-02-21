@@ -372,4 +372,16 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackPower] = .75; ///Inaccuracy multiplier
 	global.ItemIndex[#Item.military_suppressor, ItemStat.KickBackInaccuracyMultiplier] = .1; ///Noise reduction multiplier
 	global.ItemIndex[#Item.military_suppressor, ItemStat.ItemColor] = c_gray;
+	
+	///Reprezentace exploze jako itemu kvůli jeho statistikám
+	global.ItemIndex[#Item.base_explosion, ItemStat.Name] = "Explosion";
+	global.ItemIndex[#Item.base_explosion, ItemStat.Damage] = 95;
+	global.ItemIndex[#Item.base_explosion, ItemStat.PenetrationPower] = .5;
+	global.ItemIndex[#Item.base_explosion, ItemStat.DamageDrop] = .001;
+	
+	///Reprezentace nukleární exploze jako itemu kvůli jeho statistikám
+	global.ItemIndex[#Item.nuclear_explosion, ItemStat.Name] = "Nuclear explosion";
+	global.ItemIndex[#Item.nuclear_explosion, ItemStat.Damage] = 152;
+	global.ItemIndex[#Item.nuclear_explosion, ItemStat.PenetrationPower] = .9;
+	global.ItemIndex[#Item.nuclear_explosion, ItemStat.DamageDrop] = .001;
 }

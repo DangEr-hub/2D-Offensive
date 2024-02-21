@@ -386,9 +386,9 @@ if(FlashLight != undefined){
 #region Spot a chasing object
 if(instance_exists(oBulletTracer)){
 	var ChasingObjectBullet = instance_nearest(x, y, oBulletTracer);
-	if(instance_exists(ChasingObjectBullet)){
-		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.Object.object_index == ChasingObject){
-			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+	if(instance_exists(ChasingObjectBullet) && instance_exists(ChasingObjectBullet.stats.Object)){
+		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.stats.Object_index == ChasingObject){
+			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
 					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 				}
@@ -425,7 +425,7 @@ if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
 			GrenadeSpd = 1;
 		break;
 	}
-	GrenadeCreate(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
+	create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
 	EquippedGrenade, GrenadeSpd, Target_x, Target_y, EquippedGrenadeID);	
 	State = States.MoveShoot;
 	grenade_angle = random(360);
@@ -434,7 +434,7 @@ if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
 }
 	
 if(State == States.LayDownLandMine && EquippedLandMineTimer == -1){
-	LandMineCreate(
+	landmine_create(
 		x,
 		y,
 		EquippedLandMineID
@@ -504,11 +504,11 @@ if (distToGrenade <= 256 || distToLandMine <= 256) {
 	if (distToGrenade <= distToLandMine) {
 	    NearestDangerX = nearestGrenade.x;
 	    NearestDangerY = nearestGrenade.y;
-	    NearestDangerObject = nearestGrenade.Object;
+	    NearestDangerObject = nearestGrenade.stats.Object;
 	} else {
 	    NearestDangerX = nearestLandMine.x;
 	    NearestDangerY = nearestLandMine.y;
-	    NearestDangerObject = nearestLandMine.Object;
+	    NearestDangerObject = nearestLandMine.stats.Object;
 	}
 
 	if(NearestDangerObject != noone){

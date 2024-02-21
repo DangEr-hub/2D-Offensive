@@ -188,7 +188,6 @@
     {"id":{"name":"shd_Blur2Pass","path":"shaders/shd_Blur2Pass/shd_Blur2Pass.yy",},},
     {"id":{"name":"spr_HealthBar","path":"sprites/spr_HealthBar/spr_HealthBar.yy",},},
     {"id":{"name":"spr_Leaf","path":"sprites/spr_Leaf/spr_Leaf.yy",},},
-    {"id":{"name":"oShrapnel","path":"objects/oShrapnel/oShrapnel.yy",},},
     {"id":{"name":"shd_BloomBlend","path":"shaders/shd_BloomBlend/shd_BloomBlend.yy",},},
     {"id":{"name":"spr_Items","path":"sprites/spr_Items/spr_Items.yy",},},
     {"id":{"name":"snd_DesertEagle","path":"sounds/snd_DesertEagle/snd_DesertEagle.yy",},},

@@ -5,7 +5,7 @@ if(other.Type == "Concrete"){
 }
 
 if!(audio_is_playing(wall_sound)){
-	play_sound(x, y, wall_sound);
+	play_sound(x, y, wall_sound, stats.Object);
 }
 
 

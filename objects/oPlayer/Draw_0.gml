@@ -1,6 +1,4 @@
 /// @description Drawing
-draw_text(x, y - 150, global.map_rounds[global.MapID][0]);
-draw_text(x, y - 50, global.map_rounds[global.MapID][2]);
 event_inherited();
 if(stats.Health_points > 0){
 	if (equipped_usable_item()) {

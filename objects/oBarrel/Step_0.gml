@@ -1,13 +1,13 @@
 if(stats.Health_points <= 0){
+	occluder.Destroy();
 	ExplosionCreate(
-		ceil(stats.Damage/4),
+		30,
 		x,
 		y,
 		stats.Damage,
 		true,
-		Object,
-		stats.Penetration_power,
-		stats.Damage_drop
+		stats.Object,
+		stats.Item_id,
 	);
 }
 

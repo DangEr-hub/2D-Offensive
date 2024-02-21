@@ -1,5 +1,5 @@
-/// @description Insert description here
-// You can write your code in this editor
+event_inherited();
+RotationAngle = random(360);
 FlashLightX = 0;
 FlashLightY = 0;
 KilledByName = "No one";
@@ -25,7 +25,6 @@ AimPunchMultiplier = 1;
 ArmourDurability = [0, 0];
 StaminaTimer= -1;
 KilledBy = noone;
-Emitter = -1; 
 KickBackAngle = 0;
 Flashed = false;
 HitMap = ds_map_create();

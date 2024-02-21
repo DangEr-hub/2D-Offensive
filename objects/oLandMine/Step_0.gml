@@ -6,7 +6,7 @@ if (alpha_timer > -1) {
 }
 
 if (!explode) {
-    explode = shouldExplode(oPlayer, Object) || shouldExplode(oEnemy, Object) || shouldExplode(oGrenade, Object);
+    explode = shouldExplode(oPlayer, stats.Object) || shouldExplode(oEnemy, stats.Object) || shouldExplode(oGrenade, stats.Object);
 }
 
 if(explode == true){
@@ -17,15 +17,13 @@ if(explode == true){
 	}else{
 	    image_index = ImageIndex + 3;
 		ExplosionCreate(
-			global.ItemIndex[#Id, ItemStat.AmmoSpriteID],
+			global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID],
 			x,
 			y,
-			global.ItemIndex[#Id, ItemStat.Damage],
+			global.ItemIndex[#stats.Item_id, ItemStat.Damage],
 			true,
-			Object,
-			global.ItemIndex[#Id, ItemStat.PenetrationPower],
-			global.ItemIndex[#Id, ItemStat.DamageDrop],
-			Id
+			stats.Object,
+			stats.Item_id
 		);
 	}
 }

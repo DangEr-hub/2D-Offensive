@@ -104,18 +104,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	if(instance_exists(oBulletTracer)){
 		var BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
-		if(BulletTracerNearby.Object != id && distance_to_object(BulletTracerNearby) <= 64){
-			play_sound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), BulletTracerNearby);	
+		if(BulletTracerNearby.stats.Object != id && distance_to_object(BulletTracerNearby) <= 64){
+			play_sound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3));	
 		}
 	}
-	
-	if(instance_exists(oShrapnel)){
-		var ShrapnelNearby = instance_nearest(x, y, oShrapnel);
-		if(distance_to_object(ShrapnelNearby) <= 64){
-			play_sound(ShrapnelNearby.x, ShrapnelNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3), ShrapnelNearby);	
-		}
-	}
-
 	#endregion
 	
 	#region Scope attachments
@@ -166,7 +158,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		near_explosion = false;
 		if(instance_exists(oGrenade)){
 			var HEGrenade = instance_nearest(x, y, oGrenade);
-			if(HEGrenade.Id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.Speed < .1){
+			if(HEGrenade.stats.Item_id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.stats.Speed < .1){
 				if(distance_to_object(HEGrenade) <= 1024){
 					near_explosion = true;
 					ExplosionCrossShake = max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
@@ -1410,7 +1402,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				
 					#region Grenade use
 					if(EquippedGrenadeTimer == -1){
-						GrenadeCreate(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
+						create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
 						global.ItemIndex[#Id, ItemStat.BulletCasingID], global.ItemIndex[#Id, ItemStat.ReloadSpeed], oCrosshair.x, oCrosshair.y, Id);						
 						ItemAmountSubstract(ItemUsePosition, 1);
 						EquippedGrenadeTimer = EquippedGrenadeTime;
@@ -1427,7 +1419,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					var Id = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
 					switch(Id){
 						case Item.LELandMine:
-							LandMineCreate(
+							landmine_create(
 								x, 
 								y, 
 								Id
@@ -1436,7 +1428,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						break;
 						
 						case Item.HELandMine:
-							LandMineCreate(
+							landmine_create(
 								x, 
 								y, 
 								Id
@@ -1445,7 +1437,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						break;
 						
 						case Item.CELandMine:
-							LandMineCreate(
+							landmine_create(
 								x, 
 								y, 
 								Id
@@ -1646,7 +1638,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(oCamera);
 	instance_activate_object(oInventory);
 	instance_activate_object(oItems);
-	instance_activate_object(oShrapnel);
+	//instance_activate_object(oShrapnel);
 	instance_activate_object(oGrenade);
 	instance_activate_object(oExplosion);
 	#endregion
