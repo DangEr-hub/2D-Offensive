@@ -1,6 +1,54 @@
 event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
+	#region Friend command and go
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommand])){
+	    var botList = ds_list_create();
+	    with (oFriend) {
+	        ds_list_add(botList, id);
+	    }
+
+	    var currentIndex = -1;
+	    if (ds_list_size(global.selected_bots) > 0) { // Correctly checking the size of the list
+	        var lastSelectedBot = global.selected_bots[| ds_list_size(global.selected_bots)-1]; // Get the last selected bot
+	        for (var i = 0; i < ds_list_size(botList); i++) {
+	            if (botList[| i] == lastSelectedBot) {
+	                currentIndex = i;
+	                break;
+	            }
+	        }
+	    }
+
+	    // Select the next bot in the list
+	    currentIndex = (currentIndex + 1) % ds_list_size(botList);
+	    var nextBotId = botList[| currentIndex];
+
+	    with (oFriend) {
+	        selected = false;
+	    }
+	    with (nextBotId) {
+	        selected = true;
+	    }
+
+	    if (ds_list_find_index(global.selected_bots, nextBotId) == -1) {
+	        ds_list_add(global.selected_bots, nextBotId);
+	    }
+
+	    if (ds_list_size(global.selected_bots) >= instance_number(oFriend)) {
+	        ds_list_clear(global.selected_bots);
+	        ds_list_add(global.selected_bots, nextBotId);
+	    }
+		global.current_selected_bot = nextBotId;
+	    ds_list_destroy(botList);
+	}
+	
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyGo])){
+		with(global.current_selected_bot){
+			MoveTowards(oCrosshair.x, oCrosshair.y, Acceleration, 0, 0);
+		}
+	}
+	#endregion
+	
 	#region Timers
 	stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
 	stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
@@ -216,8 +264,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		
 		CrosshairShake = GunCrossShake + AimPunchCrossShake + ExplosionCrossShake + LowHPCrossShake;
 		ViewAngle = ViewAngleCurrent;
-		camera_set_view_angle(view_camera[0], ViewAngle);
-		camera_set_view_pos(view_camera[0], camera_get_view_x(view_camera[0]) + ViewShakeValuePower, camera_get_view_y(view_camera[0]) + ViewShakeValuePower); 
+		camera_set_view_angle(CAMERA, ViewAngle);
+		camera_set_view_pos(CAMERA, camera_get_view_x(CAMERA) + ViewShakeValuePower, camera_get_view_y(CAMERA) + ViewShakeValuePower); 
 	}
 		
 	#endregion
@@ -1184,8 +1232,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Level
 	if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
-		damage_indicator("Level up!", x, y - sprite_height/2, MAIN_COLOR, spr_Icons, icons.xp
-);
+		damage_indicator("Level up!", x - string_width("Level up!")/2, y, MAIN_COLOR, spr_Icons, 0, set_font("Title"));
 		if(instance_exists(oParticleSystem)){
 			var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
 			var particle_y = random_range(y - sprite_height/2, y + sprite_height/2);
@@ -1591,10 +1638,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#region Deactivate out of view
 	var DeactivateMargin = 256;
 	var ActivateMargin = 128;
-	var deactivateLeft = camera_get_view_x(view_camera[0]) - DeactivateMargin;
-	var deactivateTop = camera_get_view_y(view_camera[0]) - DeactivateMargin;
-	var deactivateRight = deactivateLeft + camera_get_view_width(view_camera[0]) + 2 * DeactivateMargin;
-	var deactivateBottom = deactivateTop + camera_get_view_height(view_camera[0]) + 2 * DeactivateMargin;
+	var deactivateLeft = camera_get_view_x(CAMERA) - DeactivateMargin;
+	var deactivateTop = camera_get_view_y(CAMERA) - DeactivateMargin;
+	var deactivateRight = deactivateLeft + camera_get_view_width(CAMERA) + 2 * DeactivateMargin;
+	var deactivateBottom = deactivateTop + camera_get_view_height(CAMERA) + 2 * DeactivateMargin;
 
 	with (oEnemy) {
 	    if (x < deactivateLeft || x > deactivateRight || y < deactivateTop || y > deactivateBottom) {
@@ -1608,10 +1655,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 	// Activate instances within view + ActivateMargin
 	instance_activate_region(
-		camera_get_view_x(view_camera[0]) - ActivateMargin,
-		camera_get_view_y(view_camera[0]) - ActivateMargin,
-		camera_get_view_width(view_camera[0]) + 2 * ActivateMargin,
-		camera_get_view_height(view_camera[0]) + 2 * ActivateMargin,
+		camera_get_view_x(CAMERA) - ActivateMargin,
+		camera_get_view_y(CAMERA) - ActivateMargin,
+		camera_get_view_width(CAMERA) + 2 * ActivateMargin,
+		camera_get_view_height(CAMERA) + 2 * ActivateMargin,
 		true
 	);
 	instance_activate_object(oWeaponDescription);
@@ -1652,6 +1699,6 @@ if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
 	Weapon.image_index = 0;
 	image_index = 3;
 	round_end("Loss");
-	camera_set_view_angle(view_camera[0], 0);
+	camera_set_view_angle(CAMERA, 0);
 }
 #endregion

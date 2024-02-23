@@ -18,7 +18,10 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 	with(bullet_tracer){
 		image_index = BulletImage;
 		image_angle = BulletDirection;
-		move_towards_point(stats.Shot_x, stats.Shot_y, stats.Speed);	
+		LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y); 
+		LightObject.angle = BulletDirection;
+		LightObject.castShadows = false;
+		move_towards_point(BulletShotX, BulletShotY, BS);	
 	}
 }
 
@@ -567,7 +570,7 @@ function reset_gui(){
 				with(zui_main()){
 					if(other.GameEndMenu == true){
 						show_debug_message(global.player_elo_struct.Headshots_per_round);
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oGameEndMenu, -1000)) {
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.55, oGameEndMenu, -1000)) {
 							alpha_value = 0;
 							alpha = global.GUIHUDAlpha * 2.25; 
 							window_id = id;
@@ -606,8 +609,9 @@ function reset_gui(){
 	}
 }
 	
-function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID) {
+function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
 	Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
+	Indicator.Font = DamageIndicatorFont;
 	Indicator.Damage_Indicator = DamageIndicatorString;
 	Indicator.Color = DamageIndicatorColor;
 	Indicator.Sprite = DamageIndicatorSprite;

@@ -1,0 +1,1 @@
+sprite_explode(30, 10, 5, 15, 5, 10, 5, 0, 0, 1, c_white, 0, -1, image_index);

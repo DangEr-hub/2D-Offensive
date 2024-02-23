@@ -1,6 +1,8 @@
-if(hover == true){
-	if(zui_get_hover())
-		pressed = 1;
+if(clickable == true){
+	if(hover == true){
+		if(zui_get_hover())
+			pressed = 1;
+	}
 }
 
 

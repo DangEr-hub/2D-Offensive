@@ -92,7 +92,7 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 }
 
 function landmine_create(PositionX, PositionY, ItemID, ObjectType = id){
-	LandMine = instance_create_depth(PositionX, PositionY, ObjectType.depth + 1, oLandMine);
+	LandMine = instance_create_layer(PositionX, PositionY, "ItemsO", oLandMine);
 	LandMine.ImageIndex = global.ItemIndex[#ItemID, ItemStat.BulletCasingID];
 	LandMine.image_index = LandMine.ImageIndex;
 	LandMine.stats = {

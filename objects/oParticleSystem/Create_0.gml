@@ -1,5 +1,5 @@
 global.ParticleSystem = part_system_create();
-part_system_depth(global.ParticleSystem, -1000);
+part_system_depth(global.ParticleSystem, -10000);
 
 FlameParticle = part_type_create();
 part_type_shape(FlameParticle,pt_shape_line);
@@ -89,12 +89,16 @@ part_type_size(snow_particle, 1, 2, 0, 0);
 part_type_color2(snow_particle, c_white, c_white);
 
 //Level up particle
+level_up_speed_min = 15;
+level_up_speed_max = 23;
+level_up_life_min = 20;
+level_up_life_max = 40;
 level_up_particle = part_type_create();
 part_type_shape(level_up_particle, pt_shape_flare);
 part_type_size(level_up_particle, .5, 1, 0, 0);
 part_type_color2(level_up_particle, MAIN_COLOR, c_white);
-part_type_speed(level_up_particle, 15, 30, 0, 0);
+part_type_speed(level_up_particle, level_up_speed_min, level_up_speed_max, 0, 0);
 part_type_direction(level_up_particle, 0, 360, 0, 0);
 part_type_blend(level_up_particle, 1);
-part_type_life(level_up_particle, 20, 40);
+part_type_life(level_up_particle, level_up_life_min, level_up_life_max);
 part_type_alpha2(level_up_particle, .5, 1);

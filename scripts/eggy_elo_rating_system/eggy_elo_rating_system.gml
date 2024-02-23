@@ -1,5 +1,6 @@
 function ini_player_struct_create(){
 	var player_struct = {
+		"Previous_elo": convert_to_eggy_scale(PLAYER_STARTING_ELO + 1),
 		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
 		"Game_volatility": PLAYER_STARTING_VOLATILITY,
 		"Local_volatility": PLAYER_STARTING_VOLATILITY,
@@ -62,8 +63,9 @@ function update_eggy_rating_system(game_result, enemy_elo, map){
 		enemy_elo
 	);
 	
+	global.player_elo_struct.Previous_elo = global.player_elo_struct.Elo;
 	global.player_elo_struct.Elo += elo_bonus;
-	global.player_elo_struct.Elo = max(global.player_elo_struct.Elo, convert_to_eggy_scale(0));
+	global.player_elo_struct.Elo = max(global.player_elo_struct.Elo, convert_to_eggy_scale(1));
 }
 
 function update_tracking_games(){
@@ -275,17 +277,17 @@ function rank_database(){
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 	
-	RankStats(RankType.Unranked, 1.05, 0.9, "Unranked", PLAYER_STARTING_ELO);
-	RankStats(RankType.SilverI, 1.05, 0.9, "Silver I", SILVERI_ELO);	
-	RankStats(RankType.SilverII, 1.04, 0.91, "Silver II", SILVERII_ELO);
-	RankStats(RankType.SilverIII, 1, 0.92, "Silver III", SILVERIII_ELO);
-	RankStats(RankType.SilverIV, 0.95, 0.93, "Silver IV", SILVERIV_ELO);
-	RankStats(RankType.SilverV, 0.92, 0.94, "Silver V", SILVERV_ELO);
-	RankStats(RankType.SilverMaster, 0.9, 1, "Silver master", SILVER_MASTER_ELO);
-	RankStats(RankType.GoldI, 0.88, 1.01, "Gold I", GOLDI_ELO);
-	RankStats(RankType.GoldII, 0.85, 1.03, "Gold II", GOLDII_ELO);
-	RankStats(RankType.GoldIII, 0.83, 1.05, "Gold III", GOLDIII_ELO);
-	RankStats(RankType.GoldIV, 0.8, 1.07, "Gold IV", GOLDIV_ELO);
+	RankStats(RankType.Unranked, 1.25, 0.8, "Unranked", PLAYER_STARTING_ELO);
+	RankStats(RankType.SilverI, 1.25, 0.8, "Silver I", SILVERI_ELO);	
+	RankStats(RankType.SilverII, 1.2, 0.87, "Silver II", SILVERII_ELO);
+	RankStats(RankType.SilverIII, 1.1, 0.9, "Silver III", SILVERIII_ELO);
+	RankStats(RankType.SilverIV, 1.05, 0.93, "Silver IV", SILVERIV_ELO);
+	RankStats(RankType.SilverV, 1, 0.94, "Silver V", SILVERV_ELO);
+	RankStats(RankType.SilverMaster, 0.97, 1, "Silver master", SILVER_MASTER_ELO);
+	RankStats(RankType.GoldI, 0.95, 1.01, "Gold I", GOLDI_ELO);
+	RankStats(RankType.GoldII, 0.92, 1.03, "Gold II", GOLDII_ELO);
+	RankStats(RankType.GoldIII, 0.85, 1.05, "Gold III", GOLDIII_ELO);
+	RankStats(RankType.GoldIV, 0.81, 1.07, "Gold IV", GOLDIV_ELO);
 	RankStats(RankType.GoldMaster, 0.79, 1.11, "Gold master", GOLD_MASTER_ELO);
 	RankStats(RankType.DiamondI, 0.75, 1.14, "Diamond I", DIAMONDI_ELO);
 	RankStats(RankType.DiamondII, 0.73, 1.15, "Diamond II", DIAMONDII_ELO);
@@ -300,25 +302,10 @@ function rank_database(){
 	RankStats(RankType.GlobalMaster, 0.45, 1.75, "Global master", GLOBAL_MASTER_ELO);
 }
 
-function get_rank(Object = noone){
-	var highest_rank = -1;
-	var object_elo = -1;
-	if(Object != oEnemy){
-		if(Object != noone){
-			if(Object.object_index == oPlayer){
-				object_elo = convert_back(global.player_elo_struct.Elo);
-			}else if(Object.object_index == oEnemy){
-				object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);	
-			}
-		}else{
-			object_elo = convert_back(global.player_elo_struct.Elo);
-		}
-	}else{
-		object_elo = convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-	}
-	
+function get_rank(Elo){
+	var highest_rank = -1;	
     for(var i = 0; i < RankType.Total; i++){
-        if(object_elo >= global.RankIndex[#i, RankStat.Elo]){
+        if(convert_back(Elo) >= global.RankIndex[#i, RankStat.Elo]){
             highest_rank = i;
         }
     }

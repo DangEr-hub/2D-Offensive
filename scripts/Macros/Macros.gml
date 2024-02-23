@@ -1,3 +1,4 @@
+#macro CAMERA view_camera[0]
 #macro AMBIENT_OFFSET 1.25
 #macro MAIN_COLOR make_color_rgb(255, 215, 0)
 #macro FLASHLIGHT_ALPHA 0.1

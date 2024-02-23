@@ -430,7 +430,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 				}
 					
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, get_rank(id), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_ranks, get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 				}
 			}
 		}
@@ -440,8 +440,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		with(oDamageIndicator){
 		    var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 		    var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+			draw_set_font(Font);
 		    draw_text_outlined(xx, yy, Damage_Indicator, Color, c_black, 1);
 		    draw_sprite_ext(Sprite, SpriteID, xx + string_width(Damage_Indicator), yy, 1, 1, 0, c_white, 1);
+			draw_set_font(set_font("Console"));
 		}
 		#endregion
 	
@@ -558,7 +560,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 			
 			var rank_position = 0;
 			if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
-				rank_position = get_rank(id);	
+				rank_position = get_rank(global.player_elo_struct.Elo);	
 			}
 			if!(instance_exists(oInventory)){
 				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -751,245 +753,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
 		
 			draw_set_alpha(1);
 		
-		}
-	
-		#region Item description
-		if(instance_exists(oInventory)){
-				
-			/*with(oSlot){
-				if(DrawItemInfo == true){
-					oDraw.DrawInfo = true;
-					var Id = global.Inventory[#VarSlot, InventoryIndex.SlotID];
-				
-					#region Draw tab and exit button
-					var ButtonOffset = 8;
-					var ButtonWidth = 64 * global.GUIMultiplier;
-					var TabWidth = 768 * global.GUIMultiplier;
-					var TitleHeight = 24 * global.GUIMultiplier;
-					var MiddleHeight = 128 * global.GUIMultiplier;
-					var EndHeight = 24 * global.GUIMultiplier;
-					var ButtonHeight = EndHeight - ButtonOffset;
-					var TabX = display_get_gui_width()/2 - (TabWidth/2);
-					var TabY = oDraw.HUDShift;
-					draw_menu_tab(
-						TabX, 
-						TabY, 
-						TabWidth,
-						MiddleHeight, 
-						TitleHeight, 
-						EndHeight, 
-						c_black,
-						c_dkgray, 
-						c_black, 
-						global.GUIHUDAlpha*1.5, 
-						2, 
-						MAIN_COLOR, 
-						global.ItemIndex[#Id, ItemStat.Name], 
-					);
-				
-					draw_button_ext(
-						TabX + TabWidth/2 - ButtonWidth/2, 
-						TabY + TitleHeight + MiddleHeight + ButtonOffset/2, 
-						ButtonWidth, 
-						ButtonHeight, 
-						"Exit", 
-						c_dkgray, 
-						MAIN_COLOR,
-						"description_exit"
-					);
-					#endregion				
-				
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
-					
-						#region Variables
-						var rows = 5;
-						var columns = 3;
-						var cell_width = (TabWidth - 2*oDraw.HUDShift)/columns/1.75;
-						var cell_height = (MiddleHeight - 2*oDraw.HUDShift)/rows;
-						var statTitles = [
-							"Damage power: ", "Ammo: ", "Clip ammo: ", "Reload time: ", "Max. range: ", "Moving inaccuracy: ", "Inaccuracy: ", "RPM: ", "Inaccuracy/shot: ", "Damage drop: ", "Range drop: ",
-							"Class: ", "Moving speed: ", "Penetration: ", "Modes: "
-						];					
-						#endregion
-					
-						#region Draw grid
-					    for (var i = 0; i < rows; i++) {
-					        for (var j = 0; j < columns; j++) {
-					            var cell_x = TabX + oDraw.HUDShift + j * cell_width;
-					            var cell_y = TabY + TitleHeight + oDraw.HUDShift + i * cell_height;
-								draw_set_color(MAIN_COLOR);
-					            draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
-								draw_set_color(c_white);
-							
-								draw_set_font(set_font("GUI_grid"));
-						        var text = "";
-						        var statIndex = ItemStat.Damage + i * columns + j;
-						        if (statIndex <= array_length(statTitles)){
-								
-									#region Specific cases
-									switch(statIndex){
-										
-										case ItemStat.Ammo:
-											text = statTitles[statIndex] + string(global.Inventory[#VarSlot, InventoryIndex.SlotAmmo]);
-										break;
-										
-										case ItemStat.ClipAmmo:
-											text = statTitles[statIndex] + string(global.Inventory[#VarSlot, InventoryIndex.SlotClipAmmo]);
-										break;
-									
-										case ItemStat.ReloadSpeed:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + "s";
-										break;
-									
-										case ItemStat.DamageDrop:
-											text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 5) + "%/Unit";
-										break;
-									
-										case ItemStat.RangeInaccuracyMultiplier:
-											text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 4) + "%/Unit";
-										break;
-
-										case ItemStat.MovingSpdMul:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
-										break;
-
-										case ItemStat.PenetrationPower:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
-										break;
-									
-										case ItemStat.ShootTimer:
-											text = statTitles[statIndex] + string(game_get_speed(gamespeed_fps)/global.ItemIndex[#Id, statIndex]*60);
-										break;
-
-										case ItemStat.Range:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
-										break;
-									
-										case ItemStat.Inaccuracy:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
-										break;
-									
-										case ItemStat.MovingInaccuracyMultiplier:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
-										break;
-										
-										case ItemStat.ShootingMode:
-											text = statTitles[statIndex] + get_shooting_modes_string(Id);
-										break;
-									
-										default:
-											text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
-										break;
-									}
-									#endregion
-								
-						        }
-						        var text_x = cell_x + cell_width / 2 - string_width(text) / 2;
-						        var text_y = cell_y + cell_height/2;
-						        draw_text_outlined(text_x, text_y, text, c_white, c_black, 1);
-					        }
-					    }		
-						#endregion
-					
-						#region Draw description
-						draw_set_font(set_font("GUI_grid"));
-						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
-						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
-						var DescriptionX = TabX + oDraw.HUDShift + columns*cell_width + oDraw.HUDShift;
-						var DescriptionY = TabY + TitleHeight - oDraw.HUDShift/2 + DescriptionStringHeight;
-						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
-						var disadvantages_string = global.ItemIndex[#Id, ItemStat.disadvantages];
-						var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
-						var advantages_string = global.ItemIndex[#Id, ItemStat.advantages];
-						var advantages_height = string_count_lines(advantages_string) * font_get_size(draw_get_font());
-						var disadvantages_x = DescriptionX + string_width(advantages_string)*1.5;
-						var advantages_x = DescriptionX;
-						var advantages_y = DescriptionY + DescriptionStringHeight*3;
-						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-						draw_text_outlined(disadvantages_x, advantages_y, disadvantages_string, c_red, c_black, 1);
-						draw_text_outlined(advantages_x, advantages_y, advantages_string, c_green, c_black, 1);
-						
-						
-						draw_set_font(set_font("Console"));
-						#endregion
-		
-						#region Draw drop button
-						draw_button_ext(
-							DescriptionX + string_width(DescriptionString)/4,
-							advantages_y + max(advantages_height, disadvantages_height) + ButtonHeight,
-							ButtonWidth,
-							ButtonHeight,
-							"Drop item",
-							c_dkgray,
-							MAIN_COLOR,
-							"description_drop"
-						);
-						#endregion	
-						
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){		
-					
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
-						
-						#region Draw description
-						draw_set_font(set_font("GUI_grid"));
-						var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
-						var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
-						var DescriptionX = TabX + oDraw.HUDShift*1.5;
-						var DescriptionY = TabY + TitleHeight + oDraw.HUDShift*1.5 + DescriptionStringHeight;
-						var StartDescriptionY = DescriptionY + DescriptionStringHeight/2;
-						draw_text_outlined(DescriptionX, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-						#endregion
-						
-						#region Item statistics
-						var statistics_string = "";
-						var statistics_x = TabX + oDraw.HUDShift + string_width(DescriptionString)*1.5;
-						var statistics_y = TabY + TitleHeight + oDraw.HUDShift*2;
-						if (Id == Item.military_suppressor) {
-						    var accuracy = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
-						    var spotted_chance = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
-						    var attack_power = (1 - global.ItemIndex[#Id, ItemStat.Defense]) * 100;
-
-						    draw_string_line(statistics_x, statistics_y, "Accuracy: ", accuracy, c_green, "%");
-						    draw_string_line(statistics_x, statistics_y + 20, "Getting spotted chance: ", -spotted_chance, c_green, "%");
-						    draw_string_line(statistics_x, statistics_y + 40, "Attack power: ", -attack_power, c_red, "%");
-						} else if (Id == Item.vertical_grip) {
-						    var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
-						    var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
-
-						    draw_string_line(statistics_x, statistics_y, "Vertical recoil: ", -vertical_recoil, c_green, "%");
-						    draw_string_line(statistics_x, statistics_y + 20, "Horizontal recoil: ", -horizontal_recoil, c_red, "%");
-						} else if (Id == Item.horizontal_grip) {
-						    var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
-						    var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
-
-						    draw_string_line(statistics_x, statistics_y, "Horizontal recoil: ", -horizontal_recoil, c_green, "%");
-						    draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, "%");
-						}
-
-						
-					draw_set_font(set_font("Console"));
-					#endregion
-						
-					#region Draw drop button
-					draw_button_ext(
-						DescriptionX + string_width(DescriptionString)/4,
-						DescriptionY + DescriptionStringHeight*1.1 + ButtonHeight,
-						ButtonWidth,
-						ButtonHeight,
-						"Drop item",
-						c_dkgray,
-						MAIN_COLOR,
-						"description_drop"
-					);
-					#endregion
-					
-					}
-				
-				}
-			}*/
-		}
-		#endregion
-	
+		}	
 	}
 
 }

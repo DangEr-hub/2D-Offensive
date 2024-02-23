@@ -368,6 +368,12 @@ function console_submit(Console) {
 							global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game] = convert_to_eggy_scale(real(c[1]));
 						}
 					break;
+					
+					case "set_player_played_games":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.player_elo_struct.Played_games = real(c[1]);
+						}
+					break;
 	            } 
 	        }
 	        global.console[? "string"] = "";

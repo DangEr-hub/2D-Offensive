@@ -105,11 +105,10 @@ function hit_entity(hit_object, /*Bullet.stats.Damage,*/ BodyPart, /*Bullet.stat
 						global.player_stats_struct.Headshots ++;
 						oEggyEloRatingSystem.headshots ++;
 					}
-				}else{
-					if(global.ranked_game == true){
-						global.player_stats_struct.Kills ++;
-						oEggyEloRatingSystem.kills ++;
-					}
+				}
+				if(global.ranked_game == true){
+					global.player_stats_struct.Kills ++;
+					oEggyEloRatingSystem.kills ++;
 				}
 			}	
 			var death_sound_effect = choose(snd_Death1, snd_Death2);

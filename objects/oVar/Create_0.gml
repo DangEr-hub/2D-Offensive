@@ -30,6 +30,8 @@ global.DrawParticles = true;
 global.CameraWidth = 1920/2;
 global.CameraHeight = 1080/2;
 global.GUIMultiplier = display_get_width()/global.CameraWidth;
+global.selected_bots = ds_list_create();
+global.current_selected_bot = -1;
 global.enemy_visibility = false;
 global.anti_aliasing = 0;
 global.sound_gain = 100;
@@ -77,7 +79,7 @@ global.player_stats_struct = {
 global.player_elo_struct = ini_player_struct_create();
 
 enum icons{
-	health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, total
+	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, total
 }
 
 enum weapon_attachments{
@@ -149,7 +151,8 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight, KeyDropMouse, KeyDrop, KeyInventory, KeyPickUp, KeyCycleLeft, KeyCycleRight, KeyUse, KeyShootMouse,
-	KeyReload, KeyRunning, KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode, KeyProne, KeyWeaponAttachments, Total	
+	KeyReload, KeyRunning, KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode, KeyProne, KeyWeaponAttachments, KeyCommand,
+	KeyGo, Total	
 }
 
 global.KeyBinds = ds_list_create();
@@ -157,7 +160,7 @@ ds_list_add(
 	global.KeyBinds, ord("W"), ord("A"), ord("S"), ord("D"),
 	mb_right, vk_shift, ord("I"), ord("G"), ord("Q"), ord("E"),
 	ord("F"), mb_left, ord("R"), vk_shift, mb_left, vk_escape,
-	ord("N"), ord("V"), ord("Y"), ord("T")
+	ord("N"), ord("V"), ord("Y"), ord("T"), ord("C"), ord("X")
 );
 
 enum player_textures{

@@ -6,7 +6,7 @@ if(instance_exists(MainObject)){
 	y = MainObject.y;
 	image_angle = MainObject.RotationAngle;
 	
-	if(MainObject.object_index != oPlayer){
+	if(MainObject.object_index == oEnemy){
 		if(instance_exists(MainObject.ChasingObject)){
 			if(MainObject.ChasingObject.object_index != oPlayer){
 				MainObject.ChasingObject = oPlayer;

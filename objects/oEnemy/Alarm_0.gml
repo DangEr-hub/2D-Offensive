@@ -37,7 +37,7 @@ function choose_offensive_action() {
 
 
 
-if(instance_exists(ChasingObject)){
+if(instance_exists(ChasingObject) && ChasingObject != noone){
     randomize();
     alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	
@@ -186,7 +186,7 @@ if(instance_exists(ChasingObject)){
 		}
 	}else{
 		
-		if(distance_to_object(oPlayer) <= ChasingDistance*2){
+		if(distance_to_object(ChasingObject) <= ChasingDistance*2){
 		
 			if(Flashed == false){
 			

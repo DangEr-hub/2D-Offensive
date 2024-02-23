@@ -144,7 +144,7 @@ draw_set_font(set_font("Menu_small"));
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 rank_position = 0;
 if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
-	rank_position = get_rank();
+	rank_position = get_rank(global.player_elo_struct.Elo);
 }
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
@@ -167,7 +167,7 @@ with (zui_create(current_rank_x - string_width("VS")/2, base_position_y + rank_i
 	caption = "VS";
 }
 
-rank_position = get_rank(oEnemy);
+rank_position = get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks) * global.GUIMultiplier;
 current_rank_x = zui_get_width() * .5;

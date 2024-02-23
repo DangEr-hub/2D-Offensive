@@ -42,6 +42,14 @@ function set_font(Font){
 				draw_font = fnt_MenuSmallSmall;
 			}
 		break;
+		
+		case "Title_large":
+			if(global.GUIMultiplier >= 2){
+				draw_font = fnt_GUITitleLargeMedium;
+			}else if(global.GUIMultiplier < 2){
+				draw_font = fnt_GUITitleLargeSmall;
+			}
+		break;
 	}
 	
 	return draw_font;

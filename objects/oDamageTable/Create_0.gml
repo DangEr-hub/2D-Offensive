@@ -5,42 +5,7 @@ respawn_menu_height_tab = 512 * global.GUIMultiplier;
 draw_set_font(set_font("Menu_small"));
 zui_set_size(respawn_menu_width_tab, respawn_menu_height_tab);
 
-#region Callbacks
-popup_respawn_callback_positive = function(){
-	with(objZUIMain){
-		zui_destroy();	
-	}
-	room_restart();	
-};
-
-respawn_callback = function(){
-	ui_show_popup("Respawn?", "Respawn", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_respawn_callback_positive, -1);		
-};
-
-popup_exit_callback_positive = function(){
-	with(objZUIMain){
-		zui_destroy();	
-	}
-	game_end();	
-};
-
-exit_callback = function(){
-	ui_show_popup("Exit game?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);		
-};
-
-popup_main_menu_callback_positive = function(){
-	with(objZUIMain){
-		zui_destroy();
-	}
-	room_goto(rm_main_menu);
-};
-
-main_menu_callback = function(){
-	ui_show_popup("Leave to main menu?", "Leave", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_main_menu_callback_positive, -1);	
-};
-#endregion
-
-offset_position_y = 0;
+offset_position_y = 32;
 offset_position_x = 32;
 grid_height = min((ds_map_size(oPlayer.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
 button_width = 128 * global.GUIMultiplier;

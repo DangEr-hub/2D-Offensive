@@ -9,7 +9,7 @@ zui_set_size(tab_width, tab_height);
 
 rank_position = 0;
 if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
-	rank_position = get_rank();
+	rank_position = get_rank(global.player_elo_struct.Elo);
 }
 
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
@@ -100,7 +100,6 @@ rank_callbacks = [
     },
 ];
 #endregion
-
 
 for(i = 0; i < RankType.Total; i++) {
     with (zui_create(rank_image_position_x, rank_image_position_y + i*rank_image_gap, objUIImage)) {

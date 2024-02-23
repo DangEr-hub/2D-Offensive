@@ -1,4 +1,16 @@
 event_inherited();
+
+#region Wall collision
+var tile = instance_place(x, y, oParentTile);
+
+if (tile != noone) {
+	var player = instance_nearest(x, y, oPlayer);
+    var dir = point_direction(x, y, player.x, player.y);
+    var pushSpeed = 5;
+    x += lengthdir_x(pushSpeed, dir);
+    y += lengthdir_y(pushSpeed, dir);
+}
+#endregion
 	
 #region Healing kit
 if(healing == true){
@@ -104,7 +116,7 @@ WeaponPositionID = min(WeaponNumber, 1);
 Weapon.x = x;
 Weapon.y = y;
 
-if(instance_exists(ChasingObject)){
+if(instance_exists(ChasingObject) && ChasingObject != noone){
 	FacingX = ChasingObject.x;
 	FacingY = ChasingObject.y;
 }
@@ -189,7 +201,7 @@ if(ArmourDurability[1] <= 0){
 }
 
 if(ChasingObject != oPlayer){
-	if!(instance_exists(ChasingObject)){
+	if!(instance_exists(ChasingObject) && ChasingObject != noone){
 		ChasingObject = oPlayer;	
 	}
 }
@@ -448,7 +460,7 @@ if(State == States.LayDownLandMine && EquippedLandMineTimer == -1){
 #endregion
 
 #region Movement
-if(instance_exists(ChasingObject)){
+if(instance_exists(ChasingObject) && ChasingObject != noone){
 	if (--MoveTime > 0) {
 		XSpeed += lengthdir_x(Acceleration * 2, MoveDirection);
 		YSpeed += lengthdir_y(Acceleration * 2, MoveDirection);

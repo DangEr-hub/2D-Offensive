@@ -1,5 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
+clickable = true;
+sprite_image_angle = 0;
 alpha_value = 0;
 alpha = global.GUIHUDAlpha * 3;
 healthbar = false;
