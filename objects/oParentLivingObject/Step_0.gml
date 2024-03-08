@@ -1,6 +1,30 @@
 headshot_x = x - 20;
 headshot_y = y - 18;
 
+if(object_index == oEnemy || object_index == oFriend){
+	
+	#region Wall collision
+	var tile = instance_place(x, y, oParentTile);
+
+	if (tile != noone) {
+	    var player = instance_nearest(x, y, oPlayer);
+	    var dir = point_direction(x, y, player.x, player.y);
+	    var pushSpeed = 5;
+    
+	    var escapeSpeed = pushSpeed - 2; // Just under the pushSpeed to check for being more than 1 pixel in
+	    var escapeX = x - lengthdir_x(escapeSpeed, dir);
+	    var escapeY = y - lengthdir_y(escapeSpeed, dir);
+    
+	    if (instance_place(escapeX, escapeY, oParentTile) != noone) {
+	        x += lengthdir_x(pushSpeed, dir);
+	        y += lengthdir_y(pushSpeed, dir);
+	    }
+	}
+	#endregion
+
+	
+}
+
 if(stats.Health_points <= 0){
 	event_user(0);	
 }

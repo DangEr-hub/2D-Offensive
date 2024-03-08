@@ -2,6 +2,10 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
+StartX = x;
+StartY = y;
+PointX = x;
+PointY = y;
 Visible = true;
 selected = false;
 EquippedLandMine = Item.None;

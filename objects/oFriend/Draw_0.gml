@@ -2,7 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 
-draw_text(x, y - 70, MoveTime);
+draw_text(x, y - 70, State);
 draw_set_alpha(.25);
 if(selected == true){
 	draw_circle(x, y, sprite_width/2, false);	

@@ -41,7 +41,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
     randomize();
     alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	
-	if(CheckIfAvailable(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
+	if(check_if_available(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
 		if(ChasingObjectSpotted == false){
 			ReactionTimer = ReactionTime;
 			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
@@ -222,7 +222,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveShoot:
 			if(ReactionTimer <= 0){
-				MoveShooting(ChasingObject.x, ChasingObject.y);
+				bot_move_shooting(ChasingObject.x, ChasingObject.y);
 			}
 		break;
 		

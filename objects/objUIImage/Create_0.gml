@@ -1,5 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
+buy_menu = false;
 clickable = true;
 sprite_image_angle = 0;
 alpha_value = 0;

@@ -183,37 +183,26 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y + ran
 }
 #endregion
 
-#region Statistics
-offset_y = 96;
-statistics_x = zui_get_width() * .25;
-statistics_y = base_position_y + rank_image_size_height*1.5 + string_height("a") + offset_y;
-with (zui_create(statistics_x, statistics_y, objUILabel)) {
-	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.kills;
-	color = c_white;
-	caption = "Kills: " + string(oEggyEloRatingSystem.kills);
-}
-
-with (zui_create(statistics_x, statistics_y + text_gap, objUILabel)) {
-	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.headshot_percentage;
-	color = c_white;
-	caption = "Headshots: " + string(oEggyEloRatingSystem.headshots);
-}
-
-with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
-	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.time;
-	color = c_white;
-	caption = "Time alive: " + string(oEggyEloRatingSystem.playing_time/game_get_speed(gamespeed_fps)) + " s";
-}
-#endregion
-
 #region Buttons
 offset_y = min(96 * global.GUIMultiplier, 192);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIButton)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Statistics";
+	callback = function(){
+		with(zui_main()){
+			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oStatistics, -1000)) {
+				alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+				window_id = id;
+			}
+		}
+	};
+}
+
+with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y + button_height*1.5, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -228,8 +217,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y, objUIBut
 	};
 }
 
-
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*1.5, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y + button_height*3, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -237,7 +225,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_
 	callback = other.continue_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*3, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y + button_height*4.5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -245,7 +233,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .8 - offset_y + button_height*4.5, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y + button_height*6, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

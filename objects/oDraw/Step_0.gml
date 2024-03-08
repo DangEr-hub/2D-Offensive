@@ -7,7 +7,7 @@ if(instance_exists(oPlayer)){
 		bloom_threshold = .35;
 	}
 
-	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"]){
+	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || oPlayer.player_can_shoot == false){
 		window_set_cursor(cr_default);
 	}else{
 		window_set_cursor(cr_none);	

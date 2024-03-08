@@ -1,14 +1,28 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
-function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
+function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enemy"){
 	
-	EnemyInaccuracyMultiplier = inaccuracy_formula(WeaponID[WeaponPositionID], id) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]) * 0.5;
+	var shoot_inaccuracy = 1;
+	if(Type == "Enemy"){
+		if(collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false)){
+			shoot_inaccuracy = random_range(5, 7) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		}
+	}
+	
+	var rank_less = get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	if(Type == "Friend"){
+		rank_less = 0;
+	}
+	
+	EnemyInaccuracyMultiplier = inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy;
 	EnemyShotX = random_range(
 					DangerShotX - global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier, 
-					DangerShotX + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier);
+					DangerShotX + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier
+				);
 	EnemyShotY = random_range(
 					DangerShotY - global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier, 
-					DangerShotY + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier);
+					DangerShotY + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier
+				);
 	
 	
 	var suppressor_multiplier = 1;
@@ -35,10 +49,10 @@ function EnemyBulletCreate(DangerShotX, DangerShotY, EnemyWeaponID){
 	);
 }
 
-function CheckIfAvailable(ObjectType){
+function check_if_available(ObjectType){
 	if(instance_exists(ObjectType) && ObjectType != noone){
 		return 
-		(!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && oPlayer.InSmoke == false)
+		(!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.InSmoke == false)
 	}else{
 		return false;
 	}
@@ -60,7 +74,7 @@ function ChasingObjectSpot(Time){
 	}
 }
 
-function MoveShooting(DangerX, DangerY){
+function bot_move_shooting(DangerX, DangerY){
 	randomize();
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		SideStepMin = 45;
@@ -98,8 +112,13 @@ function MoveShooting(DangerX, DangerY){
 }
 
 function EnemyShooting(DangerX, DangerY){
+	var shoot_chance = 100;
 	
-	if(CanShoot == true && ChasingObjectSpotted == true && !collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0){
+	if(collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false)){
+		shoot_chance = 33 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	}
+	
+	if(CanShoot == true && ChasingObjectSpotted == true && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0 && percent_chance(shoot_chance)){
 		
 		var sound_id = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.SoundID];
 		if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
@@ -137,7 +156,7 @@ function EnemyShooting(DangerX, DangerY){
 		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.KickBackPower];
 		KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);	
 		for(i=0;i<global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets];i++){	
-			EnemyBulletCreate(DangerX, DangerY, WeaponID[WeaponPositionID]);
+			bot_bullet_create(DangerX, DangerY, WeaponID[WeaponPositionID]);
 		}
 		
 		#region Create flash effect
@@ -162,44 +181,57 @@ function MoveRandom(){
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Pistol"){
 		MoveDirection = random(360);
 		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
+		alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(100, 180) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Sniper rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]); ///zmenit pri vyssim ranku
+		alarm[0] = MoveTime * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 		XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
 
-function MoveIdle(Friendly = false){
+function MoveIdle(){
 	randomize();
-	MoveTime = random_range(50, 90) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
-	if(Friendly == true){
-		MoveTime = random_range(100, 180);
-	}
+	var margin = 32;
+	var distance = random_range(0, 128);
 	MoveDirection = random(360);
-	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	var px = x + lengthdir_x(distance, MoveDirection);
+	var py = y + lengthdir_y(distance, MoveDirection); 
+	
+	if(point_distance(x, y, px, py) > margin){
+		MoveTime = random_range(50, 90) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	}else{
+		XSpeed = 0;
+		YSpeed = 0;
+	}
 }
 
 function SetReactionTimer(Time){
 	if(ReactionTimer == -1){
 		ReactionTimer = Time;
+	}
+}
+
+function set_state(state){
+	if(State != state){
+		State = state;
 	}
 }
 

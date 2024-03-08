@@ -1,3 +1,15 @@
+function buy_item(ItemID, PositionX, PositionY){
+	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost]){
+		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
+		ItemDrop(
+			ItemID,
+			PositionX,
+			PositionY,
+			100		
+		);
+	}
+}
+
 function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD){
 	var bullet_tracer = instance_create_layer(BX, BY, "ItemsO", oBulletTracer);
 	bullet_tracer.stats = {
@@ -196,16 +208,24 @@ function statistics_hit(Type, Damage, ObjectType){
 	}
 }
 
-function average(array){
-	var array_sum = 0;
-	
-	for(var i=0;i<array_length(array);i++){
-		array_sum += array[i];
-	}
-	
-	return array_sum / array_length(array);
-	
+function average(array, count_zero = true){
+    var array_sum = 0;
+    var count = 0;
+
+    for(var i = 0; i < array_length(array); i++){
+        if(count_zero == true || (array[i] != 0 && count_zero == false)){
+            array_sum += array[i];
+            count += 1;
+        }
+    }
+    
+    if(count == 0){
+        return 0;
+    }
+
+    return array_sum / count;
 }
+
 
 function sum(array){	
 	var array_sum = 0;
@@ -410,6 +430,27 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 				return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
 			}
+		}else if(ObjectType.object_index == oFriend){
+			if(instance_exists(oFriend)){
+				FlashedInaccuracy = 1;
+				InSmokeInaccuracy = 1;
+				EnemyMovingInaccuracy = 1;
+				EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
+				global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+			
+				if(ObjectType.ChasingObject.InSmoke == true){
+					InSmokeInaccuracy = 5;
+				}
+			
+				if(ObjectType.Flashed == true){
+					FlashedInaccuracy = 5;
+				}
+			
+				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
+					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
+				}
+				return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
+			}
 		}
 	}else{
 		return 0;	
@@ -559,6 +600,15 @@ function reset_gui(){
 	if(instance_exists(oController)){
 		instance_destroy(oController);	
 		instance_create_depth(0, 0, -1000, oController);
+	}
+	if(instance_exists(oBuyMenu)){
+		with(oBuyMenu){
+			zui_destroy();
+		}
+		instance_destroy(objZUIMain);
+		with(zui_main()){
+			zui_create(zui_get_width() * .5, zui_get_height() * .5, oBuyMenu);
+		}
 	}
 	if(instance_exists(oDraw)){
 		with(oDraw){

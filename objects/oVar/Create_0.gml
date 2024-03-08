@@ -120,12 +120,12 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = c_white;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = c_orange;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.75;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.5;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 1.5;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.5;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.25;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.75;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
 
@@ -152,7 +152,7 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight, KeyDropMouse, KeyDrop, KeyInventory, KeyPickUp, KeyCycleLeft, KeyCycleRight, KeyUse, KeyShootMouse,
 	KeyReload, KeyRunning, KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode, KeyProne, KeyWeaponAttachments, KeyCommand,
-	KeyGo, Total	
+	KeyGo, KeyBuyMenu, Total	
 }
 
 global.KeyBinds = ds_list_create();
@@ -160,7 +160,8 @@ ds_list_add(
 	global.KeyBinds, ord("W"), ord("A"), ord("S"), ord("D"),
 	mb_right, vk_shift, ord("I"), ord("G"), ord("Q"), ord("E"),
 	ord("F"), mb_left, ord("R"), vk_shift, mb_left, vk_escape,
-	ord("N"), ord("V"), ord("Y"), ord("T"), ord("C"), ord("X")
+	ord("N"), ord("V"), ord("Y"), ord("T"), ord("C"), ord("X"),
+	ord("B")
 );
 
 enum player_textures{
@@ -208,7 +209,9 @@ enum States{
 	MoveFlashed,
 	MoveInSmoke,
 	LayDownLandMine,
-	MoveHealing
+	MoveHealing,
+	MoveTowardPoint,
+	NoMove
 }
 
 enum Hit{

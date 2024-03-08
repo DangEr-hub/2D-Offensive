@@ -71,10 +71,10 @@ part_type_life(rain_particle, ceil(global.CameraHeight/2), ceil(global.CameraHei
 leaf_particle = part_type_create();
 part_type_sprite(leaf_particle, spr_Leaf, false, false, 1);
 part_type_size(leaf_particle, 1, 1.5, 0.001, 0);
-part_type_direction(leaf_particle, 0, 359, 0, 1);
+part_type_direction(leaf_particle, 0, 359, 0, 15);
 part_type_speed(leaf_particle, 0.5, 1, 0, .05);
 part_type_life(leaf_particle, 2 * game_get_speed(gamespeed_fps), 3 * game_get_speed(gamespeed_fps));
-part_type_orientation(leaf_particle, 0, 359, 0.1, 1, 0);
+part_type_orientation(leaf_particle, 0, 359, 0.1, 15, 0);
 part_type_alpha3(leaf_particle, 0.5, 1, 0.02);
 
 //snow_particle

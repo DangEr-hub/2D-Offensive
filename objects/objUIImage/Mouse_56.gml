@@ -1,12 +1,11 @@
-if(clickable == true){
-	if(hover == true){
-		if (pressed) {
-			pressed = 0;
+if(hover == true){
+	if (pressed) {
+		pressed = 0;
 
-			if (zui_get_hover()) {
-				if (is_callable(callback))
-					callback(id);
-			}
+		if (zui_get_hover()) {
+			if (is_callable(callback))
+				callback(id);
 		}
 	}
 }
+

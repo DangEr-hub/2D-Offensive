@@ -1,50 +1,76 @@
 event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
-	#region Friend command and go
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommand])){
-	    var botList = ds_list_create();
-	    with (oFriend) {
-	        ds_list_add(botList, id);
-	    }
-
-	    var currentIndex = -1;
-	    if (ds_list_size(global.selected_bots) > 0) { // Correctly checking the size of the list
-	        var lastSelectedBot = global.selected_bots[| ds_list_size(global.selected_bots)-1]; // Get the last selected bot
-	        for (var i = 0; i < ds_list_size(botList); i++) {
-	            if (botList[| i] == lastSelectedBot) {
-	                currentIndex = i;
-	                break;
-	            }
-	        }
-	    }
-
-	    // Select the next bot in the list
-	    currentIndex = (currentIndex + 1) % ds_list_size(botList);
-	    var nextBotId = botList[| currentIndex];
-
-	    with (oFriend) {
-	        selected = false;
-	    }
-	    with (nextBotId) {
-	        selected = true;
-	    }
-
-	    if (ds_list_find_index(global.selected_bots, nextBotId) == -1) {
-	        ds_list_add(global.selected_bots, nextBotId);
-	    }
-
-	    if (ds_list_size(global.selected_bots) >= instance_number(oFriend)) {
-	        ds_list_clear(global.selected_bots);
-	        ds_list_add(global.selected_bots, nextBotId);
-	    }
-		global.current_selected_bot = nextBotId;
-	    ds_list_destroy(botList);
+	#region Buy menu
+	if!(global.my_console[? "active"] && !instance_exists(oInventory)){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyBuyMenu])){
+			if(instance_exists(oBuyMenu)){
+				oPlayer.player_can_shoot = true;
+				with(oBuyMenu){
+					zui_destroy();
+				}
+			}else{
+				oPlayer.player_can_shoot = false;
+				with(zui_main()){
+					zui_create(zui_get_width() * .5, zui_get_height() * .5, oBuyMenu);
+				}
+			}
+			
+				
+		}
 	}
+	#endregion
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyGo])){
-		with(global.current_selected_bot){
-			MoveTowards(oCrosshair.x, oCrosshair.y, Acceleration, 0, 0);
+	#region Friend command and go
+	if!(global.my_console[? "active"]){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommand]) && instance_exists(oFriend)){
+		    var botList = ds_list_create();
+		    with (oFriend) {
+		        ds_list_add(botList, id);
+		    }
+
+		    var currentIndex = -1;
+		    if (ds_list_size(global.selected_bots) > 0) {
+		        var lastSelectedBot = global.selected_bots[| ds_list_size(global.selected_bots)-1]; // Get the last selected bot
+		        for (var i = 0; i < ds_list_size(botList); i++) {
+		            if (botList[| i] == lastSelectedBot) {
+		                currentIndex = i;
+		                break;
+		            }
+		        }
+		    }
+
+		    // Select the next bot in the list
+		    currentIndex = (currentIndex + 1) % ds_list_size(botList);
+		    var nextBotId = botList[| currentIndex];
+
+		    with (oFriend) {
+		        selected = false;
+		    }
+		    with (nextBotId) {
+		        selected = true;
+		    }
+
+		    if (ds_list_find_index(global.selected_bots, nextBotId) == -1) {
+		        ds_list_add(global.selected_bots, nextBotId);
+		    }
+
+		    if (ds_list_size(global.selected_bots) >= instance_number(oFriend)) {
+		        ds_list_clear(global.selected_bots);
+		        ds_list_add(global.selected_bots, nextBotId);
+		    }
+			global.current_selected_bot = nextBotId;
+		    ds_list_destroy(botList);
+		}
+	
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyGo])){
+			with(global.current_selected_bot){
+				set_state(States.MoveTowardPoint);
+				StartX = x;
+				StartY = y;
+				PointX = oCrosshair.x;
+				PointY = oCrosshair.y;
+			}
 		}
 	}
 	#endregion
@@ -1661,6 +1687,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		camera_get_view_height(CAMERA) + 2 * ActivateMargin,
 		true
 	);
+	instance_activate_object(objUIImage);
+	instance_activate_object(oBuyMenu);
 	instance_activate_object(oWeaponDescription);
 	instance_activate_object(oLightRenderer);
 	instance_activate_object(oHazeController);

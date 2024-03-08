@@ -1,5 +1,5 @@
 /// @description Drawing
-draw_text(x, y - 150, string(x) + string(y));
+//draw_text(x, y - 150, string(x) + string(y));
 event_inherited();
 if(stats.Health_points > 0){
 	if (equipped_usable_item()) {
