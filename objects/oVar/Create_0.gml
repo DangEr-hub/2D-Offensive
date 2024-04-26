@@ -1,4 +1,5 @@
 global.my_console = console_create();
+global.saturation_level = 1.9;
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
 global.FlashBangMaxDistance = 512;
@@ -211,6 +212,7 @@ enum States{
 	LayDownLandMine,
 	MoveHealing,
 	MoveTowardPoint,
+	MovePredictive,
 	NoMove
 }
 

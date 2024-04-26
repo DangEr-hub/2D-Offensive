@@ -65,8 +65,8 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
 #region Set armour
-ArmourID = choose(Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest, Item.None, Item.Spas);
-HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm, Item.MilitaryNightVision, Item.BasicNightVision, Item.None);
+ArmourID = choose(Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest, Item.None);
+HelmetID = Item.None;//choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm, Item.MilitaryNightVision, Item.BasicNightVision, Item.None);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
@@ -91,7 +91,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine, Item.awm);
+WeaponID[0] = Item.None;//choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine, Item.awm);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];

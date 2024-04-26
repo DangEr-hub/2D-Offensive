@@ -9,6 +9,13 @@ if(instance_exists(oPlayer) && (oPlayer.ToggleNightVision || oPlayer.ToggleInfra
     }
 }
 
+if(instance_exists(oPlayer)){
+	saturation_level = global.saturation_level;
+	if(oPlayer.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2)){
+		saturation_level = min(0 + oPlayer.stats.Health_points/100, global.saturation_level);
+	}
+}
+
 if(global.BloomShader == true){
 	if(!surface_exists(Surface1)){
 	    Surface1 = surface_create(global.GuiW, global.GuiH);
@@ -39,25 +46,14 @@ if(instance_exists(oPlayer)){
 	if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
 	    if(instance_exists(oPlayer)){
 	
-	        // Previous conditionals for blurring and grayscale effects
-	        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3)){
-	            if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
-	                if (!surface_exists(BlurSurface)){
-	                    BlurSurface = surface_create(global.GuiW, global.GuiH);
-	                }
-	                shader_set(shd_Blur1Pass);
-	                shader_set_uniform_f(usize, 8, 8, .05);
-	                surface_set_target(BlurSurface);
-	                draw_surface(application_surface, 0, 0);
-	                surface_reset_target();
-	                shader_reset();
+	        // Previous conditionals for blurring
+	        if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
+	            if (!surface_exists(BlurSurface)){
+	                BlurSurface = surface_create(global.GuiW, global.GuiH);
 	            }
-	        } else {
-	            if (!surface_exists(GrayScaleSurface)){
-	                GrayScaleSurface = surface_create(global.GuiW, global.GuiH);
-	            }
-	            shader_set(shd_GrayScale);
-	            surface_set_target(GrayScaleSurface);
+	            shader_set(shd_Blur1Pass);
+	            shader_set_uniform_f(usize, 8, 8, .05);
+	            surface_set_target(BlurSurface);
 	            draw_surface(application_surface, 0, 0);
 	            surface_reset_target();
 	            shader_reset();
@@ -94,6 +90,8 @@ if(instance_exists(oPlayer)){
 
 		        // Bloom blend effect
 		        shader_set(shader_bloom_blend);
+				shader_set_uniform_f(shader_get_uniform(shd_BloomBlend, "color_saturation"), saturation_level);
+				
 		        shader_set_uniform_f(u_bloom_intensity, bloom_intensity);
 		        shader_set_uniform_f(u_bloom_darken, bloom_darken);
 		        shader_set_uniform_f(u_bloom_saturation, bloom_saturation);
@@ -106,15 +104,11 @@ if(instance_exists(oPlayer)){
 	        }
 
 	        // Player effects and application_surface drawing
-	        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3)){
 	            if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true) {
 	                draw_surface_stretched(BlurSurface, 0, 0, global.GuiW, global.GuiH);
 	            } else {
 	                draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
 	            }
-	        } else {
-	            draw_surface_stretched(GrayScaleSurface, 0, 0, global.GuiW, global.GuiH);
-	        }
         
 			if(global.BloomShader == true){
 		        // Bloom surface effect
@@ -154,9 +148,6 @@ if(instance_exists(oPlayer)){
 	        // Cleanup surfaces
 	        if(oPlayer.AimPunchTimer <= -1 && oPlayer.near_explosion == false && surface_exists(BlurSurface)){
 	            surface_free(BlurSurface);
-	        }
-	        if(oPlayer.stats.Health_points > ceil(global.player_stats_struct.Max_health/3) && surface_exists(GrayScaleSurface)){
-	            surface_free(GrayScaleSurface);
 	        }
 			if((oPlayer.ToggleNightVision == false || oPlayer.ToggleInfraVision) && surface_exists(NightVisionSurface)){
 				surface_free(NightVisionSurface);

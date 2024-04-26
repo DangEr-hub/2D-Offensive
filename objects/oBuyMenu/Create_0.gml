@@ -22,7 +22,7 @@ for(i=0;i<item_number;i++){
 		zui_set_size(other.button_width, other.button_height);
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
-		caption_offset_y = -other.button_height/8;
+		caption_offset_y = -other.button_height/4 - 8;
 		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
 		callback = function(){
 			buy_item(items[other.i], oPlayer.x, oPlayer.y);

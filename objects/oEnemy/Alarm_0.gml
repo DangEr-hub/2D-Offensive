@@ -8,13 +8,35 @@ function decide_movement() {
 }
 
 function handle_basic_movement() {
-    if (percent_chance(25 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
-        State = States.MoveAway;
-    } else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveShoot) {
-        State = States.MoveShoot;
-    } else {
-        choose_offensive_action();
-    }
+	if(stats.Health_points <= stats.Max_health_points / 3){
+	    if (percent_chance(25 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
+	        State = States.MoveAway;
+	    } else if (percent_chance(40 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveShoot) {
+	        State = States.MoveShoot;
+	    } else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MovePredictive){
+			State = States.MovePredictive;
+		} else {
+	        choose_offensive_action();
+	    }
+	}else{
+		if(percent_chance(30 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.Move){
+				State = States.Move;
+			}
+		}else if(percent_chance(59 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.MoveShoot){
+				State = States.MoveShoot;	
+			}
+		}else if(percent_chance(25 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.MoveToward){
+				State = States.MoveToward;	
+			}
+	    } else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MovePredictive){
+			State = States.MovePredictive;
+		}else{
+			choose_offensive_action();
+		}
+	}
 }
 
 function handle_smoke_movement() {
@@ -78,49 +100,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 									reload_ai();
 								}				
 							}else{	
-								if(InSmoke == false){
-					
-								#region Basic movement
-								if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
-									if(State != States.Move){
-										State = States.Move;
-									}
-								}else if(percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
-									if(State != States.MoveShoot){
-										State = States.MoveShoot;	
-									}
-								}else if(percent_chance(25 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
-									if(State != States.MoveToward){
-										State = States.MoveToward;	
-									}
-								}else{
-									if(percent_chance(50)){
-										ThrowGrenadeAI();
-									}else{
-										LayDownLandMineAI();
-									}
-								}
-								#endregion
-								
-								}else{
-								
-									#region In smoke movement
-									if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
-										if(State != States.MoveInSmoke){
-											State = States.MoveInSmoke;
-										}
-									}else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
-										if(State != States.MoveAway){
-											State = States.MoveAway;	
-										}
-									}else{
-										if(State != States.MoveShoot){
-											State = States.MoveShoot;	
-										}
-									}
-									#endregion
-								
-								}
+								decide_movement();
 							}
 						}
 						#endregion
@@ -287,6 +267,12 @@ if(global.EnemyCanMove == true){
 		case States.MoveHealing:
 			if(ReactionTimer <= 0){
 				MoveRunAway(ChasingObject.x, ChasingObject.y);
+			}
+		break;
+		
+		case States.MovePredictive:
+			if(ReactionTimer <= 0){
+				move_predictive(ChasingObject.x, ChasingObject.y)
 			}
 		break;
 	}

@@ -374,6 +374,12 @@ function console_submit(Console) {
 							global.player_elo_struct.Played_games = real(c[1]);
 						}
 					break;
+
+					case "set_saturation_level":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.saturation_level = real(c[1]);
+						}
+					break;
 	            } 
 	        }
 	        global.console[? "string"] = "";

@@ -11,6 +11,13 @@ function buy_item(ItemID, PositionX, PositionY){
 }
 
 function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD){
+	if(instance_exists(BulletObject)){
+		if(instance_exists(oParticleSystem) && BulletObject.Visible == true){
+			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
+			part_particles_create(global.ParticleSystem, BX, BY, oParticleSystem.Spark, BulletDamage/5);
+			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
+		}
+	}
 	var bullet_tracer = instance_create_layer(BX, BY, "ItemsO", oBulletTracer);
 	bullet_tracer.stats = {
 		"Speed": BS,
@@ -51,6 +58,21 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		"Object_index": ObjectIndex,
 		"Object_name": ObjectName
 	};
+	if(instance_number(oFog) < 10){
+		Fog = instance_create_layer(BulletX, BulletY, "OtherO", oFog);
+		with(Fog){
+			smoke_effect_create(
+				BulletDamage/10,
+				random(360),
+				0.1,
+				random_range(.1, .5),
+				clamp(ceil(BulletDamage/10), 5, 7.5),
+				clamp(BulletDamage/50, .5, .9),
+				clamp(BulletDamage/50, .1, .75),
+				2 * game_get_speed(gamespeed_fps)
+			);	
+		}
+	}
 }
 
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
@@ -244,21 +266,23 @@ function player_shooting(){
 	}
 	
 	#region Create smoke effect
-	Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
-	Fog.moving = true;
-	Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
-	Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
-	with(Fog){
-		smoke_effect_create(
-			20,
-			oPlayer.RotationAngle - 180,
-			5,
-			5,
-			10,
-			.1,
-			.75,
-			clamp(oPlayer.ShootTimer, 10, 30)
-		);	
+	if(instance_number(oFog) < 10){
+		Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
+		Fog.moving = true;
+		Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
+		Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
+		with(Fog){
+			smoke_effect_create(
+				20,
+				oPlayer.RotationAngle - 180,
+				5,
+				5,
+				10,
+				.1,
+				.75,
+				clamp(oPlayer.ShootTimer, 10, 30)
+			);	
+		}
 	}
 	#endregion
 						
@@ -335,13 +359,13 @@ function player_shooting(){
 			
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			create_bullet_tracer(
-				Weapon.x + lengthdir_x(32, RotationAngle),
+				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
 				Weapon.y + lengthdir_y(32, RotationAngle),
 				ShotX,
 				ShotY,
 				1,
 				global.weapon_id[min(WeaponID, 2)],
-				point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), ShotX, ShotY),
+				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				25,
 				-1,
 				id,
@@ -353,13 +377,13 @@ function player_shooting(){
 			);
 		}else{
 			create_bullet_tracer(
-				Weapon.x + lengthdir_x(32, RotationAngle),
+				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
 				Weapon.y + lengthdir_y(32, RotationAngle),
 				ShotX,
 				ShotY,
 				0,
 				global.weapon_id[min(WeaponID, 2)],
-				point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), ShotX, ShotY),
+				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				global.BulletSpeed,
 				-1,
 				id,

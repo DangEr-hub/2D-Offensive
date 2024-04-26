@@ -1,5 +1,6 @@
 application_surface_draw_enable(false);
 draw_texture_flush();
+saturation_level = 0;
 //haze_start(true, false);
 KilledByWeapon = "Nothing";
 KilledByName = "No one";

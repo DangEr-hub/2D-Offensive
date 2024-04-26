@@ -37,6 +37,7 @@ function console_preset(argument0) {
 	console_add(c, "set_enemy_visibility " + string(global.enemy_visibility));
 	console_add(c, "set_enemy_eggy_points " + string(convert_back(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
 	console_add(c, "set_player_played_games " + string(global.player_elo_struct.Played_games));
+	console_add(c, "set_saturation_level " + string(global.saturation_level));
 	c[? "preset"] = true;
 
 

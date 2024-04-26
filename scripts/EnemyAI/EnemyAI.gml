@@ -127,23 +127,25 @@ function EnemyShooting(DangerX, DangerY){
 
 		if(Visible == true){
 		
-		#region Create smoke effect
-		Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
-		Fog.moving = true;
-		Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
-		Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
-		Fog.shoot_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer];
-		with(Fog){
-			smoke_effect_create(
-				20,
-				other.RotationAngle - 180,
-				5,
-				5,
-				10,
-				.1,
-				.75,
-				shoot_timer
-			);	
+			#region Create smoke effect
+		if(instance_number(oFog) < 10){
+			Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
+			Fog.moving = true;
+			Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
+			Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
+			Fog.shoot_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer];
+			with(Fog){
+				smoke_effect_create(
+					20,
+					other.RotationAngle - 180,
+					5,
+					5,
+					10,
+					.1,
+					.75,
+					shoot_timer
+				);	
+			}
 		}
 		//part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.dust_particle, random_range(1, 10));
 		#endregion
@@ -204,6 +206,34 @@ function MoveRandom(){
 		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
+
+function move_predictive(PositionX, PositionY) {
+    var chasing_object_direction = point_direction(x, y, PositionX, PositionY);
+    var wall_between = collision_line(x, y, PositionX, PositionY, oParentTile, false, true);
+
+    if (wall_between) {
+        // Determine the relative positions of the wall to the bot
+        var wall_direction = point_direction(x, y, wall_between.x, wall_between.y);
+
+        // Compare wall direction to determine side of obstruction relative to bot
+        if (angle_difference(wall_direction, chasing_object_direction) > 0) {
+            // Wall is on the right of the line from bot to player, move left
+            MoveDirection = chasing_object_direction - 90;
+        } else {
+            // Wall is on the left of the line from bot to player, move right
+            MoveDirection = chasing_object_direction + 90;
+        }
+    } else {
+        // No wall directly between bot and player, choose a random side to move towards
+        MoveDirection = choose(chasing_object_direction - 90, chasing_object_direction + 90);
+    }
+
+    MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+    alarm[0] = MoveTime * random_range(1, 2) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+    XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+    YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+}
+
 
 function MoveIdle(){
 	randomize();

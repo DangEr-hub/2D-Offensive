@@ -1,3 +1,4 @@
+Visible = true;
 image_speed = 0;
 alpha_timer = 1 * game_get_speed(gamespeed_fps);
 explosion_distance = 64;

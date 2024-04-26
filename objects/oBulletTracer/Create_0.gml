@@ -1,4 +1,6 @@
 stats = {
+	"Shot_x": 0,
+	"Shot_y":0,
 	"Starting_x": 0,
 	"Starting_y": 0,
 	"Penetration_damage": 0

@@ -1,6 +1,6 @@
 event_inherited();
 pause_width_tab = 512 * global.GUIMultiplier;
-pause_height_tab = max(512 * global.GUIMultiplier, 896);
+pause_height_tab = max(512 * global.GUIMultiplier, 968);
 
 zui_set_size(pause_width_tab, pause_height_tab);
 
@@ -184,7 +184,7 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y + ran
 #endregion
 
 #region Buttons
-offset_y = min(96 * global.GUIMultiplier, 192);
+offset_y = min(120 * global.GUIMultiplier, 224);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
 with(zui_create(zui_get_width() * .5, zui_get_height() * .75 - offset_y, objUIButton)){

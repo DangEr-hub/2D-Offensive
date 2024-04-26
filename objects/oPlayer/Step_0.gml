@@ -981,7 +981,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 		var ReloadingSpeedMultiplier = 1;
 		if(Reloading == true){
-			ReloadingSpeedMultiplier = .5;
+			ReloadingSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ReloadSpdMul];
 		}
 		var moving_speed_multiplier = 1;	
 		if(moving_state == player_states.running_state){

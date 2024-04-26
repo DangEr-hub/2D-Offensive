@@ -2,7 +2,7 @@
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
   "name": "spr_RainForestTiles",
-  "bbox_bottom": 447,
+  "bbox_bottom": 255,
   "bbox_left": 0,
   "bbox_right": 457,
   "bbox_top": 0,

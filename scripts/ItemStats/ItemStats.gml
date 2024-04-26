@@ -32,6 +32,7 @@
 /// @param PP
 /// @param DD
 /// @param EQT
+/// @param RSM
 function WeaponStats(){
 	ItemID = argument[0];
 	global.ItemIndex[#ItemID, ItemStat.Name] = argument[1];
@@ -67,6 +68,7 @@ function WeaponStats(){
 	global.ItemIndex[#ItemID, ItemStat.PenetrationPower] = argument[30];
 	global.ItemIndex[#ItemID, ItemStat.DamageDrop] = argument[31];
 	global.ItemIndex[#ItemID, ItemStat.EquipTime] = argument[32];
+	global.ItemIndex[#ItemID, ItemStat.ReloadSpdMul] = argument[33];
 }
 
 function ArmourStats(ID, Name, Weight, Defense){

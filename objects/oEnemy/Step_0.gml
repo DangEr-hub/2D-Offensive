@@ -16,7 +16,7 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 #endregion
 	
 #region Shooting state
-if(global.EnemyCanMove == true){
+if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 	var shooting_chance;
 	switch(State){
 		case States.MoveAway:
@@ -403,46 +403,48 @@ if(ChasingObject.stats.Health_points <= 0 && instance_exists(oPlayer)){
 #endregion
 
 #region Throw grenade or lay land mine
-if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
-	var Target_x, Target_y, GrenadeSpd;
-	switch(EquippedGrenadeID){
-		case Item.HEGrenade:
-			Target_x = ChasingObject.x;
-			Target_y = ChasingObject.y;
-			GrenadeSpd = 3;
-		break;
+if(global.EnemyCanMove == true){
+	if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
+		var Target_x, Target_y, GrenadeSpd;
+		switch(EquippedGrenadeID){
+			case Item.HEGrenade:
+				Target_x = ChasingObject.x;
+				Target_y = ChasingObject.y;
+				GrenadeSpd = 3;
+			break;
 		
-		case Item.FlashBangGrenade:
-			var behindAngle = RotationAngle + 180;
-			Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
-			Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
-			GrenadeSpd = 5;
-		break;
+			case Item.FlashBangGrenade:
+				var behindAngle = RotationAngle + 180;
+				Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
+				Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
+				GrenadeSpd = 5;
+			break;
 			
-		case Item.SmokeGrenade:
-			Target_x = random_range(x - sprite_width, x + sprite_width);
-			Target_y = random_range(y - sprite_height, y + sprite_height);
-			GrenadeSpd = 1;
-		break;
+			case Item.SmokeGrenade:
+				Target_x = random_range(x - sprite_width, x + sprite_width);
+				Target_y = random_range(y - sprite_height, y + sprite_height);
+				GrenadeSpd = 1;
+			break;
+		}
+		create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
+		EquippedGrenade, GrenadeSpd, Target_x, Target_y, EquippedGrenadeID);	
+		State = States.MoveShoot;
+		grenade_angle = random(360);
+		Grenades[EquippedGrenade] --;
+		EquippedGrenadeTimer = EquippedGrenadeTime;
 	}
-	create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
-	EquippedGrenade, GrenadeSpd, Target_x, Target_y, EquippedGrenadeID);	
-	State = States.MoveShoot;
-	grenade_angle = random(360);
-	Grenades[EquippedGrenade] --;
-	EquippedGrenadeTimer = EquippedGrenadeTime;
-}
 	
-if(State == States.LayDownLandMine && EquippedLandMineTimer == -1){
-	landmine_create(
-		x,
-		y,
-		EquippedLandMineID
-	);
-	State = States.MoveShoot;
-	LandMineAngle = random(360);
-	LandMines[floor(EquippedLandMine/4)] --;
-	EquippedLandMineTimer = EquippedLandMineTime;
+	if(State == States.LayDownLandMine && EquippedLandMineTimer == -1){
+		landmine_create(
+			x,
+			y,
+			EquippedLandMineID
+		);
+		State = States.MoveShoot;
+		LandMineAngle = random(360);
+		LandMines[floor(EquippedLandMine/4)] --;
+		EquippedLandMineTimer = EquippedLandMineTime;
+	}
 }
 
 #endregion
@@ -498,24 +500,30 @@ if (instance_exists(oLandMine)) {
 }
 
 if (distToGrenade <= 256 || distToLandMine <= 256) {
-	SpottedDanger = true;
     
-	// Check which danger is closer
 	if (distToGrenade <= distToLandMine) {
-	    NearestDangerX = nearestGrenade.x;
-	    NearestDangerY = nearestGrenade.y;
-	    NearestDangerObject = nearestGrenade.stats.Object;
+		if(nearestGrenade.stats.Object_index != oEnemy){
+			if (!ChasingObjectSpotted) {
+				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+			}
+			SpottedDanger = true;
+		    NearestDangerX = nearestGrenade.x;
+		    NearestDangerY = nearestGrenade.y;
+		    NearestDangerObject = nearestGrenade.stats.Object;
+		}
 	} else {
-	    NearestDangerX = nearestLandMine.x;
-	    NearestDangerY = nearestLandMine.y;
-	    NearestDangerObject = nearestLandMine.stats.Object;
-	}
-
-	if(NearestDangerObject != noone){
-		if (!ChasingObjectSpotted) {
-		    ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+		if(nearestLandMine.stats.Object_index != oEnemy){
+			if (!ChasingObjectSpotted) {
+				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+			}
+			SpottedDanger = true;
+			NearestDangerX = nearestLandMine.x;
+			NearestDangerY = nearestLandMine.y;
+			NearestDangerObject = nearestLandMine.stats.Object;
 		}
 	}
+}else{
+	SpottedDanger = false;	
 }
 #endregion
 

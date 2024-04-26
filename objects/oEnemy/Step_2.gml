@@ -1,6 +1,6 @@
 /// @description Insert description
 	// YSpeed
-	for (i = 0; i < abs(YSpeed); ++i) {
+	for (var i = 0; i < abs(YSpeed); ++i) {
 	    // UP slope
 	    if (place_meeting(x, y + sign(YSpeed), oParentTile) && !place_meeting(x - 1, y + sign(YSpeed), oParentTile)){
 	        --x;
@@ -43,7 +43,7 @@
 	}
 
 	// XSpeed
-	for (i = 0; i < abs(XSpeed); ++i) { 
+	for (var i = 0; i < abs(XSpeed); ++i) { 
 	    // Slopes
 	    if (place_meeting(x + sign(XSpeed), y, oParentTile) && !place_meeting(x + sign(XSpeed), y - 1, oParentTile)){
 	        --y;

@@ -69,19 +69,20 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 			0
 		);	
 	}
-	
-	Fog = instance_create_layer(x, y, "OtherO", oFog);
-	with(Fog){
-		smoke_effect_create(
-			clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75),
-			random(360),
-			0.1,
-			random_range(.1, .5),
-			clamp(ceil(ExplosionDamage/10), 5, 7.5),
-			clamp(ExplosionDamage/250, .5, .9),
-			clamp(ExplosionDamage/250, .1, .75),
-			2 * game_get_speed(gamespeed_fps)
-		);	
+	if(instance_number(oFog) < 10){
+		Fog = instance_create_layer(x, y, "OtherO", oFog);
+		with(Fog){
+			smoke_effect_create(
+				clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75),
+				random(360),
+				0.1,
+				random_range(.1, .5),
+				clamp(ceil(ExplosionDamage/10), 5, 7.5),
+				clamp(ExplosionDamage/250, .5, .9),
+				clamp(ExplosionDamage/250, .1, .75),
+				2 * game_get_speed(gamespeed_fps)
+			);
+		}
 	}
 	
 	
