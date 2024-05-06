@@ -174,7 +174,8 @@ enum player_textures{
 enum player_states{
 	none_state,
 	running_state,
-	prone_state
+	prone_state,
+	machine_gun_state
 }
 
 enum HitBox{

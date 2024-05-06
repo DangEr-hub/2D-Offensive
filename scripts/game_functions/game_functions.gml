@@ -1,3 +1,7 @@
+function player_has_machine_gun(){
+	return global.weapon_id[0] == Item.basic_machine_gun;
+}
+
 function buy_item(ItemID, PositionX, PositionY){
 	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost]){
 		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
@@ -289,7 +293,7 @@ function player_shooting(){
 	#region Create bullet casing
 	if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID] != -1){
 		ParticleCreate(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, false, true, global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID], x, y, 1, 60);
+		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID], x, y, 1, 60);
 	}
 	#endregion
 				
@@ -360,7 +364,7 @@ function player_shooting(){
 		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			create_bullet_tracer(
 				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-				Weapon.y + lengthdir_y(32, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
 				ShotX,
 				ShotY,
 				1,
@@ -378,7 +382,7 @@ function player_shooting(){
 		}else{
 			create_bullet_tracer(
 				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-				Weapon.y + lengthdir_y(32, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
 				ShotX,
 				ShotY,
 				0,

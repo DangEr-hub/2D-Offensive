@@ -18,7 +18,7 @@ function enemy_initalized(hitObj, enemyId) {
 	}
 }
 
-function hit_entity(hit_object, /*Bullet.stats.Damage,*/ BodyPart, /*Bullet.stats.Item_id, Bullet.stats.Object,*/ Bullet, /*global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower], Bullet.stats.Penetration_damage*//*,*/ ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
+function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer)){
 		var Damage = Bullet.stats.Damage * power(1 - global.ItemIndex[#Bullet.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, Bullet.stats.Starting_x, Bullet.stats.Starting_y));
 		if(hit_object.object_index == oPlayer){
@@ -156,8 +156,21 @@ function hit_entity(hit_object, /*Bullet.stats.Damage,*/ BodyPart, /*Bullet.stat
 					hit_object.ArmourDurability[0] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];
 					hit_object.ArmourDurability[0] = max(hit_object.ArmourDurability[0], 0);
 				}
-				if(instance_exists(oParticleSystem)){
-					part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
+				if(instance_exists(oParticleSystem) && instance_exists(Bullet.stats.Object)){
+					var posX = BloodSplashX;
+					var posY = BloodSplashY;
+					var partSystem = global.ParticleSystem;
+					var partType = oParticleSystem.headshot_particle;
+					var numParticles = ceil(max(hit_object.attack_damage / 5, 10));
+
+					for (var i = 0; i < numParticles; i++) {
+					    var randomDirection = random_range(Bullet.stats.Object.RotationAngle - 180 - 90, Bullet.stats.Object.RotationAngle - 180 + 90);
+						part_type_color1(partType, c_gray);
+					    part_type_direction(partType, randomDirection, randomDirection, 0, 0);
+					    part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
+					    part_particles_create(partSystem, posX, posY, partType, 1);
+						part_type_color1(partType, c_white);
+					}
 				}
 				var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
 				if!(audio_is_playing(sound_effect)){
@@ -165,6 +178,20 @@ function hit_entity(hit_object, /*Bullet.stats.Damage,*/ BodyPart, /*Bullet.stat
 				}
 			}
 		}else{
+			if(instance_exists(oParticleSystem) && instance_exists(Bullet.stats.Object)){
+				var posX = BloodSplashX;
+				var posY = BloodSplashY;
+				var partSystem = global.ParticleSystem;
+				var partType = oParticleSystem.headshot_particle;
+				var numParticles = ceil(max(hit_object.attack_damage / 5, 10));
+
+				for (var i = 0; i < numParticles; i++) {
+				    var randomDirection = random_range(Bullet.stats.Object.RotationAngle - 180 - 90, Bullet.stats.Object.RotationAngle - 180 + 90);
+				    part_type_direction(partType, randomDirection, randomDirection, 0, 0);
+				    part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
+				    part_particles_create(partSystem, posX, posY, partType, 1);
+				}
+			}
 			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .9 || helmet_durability <= 0){
 				var sound_effect = snd_HeadShot;
 				if!(audio_is_playing(sound_effect)){
@@ -177,9 +204,6 @@ function hit_entity(hit_object, /*Bullet.stats.Damage,*/ BodyPart, /*Bullet.stat
 				}else{
 					hit_object.ArmourDurability[1] -= hit_object.attack_damage/50/global.ItemIndex[#HelmetID, ItemStat.Defense];
 					hit_object.ArmourDurability[1] = max(hit_object.ArmourDurability[1], 0);
-				}
-				if(instance_exists(oParticleSystem)){
-					part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.Spark, ceil(hit_object.attack_damage/5));
 				}
 				var sound_effect = snd_HeadShotHelmet;
 				if!(audio_is_playing(sound_effect)){

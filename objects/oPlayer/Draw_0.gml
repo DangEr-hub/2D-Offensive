@@ -1,11 +1,16 @@
 /// @description Drawing
-//draw_text(x, y - 150, oDraw.saturation_level);
+//draw_text(x, y - 150, string(Moving));
 event_inherited();
 if(stats.Health_points > 0){
 	if (equipped_usable_item()) {
-	    var distance = sqrt(power(45, 2) + power(15, 2));
-	    var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
-	    var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
+		var distance = sqrt(power(90, 2) + power(30, 2));
+		var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(0, 90));
+		var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(0, 90));
+		if(moving_state != player_states.prone_state){
+			distance = sqrt(power(45, 2) + power(15, 2));
+		    rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
+		    rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
+		}
 	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
 	}
 	

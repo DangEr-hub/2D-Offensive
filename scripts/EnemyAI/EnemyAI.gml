@@ -31,13 +31,13 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	}
 	
 	create_bullet_tracer(
-		Weapon.x + lengthdir_x(32, RotationAngle),
-		Weapon.y + lengthdir_y(32, RotationAngle),
+		Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
+		Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
 		EnemyShotX,
 		EnemyShotY,
 		0,
 		EnemyWeaponID,
-		point_direction(Weapon.x + lengthdir_x(32, RotationAngle), Weapon.y + lengthdir_y(32, RotationAngle), EnemyShotX, EnemyShotY),
+		point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
 		global.BulletSpeed,
 		-1,
 		id,
@@ -113,9 +113,13 @@ function bot_move_shooting(DangerX, DangerY){
 
 function EnemyShooting(DangerX, DangerY){
 	var shoot_chance = 100;
-	
-	if(collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false)){
-		shoot_chance = 33 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+	var collision_tile = collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false);
+	if(collision_tile){
+		if(collision_tile.object_index != oMachineGunFloor){
+			shoot_chance = 33 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+		}else{
+			shoot_chance = 100;	
+		}
 	}
 	
 	if(CanShoot == true && ChasingObjectSpotted == true && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0 && percent_chance(shoot_chance)){

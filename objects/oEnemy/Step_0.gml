@@ -283,7 +283,8 @@ if(global.enemy_visibility == false){
 			HPTimer != -1
 		){
 			if(InSmoke == false){
-				if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
+				var collision_object = collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false);
+				if(!collision_object || (oPlayer.moving_state == player_states.machine_gun_state && collision_object.object_index == oMachineGunFloor)){
 					Visible = true;
 				}else{
 					if(Visible == true){

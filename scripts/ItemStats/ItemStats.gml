@@ -1,4 +1,4 @@
-/// @description WeaponStat(Id, Name, RS, Range, Dmg, CA, MA, Type, Bullets, In, ST, Sound, CrShake, CShake, HR, P1, P2, RX, RY, MKB, KBIM, MIM, KBP, RIM, ROX, ROY, SSM, BCID, TypeClass, MSM, PP, DD)
+/// @description WeaponStat(Id, N, RS, Range, Dmg, CA, MA, T, B, In, ST, Snd, CrShake, CShake, HR, P1, P2, RX, RY, MKB, KBIM, MIM, KBP, RIM, ROX, ROY, SSM, BCID, TypeClass, MSM, PP, DD)
 /// @param Id
 /// @param  Name
 /// @param  RS
@@ -10,9 +10,9 @@
 /// @param  Bullets
 /// @param  In
 /// @param  ST
-/// @param  Sound
-/// @param  CrShake
-/// @param  CShake
+/// @param  Snd
+/// @param  CrS
+/// @param  CS
 /// @param  HR
 /// @param  P1
 /// @param  P2
@@ -27,7 +27,7 @@
 /// @param  ROY
 /// @param  SSM
 /// @param  BCID
-/// @param TypeClass
+/// @param TC
 /// @param MSM
 /// @param PP
 /// @param DD

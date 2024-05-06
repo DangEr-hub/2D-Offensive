@@ -1,11 +1,22 @@
 event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
+	#region Legs animation
+	if (global.my_console[? "active"] || moving_state == player_states.prone_state || moving_state == player_states.machine_gun_state || instance_exists(oInventory) || Moving == false) {
+	    Legs.image_speed = 0;
+	} else {
+	    Legs.image_speed = 1;
+	}
+	#endregion
+	
 	#region Buy menu
 	if!(global.my_console[? "active"] && !instance_exists(oInventory)){
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyBuyMenu])){
 			if(instance_exists(oBuyMenu)){
 				oPlayer.player_can_shoot = true;
+				with(oBuyMenuDescription){
+					zui_destroy();
+				}
 				with(oBuyMenu){
 					zui_destroy();
 				}
@@ -320,471 +331,470 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Texture
-	if!(equipped_usable_item()){
 		
-		#region Weapon texture
-		switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Name]){
-			case "AKM":
-				Weapon.image_index = 1;
-			break;
+	#region Weapon texture
+	switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Name]){
+		case "AKM":
+			Weapon.image_index = 1;
+		break;
 			
-			case "IMI Desert eagle":
-				Weapon.image_index = 2;
-			break;
+		case "IMI Desert eagle":
+			Weapon.image_index = 2;
+		break;
 			
-			case "Spas-12":
-				Weapon.image_index = 3;
-			break;
+		case "Spas-12":
+			Weapon.image_index = 3;
+		break;
 			
-			case "Steyr SSG 08":
-				Weapon.image_index = 4;
-			break;
+		case "Steyr SSG 08":
+			Weapon.image_index = 4;
+		break;
 			
-			case "MAC11":
-				Weapon.image_index = 5;
-			break;
+		case "MAC11":
+			Weapon.image_index = 5;
+		break;
 			
-			case "SIG SG550":
-				Weapon.image_index = 6;
-			break;
+		case "SIG SG550":
+			Weapon.image_index = 6;
+		break;
 			
-			case "FGM-148 Javelin":
-				Weapon.image_index = 7;
-			break;
+		case "FGM-148 Javelin":
+			Weapon.image_index = 7;
+		break;
 			
-			case "Glock-17":
-				Weapon.image_index = 8;
-			break;
+		case "Glock-17":
+			Weapon.image_index = 8;
+		break;
 			
-			case "M4A1":
-				Weapon.image_index = 9;
-			break;
+		case "M4A1":
+			Weapon.image_index = 9;
+		break;
 			
-			case "AWM":
-				Weapon.image_index = 10;
-			break;
+		case "AWM":
+			Weapon.image_index = 10;
+		break;
 			
-			case "USP":
-				Weapon.image_index = 11;
-			break;
+		case "USP":
+			Weapon.image_index = 11;
+		break;
 			
-			default:
-				Weapon.image_index = 0;
-			break;
-		}
-		#endregion
+		default:
+			Weapon.image_index = 0;
+		break;
+	}
 		
-		#region Player texture
-		if(moving_timer > -1){
-			moving_timer --;
-		}
-		switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass]){
-			
-			#region Assault rifle texture
-			case "Assault rifle":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index = player_textures.assault_rifle;
-							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-						}else{
-							image_index = player_textures.reload;
-							ArmHitBox.image_index = HitBox.ArmReloading;
-						}
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;		
-						}else{
-							image_index_variable = player_textures.reload_prone;
-							ArmHitBox.image_index = HitBox.ArmProneReloading;
-						}
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-				
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
-			break;
-			#endregion
-	
-			#region Pistol texture
-			case "Pistol":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index = player_textures.pistol;
-							ArmHitBox.image_index = HitBox.ArmWithPistol;
-						}else{
-							image_index = player_textures.reload;
-							ArmHitBox.image_index = HitBox.ArmReloading;
-						}
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){	
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;
-							
-						}else{
-							image_index_variable = player_textures.reload_prone;
-							ArmHitBox.image_index = HitBox.ArmProneReloading;
-						}
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-	
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .8;
-			break;
-			#endregion
-			
-			#region Submachine gun texture
-			case "Submachine gun":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index = player_textures.pistol;
-							ArmHitBox.image_index = HitBox.ArmWithPistol;
-						}else{
-							image_index = player_textures.reload;
-							ArmHitBox.image_index = HitBox.ArmReloading;
-						}
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;
-						}else{
-							image_index_variable = player_textures.reload_prone;
-							ArmHitBox.image_index = HitBox.ArmProneReloading;
-						}
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-				
-				WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .9;
-			break;
-			#endregion
-	
-			#region Sniper rifle texture
-			case "Sniper rifle":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index = player_textures.assault_rifle;
-							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-						}else{
-							image_index = player_textures.reload;
-							ArmHitBox.image_index = HitBox.ArmReloading;
-						}
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;
-						}else{
-							image_index_variable = player_textures.reload_prone;
-							ArmHitBox.image_index = HitBox.ArmProneReloading;
-						}
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-				
-				WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-			break;
-			#endregion
-			
-			#region Shotgun texture
-			case "Shotgun":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						image_index = player_textures.assault_rifle;
-						ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						image_index_variable = player_textures.prone;
-						ArmHitBox.image_index = HitBox.ArmProne;
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-				
-				WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-			break;
-			#endregion
-			
-			#region Anti-tank missile texture
-			case "Anti-tank missile":
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithWeapon;
-					if(Flashed == false){
-						image_index = player_textures.assault_rifle;
-						ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-					}else{
-						image_index = player_textures.flashed_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						image_index_variable = player_textures.prone;
-						ArmHitBox.image_index = HitBox.ArmProne;
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-				}
-				
-				WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-			break;
-			#endregion
-
-			#region Default texture
-			default:
-				if(moving_state != player_states.prone_state){
-					HeadHitBox.image_index = HitBox.Head;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					if(Flashed == false){
-						image_index = player_textures.no_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
-					}else{
-						image_index = player_textures.flashed_no_weapon;
-						ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
-					}
-				}else{
-					HeadHitBox.image_index = HitBox.HeadProne;
-					BodyHitBox.image_index = HitBox.BodyProne;
-					var image_index_variable;
-					if(Flashed == false){
-						image_index_variable = player_textures.prone;
-						ArmHitBox.image_index = HitBox.ArmProne;
-					}else{
-						image_index_variable = player_textures.flashed_prone;
-						ArmHitBox.image_index = HitBox.ArmProneFlashed;
-					}
-					
-					#region Leg animation mechanics
-					if(Moving == true){
-						if(moving_timer == -1){
-							if(image_index < image_index_variable + 2){	
-								image_index += 1;
-								LegHitBox.image_index += 1;
-							}else{
-								image_index = image_index_variable;	
-								LegHitBox.image_index = HitBox.LegProne;
-							}
-							moving_timer = 10;
-						}
-					}else{
-						moving_timer = -1;
-						image_index = image_index_variable;
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					#endregion
-					
-				}
-				
-				WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-			break;
-			#endregion
-			
-		}
-	}else{
-		Weapon.image_index = 0;
-		if(moving_state != player_states.prone_state){
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-			if(Flashed == false){
-				image_index = player_textures.no_weapon;
-				ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
-			}else{
-				image_index = player_textures.flashed_no_weapon;
-				ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
-			}
-			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-		}else{
-			HeadHitBox.image_index = HitBox.HeadProne;
-			BodyHitBox.image_index = HitBox.BodyProne;
-			if(Flashed == false){
-				image_index = player_textures.prone;
-				ArmHitBox.image_index = HitBox.ArmProne;
-			}else{
-				image_index = player_textures.flashed_prone;
-				ArmHitBox.image_index = HitBox.ArmProneFlashed;
-			}
-			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
-		}
+	if(equipped_usable_item()){
+		Weapon.image_index = 0;	
 	}
 	#endregion
+		
+	#region Player texture
+	if(moving_timer > -1){
+		moving_timer --;
+	}
+	switch(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass]){
+			
+		#region Assault rifle texture
+		case "Assault rifle":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index = player_textures.assault_rifle;
+						ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+					}else{
+						image_index = player_textures.reload;
+						ArmHitBox.image_index = HitBox.ArmReloading;
+					}
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index_variable = player_textures.prone;
+						ArmHitBox.image_index = HitBox.ArmProne;		
+					}else{
+						image_index_variable = player_textures.reload_prone;
+						ArmHitBox.image_index = HitBox.ArmProneReloading;
+					}
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+				
+			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+		break;
+		#endregion
+	
+		#region Pistol texture
+		case "Pistol":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index = player_textures.pistol;
+						ArmHitBox.image_index = HitBox.ArmWithPistol;
+					}else{
+						image_index = player_textures.reload;
+						ArmHitBox.image_index = HitBox.ArmReloading;
+					}
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){	
+						image_index_variable = player_textures.prone;
+						ArmHitBox.image_index = HitBox.ArmProne;
+							
+					}else{
+						image_index_variable = player_textures.reload_prone;
+						ArmHitBox.image_index = HitBox.ArmProneReloading;
+					}
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+	
+			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .8;
+		break;
+		#endregion
+			
+		#region Submachine gun texture
+		case "Submachine gun":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index = player_textures.pistol;
+						ArmHitBox.image_index = HitBox.ArmWithPistol;
+					}else{
+						image_index = player_textures.reload;
+						ArmHitBox.image_index = HitBox.ArmReloading;
+					}
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index_variable = player_textures.prone;
+						ArmHitBox.image_index = HitBox.ArmProne;
+					}else{
+						image_index_variable = player_textures.reload_prone;
+						ArmHitBox.image_index = HitBox.ArmProneReloading;
+					}
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+				
+			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .9;
+		break;
+		#endregion
+	
+		#region Sniper rifle texture
+		case "Sniper rifle":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index = player_textures.assault_rifle;
+						ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+					}else{
+						image_index = player_textures.reload;
+						ArmHitBox.image_index = HitBox.ArmReloading;
+					}
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+						image_index_variable = player_textures.prone;
+						ArmHitBox.image_index = HitBox.ArmProne;
+					}else{
+						image_index_variable = player_textures.reload_prone;
+						ArmHitBox.image_index = HitBox.ArmProneReloading;
+					}
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+				
+			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+		break;
+		#endregion
+			
+		#region Shotgun texture
+		case "Shotgun":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					image_index = player_textures.assault_rifle;
+					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					image_index_variable = player_textures.prone;
+					ArmHitBox.image_index = HitBox.ArmProne;
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+				
+			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+		break;
+		#endregion
+			
+		#region Anti-tank missile texture
+		case "Anti-tank missile":
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithWeapon;
+				if(Flashed == false){
+					image_index = player_textures.assault_rifle;
+					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				}else{
+					image_index = player_textures.flashed_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					image_index_variable = player_textures.prone;
+					ArmHitBox.image_index = HitBox.ArmProne;
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+			}
+				
+			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+		break;
+		#endregion
+			
+		#region Machine gun
+		case "Machine gun":
+			HeadHitBox.image_index = HitBox.Head;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+			if(Flashed == false){
+				if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+					image_index = player_textures.no_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+				}else{
+					image_index = player_textures.reload;
+					ArmHitBox.image_index = HitBox.ArmReloading;
+				}
+			}else{
+				image_index = player_textures.flashed_no_weapon;
+				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
+			}
+				
+			WeaponDistance = 150;
+		break;
+		#endregion
+
+		#region Default texture
+		default:
+			if(moving_state != player_states.prone_state){
+				HeadHitBox.image_index = HitBox.Head;
+				BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+				if(Flashed == false){
+					image_index = player_textures.no_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+				}else{
+					image_index = player_textures.flashed_no_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
+				}
+			}else{
+				HeadHitBox.image_index = HitBox.HeadProne;
+				BodyHitBox.image_index = HitBox.BodyProne;
+				var image_index_variable;
+				if(Flashed == false){
+					image_index_variable = player_textures.prone;
+					ArmHitBox.image_index = HitBox.ArmProne;
+				}else{
+					image_index_variable = player_textures.flashed_prone;
+					ArmHitBox.image_index = HitBox.ArmProneFlashed;
+				}
+					
+				#region Leg animation mechanics
+				if(Moving == true){
+					if(moving_timer == -1){
+						if(image_index < image_index_variable + 2){	
+							image_index += 1;
+							LegHitBox.image_index += 1;
+						}else{
+							image_index = image_index_variable;	
+							LegHitBox.image_index = HitBox.LegProne;
+						}
+						moving_timer = 10;
+					}
+				}else{
+					moving_timer = -1;
+					image_index = image_index_variable;
+					LegHitBox.image_index = HitBox.LegProne;
+				}
+				#endregion
+					
+			}
+				
+			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+		break;
+		#endregion
+			
+	}
+#endregion
 		
 	#endregion
 	
@@ -958,7 +968,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Movement
-	if(player_can_shoot == true && !global.my_console[? "active"]){
+	if(player_can_shoot == true && !global.my_console[? "active"] && can_player_shoot()){
 		var Up = keyboard_check(global.KeyBinds[| KeyBind.KeyUp]);
 		var Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
 		var Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
@@ -1030,7 +1040,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 		if(Moving == true){
 			if(moving_state != player_states.prone_state){
-				Legs.image_speed = 1;
 				if(FootStepTimer == -1){
 					FootStepTimer = 5;
 					FootSteps ++;
@@ -1095,8 +1104,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			y += YSpeed;
 			#endregion
 		
-			Legs.image_speed = 0;
-		
 		}
 
 		x = clamp(x,0,room_width-sprite_width);
@@ -1105,14 +1112,21 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 	#endregion
 	
-	#region Enemy collision
+	#region Object push player
 	if(place_meeting(x, y, oEnemy)) {
-	    var Enemy = instance_nearest(x, y, oEnemy); // Get nearest Enemy
-		var dir = point_direction(Enemy.x, Enemy.y, x, y); // Direction from Enemy to player
-    
-		// Bounce player smoothly by setting acceleration
+	    var Enemy = instance_nearest(x, y, oEnemy);
+		var dir = point_direction(Enemy.x, Enemy.y, x, y);
 		AccelX = 5 * cos(degtorad(dir));
 		AccelY = -5 * sin(degtorad(dir));
+	}
+	
+	if(place_meeting(x, y, oMachineGunFloor)){
+		var machine_gun_floor = instance_nearest(x, y, oMachineGunFloor);
+		if(global.weapon_id[0] != machine_gun_floor.stats.Id){
+		var dir = point_direction(machine_gun_floor.x + lengthdir_x(-64, RotationAngle), machine_gun_floor.y + lengthdir_y(-64, RotationAngle), x, y);
+		AccelX = 15 * cos(degtorad(dir));
+		AccelY = -15 * sin(degtorad(dir));
+		}
 	}
 
 	// Apply physics
@@ -1139,24 +1153,76 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	AccelY = 0;		
 	#endregion
 
-	#region Running and prone
-	if(keyboard_check(global.KeyBinds[| KeyBind.KeyRunning]) && !global.my_console[? "active"] && Moving == true){
-		if(moving_state == player_states.none_state /*|| moving_state == player_states.running_state*/){
-			moving_state = player_states.running_state;
+	#region Running and prone and machine gun
+	if(!global.my_console[? "active"]){
+		if(keyboard_check(global.KeyBinds[| KeyBind.KeyRunning]) && Moving == true){
+			if(moving_state == player_states.none_state){
+				moving_state = player_states.running_state;
+			}
 		}
-	}
 	
-	if(moving_state == player_states.running_state){
-		if(keyboard_check_released(global.KeyBinds[| KeyBind.KeyRunning])){
-			moving_state = 	player_states.none_state;
+		if(moving_state == player_states.running_state){
+			if(keyboard_check_released(global.KeyBinds[| KeyBind.KeyRunning])){
+				moving_state = 	player_states.none_state;
+			}
 		}
-	}
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyProne]) && !global.my_console[? "active"] && Moving == false){
-		if(moving_state == player_states.none_state){
-			moving_state = player_states.prone_state;
-		}else if(moving_state == player_states.prone_state){
-			moving_state = player_states.none_state;
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyProne]) && Moving == false){
+			if(moving_state == player_states.none_state){
+				moving_state = player_states.prone_state;
+			}else if(moving_state == player_states.prone_state){
+				moving_state = player_states.none_state;
+			}
+		}
+	
+		if(instance_exists(oMachineGun)){
+			var machine_gun = instance_nearest(x, y, oMachineGun);		
+			if(distance_to_object(machine_gun) <= oPlayer.PickUpDistance){
+				if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
+					if(moving_state == player_states.none_state && global.weapon_id[min(WeaponID, 2)] == Item.None){ /// Pokud neběži ani se neplazí
+						
+						#region Equip machine gun
+						EquipmentAlpha = global.GUIHUDAlpha;
+						global.weapon_id[0] = machine_gun.stats.Id;
+						global.weapon_attachments[0][weapon_attachments.weapon_scope] = machine_gun.stats.Slot_scope;
+						global.weapon_attachments[0][weapon_attachments.weapon_barrel] = machine_gun.stats.Slot_barrel;
+						global.weapon_attachments[0][weapon_attachments.weapon_grip] = machine_gun.stats.Slot_grip;
+						global.weapon_attachments[0][weapon_attachments.weapon_suppressor] = machine_gun.stats.Slot_suppressor;
+						global.Ammo[0] = machine_gun.stats.Ammo;
+						global.ClipAmmo[0] = machine_gun.stats.Clip_ammo;
+						global.MaxAmmo[0] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.MaxAmmo];
+						global.HardRecoil[0] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.HardRecoil];
+						#endregion
+						
+						x = machine_gun.x;
+						y = machine_gun.y;
+						machine_gun.stats.Object = id;
+						moving_state = player_states.machine_gun_state;	
+					}else if(moving_state == player_states.machine_gun_state){
+						ReloadTime = 0;
+						moving_state = player_states.none_state;
+						Reloading = false;
+						
+						#region Dequip machine gun
+						global.weapon_id[0] = Item.None;
+						machine_gun.stats.Slot_scope = global.weapon_attachments[0][weapon_attachments.weapon_scope];
+						machine_gun.stats.Slot_barrel = global.weapon_attachments[0][weapon_attachments.weapon_barrel];
+						machine_gun.stats.Slot_grip = global.weapon_attachments[0][weapon_attachments.weapon_grip];
+						machine_gun.stats.Slot_suppressor = global.weapon_attachments[0][weapon_attachments.weapon_suppressor];
+						machine_gun.stats.Ammo = global.Ammo[0];
+						machine_gun.stats.Clip_ammo = global.ClipAmmo[0];
+						if(oDraw.show_weapon_attachments == true){
+							player_can_shoot = true;
+							oDraw.show_weapon_attachments = false;
+						}
+						player_has_scope = -1;
+						ScopeIn = false;	
+						WeaponDrop(1, id);
+						#endregion
+						
+					}
+				}
+			}
 		}
 	}
 	
@@ -1281,7 +1347,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				instance_create_layer(x, y, "OtherO", oInventory);
 				player_can_shoot = false;
 				Moving = false;
-				Legs.image_speed = 0;
 				RelativeSpeedX = 0;
 				RelativeSpeedY = 0;
 			}else{
@@ -1687,6 +1752,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		camera_get_view_height(CAMERA) + 2 * ActivateMargin,
 		true
 	);
+	instance_activate_object(oBuyMenuDescription);
 	instance_activate_object(objUIImage);
 	instance_activate_object(oBuyMenu);
 	instance_activate_object(oWeaponDescription);

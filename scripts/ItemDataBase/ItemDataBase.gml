@@ -50,6 +50,9 @@ function weapon_attachment_equip(ID, AttachmentPosition, ObjectType = oPlayer) {
         case "Anti-tank missile":
             ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
         break;
+        case "Machine gun":
+            ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+        break;
     }
 
     var canEquip = (weapon_id != Item.None) && (ds_list_find_index(possible_attachments, AttachmentPosition) != -1) && (global.weapon_attachments[ObjectType.WeaponID][AttachmentPosition] == Item.None);
@@ -77,6 +80,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.m4_carbine, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.awm, ["Semi", "Safety"]);
 	add_shooting_modes(Item.usp, ["Semi", "Safety"]);
+	add_shooting_modes(Item.basic_machine_gun, ["Auto", "Semi", "Burst", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -248,7 +252,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Javelin, ItemStat.advantages] = "-Homing projectiles\n-High damage";
 	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.Javelin, ItemStat.AmmoSpriteID] = 6;
-	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "A man-portable, anti-tank weapon system developed in America, operational since 1996. Its design includes a fire-and-forget mechanism with integrated infrared guidance, enabling the operator to find shelter right after firing.";
+	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "High-damage, armor-piercing powerhouse. Mastery requires skill due to its recoil and limited magazine, but in the hands of a skilled player, each shot spells devastation for your enemies.";
 
 	global.ItemIndex[#Item.Glock, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 750, 33, 240, 24, "Secondary", 1, 2, 9, snd_Glock, 3, 1, false,
@@ -384,4 +388,10 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.nuclear_explosion, ItemStat.Damage] = 152;
 	global.ItemIndex[#Item.nuclear_explosion, ItemStat.PenetrationPower] = .9;
 	global.ItemIndex[#Item.nuclear_explosion, ItemStat.DamageDrop] = .001;
+		
+	///Reprezentace základní machine gun
+	global.ItemIndex[#Item.basic_machine_gun, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 700, 33, 500, 50, "Primary", 1, 10, 7, snd_machine_gun, 10, 2, false,
+	0, 0, 10, 30, 50, .05, 1, 1, .0025, 0, 0, 1, 1, "Machine gun", .95, .775, .001, 1.75 * game_get_speed(gamespeed_fps), 1);
+	global.ItemIndex[#Item.basic_machine_gun, ItemStat.ItemColor] = c_ltgray	global.ItemIndex[#Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
 }

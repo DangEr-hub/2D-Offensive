@@ -1,6 +1,19 @@
 global.ParticleSystem = part_system_create();
 part_system_depth(global.ParticleSystem, -10000);
 
+//Headshot
+headshot_particle = part_type_create();
+part_type_sprite(headshot_particle, spr_BulletTracer, 0, 0, 0);
+part_type_orientation(headshot_particle, 0, 360, 0, 0, 0);
+part_type_color1(headshot_particle, c_white);
+part_type_size(headshot_particle, .1, .3,0,.1);
+part_type_speed(headshot_particle, 10, 20, 0, 0);
+part_type_direction(headshot_particle,0,359,0,0);
+part_type_blend(headshot_particle, 1);
+part_type_life(headshot_particle, 5, 5);
+
+
+//Flame
 FlameParticle = part_type_create();
 part_type_shape(FlameParticle,pt_shape_line);
 part_type_size(FlameParticle,.25,1,0,0);
