@@ -113,17 +113,18 @@ for (var i = 0; i < MapIndex.Total; i++) {
 global.MapID = -1;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
 global.MapProperties[#MapIndex.Desert, MapProperty.Name] = "Desert";
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(192, 108, 0);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(255, 192, 0);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .1;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(178, 141, 35);
+global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(229, 181, 45);
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .25;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = 1;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .95;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = c_orange;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_color_rgb(229, 181, 45);
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = make_color_rgb(229, 199, 114);
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.5;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.25;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.75;
@@ -153,7 +154,7 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight, KeyDropMouse, KeyDrop, KeyInventory, KeyPickUp, KeyCycleLeft, KeyCycleRight, KeyUse, KeyShootMouse,
 	KeyReload, KeyRunning, KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode, KeyProne, KeyWeaponAttachments, KeyCommand,
-	KeyGo, KeyBuyMenu, Total	
+	KeyGo, KeyBuyMenu, KeyHoldStamina, Total	
 }
 
 global.KeyBinds = ds_list_create();
@@ -162,7 +163,7 @@ ds_list_add(
 	mb_right, vk_shift, ord("I"), ord("G"), ord("Q"), ord("E"),
 	ord("F"), mb_left, ord("R"), vk_shift, mb_left, vk_escape,
 	ord("N"), ord("V"), ord("Y"), ord("T"), ord("C"), ord("X"),
-	ord("B")
+	ord("B"), vk_control
 );
 
 enum player_textures{

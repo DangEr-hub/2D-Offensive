@@ -1,4 +1,5 @@
 event_inherited();
+attack_damage = 0;
 RotationAngle = random(360);
 FlashLightX = 0;
 FlashLightY = 0;

@@ -14,14 +14,13 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 		rank_less = 0;
 	}
 	
-	EnemyInaccuracyMultiplier = inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy;
 	EnemyShotX = random_range(
-					DangerShotX - global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier, 
-					DangerShotX + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier
+					DangerShotX - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy,
+					DangerShotX + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy
 				);
 	EnemyShotY = random_range(
-					DangerShotY - global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier, 
-					DangerShotY + global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Inaccuracy] * EnemyInaccuracyMultiplier
+					DangerShotY - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy, 
+					DangerShotY + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy
 				);
 	
 	

@@ -2,39 +2,29 @@
 //draw_text(x, y - 150, string(Moving));
 event_inherited();
 if(stats.Health_points > 0){
-	if (equipped_usable_item()) {
-		var distance = sqrt(power(90, 2) + power(30, 2));
-		var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(0, 90));
-		var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(0, 90));
-		if(moving_state != player_states.prone_state){
-			distance = sqrt(power(45, 2) + power(15, 2));
-		    rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
-		    rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
-		}
-	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
-	}
-	
-	if!(WeaponID >= 2){
-		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_usable_item()){
-			draw_sprite_ext(
-				spr_Items,
-				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],
-				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
-				.5,
-				.5,
-				RotationAngle,
-				c_white, 
-				1
-			);
-		}
-	}
-	
-	var armour_sprite_index = 1;
-	if(image_index == 0 || image_index == 5){
+	var armour_sprite_index = 0;
+	if(image_index == player_textures.no_weapon){
 		armour_sprite_index = 0;	
-	}else if(image_index >= player_textures.prone){
+	}else if(image_index == player_textures.pistol){
+		armour_sprite_index = 1;
+	}else if(image_index == player_textures.assault_rifle){
 		armour_sprite_index = 2;
+	}else if(image_index == player_textures.flashed_weapon){
+		armour_sprite_index = 3;
+	}else if(image_index == player_textures.flashed_no_weapon){
+		armour_sprite_index = 4;
+	}else if(image_index == player_textures.reload){
+		armour_sprite_index = 7;
+	}else if(image_index >= player_textures.prone){
+		armour_sprite_index = 5;
+	}
+	
+	if(image_index == player_textures.flashed_prone || image_index == player_textures.flashed_prone_second || image_index == player_textures.flashed_prone_third){
+		armour_sprite_index = 6;
+	}
+	
+	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
+		armour_sprite_index = 8;
 	}
 
 	if(global.ArmourID[0] == Item.KevlarVest){
@@ -65,6 +55,34 @@ if(stats.Health_points > 0){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}else if(global.ArmourID[1] == Item.InfraredVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}
+	
+	if (equipped_usable_item()) {
+		var distance = sqrt(power(90, 2) + power(30, 2));
+		var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(0, 90));
+		var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(0, 90));
+		if(moving_state != player_states.prone_state){
+			distance = sqrt(power(45, 2) + power(15, 2));
+		    rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
+		    rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
+		}
+	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
+	}
+	
+	if!(WeaponID >= 2){
+		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && !equipped_usable_item()){
+			draw_sprite_ext(
+				spr_Items,
+				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],
+				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
+				.5,
+				.5,
+				RotationAngle,
+				c_white, 
+				1
+			);
+		}
 	}
 	
 }

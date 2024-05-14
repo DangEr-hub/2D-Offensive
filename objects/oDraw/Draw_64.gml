@@ -91,14 +91,14 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	
 	#region Weapon attachments
 	if(show_weapon_attachments == true){
-		var button_width = 48 * global.GUIMultiplier;
+		/*var button_width = 48 * global.GUIMultiplier;
 		var weapon_scale = 2 * global.GUIMultiplier;
 		var weapon_sprite_width = sprite_get_width(spr_Items) * weapon_scale;
 		var weapon_sprite_height = sprite_get_height(spr_Items)/2 * weapon_scale;
 		var weapon_position_x = display_get_gui_width()/2;
 		var weapon_position_y = display_get_gui_height() - weapon_sprite_height;
 		
-		draw_sprite_ext(spr_Items, global.weapon_id[min(oPlayer.WeaponID, 2)], weapon_position_x, weapon_position_y, weapon_scale, weapon_scale, 0, c_white, 1);
+		//draw_sprite_ext(spr_Items, global.weapon_id[min(oPlayer.WeaponID, 2)], weapon_position_x, weapon_position_y, weapon_scale, weapon_scale, 0, c_white, 1);
 		
 		#region Weapon scope attachment
 		if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_scope] != Item.None){
@@ -113,17 +113,6 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				c_white,
 				1
 			);	
-			
-			draw_button_ext(
-				weapon_position_x + weapon_sprite_width/8 + 16 * global.GUIMultiplier, 
-				weapon_position_y - weapon_sprite_height/1.5, 
-				button_width, 
-				16 * global.GUIMultiplier, 
-				"Dequip",
-				c_dkgray,
-				MAIN_COLOR,
-				"weapon_scope_dequip"
-			);
 		}else{
 			draw_button_ext(
 				weapon_position_x + weapon_sprite_width/8 + 16 * global.GUIMultiplier, 
@@ -251,6 +240,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			);
 		}
 		#endregion
+		*/
 		
 	}
 	#endregion
@@ -785,7 +775,7 @@ if(instance_exists(oPlayer) && !instance_exists(oBuyMenu)){
 		draw_text_outlined(AdminHUDX - string_width(KBString), AdminHUDY + TextHeightSmall*2, KBString, c_white, c_black, 1);	
 				
 		//Inaccuracy
-		var player_inaccuracy = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer);
+		var player_inaccuracy = inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer);
 		var inaccuracy_string = "Inaccuracy: " + string_format(player_inaccuracy, 0, 1) + " Units";
 		draw_text_outlined(AdminHUDX - string_width(inaccuracy_string), AdminHUDY + TextHeightSmall*3, inaccuracy_string, c_white, c_black, 1);	
 		
@@ -876,7 +866,7 @@ with(oCrosshair){
 				draw_sprite_ext(
 					spr_DynamicCrosshair, 
 					0, 
-					xx - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
+					xx - Gap - inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
 					y_scale, 
 					x_scale, 
@@ -887,7 +877,7 @@ with(oCrosshair){
 				draw_sprite_ext(
 					spr_DynamicCrosshair, 
 					0, 
-					xx + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
+					xx + Gap + inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + x_offset, 
 					yy, 
 					y_scale, 
 					x_scale, 
@@ -899,7 +889,7 @@ with(oCrosshair){
 					spr_DynamicCrosshair, 
 					0, 
 					xx, 
-					yy - Gap - global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
+					yy - Gap - inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
 					y_scale, 
 					x_scale, 
 					90, 
@@ -910,7 +900,7 @@ with(oCrosshair){
 					spr_DynamicCrosshair, 
 					0, 
 					xx, 
-					yy + Gap + global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.Inaccuracy]*inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
+					yy + Gap + inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*2 + y_offset, 
 					y_scale, 
 					x_scale, 
 					90, 

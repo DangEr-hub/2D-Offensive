@@ -1,4 +1,5 @@
 event_inherited();
+stamina_inaccuracy = 1;
 MoveDirection = 0;
 ax = 0;
 ay = 0;

@@ -16,6 +16,11 @@ if(instance_exists(oPlayer)){
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
 		if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
 			if(show_weapon_attachments == false){
+				with(zui_main()){
+					with(zui_create(zui_get_width() * .5, zui_get_height() * .87, oWeaponAttachments)){
+						
+					}
+				}
 				oPlayer.Moving = false;
 				oPlayer.Legs.image_speed = 0;
 				oPlayer.RelativeSpeedX = 0;
@@ -23,6 +28,11 @@ if(instance_exists(oPlayer)){
 				oPlayer.player_can_shoot = false;
 				show_weapon_attachments = true;
 			}else{
+				if(instance_exists(oWeaponAttachments)){
+					with(oWeaponAttachments){
+						zui_destroy();
+					}
+				}
 				show_weapon_attachments = false;
 				if!(instance_exists(oInventory)){
 					oPlayer.player_can_shoot = true;	

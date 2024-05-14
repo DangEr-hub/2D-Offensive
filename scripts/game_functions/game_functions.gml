@@ -322,8 +322,6 @@ function player_shooting(){
 			suppressor_multiplier = global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.Defense];	
 		}
 		var current_weapon_id = global.weapon_id[min(WeaponID, 2)];
-		var inaccuracy_value = global.ItemIndex[# current_weapon_id, ItemStat.Inaccuracy];
-		var inaccuracy_calculation = inaccuracy_formula(current_weapon_id, id);
 		var kb_phase_1 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback;
 		var kb_phase_2 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback;
 		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
@@ -333,29 +331,29 @@ function player_shooting(){
 
 		if (global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.HardRecoil] == false) {
 			ShotX = random_range(
-				oCrosshair.x - inaccuracy_value * inaccuracy_calculation, 
-				oCrosshair.x + inaccuracy_value * inaccuracy_calculation
+				oCrosshair.x - inaccuracy_formula(current_weapon_id, id), 
+				oCrosshair.x + inaccuracy_formula(current_weapon_id, id)
 			);
 			ShotY = random_range(
-				oCrosshair.y - inaccuracy_value * inaccuracy_calculation, 
-				oCrosshair.y + inaccuracy_value * inaccuracy_calculation
+				oCrosshair.y - inaccuracy_formula(current_weapon_id, id), 
+				oCrosshair.y + inaccuracy_formula(current_weapon_id, id)
 			);
 		} else {
 			if (KickBack <= kb_phase_1) {
-				ShotX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation, oCrosshair.x + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
-				ShotY = random_range(oCrosshair.y - inaccuracy_value * inaccuracy_calculation, oCrosshair.y + inaccuracy_value * inaccuracy_calculation) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
+				ShotX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id), oCrosshair.x + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
+				ShotY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id), oCrosshair.y + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
 
 				if (KickBack == kb_phase_1) {
-					DeltaX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation, oCrosshair.x + inaccuracy_value * inaccuracy_calculation) - ShotX;
-					DeltaY = random_range(oCrosshair.y - inaccuracy_value * inaccuracy_calculation, oCrosshair.y + inaccuracy_value * inaccuracy_calculation) - ShotY;
+					DeltaX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id), oCrosshair.x + inaccuracy_formula(current_weapon_id, id)) - ShotX;
+					DeltaY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id), oCrosshair.y + inaccuracy_formula(current_weapon_id, id)) - ShotY;
 				}
 			} else {
-				ShotX = random_range(oCrosshair.x - inaccuracy_value * inaccuracy_calculation * 0.25, oCrosshair.x + inaccuracy_value * 0.25) - DeltaX;
-				ShotY = random_range(oCrosshair.y - inaccuracy_value * 0.25, oCrosshair.y + inaccuracy_value * 0.25) - DeltaY;
+				ShotX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.x + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaX;
+				ShotY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.y + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaY;
 
 				if (KickBack == kb_phase_2) {
-					DeltaX = random_range(oCrosshair.x - inaccuracy_value * 0.25, oCrosshair.x + inaccuracy_value * 0.25) - ShotX;
-					DeltaY = random_range(oCrosshair.y - inaccuracy_value * 0.25, oCrosshair.y + inaccuracy_value * 0.25) - ShotY;
+					DeltaX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.x + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotX;
+					DeltaY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.y + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotY;
 				}
 			}
 		}
@@ -435,7 +433,9 @@ function inaccuracy_formula(WID, ObjectType){
 						ScopeInaccuracy = .5;
 					}
 				}
-				return min(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1), 50);
+				return
+				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
+				(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1) * ObjectType.stamina_inaccuracy), 175);
 			}
 		}else if(ObjectType.object_index == oEnemy){
 			if(instance_exists(oEnemy)){
@@ -498,6 +498,11 @@ function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_d
 }
 	
 function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time){
+	if(Radius >= 96){
+		smoke_tile = instance_create_layer(x, y, "OtherO", oSmokeTile);
+		smoke_tile.image_xscale = Radius/smoke_tile.sprite_width*2;
+		smoke_tile.image_yscale = Radius/smoke_tile.sprite_height*2;
+	}
 	radius = Radius;  //size of cloud
 	move_dir = MoveDirection;  //movement of particles
 	move_speed = MoveSpeed;  //movement of particles
@@ -619,7 +624,17 @@ function set_crosshair_color(ColorString){
 	}
 }
 	
-function reset_gui(){		
+function reset_gui(){	
+	if(instance_exists(oWeaponAttachments)){
+		with(oWeaponAttachments){
+			zui_destroy();
+		}
+		with(zui_main()){
+			with(zui_create(zui_get_width() * .5, zui_get_height() * .87, oWeaponAttachments)){
+						
+			}
+		}
+	}
 	if(instance_exists(oInventory)){
 		instance_destroy(oInventory);
 		instance_destroy(oSlot);

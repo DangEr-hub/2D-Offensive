@@ -65,8 +65,8 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
 #region Set armour
-ArmourID = choose(Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest);
-HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm);
+ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest);
+HelmetID = Item.None;//choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
@@ -91,7 +91,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine, Item.awm);
+WeaponID[0] = Item.None;//choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine, Item.awm);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
@@ -119,10 +119,10 @@ BodyHitBox.MainObject = id;
 ArmHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
 ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
 ArmHitBox.MainObject = id;
-LegHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-LegHitBox.image_index = HitBox.LegProne;
-LegHitBox.MainObject = id;
-LegHitBox.visible = false;
+//LegHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
+//LegHitBox.image_index = HitBox.LegProne;
+//LegHitBox.MainObject = id;
+//LegHitBox.visible = false;
 #endregion
 
 

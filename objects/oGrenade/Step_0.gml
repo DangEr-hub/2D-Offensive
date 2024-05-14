@@ -119,9 +119,21 @@ if(ExplosionTimer == -1){
 		}else if(stats.Item_id == Item.SmokeGrenade){
 				
 			#region Create smoke effect
-				instance_create_layer(x, y, "OtherO", oFog);
-				instance_destroy(self);
-				#endregion
+				instance_destroy(id);
+				var Fog = instance_create_layer(x, y, "OtherO", oFog);
+				with(Fog){
+					smoke_effect_create(
+						random_range(100, 150),
+						random(360),
+						0.1,
+						random_range(.1, .5),
+						11,
+						.9,
+						.75,
+						5 * game_get_speed(gamespeed_fps)
+					);
+				}
+			#endregion
 				
 		}else if(stats.Item_id == Item.StickyGrenade){
 			
@@ -192,9 +204,21 @@ if(ExplodeTimer == -1){
 	}else if(stats.Item_id == Item.SmokeGrenade){
 				
 		#region Create smoke effect
-			instance_create_layer(x, y, "OtherO", oFog);
-			instance_destroy(self);
-			#endregion
+			instance_destroy(id);
+			var Fog = instance_create_layer(x, y, "OtherO", oFog);
+			with(Fog){
+				smoke_effect_create(
+					random_range(100, 150),
+					random(360),
+					0.1,
+					random_range(.1, .5),
+					11,
+					.9,
+					.75,
+					5 * game_get_speed(gamespeed_fps)
+				);
+			}
+		#endregion
 			
 	}else if(stats.Item_id == Item.StickyGrenade){
 			

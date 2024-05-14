@@ -1,6 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
-var bullet_hit = choose(snd_BulletHit1, snd_BulletHit2);
+var bullet_hit = snd_BulletHit;
 var BloodSplashNumber = ceil(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 5);
 var BloodParticleNumber = ceil(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 2);
 

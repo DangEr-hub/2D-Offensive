@@ -1,13 +1,55 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-//draw_text(x, y - 35, Flashed);
+//draw_text(x, y - 35, VisibilityTimer);
 if(Visible == true){
-
+	var armour_sprite_index = 0;
+	if(image_index == player_textures.no_weapon){
+		armour_sprite_index = 0;	
+	}else if(image_index == player_textures.pistol){
+		armour_sprite_index = 1;
+	}else if(image_index == player_textures.assault_rifle){
+		armour_sprite_index = 2;
+	}else if(image_index == player_textures.flashed_weapon){
+		armour_sprite_index = 3;
+	}else if(image_index == player_textures.flashed_no_weapon){
+		armour_sprite_index = 4;
+	}else if(image_index == player_textures.reload){
+		armour_sprite_index = 7;
+	}else if(image_index >= player_textures.prone){
+		armour_sprite_index = 5;
+	}
 	
-	//draw_text(x, y - 300, SpottedDanger); 
-	draw_text(x, y - 70, MaxSpeed); 
-		
+	if(image_index == player_textures.flashed_prone || image_index == player_textures.flashed_prone_second || image_index == player_textures.flashed_prone_third){
+		armour_sprite_index = 6;
+	}
+	
+	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
+		armour_sprite_index = 8;
+	}
+
+	if(ArmourID == Item.KevlarVest){
+		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}else if(ArmourID == Item.MilitaryVest){
+		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}else if(ArmourID == Item.SpecOpsVest){
+		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}
+
+	if(HelmetID == Item.KevlarHelm){
+		draw_sprite_ext(spr_Helmet, 0, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);	
+	}else if(HelmetID == Item.MilitaryHelm){
+		draw_sprite_ext(spr_Helmet, 1, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}else if(HelmetID == Item.SpecOpsHelm){
+		draw_sprite_ext(spr_Helmet, 2, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}else if(HelmetID == Item.MilitaryNightVision){
+		draw_sprite_ext(spr_Helmet, 3, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}else if(HelmetID == Item.BasicNightVision){
+		draw_sprite_ext(spr_Helmet, 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}else if(HelmetID == Item.InfraredVision){
+		draw_sprite_ext(spr_Helmet, 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+	}
+	
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
 		draw_sprite_ext(
 			spr_Items,
@@ -34,32 +76,5 @@ if(Visible == true){
 		var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
 		var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
 		draw_sprite_ext(spr_LandMine, EquippedLandMine, x + rotated_dx, y + rotated_dy, .5, .5, LandMineAngle, c_white, 1); 
-	}
-
-	var armour_sprite_index = 1;
-	if(image_index == 0 || image_index == 5){
-		armour_sprite_index = 0;	
-	}
-
-	if(ArmourID == Item.KevlarVest){
-		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == Item.MilitaryVest){
-		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == Item.SpecOpsVest){
-		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}
-
-	if(HelmetID == Item.KevlarHelm){
-		draw_sprite_ext(spr_Helmet, 0, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);	
-	}else if(HelmetID == Item.MilitaryHelm){
-		draw_sprite_ext(spr_Helmet, 1, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(HelmetID == Item.SpecOpsHelm){
-		draw_sprite_ext(spr_Helmet, 2, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(HelmetID == Item.MilitaryNightVision){
-		draw_sprite_ext(spr_Helmet, 3, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(HelmetID == Item.BasicNightVision){
-		draw_sprite_ext(spr_Helmet, 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(HelmetID == Item.InfraredVision){
-		draw_sprite_ext(spr_Helmet, 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 }

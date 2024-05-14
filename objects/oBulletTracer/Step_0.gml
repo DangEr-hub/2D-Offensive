@@ -83,13 +83,13 @@ if(image_index == 1){
 		}
 	}else{
 		RandomX = random_range(
-			stats.Shot_x - global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object), 
-			stats.Shot_x + global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object)
+			stats.Shot_x - inaccuracy_formula(stats.Item_id, stats.Object), 
+			stats.Shot_x + inaccuracy_formula(stats.Item_id, stats.Object)
 		);
 			
 		RandomY = random_range(
-			stats.Shot_y - global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object), 
-			stats.Shot_y + global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object)
+			stats.Shot_y - inaccuracy_formula(stats.Item_id, stats.Object), 
+			stats.Shot_y + inaccuracy_formula(stats.Item_id, stats.Object)
 		);
 		NearestTargetX = stats.Starting_x +
 		lengthdir_x(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
@@ -158,13 +158,13 @@ if(image_index == 0){
 		var RandomY = 0;
 		if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
 			RandomX = random_range(
-				stats.Shot_x - global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object), 
-				stats.Shot_x + global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object)
+				stats.Shot_x - inaccuracy_formula(stats.Item_id, stats.Object), 
+				stats.Shot_x + inaccuracy_formula(stats.Item_id, stats.Object)
 			);
 			
 			RandomY = random_range(
-				stats.Shot_y - global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object), 
-				stats.Shot_y + global.ItemIndex[#stats.Item_id, ItemStat.Inaccuracy]*inaccuracy_formula(stats.Item_id, stats.Object)
+				stats.Shot_y - inaccuracy_formula(stats.Item_id, stats.Object), 
+				stats.Shot_y + inaccuracy_formula(stats.Item_id, stats.Object)
 			);
 			var BX = stats.Starting_x +
 			lengthdir_x(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
