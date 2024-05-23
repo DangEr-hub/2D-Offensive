@@ -140,10 +140,10 @@ if(instance_exists(oPlayer)){
 		#region Basic recoil
 		if(oPlayer.CanShoot == false && oPlayer.ShootTimer >= global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootTimer]/2){
 			if(RecoilTimer[0] == -1){
-				RecoilTimer[0] = ceil(abs(recoilY)/StabilizationSpeed);
+				RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
 			}
 			if(RecoilTimer[1] == -1){
-				RecoilTimer[1] = ceil(abs(recoilX)/StabilizationSpeed);
+				RecoilTimer[1] = floor(abs(recoilX)/StabilizationSpeed);
 			}
 		}
 		
@@ -169,11 +169,10 @@ if(instance_exists(oPlayer)){
 			}
 			RecoilTimer[1] --;
 		}else{
-			Recoil[1] -= (StabilizationSpeed * sign(recoilX));
+			Recoil[1] -= StabilizationSpeed * sign(recoilX);
 			Recoil[1] = max(0, Recoil[1]);
 		}
 		#endregion
-		
 		
 		x = lerp(x, mouse_x - Recoil[1], WobbleResetSpeed*2);
 		y = lerp(y, mouse_y - Recoil[0], WobbleResetSpeed*2);
@@ -185,7 +184,6 @@ if(instance_exists(oPlayer)){
 	y = clamp(y,0,room_height-sprite_height);
 	#endregion
 	
-
 }
 
 #region Dynamic crosshair

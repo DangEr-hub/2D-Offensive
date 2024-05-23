@@ -1,4 +1,5 @@
 event_inherited();
+ViewShakeMagnitude = 0;
 stamina_inaccuracy = 1;
 MoveDirection = 0;
 ax = 0;

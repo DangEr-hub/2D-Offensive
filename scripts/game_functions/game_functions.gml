@@ -450,13 +450,15 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 			
 				if(ObjectType.Flashed == true){
-					FlashedInaccuracy = 5;
+					FlashedInaccuracy = 10;
 				}
 			
 				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
 					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
 				}
-				return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
+				return
+				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
+				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy, 175);
 			}
 		}else if(ObjectType.object_index == oFriend){
 			if(instance_exists(oFriend)){
@@ -584,6 +586,15 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
 }
 
 function pause(ObjectType){
+	if(instance_exists(oBuyMenu)){
+		oPlayer.player_can_shoot = true;
+		with(oBuyMenuDescription){
+			zui_destroy();
+		}
+		with(oBuyMenu){
+			zui_destroy();
+		}
+	}
 	with(zui_main()){
 		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
 			alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
@@ -630,7 +641,7 @@ function reset_gui(){
 			zui_destroy();
 		}
 		with(zui_main()){
-			with(zui_create(zui_get_width() * .5, zui_get_height() * .87, oWeaponAttachments)){
+			with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
 						
 			}
 		}

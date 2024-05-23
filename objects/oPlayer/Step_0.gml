@@ -159,7 +159,11 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				if(moving_state == player_states.prone_state){
 					stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/10);
 				}
-				stats.Stamina_points += stamina_healing_power;
+				if(stats.Stamina_points <= global.player_stats_struct.Max_stamina - stamina_healing_power){
+					stats.Stamina_points += stamina_healing_power;
+				}else{
+					stats.Stamina_points += (global.player_stats_struct.Max_stamina - stats.Stamina_points);
+				}
 				stats.Damage_stamina_points = stats.Stamina_points;
 				StaminaHealingTimer = HealingTimer;
 			}
@@ -223,7 +227,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Camera shake
 	if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && stats.Health_points > 0 && global.ViewShake == true){
-		var ViewShakeMagnitude = 0;
 		var LowHPViewAngleFrequency = 0;
 		var ExplosionViewAngleFrequency = 0;
 		var AimPunchStrength = 5;
@@ -282,7 +285,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 		
 		#region Camera shake using camera position
-		if(shooting == true){
+		if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/2){
 			if(ViewShake == false){
 				ViewShakeMagnitude = choose(
 											-global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.CrosshairShake], 
@@ -301,6 +304,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		      ViewShakeMagnitude -= 1; 
 
 		      if (ViewShakeMagnitude <= 0){ 
+				  ViewShakeMagnitude = 0;
 		         ViewShake = false; 
 		      } 
 		   } 
@@ -309,6 +313,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 		#endregion
 		
+		if (abs(ViewShakeValuePower) < 1) {
+		    ViewShakeValuePower = 0;
+		}
+
 		CrosshairShake = GunCrossShake + AimPunchCrossShake + ExplosionCrossShake + LowHPCrossShake;
 		ViewAngle = ViewAngleCurrent;
 		camera_set_view_angle(CAMERA, ViewAngle);
@@ -386,6 +394,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			case "USP":
 				Weapon.image_index = 11;
+			break;
+			
+			case "Galil":
+				Weapon.image_index = 12;
 			break;
 			
 			default:
@@ -871,9 +883,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	if(shooting_mode == "Auto"){	
 		if(KickBack > 1){
-			KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
+			KickBackTime = round(.08 * game_get_speed(gamespeed_fps) * global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KBResetMultiplier]);
 		}else{
-			KickBackTime = round(.5 * game_get_speed(gamespeed_fps));
+			KickBackTime = round(.5 * game_get_speed(gamespeed_fps) * global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KBResetMultiplier]);
 		}
 		Shoot = mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]);
 		if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse])) || (global.Ammo[WeaponID] <= 0 && shooting == true)){
@@ -883,14 +895,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			crosshair_position[1] = oCrosshair.y;
 		}
 	}else if(shooting_mode == "Semi" || shooting_mode == "Burst"){
-		KickBackTime = round(.25 * game_get_speed(gamespeed_fps));
+		KickBackTime = round(.25 * game_get_speed(gamespeed_fps) * global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KBResetMultiplier]);
 		Shoot = mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]);
 		/*
 			Jelikož se při auto modu vždycky resetne "shooting" na false po tom co hráč releasne tlačítko na střílení, musel jsem přidat "shooting_reset_timer"
 		
 		*/
 		if(mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]) && shooting_reset_timer == -1){
-			shooting_reset_timer = KickBackTime;		
+			shooting_reset_timer = KickBackTime;
 		}
 		if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Ammo[WeaponID] > 0) || (global.Ammo[WeaponID] <= 0 && shooting == true && shooting_reset_timer == -1)){
 			shooting_reset_timer = KickBackTime;
@@ -1042,7 +1054,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			AimPunchSpeedMultiplier = .1;
 		}	
 		var ShootingSpeedMultiplier = 1;
-		if(shooting == true){
+		if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/2){
 			ShootingSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootSpdMul];
 		}
 		var ReloadingSpeedMultiplier = 1;
@@ -1395,7 +1407,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 
-	if(!global.my_console[? "active"]){
+	if(!global.my_console[? "active"] && !instance_exists(oBuyMenu)){
 		
 		#region Inventory
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyInventory])){
@@ -1651,7 +1663,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#region Scope
 		var ScopeButton = mouse_check_button(mb_right);
 		if!(instance_exists(oInventory)){
-			if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_scope] != Item.None && CanShoot == true){
+			if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_scope] != Item.None && CanShoot == true && !equipped_usable_item()){
 				if(ScopeButton){
 					if(ScopeIn == false){
 					

@@ -23,11 +23,11 @@ function handle_basic_movement() {
 			if(State != States.Move){
 				State = States.Move;
 			}
-		}else if(percent_chance(59 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		}else if(percent_chance(10 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 			if(State != States.MoveShoot){
 				State = States.MoveShoot;	
 			}
-		}else if(percent_chance(25 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		}else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 			if(State != States.MoveToward){
 				State = States.MoveToward;	
 			}

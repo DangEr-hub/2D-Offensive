@@ -15,12 +15,12 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	}
 	
 	EnemyShotX = random_range(
-					DangerShotX - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy,
-					DangerShotX + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy
+					DangerShotX - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * shoot_inaccuracy,
+					DangerShotX + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * shoot_inaccuracy
 				);
 	EnemyShotY = random_range(
-					DangerShotY - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy, 
-					DangerShotY + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * .5 * shoot_inaccuracy
+					DangerShotY - inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * shoot_inaccuracy, 
+					DangerShotY + inaccuracy_formula(WeaponID[WeaponPositionID], id) * rank_less * shoot_inaccuracy
 				);
 	
 	
@@ -48,13 +48,28 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	);
 }
 
-function check_if_available(ObjectType){
-	if(instance_exists(ObjectType) && ObjectType != noone){
-		return 
-		(!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.InSmoke == false)
-	}else{
-		return false;
-	}
+function check_if_available(ObjectType) {
+    if (instance_exists(ObjectType) && ObjectType != noone) {
+        var rotation = false;
+        var enemy_x = x;
+        var enemy_y = y;
+        
+        var angle_to_player = point_direction(enemy_x, enemy_y, ObjectType.x, ObjectType.y);
+        var angle_diff = angle_to_player - RotationAngle;
+        angle_diff = angle_diff % 360;
+        if (angle_diff > 180) angle_diff -= 360;
+        if (angle_diff < -180) angle_diff += 360;
+
+        if (angle_diff > -90 && angle_diff < 90) {
+            rotation = true;
+        }
+        
+        return 
+        (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.InSmoke == false && 
+        rotation == true);
+    } else {
+        return false;
+    }
 }
 
 function MoveRunAway(DangerX, DangerY){

@@ -47,3 +47,29 @@ for(var i=0;i<damage_rating;i++){
 	}
 }
 #endregion
+
+#region Price
+with(zui_create(start_x, start_y + text_gap*2, objUILabel)){
+	zui_set_anchor(0, 0);
+	font = set_font("GUI_grid");
+	color = c_white;
+	caption = "Price: " + string(global.ItemIndex[#other.item_variable, ItemStat.Cost]);
+}
+
+with(zui_create(start_x + string_width( "Price: " + string(global.ItemIndex[#other.item_variable, ItemStat.Cost]))*1.25+8, start_y + text_gap*2.79, objUIImage)){
+	zui_set_size(64, 64);
+	sprite = spr_Coin;
+	sprite_image_index = 0
+	sprite_width_size = 32;
+	sprite_height_size = 32;
+}
+#endregion
+
+#region Type
+with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
+	zui_set_anchor(0, 0);
+	font = set_font("GUI_grid");
+	color = c_white;
+	caption = "Type: " + string(global.ItemIndex[#other.item_variable, ItemStat.WeaponTypeClass]);
+}
+#endregion

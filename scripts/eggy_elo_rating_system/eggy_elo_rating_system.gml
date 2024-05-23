@@ -277,29 +277,29 @@ function rank_database(){
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 	
-	RankStats(RankType.Unranked, 1.25, 0.8, "Unranked", PLAYER_STARTING_ELO);
-	RankStats(RankType.SilverI, 1.25, 0.8, "Silver I", SILVERI_ELO);	
-	RankStats(RankType.SilverII, 1.2, 0.87, "Silver II", SILVERII_ELO);
-	RankStats(RankType.SilverIII, 1.1, 0.9, "Silver III", SILVERIII_ELO);
-	RankStats(RankType.SilverIV, 1.05, 0.93, "Silver IV", SILVERIV_ELO);
-	RankStats(RankType.SilverV, 1, 0.94, "Silver V", SILVERV_ELO);
-	RankStats(RankType.SilverMaster, 0.97, 1, "Silver master", SILVER_MASTER_ELO);
-	RankStats(RankType.GoldI, 0.95, 1.01, "Gold I", GOLDI_ELO);
-	RankStats(RankType.GoldII, 0.92, 1.03, "Gold II", GOLDII_ELO);
-	RankStats(RankType.GoldIII, 0.85, 1.05, "Gold III", GOLDIII_ELO);
-	RankStats(RankType.GoldIV, 0.81, 1.07, "Gold IV", GOLDIV_ELO);
-	RankStats(RankType.GoldMaster, 0.79, 1.11, "Gold master", GOLD_MASTER_ELO);
-	RankStats(RankType.DiamondI, 0.75, 1.14, "Diamond I", DIAMONDI_ELO);
-	RankStats(RankType.DiamondII, 0.73, 1.15, "Diamond II", DIAMONDII_ELO);
-	RankStats(RankType.DiamondIII, 0.71, 1.18, "Diamond III", DIAMONDIII_ELO);
-	RankStats(RankType.DiamondMaster, 0.69, 1.2, "Diamond master", DIAMOND_MASTER_ELO);
-	RankStats(RankType.AssaultEliteI, 0.65, 1.21, "Assault elite I", ASSAULT_ELITEI_ELO);
-	RankStats(RankType.AssaultEliteII, 0.63, 1.22, "Assault elite II", ASSAULT_ELITEII_ELO);
-	RankStats(RankType.AssaultMaster, 0.59, 1.23, "Assault master", ASSAULT_MASTER_ELO);
-	RankStats(RankType.VersatileMaster, 0.54, 1.25, "Versatile master", VERSATILE_MASTER_ELO);
-	RankStats(RankType.ExperiencedVersatileMaster, 0.5, 1.3, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_ELO);
-	RankStats(RankType.SupremeMaster, 0.48, 1.35, "Supreme master", SUPREME_MASTER_ELO);
-	RankStats(RankType.GlobalMaster, 0.45, 1.75, "Global master", GLOBAL_MASTER_ELO);
+	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", PLAYER_STARTING_ELO);
+	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_ELO);	
+	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_ELO);
+	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_ELO);
+	RankStats(RankType.SilverIV, 1.2, 0.93, "Silver IV", SILVERIV_ELO);
+	RankStats(RankType.SilverV, 1.1, 0.94, "Silver V", SILVERV_ELO);
+	RankStats(RankType.SilverMaster, 1.07, 1, "Silver master", SILVER_MASTER_ELO);
+	RankStats(RankType.GoldI, 1, 1.01, "Gold I", GOLDI_ELO);
+	RankStats(RankType.GoldII, 0.95, 1.03, "Gold II", GOLDII_ELO);
+	RankStats(RankType.GoldIII, 0.93, 1.05, "Gold III", GOLDIII_ELO);
+	RankStats(RankType.GoldIV, 0.85, 1.07, "Gold IV", GOLDIV_ELO);
+	RankStats(RankType.GoldMaster, 0.83, 1.11, "Gold master", GOLD_MASTER_ELO);
+	RankStats(RankType.DiamondI, 0.8, 1.14, "Diamond I", DIAMONDI_ELO);
+	RankStats(RankType.DiamondII, 0.77, 1.15, "Diamond II", DIAMONDII_ELO);
+	RankStats(RankType.DiamondIII, 0.73, 1.18, "Diamond III", DIAMONDIII_ELO);
+	RankStats(RankType.DiamondMaster, 0.7, 1.2, "Diamond master", DIAMOND_MASTER_ELO);
+	RankStats(RankType.AssaultEliteI, 0.69, 1.21, "Assault elite I", ASSAULT_ELITEI_ELO);
+	RankStats(RankType.AssaultEliteII, 0.67, 1.22, "Assault elite II", ASSAULT_ELITEII_ELO);
+	RankStats(RankType.AssaultMaster, 0.63, 1.23, "Assault master", ASSAULT_MASTER_ELO);
+	RankStats(RankType.VersatileMaster, 0.61, 1.25, "Versatile master", VERSATILE_MASTER_ELO);
+	RankStats(RankType.ExperiencedVersatileMaster, 0.59, 1.3, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_ELO);
+	RankStats(RankType.SupremeMaster, 0.53, 1.35, "Supreme master", SUPREME_MASTER_ELO);
+	RankStats(RankType.GlobalMaster, 0.5, 1.75, "Global master", GLOBAL_MASTER_ELO);
 }
 
 function get_rank(Elo){

@@ -14,10 +14,10 @@ if(instance_exists(oPlayer)){
 	}
 
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
-		if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"])){
+		if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory)){
 			if(show_weapon_attachments == false){
 				with(zui_main()){
-					with(zui_create(zui_get_width() * .5, zui_get_height() * .87, oWeaponAttachments)){
+					with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
 						
 					}
 				}

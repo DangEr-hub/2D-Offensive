@@ -389,6 +389,19 @@ if(instance_exists(oBulletTracer)){
 		}
 	}
 }
+
+if(instance_exists(oBullet)){
+	var ChasingObjectBullet = instance_nearest(x, y, oBullet);
+	if(instance_exists(ChasingObjectBullet) && instance_exists(ChasingObjectBullet.stats.Object)){
+		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.stats.Object_index == ChasingObject){
+			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+				if(ChasingObjectSpotted == false){
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+				}
+			}
+		}
+	}
+}
 	
 if(ChasingObject.stats.Health_points <= 0 && instance_exists(oPlayer)){
 	ChasingObject = oPlayer;	
@@ -565,6 +578,10 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			
 		case "USP":
 			Weapon.image_index = 11;
+		break;
+		
+		case "Galil":
+			Weapon.image_index = 12;
 		break;
 			
 		default:

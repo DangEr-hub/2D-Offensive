@@ -71,7 +71,7 @@ global.player_stats_struct = {
 	Lvl: 1,
 	Skill_points: 0,
 	Unskill_points: 0,
-	Money: 0,
+	Money: 1000,
 	Weight: 0,
 	Max_weight: 15,
 	Armour: 0

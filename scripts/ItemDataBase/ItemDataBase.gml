@@ -65,6 +65,19 @@ function weapon_attachment_equip(ID, AttachmentPosition, ObjectType = oPlayer) {
     }
 	
     ds_list_destroy(possible_attachments);
+	
+	if(oDraw.show_weapon_attachments == true){
+		if(instance_exists(oWeaponAttachments)){
+			with(oWeaponAttachments){
+				zui_destroy();
+			}
+		}
+		with(zui_main()){
+			with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
+						
+			}
+		}
+	}
 }
 
 function ItemDataBase(){
@@ -81,6 +94,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.awm, ["Semi", "Safety"]);
 	add_shooting_modes(Item.usp, ["Semi", "Safety"]);
 	add_shooting_modes(Item.basic_machine_gun, ["Auto", "Semi", "Burst", "Safety"]);
+	add_shooting_modes(Item.galil, ["Auto", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -90,7 +104,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.AKM, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 900, 45, 270, 30, "Main", 1, 8, 6, snd_AKM, 5, 2, true,
-	10, 20, 10, 5.9, 30, .017, 10, 3.5, .0025, 1, 7, .25, 1, "Assault rifle", .81, .89, .00015, .5 * game_get_speed(gamespeed_fps), .85);
+	10, 20, 10, 5.9, 30, .017, 10, 3.5, .0025, 1, 7, .25, 1, "Assault rifle", .81, .775, .00015, .5 * game_get_speed(gamespeed_fps), .85, 270, 1);
 	global.ItemIndex[#Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
@@ -106,7 +120,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.DesertEagle, "IMI Desert eagle", 1.75 * game_get_speed(gamespeed_fps), 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
-	0, 0, 10, 30, 7, 2.5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .00033, .1 * game_get_speed(gamespeed_fps), .77);
+	0, 0, 10, 30, 7, 2.5, 9, 7.5, .003, 0, 0, .5, 1, "Pistol", .95, .932, .00033, .1 * game_get_speed(gamespeed_fps), .77, 75, 2);
 	global.ItemIndex[#Item.DesertEagle, ItemStat.difficulty] = 5;
 	global.ItemIndex[#Item.DesertEagle, ItemStat.disadvantages] = "-High recoil\n-Low magazine capacity";
 	global.ItemIndex[#Item.DesertEagle, ItemStat.advantages] = "-High damage\n-High range\n-High armour penetration";
@@ -122,7 +136,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.Spas, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 500, 33, 120, 12, "Main", 5, 5, 30, snd_Spas, 15, 2, false,
-	0, 0, 20, 10, 12, 1.25, 2, 10, .009, 0, 0, .25, 2, "Shotgun", .89, .575, .00125, .75 * game_get_speed(gamespeed_fps), .73);
+	0, 0, 20, 10, 12, 1.25, 2, 10, .009, 0, 0, .25, 2, "Shotgun", .89, .575, .00125, .75 * game_get_speed(gamespeed_fps), .73, 140, 2);
 	global.ItemIndex[#Item.Spas, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.Spas, ItemStat.disadvantages] = "-Low penetration power\n-Low range";
 	global.ItemIndex[#Item.Spas, ItemStat.advantages] = "-Great mobility\n-High damage";
@@ -146,7 +160,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 2, 30, snd_SSG08, 15, 2, false,
-	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * game_get_speed(gamespeed_fps), .5);
+	0, 0, 10, 20, 10, 50, 5, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00007, 1 * game_get_speed(gamespeed_fps), .5, 170, 2);
 	global.ItemIndex[#Item.SSG08, ItemStat.difficulty] = 5;
 	global.ItemIndex[#Item.SSG08, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
@@ -158,7 +172,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.MAC11, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 790, 29, 300, 30, "Main", 1, 2, 6, snd_MAC11, 2, 1, true,
-	15, 20, -9, 9, 30, 0.025, 1.5, 2, .015, 3, 5, .9, 0, "Submachine gun", .9, .57, .00053, .1 * game_get_speed(gamespeed_fps), .89);
+	15, 20, -9, 9, 30, 0.025, 1.5, 2, .015, 3, 5, .9, 0, "Submachine gun", .9, .57, .00053, .1 * game_get_speed(gamespeed_fps), .89, 105, .5);
 	global.ItemIndex[#Item.MAC11, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.MAC11, ItemStat.disadvantages] = "-Low penetration power\n-High bullet spread\n-Low range";
 	global.ItemIndex[#Item.MAC11, ItemStat.advantages] = "-Great mobility\n-Low equip time";
@@ -191,7 +205,8 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 10, 7, snd_SG550, 7, 1.75, true,
-	10, 17, -9, 7, 40, 0.01, 9, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps), .83);
+	10, 17, -9, 7, 40, 0.01, 9, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps), .83, 300, 1);
+	global.ItemIndex[#Item.SG550, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
 	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\-High damage";
@@ -252,7 +267,8 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.Javelin, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Javelin, "FGM-148 Javelin", 1.5 * game_get_speed(gamespeed_fps), 590, 138, 50, 1, "Main", 1, 25, 15, snd_Javelin, 15, 5, false,
-	0, 0, 0, 0, 1, 0, 5, 10, .001, 15, 25, .25, -1, "Anti-tank missile", .59, .99, .00075, 1 * game_get_speed(gamespeed_fps), .5);
+	0, 0, 0, 0, 1, 0, 5, 10, .001, 15, 25, .25, -1, "Anti-tank missile", .59, .99, .00075, 1 * game_get_speed(gamespeed_fps), .5, 350, 1);
+	global.ItemIndex[#Item.Javelin, ItemStat.difficulty] = 1;
 	global.ItemIndex[#Item.Javelin, ItemStat.disadvantages] = "-Very bad mobility\n-Dangerous explosion\n-Only one rocket per shot";
 	global.ItemIndex[#Item.Javelin, ItemStat.advantages] = "-Homing projectiles\n-High damage";
 	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = c_gray;
@@ -261,7 +277,8 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.Glock, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 750, 33, 240, 24, "Secondary", 1, 5, 9, snd_Glock, 3, 1, false,
-	0, 0, 5, 8, 24, .1, 1.75, 4, .008, 0, 0, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps), .9);
+	0, 0, 5, 8, 24, .1, 1.75, 4, .008, 0, 0, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps), .9, 20, .5);
+	global.ItemIndex[#Item.Glock, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
 	global.ItemIndex[#Item.Glock, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
 	global.ItemIndex[#Item.Glock, ItemStat.ItemColor] = c_gray;
@@ -270,7 +287,8 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.m4_carbine, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 38, 760, 30, "Main", 1, 7, 5.5, snd_m4_carbine, 2.5, 1, true,
-	10, 20, -5, 3.9, 30, .01, 8, 3.5, .0025, 1, 7, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps), .73);
+	10, 20, -5, 3.9, 30, .01, 8, 3.5, .0025, 1, 7, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps), .73, 290, .75);
+	global.ItemIndex[#Item.m4_carbine, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.m4_carbine, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.advantages] = "-Good mobility\n-Low bullet spread\n-Low recoil";
 	global.ItemIndex[#Item.m4_carbine, ItemStat.has_suppressor] = Item.military_suppressor; ///Military suppressor
@@ -280,18 +298,20 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.awm, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 1150, 118, 50, 5, "Main", 1, 1, 30, snd_awm, 30, 2, false,
-	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps), .33);
+	0, 0, 25, 50, 5, 50, 10, 10, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2);
+	global.ItemIndex[#Item.awm, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.awm, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n-High damage\n-High range\n-Neglidible damage drop";
 	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.awm, ItemStat.AmmoSpriteID] = 9;
-	global.ItemIndex[#Item.awm, ItemStat.ScopeInaccuracyResetTimer] = 15;
+	global.ItemIndex[#Item.awm, ItemStat.ScopeInaccuracyResetTimer] = 55;
 	global.ItemIndex[#Item.awm, ItemStat.Description] = "Formidable long-range weapon, boasting unparalleled damage and minimal damage drop over distance, yet hampered by its poor mobility. Skilled marksmen wield it to devastating effect, delivering precise and lethal shots.";
 	
 	global.ItemIndex[#Item.usp, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 750, 35, 350, 15, "Secondary", 1, 3, 7, snd_usp, 2, 1, false,
-	0, 0, 7, 5, 15, .5, 5.5, 5, .0125, 0, 0, .93, 0, "Pistol", .93, .505, .00025, 0.15 * game_get_speed(gamespeed_fps), .87);
+	0, 0, 7, 5, 15, .5, 5.5, 5, .0125, 0, 0, .93, 0, "Pistol", .93, .505, .00025, 0.15 * game_get_speed(gamespeed_fps), .87, 35, 1.1);
+	global.ItemIndex[#Item.usp, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low penetration power";
 	global.ItemIndex[#Item.usp, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
 	global.ItemIndex[#Item.usp, ItemStat.has_suppressor] = Item.military_suppressor;
@@ -341,7 +361,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.DamageDrop] = .005;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.BulletCasingID] = 3;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.ItemColor] = make_color_rgb(158, 154, 117);
-	global.ItemIndex[#Item.usp, ItemStat.Description] = "The sticky grenade has moderate damage but a unique ability to adhere to targets upon impact. While its explosive power maybe be less dangerous, its ability to immobilize adversaries offers strategic oppurtunities for skilled players to neutralize threats with precision.";
+	global.ItemIndex[#Item.StickyGrenade, ItemStat.Description] = "The sticky grenade has moderate damage but a unique ability to adhere to targets upon impact. While its explosive power maybe be less dangerous, its ability to immobilize adversaries offers strategic oppurtunities for skilled players to neutralize threats with precision.";
 	
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Name] = "Red dot sight";
@@ -397,6 +417,16 @@ function ItemDataBase(){
 	///Reprezentace základní machine gun
 	global.ItemIndex[#Item.basic_machine_gun, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 700, 33, 500, 50, "Primary", 1, 10, 7, snd_machine_gun, 10, 2, false,
-	0, 0, 10, 30, 50, .05, 1, 1, .0025, 0, 0, 1, 1, "Machine gun", .95, .775, .001, 1.75 * game_get_speed(gamespeed_fps), 1);
+	0, 0, 10, 30, 50, .05, 1, 1, .0025, 0, 0, 1, 1, "Machine gun", .95, .775, .001, 1.75 * game_get_speed(gamespeed_fps), 1, 0, 1);
 	global.ItemIndex[#Item.basic_machine_gun, ItemStat.ItemColor] = c_ltgray	global.ItemIndex[#Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
+	
+	global.ItemIndex[#Item.galil, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.galil, "Galil", 1.75 * game_get_speed(gamespeed_fps), 790, 36, 270, 30, "Main", 1, 10, 6, snd_galil, 5, 2, true,
+	8, 20, 12, 5.9, 30, .02, 10, 3.5, .00275, 1, 7, .59, 1, "Assault rifle", .89, .71, .00012, .25 * game_get_speed(gamespeed_fps), .85, 180, 1);
+	global.ItemIndex[#Item.galil, ItemStat.difficulty] = 4;
+	global.ItemIndex[#Item.galil, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
+	global.ItemIndex[#Item.galil, ItemStat.advantages] = "-High damage\n-High range\n-Low equip time";
+	global.ItemIndex[#Item.galil, ItemStat.ItemColor] = c_orange;
+	global.ItemIndex[#Item.galil, ItemStat.AmmoSpriteID] = 0;
+	global.ItemIndex[#Item.galil, ItemStat.Description] = "Known for its challenging handling yet unmatched lethality on the battlefield. Mastering its recoil demands skill, but once tamed, it becomes a devastating tool capable of swiftly dispatching foes with deadly precision.";
 }

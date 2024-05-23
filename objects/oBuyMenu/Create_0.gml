@@ -23,20 +23,20 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -other.button_height/4 - 8;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
 		zui_set_anchor(0.5, 0);
 		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
+		clickable = true;
 		sprite_image_index = other.items[other.i];
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);
+		};
 	}
 }
 
@@ -49,10 +49,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -63,6 +60,9 @@ for(i=0;i<item_number;i++){
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);
+		};
 	}
 }
 
@@ -76,10 +76,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -90,6 +87,9 @@ for(i=0;i<item_number;i++){
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+		};
 	}
 }
 
@@ -102,10 +102,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -116,6 +113,9 @@ for(i=0;i<item_number;i++){
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+		};
 	}
 }
 
@@ -128,10 +128,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -142,6 +139,9 @@ for(i=0;i<item_number;i++){
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+		};
 	}
 }
 
@@ -154,10 +154,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = global.ItemIndex[#other.items[other.i], ItemStat.Name];
-		callback = function(){
-			buy_item(other.items[other.i], oPlayer.x, oPlayer.y);
-		};
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -168,5 +165,8 @@ for(i=0;i<item_number;i++){
 		sprite = spr_Items;
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
+		callback = function(){
+			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+		};
 	}
 }

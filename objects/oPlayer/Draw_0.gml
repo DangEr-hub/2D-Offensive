@@ -1,5 +1,6 @@
 /// @description Drawing
-//draw_text(x, y - 150, string(Moving));
+draw_text(x, y + 25, string(ViewShakeMagnitude));
+draw_text(x, y + 300, string(ViewShake));
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;

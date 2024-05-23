@@ -115,7 +115,7 @@ function InventoryInit() {
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4_carbine, awm, usp, base_explosion,
-		nuclear_explosion, basic_machine_gun, MolotovGrenade, Total
+		nuclear_explosion, basic_machine_gun, galil, MolotovGrenade, Total
 	}
 
 	enum ItemStat{
@@ -127,7 +127,7 @@ function InventoryInit() {
 		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, MaxKickBack, SniperScope, ShootSpdMul, has_barrel, EquipTime, has_suppressor,
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
 		EnemyInaccuracyCompensation, MaxAmmo, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
-		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, Total
+		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, Total
 	}
 	
 	enum InventoryIndex{
@@ -200,12 +200,30 @@ function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAm
 		ItemDropped.Amount = ObjectAmount;
 		ItemDropped.image_index = ID;
 		if(global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-			ItemDropped.scope_attachment = OWSA;
-			ItemDropped.barrel_attachment = OWBA;
-			ItemDropped.grip_attachment = OWGA;
-			ItemDropped.suppressor_attachment = OWsuppressorA;
-			ItemDropped.Ammo = ObjectAmmo;
-			ItemDropped.ClipAmmo = ObjectClipAmmo;
+			ItemDropped.scope_attachment = global.ItemIndex[#ID, ItemStat.has_scope];
+			if(OWSA != -1){
+				ItemDropped.scope_attachment = OWSA;
+			}	
+			ItemDropped.barrel_attachment = global.ItemIndex[#ID, ItemStat.has_barrel];
+			if(OWBA != -1){
+				ItemDropped.barrel_attachment = OWBA;
+			}
+			ItemDropped.grip_attachment = global.ItemIndex[#ID, ItemStat.has_grip];
+			if(OWGA != -1){
+				ItemDropped.grip_attachment = OWGA;
+			}
+			ItemDropped.suppressor_attachment = global.ItemIndex[#ID, ItemStat.has_suppressor];
+			if(OWsuppressorA != -1){
+				ItemDropped.suppressor_attachment = OWsuppressorA;
+			}
+			ItemDropped.Ammo = global.ItemIndex[#ID, ItemStat.Ammo];
+			if(ObjectAmmo != 0){
+				ItemDropped.Ammo = ObjectAmmo;
+			}
+			ItemDropped.ClipAmmo = global.ItemIndex[#ID, ItemStat.ClipAmmo];
+			if(ObjectClipAmmo != 0){
+				ItemDropped.ClipAmmo = ObjectClipAmmo;
+			}
 		}else if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || 
 		global.ItemIndex[#ID, ItemStat.Type] == "Helmet"){
 			ItemDropped.Durability = ObjectDurability;
@@ -223,7 +241,7 @@ function WeaponDrop(ID, ObjectType){
 	if(ObjectType.object_index == oPlayer){
 		ObjectType.Reloading = false;
 		ObjectType.ReloadTime = 0;
-		for(i = 0;i<weapon_attachments.Total;i++){
+		for(var i = 0;i<weapon_attachments.Total;i++){
 			global.weapon_attachments[ID][i] = Item.None;
 		}
 		global.weapon_id[ID] = Item.None;
