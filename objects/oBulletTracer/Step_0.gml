@@ -133,7 +133,7 @@ if(image_index == 0){
 				stats.Object_name,
 				direction
 			);
-			ParticleCreate(
+			/*ParticleCreate(
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5, 
 				.8, 
 				random(360), 
@@ -150,7 +150,7 @@ if(image_index == 0){
 			);
 			if(instance_exists(oParticleSystem)){
 				part_particles_create(global.ParticleSystem, stats.Shot_x, stats.Shot_y, oParticleSystem.Spark, ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
-			}
+			}*/
 			instance_destroy(id);
 		}
 	}else{
@@ -184,7 +184,7 @@ if(image_index == 0){
 				stats.Object_name,
 				direction
 			);
-			ParticleCreate(
+			/*ParticleCreate(
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5, 
 				.8, 
 				random(360), 
@@ -201,7 +201,7 @@ if(image_index == 0){
 			);
 			if(instance_exists(oParticleSystem)){
 				part_particles_create(global.ParticleSystem, BX, BY, oParticleSystem.Spark, ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
-			}
+			}*/
 			instance_destroy(id);
 		}	
 	}
@@ -241,7 +241,7 @@ if(image_index == 2){
 			stats.Object_name,
 			direction
 		);
-		ParticleCreate(
+		/*ParticleCreate(
 			1, 
 			.8, 
 			random(360), 
@@ -258,7 +258,7 @@ if(image_index == 2){
 		);
 		if(instance_exists(oParticleSystem)){
 			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, 1);
-		}
+		}*/
 
 	    // Update tracking for the last bullet created
 	    last_bullet_x = bullet_x;

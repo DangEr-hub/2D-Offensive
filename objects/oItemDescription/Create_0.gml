@@ -44,7 +44,7 @@ if(global.GUIMultiplier < 2){
 with(zui_create(offset_position_x, offset_position_y + offset_y, objUILabel)){
 	zui_set_anchor(0, 0);
 	font = set_font("GUI_grid");
-	item_description = true;
+	description = "Inventory";
 	color = c_white;
 	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.Description];
 }

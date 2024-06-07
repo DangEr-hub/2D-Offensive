@@ -45,7 +45,6 @@ ToggleInfraVision = false;
 AimPunchDir = 0;
 KickBack = 0;
 KickBackAngle = 0;
-KickBackStabilizationSpeed = 1;
 kick_back_timer = -1;
 KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
 Range = 0;

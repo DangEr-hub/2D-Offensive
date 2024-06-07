@@ -6,6 +6,7 @@ DeltaX = 0; DeltaY = 0;
 recoil_speed = .1;
 x = mouse_x;
 y = mouse_y;
+
 #region Crosshair shake vars
 HitMarker = -1;
 WobbleResetSpeed = .25;

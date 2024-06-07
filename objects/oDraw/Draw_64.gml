@@ -314,7 +314,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				global.GuiH/sprite_get_height(spr_AimPunch), 0, c_white, .75);	
 			}
 		}
-		#endregion
+		#endregion	
 
 		#region Draw player healtbars and mags
 		var bar_gap = (sprite_get_height(spr_HealthBar)*1.1*global.GUIMultiplier);
@@ -362,6 +362,15 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		draw_sprite_ext(spr_HealthBar, 8, xp_x, xp_y, (global.player_stats_struct.Xp/global.player_stats_struct.Max_xp) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 		#endregion
 			
+		#endregion
+
+		#region Draw money value number
+		var money_string = "Money: " + string(global.player_stats_struct.Money);
+		var money_x = HUDShift;
+		var money_y = StaminaY - bar_gap*4;
+		draw_text_outlined(money_x, money_y, "Money: ", c_white, c_black, 1);
+		draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats_struct.Money), global.gold_color, c_black, 1);
+		draw_sprite_ext(spr_Coin, 0, money_x + 8 + string_width(money_string)*1.1, money_y, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 		#endregion
 	
 		#region Player

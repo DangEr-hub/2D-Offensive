@@ -1,6 +1,15 @@
 xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 
+recoil_speed = .1;
+WobbleResetSpeed = .25;
+StabilizationSpeed = 15;
+if(global.ItemIndex[#oPlayer.WeaponID, ItemStat.WeaponTypeClass] == "Pistol"){
+	recoil_speed = 10;
+	WobbleResetSpeed = 20;
+	StabilizationSpeed = 75;
+}
+
 if(HitMarker > -1){	
 	HitMarker += .5;
 	if(HitMarker % 4 == 0){
@@ -58,7 +67,7 @@ if(instance_exists(oPlayer)){
 			var MaxKickBack = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.MaxKickBack];
 			#endregion
 
-			if (oPlayer.shooting) {
+			if ((!oPlayer.CanShoot && oPlayer.ShootTimer >= global.ItemIndex[# global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootTimer] / 2 && global.ItemIndex[# oPlayer.WeaponID, ItemStat.WeaponTypeClass] == "Pistol") || (oPlayer.shooting && global.ItemIndex[# oPlayer.WeaponID, ItemStat.WeaponTypeClass] != "Pistol")) {
 				
 				#region Recoil mechanic
 			    axis_multiplier[1] = -sign(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.RecoilY]);

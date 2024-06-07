@@ -5,12 +5,12 @@ if(window_get_fullscreen() == true){
 draw_set_alpha(alpha * alpha_value);
 draw_set_font(font);
 
-if(item_description == false){
+if(description = ""){
 	draw_text_outlined(0, 0, caption, color, outline_color, 1);
 	if(icon_image_index != -1 && icon_sprite_index != -1){
 		draw_sprite_ext(icon_sprite_index, icon_image_index, 0 - sprite_get_width(icon_sprite_index), 0, 1, 1, 0, c_white, alpha * alpha_value);
 	}
-}else{
+}else if(description == "Inventory"){
 	var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
 	if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 		var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
@@ -70,6 +70,13 @@ if(item_description == false){
 						
 		draw_set_font(set_font("Console"));
 	}
+}else if(description == "Buy_menu"){
+	draw_set_font(set_font("GUI_grid"));
+	var Id = item_id;
+	var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 150 * global.GUIMultiplier);
+	var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
+	var StartDescriptionY = y + 96 + DescriptionStringHeight/2;
+	draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 }
 gpu_set_tex_filter(false);
 draw_set_alpha(1);

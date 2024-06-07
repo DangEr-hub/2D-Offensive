@@ -104,23 +104,25 @@ if(ExplosionTimer == -1){
 					#endregion					
 				}
 			}
-			if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
-				if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
+			if(instance_exists(oEnemy)){
+				if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
+					if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
 						
-					#region Flash enemy
-					if(instance_exists(oEnemy)){
-						var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
-						if (angular_diff > 180){
-							angular_diff = 360 - angular_diff;
+						#region Flash enemy
+						if(instance_exists(oEnemy)){
+							var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
+							if (angular_diff > 180){
+								angular_diff = 360 - angular_diff;
+							}
+							oEnemy.Flashed = true;
+							oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
 						}
-						oEnemy.Flashed = true;
-						oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
-					}
-					#endregion
+						#endregion
 						
-				}
+					}
 					
-			}			
+				}	
+			}
 		}else if(stats.Item_id == Item.SmokeGrenade){
 				
 			#region Create smoke effect
@@ -196,22 +198,24 @@ if(ExplodeTimer == -1){
 				
 			}
 		}
-		if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
-			if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
+		if(instance_exists(oEnemy)){
+			if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
+				if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
 						
-				#region Flash enemy
-				if(instance_exists(oEnemy)){
-					var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
-					if (angular_diff > 180){
-						angular_diff = 360 - angular_diff;
+					#region Flash enemy
+					if(instance_exists(oEnemy)){
+						var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
+						if (angular_diff > 180){
+							angular_diff = 360 - angular_diff;
+						}
+						oEnemy.Flashed = true;
+						oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
 					}
-					oEnemy.Flashed = true;
-					oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
-				}
-				#endregion
+					#endregion
 						
-			}
+				}
 					
+			}	
 		}
 	}else if(stats.Item_id == Item.SmokeGrenade){
 				

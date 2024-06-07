@@ -1,4 +1,6 @@
 global.my_console = console_create();
+global.gold_color = make_color_rgb(255, 215, 0);
+global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 global.saturation_level = 1.9;
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
@@ -117,7 +119,7 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_r
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(229, 181, 45);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .25;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .95;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .8;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 

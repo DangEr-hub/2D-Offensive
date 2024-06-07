@@ -1,7 +1,81 @@
-if(instance_exists(oPlayer) && oDraw.PauseMenu == false && oDraw.RespawnMenu == false){
-	if (oPlayer.player_can_shoot == true) {
-		var xx = (device_mouse_x_to_gui(0) * oDraw.ViewW / global.GuiW) + oDraw.ViewX;
-		var yy = (device_mouse_y_to_gui(0) * oDraw.ViewH / global.GuiH) + oDraw.ViewY;
-		camera_set_xy(Object.x, Object.y, mouse_x, mouse_y, Speed);			
-	}
+// Step Event of oCamera
+if (instance_exists(oPlayer) && oDraw.PauseMenu == false && oDraw.RespawnMenu == false) {
+    if (oPlayer.player_can_shoot == true && !global.my_console[? "active"]) {
+		var PlayerVelocity = sqrt(power(oPlayer.XSpeed, 2) + power(oPlayer.YSpeed, 2)) * game_get_speed(gamespeed_fps);
+		var rotation_increment = PlayerVelocity/5000;
+		var max_rotation = PlayerVelocity/750;
+		show_debug_message(max_rotation)
+		if (keyboard_check(ord("A"))) {
+		    if (rotation_target > -max_rotation && rotation_direction == 1) {
+		        rotation_target -= rotation_increment;
+		        if (rotation_target <= -max_rotation) {
+		            rotation_direction = -1;
+		        }
+		    } else {
+		        rotation_target += rotation_increment;
+		        if (rotation_target >= max_rotation) {
+		            rotation_direction = 1;
+		        }
+		    }
+		} else if (keyboard_check(ord("D"))) {
+		    if (rotation_target < max_rotation && rotation_direction == 1) {
+		        rotation_target += rotation_increment;
+		        if (rotation_target >= max_rotation) {
+		            rotation_direction = -1;
+		        }
+		    } else {
+		        rotation_target -= rotation_increment;
+		        if (rotation_target <= -max_rotation) {
+		            rotation_direction = 1;
+		        }
+		    }
+		} else if (keyboard_check(ord("W"))) {
+		    if (rotation_target > -max_rotation && rotation_direction == 1) {
+		        rotation_target -= rotation_increment;
+		        if (rotation_target <= -max_rotation) {
+		            rotation_direction = -1;
+		        }
+		    } else {
+		        rotation_target += rotation_increment;
+		        if (rotation_target >= max_rotation) {
+		            rotation_direction = 1;
+		        }
+		    }
+		} else if (keyboard_check(ord("S"))) {
+		    if (rotation_target < max_rotation && rotation_direction == 1) {
+		        rotation_target += rotation_increment;
+		        if (rotation_target >= max_rotation) {
+		            rotation_direction = -1;
+		        }
+		    } else {
+		        rotation_target -= rotation_increment;
+		        if (rotation_target <= -max_rotation) {
+		            rotation_direction = 1;
+		        }
+		    }
+		} else {
+            // Gradually reduce rotation when no key is pressed
+            if (rotation_target > 0) {
+                rotation_target -= rotation_increment;
+                if (rotation_target < 0) {
+                    rotation_target = 0;
+                }
+            } else if (rotation_target < 0) {
+                rotation_target += rotation_increment;
+                if (rotation_target > 0) {
+                    rotation_target = 0;
+                }
+            }
+        }
+
+        // Smooth rotation transition
+        rotation_angle = lerp(rotation_angle, rotation_target, Speed);
+        var target_x = Object.x;
+        var target_y = Object.y;
+
+        camera_set_xy(target_x, target_y, mouse_x, mouse_y, Speed);
+        camera_set_view_angle(view_camera[0], camera_get_view_angle(view_camera[0]) + rotation_angle);
+    }
 }
+
+

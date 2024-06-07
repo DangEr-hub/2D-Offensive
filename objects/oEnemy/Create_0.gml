@@ -65,13 +65,13 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
 #region Set armour
-ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest);
-HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm);
+ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
+HelmetID = Item.None;//choose(Item.KevlarHelm, Item.MilitaryHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
 #region Movement engine
-Acceleration = min(.59 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .75);
+Acceleration = min(.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .75);
 Friction = .75;
 MaxSpeed = min(2.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 5.75);
 MoveDirection  = 0;
@@ -91,7 +91,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4_carbine, Item.awm, Item.galil);
+WeaponID[0] = Item.None;//choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];

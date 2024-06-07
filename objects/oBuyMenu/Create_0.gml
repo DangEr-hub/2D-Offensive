@@ -11,7 +11,7 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	draggable = 1;
 }
 
-items = [Item.AKM, Item.m4_carbine, Item.SG550, Item.SSG08, Item.awm, Item.None, Item.None];
+items = [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.m4_carbine];
 item_number = 7;
 position_x = zui_get_width() * .1;
 position_y = zui_get_height() * .1;
@@ -66,7 +66,7 @@ for(i=0;i<item_number;i++){
 	}
 }
 
-items = [Item.Glock, Item.usp, Item.DesertEagle, Item.None, Item.None, Item.None, Item.None];
+items = [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.None, Item.None, Item.None];
 item_number = 7;
 position_x = zui_get_width() * .1 + button_width*1.1*2;
 position_y = zui_get_height() * .1;
@@ -145,7 +145,7 @@ for(i=0;i<item_number;i++){
 	}
 }
 
-items = [Item.None, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None];
+items = [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None];
 position_x = zui_get_width() * .1 + button_width*1.1*5;
 position_y = zui_get_height() * .1;
 for(i=0;i<item_number;i++){

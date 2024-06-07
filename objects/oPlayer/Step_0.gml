@@ -3,7 +3,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Hold stamina
 	stamina_inaccuracy = 1;
-	if (!global.my_console[? "active"]){
+	if (!global.my_console[? "active"] && global.weapon_id[WeaponID] != Item.None){
 		if(keyboard_check(global.KeyBinds[| KeyBind.KeyHoldStamina]) && stats.Stamina_points > 0){
 			stats.Stamina_points -= STAMINA_HOLD_VALUE;
 			stamina_inaccuracy = .5;
@@ -356,7 +356,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Weapon.image_index = 1;
 			break;
 			
-			case "IMI Desert eagle":
+			case "Desert Eagle":
 				Weapon.image_index = 2;
 			break;
 			
@@ -398,6 +398,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			case "Galil":
 				Weapon.image_index = 12;
+			break;
+			
+			case "P250":
+				Weapon.image_index = 13;
+			break;
+			
+			case "MK18":
+				Weapon.image_index = 14;
 			break;
 			
 			default:
@@ -1012,10 +1020,9 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 		}
 	}
-
 	if(shooting == false){
 		if(kick_back_timer == -1){
-			KickBack = max(0, KickBack - KickBackStabilizationSpeed);
+			KickBack = max(0, KickBack - (global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.KBStabilization] + 1));
 			KickBackAngle = 0;
 		}
 	}

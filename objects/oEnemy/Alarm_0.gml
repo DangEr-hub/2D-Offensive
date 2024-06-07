@@ -19,7 +19,7 @@ function handle_basic_movement() {
 	        choose_offensive_action();
 	    }
 	}else{
-		if(percent_chance(30 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		if(percent_chance(10 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 			if(State != States.Move){
 				State = States.Move;
 			}
@@ -27,7 +27,7 @@ function handle_basic_movement() {
 			if(State != States.MoveShoot){
 				State = States.MoveShoot;	
 			}
-		}else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		}else if(percent_chance(75 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
 			if(State != States.MoveToward){
 				State = States.MoveToward;	
 			}

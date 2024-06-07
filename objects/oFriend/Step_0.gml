@@ -461,7 +461,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			Weapon.image_index = 1;
 		break;
 			
-		case "IMI Desert eagle":
+		case "Desert Eagle":
 			Weapon.image_index = 2;
 		break;
 			

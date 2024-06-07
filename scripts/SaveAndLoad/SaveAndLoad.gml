@@ -39,6 +39,7 @@ function save_game(){
 	ini_write_real("Vars", "window_width", global.window_width);
 	ini_write_real("Vars", "window_height", global.window_height);
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
+	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	
 	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
@@ -135,6 +136,7 @@ function load_game(){
 		global.GUIMultiplier = ini_read_real("Vars", "gui_scale", global.GUIMultiplier);
 		global.window_width = ini_read_real("Vars", "window_width", global.window_width);
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
+		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 
 		global.weapon_attachments = array_create(2);

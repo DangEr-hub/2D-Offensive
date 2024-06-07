@@ -411,39 +411,55 @@ function ChooseLandMine(){
 	return LandMine;	
 }
 
-function ThrowGrenadeAI(){
-	if(distance_to_object(ChasingObject) <= ChasingDistance*.5){
-		if(instance_exists(oParentTile)){
-			if(distance_to_object(oParentTile) >= 128){
-				if(State !=	States.ThrowGrenade && EquippedGrenadeTimer == -1){
-					EquippedGrenade = ChooseGrenade();
-					if(Grenades[EquippedGrenade] > 0){
-						State = States.ThrowGrenade;	
-					}else{
-						if(State != States.MoveShoot){
-							State = States.MoveShoot;	
-						}
-					}
-				}else{
-					if(State != States.MoveShoot){
-						State = States.MoveShoot;	
-					}
-				}
-			}else{
-				if(State != States.MoveShoot){
-					State = States.MoveShoot;	
-				}
-			}
+function handle_offensive_movement(){
+	if(stats.Health_points <= stats.Max_health_points / 3){
+	    if (percent_chance(25 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
+	        State = States.MoveAway;
+	    } else if (percent_chance(40 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveShoot) {
+	        State = States.MoveShoot;
 		}else{
-			if(State != States.MoveShoot){
-				State = States.MoveShoot;	
-			}			
+			State = States.MovePredictive;
 		}
 	}else{
-		if(State != States.MoveShoot){
-			State = States.MoveShoot;	
+		if(percent_chance(10 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.Move){
+				State = States.Move;
+			}
+		}else if(percent_chance(10 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.MoveShoot){
+				State = States.MoveShoot;	
+			}
+		}else if(percent_chance(75 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(State != States.MoveToward){
+				State = States.MoveToward;	
+			}
+		}else{
+			State = States.MovePredictive;
 		}
 	}
+}
+
+function ThrowGrenadeAI() {
+    if (distance_to_object(ChasingObject) > ChasingDistance * 0.5) {
+        handle_offensive_movement();
+        return;
+    }
+
+    if (!instance_exists(oParentTile) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oEnemy, true, true)) {
+        handle_offensive_movement();
+        return;
+    }
+
+    if (State != States.ThrowGrenade && EquippedGrenadeTimer == -1) {
+        EquippedGrenade = ChooseGrenade();
+        if (Grenades[EquippedGrenade] <= 0) {
+            handle_offensive_movement();
+            return;
+        }
+        State = States.ThrowGrenade;
+    } else {
+        handle_offensive_movement();
+    }
 }
 
 function LayDownLandMineAI(){

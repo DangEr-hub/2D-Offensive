@@ -50,6 +50,43 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
+	var particles_number = global.ItemIndex[#BulletItemID, ItemStat.Damage]/5;
+	if(BulletItemID == Item.base_explosion || BulletItemID == Item.HEGrenade || BulletItemID == Item.StickyGrenade
+	|| BulletItemID == Item.CELandMine || BulletItemID == Item.HELandMine
+	|| BulletItemID == Item.LELandMine || BulletItemID == Item.nuclear_explosion){
+		particles_number = 1;
+	}
+	
+	ParticleCreate(
+		particles_number, 
+		.8, 
+		random(360), 
+		spr_MovementParticle, 
+		particles_number, 
+		random_range(-90, 90),
+		random(360),
+		1,
+		choose(true, false),
+		false,
+		0,
+		BulletX,
+		BulletY
+	);
+	if(instance_exists(oParticleSystem)){
+		part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.Spark, ceil(particles_number));
+		var posX = BulletX;
+		var posY = BulletY;
+		var partSystem = global.ParticleSystem;
+		var partType = oParticleSystem.headshot_particle;
+		for (var i = 0; i < ceil(particles_number); i++) {
+			var randomDirection = random_range(BulletDirection - 180 - 90, BulletDirection - 180 + 90);
+			part_type_color1(partType, c_gray);
+			part_type_direction(partType, randomDirection, randomDirection, 0, 0);
+			part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
+			part_particles_create(partSystem, posX, posY, partType, 1);
+			part_type_color1(partType, c_white);
+		}
+	}
 	Bullet.direction = BulletDirection;
 	Bullet.stats = {
 		"Damage": BulletDamage,
@@ -157,7 +194,25 @@ function shouldExplode(ObjectType, Placer) {
 
     if (instance_exists(instance_to_check)) {
         var isWithinExplosionDistance = distance_to_object(instance_to_check) <= explosion_distance;
-        var isNotPlacer = (Placer == noone || instance_to_check != Placer);
+        var isNotPlacer = (Placer == noone || !instance_exists(Placer) || instance_to_check != Placer);
+
+        // Use the landmine's stats.Object_index to determine behavior
+        var landminePlacerType = stats.Object_index;
+
+        // Additional check: if the landmine is placed by an enemy, do not trigger for other enemies
+        if (landminePlacerType == oEnemy && instance_to_check.object_index == oEnemy) {
+            isNotPlacer = false;
+        }
+
+        // Check for grenade specific conditions
+        if (ObjectType == oGrenade) {
+            if (landminePlacerType == oEnemy && instance_to_check.stats.Object_index != oPlayer) {
+                return false;
+            }
+            if (landminePlacerType == oPlayer && instance_to_check.stats.Object_index != oEnemy) {
+                return false;
+            }
+        }
 
         return isWithinExplosionDistance && isNotPlacer;
     }
@@ -329,7 +384,7 @@ function player_shooting(){
 		var horizontal_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackInaccuracyMultiplier];
 		var vertical_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackPower];		
 
-		if (global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.HardRecoil] == false) {
+		if (global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.random_bullet_spread] == true) {
 			ShotX = random_range(
 				oCrosshair.x - inaccuracy_formula(current_weapon_id, id), 
 				oCrosshair.x + inaccuracy_formula(current_weapon_id, id)

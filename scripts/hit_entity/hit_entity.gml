@@ -105,6 +105,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 		randomize();
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
 			if(hit_object.object_index == oEnemy){
+				global.player_stats_struct.Money += global.ItemIndex[#Bullet.stats.Item_id, ItemStat.reward];
 				if(BodyPart <= HitBox.HeadProne){
 					if(global.ranked_game == true){
 						global.player_stats_struct.Headshots ++;

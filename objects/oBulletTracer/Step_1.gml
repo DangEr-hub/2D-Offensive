@@ -38,14 +38,31 @@ if(wall_collision != noone){
 				#region Barrel
 				if(wall_collision.instance_id.object_index == oGlass){
 					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.instance_id.x, wall_collision.instance_id.y));
-					//wall_collision.instance_id.stats.Object_name = stats.Object_name;
-					//wall_collision.instance_id.stats.Object_index = stats.Object_index;
-					//wall_collision.instance_id.stats.Object = stats.Object;
 					wall_collision.instance_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
 				}
 				#endregion
 			
 				#region Particles
+				if(instance_exists(oParticleSystem)){
+					var spark_number = ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5);
+					if(image_index == 2){
+						spark_number = 1;	
+					}
+					part_particles_create(global.ParticleSystem, wall_collision.x, wall_collision.y, oParticleSystem.Spark, spark_number);
+					var posX = x;
+					var posY = y;
+					var partSystem = global.ParticleSystem;
+					var partType = oParticleSystem.headshot_particle;
+
+					for (var i = 0; i < spark_number; i++) {
+					    var randomDirection = random_range(direction - 180 - 90, direction - 180 + 90);
+						part_type_color1(partType, c_gray);
+					    part_type_direction(partType, randomDirection, randomDirection, 0, 0);
+					    part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
+					    part_particles_create(partSystem, posX, posY, partType, 1);
+						part_type_color1(partType, c_white);
+					}
+				}
 				var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
 				ParticleCreate(
 					WallParticles, 
@@ -92,13 +109,6 @@ if(wall_collision != noone){
 					wall_collision.x,
 					wall_collision.y
 				);
-				var spark_number = ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5);
-				if(image_index == 2){
-					spark_number = 1;	
-				}
-				if(instance_exists(oParticleSystem)){
-					part_particles_create(global.ParticleSystem, wall_collision.x, wall_collision.y, oParticleSystem.Spark, spark_number);
-				}
 				#endregion
 			
 				ds_list_add(HitList, wall_collision.instance_id);

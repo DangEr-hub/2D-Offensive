@@ -380,6 +380,16 @@ function console_submit(Console) {
 							global.saturation_level = real(c[1]);
 						}
 					break;
+					
+					case "set_clear_particles_timer":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.clear_particles_timer = real(c[1]);
+							
+							if(instance_exists(oParticleSurface)){
+								oParticleSurface.alarm[0] = global.clear_particles_timer;
+							}
+						}
+					break;
 	            } 
 	        }
 	        global.console[? "string"] = "";

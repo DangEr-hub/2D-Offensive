@@ -21,7 +21,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 	switch(State){
 		case States.MoveAway:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -30,7 +30,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveShoot:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -39,7 +39,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.Move:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -48,7 +48,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveToward:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -57,7 +57,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveAwayFromGrenade:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -66,7 +66,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.Chase:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -75,7 +75,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -84,7 +84,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/2) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -283,11 +283,15 @@ if(global.enemy_visibility == false){
 			HPTimer != -1
 		){
 			var collision_object = collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false);
-			if(collision_object || collision_line(x, y, oPlayer.x, oPlayer.y, oSmokeTile, true, false) && !(oPlayer.moving_state == player_states.machine_gun_state && collision_object.object_index == oMachineGunFloor)){
-				if(Visible == true){
-					if(VisibilityTimer == -1){
-						VisibilityTimer = VisibilityTime;
+			if(collision_object || collision_line(x, y, oPlayer.x, oPlayer.y, oSmokeTile, true, false)){
+				if!(oPlayer.moving_state == player_states.machine_gun_state && collision_object.object_index == oMachineGunFloor){
+					if(Visible == true){
+						if(VisibilityTimer == -1){
+							VisibilityTimer = VisibilityTime;
+						}
 					}
+				}else{
+					Visible = true;	
 				}
 			}else{
 				Visible = true;
@@ -416,7 +420,7 @@ if(global.EnemyCanMove == true){
 			case Item.HEGrenade:
 				Target_x = ChasingObject.x;
 				Target_y = ChasingObject.y;
-				GrenadeSpd = 3;
+				GrenadeSpd = 7;
 			break;
 		
 			case Item.FlashBangGrenade:
@@ -540,7 +544,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			Weapon.image_index = 1;
 		break;
 			
-		case "IMI Desert eagle":
+		case "Desert Eagle":
 			Weapon.image_index = 2;
 		break;
 			

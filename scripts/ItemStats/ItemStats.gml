@@ -35,6 +35,7 @@
 /// @param RSM
 /// @param C
 /// @param KBR
+/// @param R
 function WeaponStats(){
 	ItemID = argument[0];
 	global.ItemIndex[#ItemID, ItemStat.Name] = argument[1];
@@ -73,6 +74,7 @@ function WeaponStats(){
 	global.ItemIndex[#ItemID, ItemStat.ReloadSpdMul] = argument[33];
 	global.ItemIndex[#ItemID, ItemStat.Cost] = argument[34];
 	global.ItemIndex[#ItemID, ItemStat.KBResetMultiplier] = argument[35];
+	global.ItemIndex[#ItemID, ItemStat.reward] = argument[36];
 }
 
 function ArmourStats(ID, Name, Weight, Defense){
@@ -80,4 +82,5 @@ function ArmourStats(ID, Name, Weight, Defense){
 	global.ItemIndex[#ItemID, ItemStat.Name] = argument[1];
 	global.ItemIndex[#ItemID, ItemStat.Weight] = argument[2];
 	global.ItemIndex[#ItemID, ItemStat.Defense] = argument[3];
+	global.ItemIndex[#ItemID, ItemStat.Cost] = argument[4];
 }
