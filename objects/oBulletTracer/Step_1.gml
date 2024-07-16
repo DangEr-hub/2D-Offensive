@@ -1,4 +1,11 @@
 var wall_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, oParentTile, false);
+
+if(wall_collision == noone && instance_exists(stats.Object)){
+	if(collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false)){
+		stats.Penetration_damage ++;
+	}
+}
+
 if(wall_collision != noone){
 	
 	randomize();
@@ -64,7 +71,7 @@ if(wall_collision != noone){
 					}
 				}
 				var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
-				ParticleCreate(
+				particle_create(
 					WallParticles, 
 					0.8, 
 					random(360), 
@@ -79,7 +86,7 @@ if(wall_collision != noone){
 					wall_collision.x,
 					wall_collision.y
 				);
-				ParticleCreate(
+				particle_create(
 					ceil(WallParticles/2), 
 					0.8, 
 					random(360), 
@@ -94,7 +101,7 @@ if(wall_collision != noone){
 					wall_collision.x,
 					wall_collision.y
 				);
-				ParticleCreate(
+				particle_create(
 					WallParticles, 
 					.8, 
 					random(360), 
@@ -122,11 +129,11 @@ if(wall_collision != noone){
 		
 		#region Rocket hits wall
 		var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
-		ParticleCreate(WallParticles, 0.8, random(360), ParticleTexture, 
+		particle_create(WallParticles, 0.8, random(360), ParticleTexture, 
 		random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, false, false, 0, x, y);
-		ParticleCreate(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 
+		particle_create(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 
 		random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
-		ExplosionCreate(
+		explosion_create(
 			30, 
 			x, 
 			y, 

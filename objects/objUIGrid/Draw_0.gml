@@ -172,6 +172,10 @@ if(type == "Respawn menu"){
 					case ItemStat.ShootingMode:
 						text = statTitles[statIndex] + get_shooting_modes_string(Id);
 					break;
+					
+					case ItemStat.KickBackInaccuracyMultiplier:
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
+					break;
 									
 					default:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
@@ -236,9 +240,46 @@ if(type == "Respawn menu"){
 	
 	#endregion
 	
-}else if(type == "Item description"){
+}else if(type == "Usable item description"){
 
 	#region Item description
+	var rows = 1;
+	var columns = 3;
+	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
+	var statTitles = ["Damage: ", "Penetration power: ", "Damage drop: "];
+						
+	#region Draw grid
+	for (var i = 0; i < rows; i++) {
+		for (var j = 0; j < columns; j++) {
+			var cell_x = x + j * cell_width;
+			var cell_y = y + i * cell_height;
+			draw_set_color(MAIN_COLOR);
+			draw_rectangle(cell_x, cell_y, cell_x + cell_width, cell_y + cell_height, true);
+			draw_set_color(c_white);
+							
+			draw_set_font(set_font("GUI_grid"));
+			var text = "";
+			
+			switch(statTitles[j]){			
+				case "Damage: ":
+					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.Damage]);
+				break;
+				
+				case "Penetration power: ":
+					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.PenetrationPower]*100) + "%";
+				break;
+				
+				case "Damage drop: ":
+					text = statTitles[2] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.DamageDrop]*100) + "%/Unit";
+				break;
+			}
+			
+			var text_x = cell_x + cell_width / 2 - string_width(text) / 2;
+			var text_y = cell_y + cell_height/2;
+			draw_text_outlined(text_x, text_y, text, c_white, c_black, 1);
+		}
+	}
+	#endregion
 	
 	#endregion
 

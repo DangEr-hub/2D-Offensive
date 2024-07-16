@@ -21,6 +21,14 @@ function enemy_initalized(hitObj, enemyId) {
 function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer) && instance_exists(hit_object)){
 		var Damage = Bullet.stats.Damage * power(1 - global.ItemIndex[#Bullet.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, Bullet.stats.Starting_x, Bullet.stats.Starting_y));
+		if(hit_object.object_index == oEnemy){
+			with(hit_object){
+				if(ChasingObjectSpotted == false){
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+				}
+			}
+		}
+		
 		if(hit_object.object_index == oPlayer){
 			Damage *= (1 - global.player_stats_struct.Armour);
 		}

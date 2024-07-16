@@ -16,7 +16,7 @@ if(explode == true){
 	    image_index = lerp(ImageIndex, ImageIndex + 3, progress);
 	}else{
 	    image_index = ImageIndex + 3;
-		ExplosionCreate(
+		explosion_create(
 			global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID],
 			x,
 			y,

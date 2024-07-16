@@ -1,8 +1,10 @@
 stats = {
+	"Object_x": x,
+	"Object_y": y,
 	"Shot_x": 0,
-	"Shot_y":0,
-	"Starting_x": 0,
-	"Starting_y": 0,
+	"Shot_y": 0,
+	"Starting_x": x,
+	"Starting_y": y,
 	"Penetration_damage": 0
 };
 last_bullet_x = x;

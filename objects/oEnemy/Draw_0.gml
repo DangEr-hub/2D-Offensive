@@ -50,12 +50,12 @@ if(Visible == true){
 		draw_sprite_ext(spr_Helmet, 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 	
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
+	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None && EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		draw_sprite_ext(
 			spr_Items,
 			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor],
-			Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-			Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
+			Weapon.x + lengthdir_x(WeaponDistance*.95, RotationAngle),
+			Weapon.y + lengthdir_y(WeaponDistance*.95, RotationAngle),
 			.5,
 			.5,
 			RotationAngle,

@@ -17,7 +17,7 @@ volume_gain_string = "Volume gain: ";
 text_height = string_height("a")*2;
 
 window_width_function = function() {
-    window_sizes = [480, 960, 1920, 3840];
+    window_sizes = [480, 960, 1366, 1600, 1280, 1920, 2560, 3840];
     current_index = -1;
     for (i = 0; i < array_length(window_sizes); i++) {
         if (global.window_width == window_sizes[i]) {
@@ -53,7 +53,7 @@ window_width_function = function() {
 };
 
 window_height_function = function() {
-    window_sizes = [270, 540, 1080, 2160];
+    window_sizes = [270, 540, 768, 900, 1024, 1080, 1440, 2160];
     current_index = -1;
     for (i = 0; i < array_length(window_sizes); i++) {
         if (global.window_height == window_sizes[i]) {

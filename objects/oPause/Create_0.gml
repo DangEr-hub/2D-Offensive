@@ -27,7 +27,7 @@ popup_exit_callback_positive = function(){
 };
 
 exit_callback = function(){
-	ui_show_popup("Exit game?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);		
+	ui_show_popup("Exit the game?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);		
 };
 
 popup_main_menu_callback_positive = function(){

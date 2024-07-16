@@ -2,19 +2,25 @@ function player_has_machine_gun(){
 	return global.weapon_id[0] == Item.basic_machine_gun;
 }
 
-function buy_item(ItemID, PositionX, PositionY){
-	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost]){
+function buy_item(ItemID){
+	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID)){
 		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
-		ItemDrop(
+		GainItem(
 			ItemID,
-			PositionX,
-			PositionY,
-			100		
+			1,
+			global.ItemIndex[#ItemID, ItemStat.Ammo], 
+			global.ItemIndex[#ItemID, ItemStat.ClipAmmo], 
+			global.ItemIndex[#ItemID, ItemStat.BaseDurability],
+			global.ItemIndex[#ItemID, ItemStat.has_scope],
+			global.ItemIndex[#ItemID, ItemStat.has_barrel],
+			global.ItemIndex[#ItemID, ItemStat.has_grip],
+			global.ItemIndex[#ItemID, ItemStat.has_suppressor],
+			false
 		);
 	}
 }
 
-function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD){
+function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD, BOPosition){
 	if(instance_exists(BulletObject)){
 		if(instance_exists(oParticleSystem) && BulletObject.Visible == true){
 			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
@@ -36,8 +42,11 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 		"Object_index": ObjectIndex,
 		"Object_name": ObjectName,
 		"Distance": BulletDistance,
-		"Nearest_enemy": BNE
+		"Nearest_enemy": BNE,
+		"Object_x": BOPosition[0],
+		"Object_y": BOPosition[1]
 	};
+	
 	with(bullet_tracer){
 		image_index = BulletImage;
 		image_angle = BulletDirection;
@@ -57,7 +66,7 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		particles_number = 1;
 	}
 	
-	ParticleCreate(
+	particle_create(
 		particles_number, 
 		.8, 
 		random(360), 
@@ -178,14 +187,25 @@ function find_collision_point(x1, y1, x2, y2, object) {
 }
 
 function item_description_destroy(){
-	with(oItemDescription){
-		zui_destroy();
+	if(instance_exists(oItemDescription)){
+		with(oItemDescription){
+			zui_destroy();
+		}
 	}
-	with(oWeaponDescription){
-		zui_destroy();
-	}	
-	with(oArmourDescription){
-		zui_destroy();
+	if(instance_exists(oWeaponDescription)){
+		with(oWeaponDescription){
+			zui_destroy();
+		}	
+	}
+	if(oArmourDescription){
+		with(oArmourDescription){
+			zui_destroy();
+		}
+	}
+	if(oUsableItemDescription){
+		with(oUsableItemDescription){
+			zui_destroy();
+		}
 	}
 }
 
@@ -347,7 +367,7 @@ function player_shooting(){
 						
 	#region Create bullet casing
 	if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID] != -1){
-		ParticleCreate(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+		particle_create(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
 		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID], x, y, 1, 60);
 	}
 	#endregion
@@ -430,7 +450,8 @@ function player_shooting(){
 				object_index,
 				stats.Name,
 				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
-				0
+				0,
+				[id.x, id.y]
 			);
 		}else{
 			create_bullet_tracer(
@@ -448,7 +469,8 @@ function player_shooting(){
 				object_index,
 				stats.Name,
 				noone,
-				0
+				0,
+				[id.x, id.y]
 			);
 		}
 					
@@ -465,9 +487,7 @@ function inaccuracy_formula(WID, ObjectType){
 				range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
 				moving_state_inaccuracy = 1;
 	
-				if(ObjectType.moving_state == player_states.running_state){
-					moving_state_inaccuracy = 2;
-				}else if(ObjectType.moving_state == player_states.prone_state){
+				if(ObjectType.moving_state == player_states.prone_state){
 					moving_state_inaccuracy = .5;	
 				}
 	
@@ -641,6 +661,12 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
 }
 
 function pause(ObjectType){
+	if(instance_exists(oWeaponAttachments)){
+		oPlayer.player_can_shoot = true;
+		with(oWeaponAttachments){
+			zui_destroy();
+		}
+	}
 	if(instance_exists(oBuyMenu)){
 		oPlayer.player_can_shoot = true;
 		with(oBuyMenuDescription){
@@ -695,6 +721,7 @@ function reset_gui(){
 		with(oWeaponAttachments){
 			zui_destroy();
 		}
+		instance_destroy(objZUIMain);
 		with(zui_main()){
 			with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
 						
@@ -728,8 +755,7 @@ function reset_gui(){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
 					if(other.GameEndMenu == true){
-						show_debug_message(global.player_elo_struct.Headshots_per_round);
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.55, oGameEndMenu, -1000)) {
+						with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 							alpha_value = 0;
 							alpha = global.GUIHUDAlpha * 2.25; 
 							window_id = id;
@@ -753,12 +779,16 @@ function reset_gui(){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
+							alpha = global.GUIHUDAlpha * 3;
+						}
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}
 					}
@@ -769,10 +799,21 @@ function reset_gui(){
 }
 	
 function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
-	Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
-	Indicator.Font = DamageIndicatorFont;
-	Indicator.Damage_Indicator = DamageIndicatorString;
-	Indicator.Color = DamageIndicatorColor;
-	Indicator.Sprite = DamageIndicatorSprite;
-	Indicator.SpriteID = DamageIndicatorSpriteID;
+	if(object_index == oEnemy){
+		if(Visible == true){
+			Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
+			Indicator.Font = DamageIndicatorFont;
+			Indicator.Damage_Indicator = DamageIndicatorString;
+			Indicator.Color = DamageIndicatorColor;
+			Indicator.Sprite = DamageIndicatorSprite;
+			Indicator.SpriteID = DamageIndicatorSpriteID;
+		}
+	}else{
+		Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
+		Indicator.Font = DamageIndicatorFont;
+		Indicator.Damage_Indicator = DamageIndicatorString;
+		Indicator.Color = DamageIndicatorColor;
+		Indicator.Sprite = DamageIndicatorSprite;
+		Indicator.SpriteID = DamageIndicatorSpriteID;
+	}
 }

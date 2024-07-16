@@ -1,4 +1,5 @@
 event_inherited();
+mortar_coordinates = [x, y];
 ViewShakeMagnitude = 0;
 stamina_inaccuracy = 1;
 MoveDirection = 0;

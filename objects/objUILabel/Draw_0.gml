@@ -17,7 +17,7 @@ if(description = ""){
 		var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 		var StartDescriptionY = y + DescriptionStringHeight/2;
 		draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
 		draw_set_font(set_font("GUI_grid"));
 		var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
 		var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());

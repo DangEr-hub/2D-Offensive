@@ -66,7 +66,7 @@ if(ExplosionTimer == -1){
 		if(stats.Item_id == Item.HEGrenade){
 			
 			#region Create explosion effect
-			ExplosionCreate(
+			explosion_create(
 				30, 
 				x, 
 				y, 
@@ -78,7 +78,7 @@ if(ExplosionTimer == -1){
 			#endregion
 			
 		}else if(stats.Item_id == Item.FlashBangGrenade){
-			ExplosionCreate(
+			explosion_create(
 				5, 
 				x, 
 				y, 
@@ -145,7 +145,7 @@ if(ExplosionTimer == -1){
 		}else if(stats.Item_id == Item.StickyGrenade){
 			
 			#region Create explosion effect
-			ExplosionCreate(
+			explosion_create(
 				30,
 				x, 
 				y, 
@@ -161,7 +161,7 @@ if(ExplosionTimer == -1){
 
 if(ExplodeTimer == -1){
 	if(stats.Item_id == Item.HEGrenade){
-		ExplosionCreate(
+		explosion_create(
 			30, 
 			x, 
 			y, 
@@ -171,7 +171,7 @@ if(ExplodeTimer == -1){
 			stats.Item_id
 		);
 	}else if(stats.Item_id == Item.FlashBangGrenade){
-		ExplosionCreate(
+		explosion_create(
 			5, 
 			x, 
 			y, 
@@ -239,7 +239,7 @@ if(ExplodeTimer == -1){
 	}else if(stats.Item_id == Item.StickyGrenade){
 			
 		#region Create explosion effect
-		ExplosionCreate(
+		explosion_create(
 			30,
 			x, 
 			y, 

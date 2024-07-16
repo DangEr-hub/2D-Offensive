@@ -44,7 +44,8 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 		object_index,
 		stats.Name,
 		noone,
-		0
+		0,
+		[id.x, id.y]
 	);
 }
 
@@ -171,7 +172,7 @@ function EnemyShooting(DangerX, DangerY){
 		}
 		
 		play_sound(x, y, sound_id);
-		ParticleCreate(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+		particle_create(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
 		0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BulletCasingID], x, y, 1, 60);
 		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.KickBackPower];
 		KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);	

@@ -100,8 +100,8 @@ if(image_index == 1){
 	direction += get_angle(Angle, 16);
 			
 	if(position_meeting(NearestTargetX, NearestTargetY, self) || distance_to_point(NearestTargetX, NearestTargetY) <= 64){	
-		ExplosionCreate(
-			30, 
+		explosion_create(
+			10, 
 			NearestTargetX, 
 			NearestTargetY, 
 			global.ItemIndex[#stats.Item_id, ItemStat.Damage] * power(1 - global.ItemIndex[#other.stats.Item_id, ItemStat.DamageDrop], PointDistance), 
@@ -111,6 +111,7 @@ if(image_index == 1){
 			2,
 			128
 		);	
+		instance_destroy(id);
 	}
 }
 #endregion
@@ -133,7 +134,7 @@ if(image_index == 0){
 				stats.Object_name,
 				direction
 			);
-			/*ParticleCreate(
+			/*particle_create(
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5, 
 				.8, 
 				random(360), 
@@ -184,7 +185,7 @@ if(image_index == 0){
 				stats.Object_name,
 				direction
 			);
-			/*ParticleCreate(
+			/*particle_create(
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5, 
 				.8, 
 				random(360), 
@@ -241,7 +242,7 @@ if(image_index == 2){
 			stats.Object_name,
 			direction
 		);
-		/*ParticleCreate(
+		/*particle_create(
 			1, 
 			.8, 
 			random(360), 

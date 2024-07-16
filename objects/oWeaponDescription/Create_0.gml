@@ -29,6 +29,50 @@ with(zui_create(zui_get_width() * .5, zui_get_height() - button_height*1.25, obj
 		}
 	};
 }
+
+with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Equip";
+	callback = function(){
+		if(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotAmount] <= 1){
+			with(oWeaponDescription){
+				zui_destroy();
+			}
+		}
+		var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+		switch(global.ItemIndex[#Id, ItemStat.Type]){
+				
+			case "Weapon":
+				
+				#region Weapon use
+				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Main"){
+					i = 0;
+				}else{
+					i = 1;
+				}
+				if(global.weapon_id[i] == Item.None){
+					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
+					global.weapon_id[i] = Id;
+					global.weapon_attachments[i][weapon_attachments.weapon_scope] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_scope];
+					global.weapon_attachments[i][weapon_attachments.weapon_barrel] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_barrel];
+					global.weapon_attachments[i][weapon_attachments.weapon_grip] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_grip];
+					global.weapon_attachments[i][weapon_attachments.weapon_suppressor] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_suppressor];
+					global.Ammo[i] = global.Inventory[# oDraw.var_slot, 2];
+					global.ClipAmmo[i] = global.Inventory[# oDraw.var_slot, 3];
+					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
+					//global.HardRecoil[i] = global.ItemIndex[#Id, ItemStat.HardRecoil];
+					ItemAmountSubstract(oDraw.var_slot, 1);
+				}
+				#endregion
+					
+			break;
+		}
+	};
+}
+
+
 with(zui_create(offset_position_x, offset_position_y, objUIGrid)){
 	zui_set_anchor(0, 0);
 	type = "Weapon description";

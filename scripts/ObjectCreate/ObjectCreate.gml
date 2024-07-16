@@ -17,7 +17,7 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 	GrenadeObject.image_index = ID;
 }
 
-function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, xPosition, yPosition, Alpha = 1, FadeAwayTime = 1){
+function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, xPosition, yPosition, Alpha = 1, FadeAwayTime = 1){
 	if(global.DrawParticles == true){
 		repeat(Number){
 			Particle = instance_create_layer(xPosition, yPosition, "ItemsO", oParticle);
@@ -37,7 +37,7 @@ function ParticleCreate(Number, Friction, Angle, Sprite, Speed, AngleRandomness,
 	}
 }
 
-function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
+function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
 	randomize();
 	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
@@ -66,7 +66,8 @@ function ExplosionCreate(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, 
 			stats.Object_index,
 			stats.Object_name,
 			noone,
-			0
+			0,
+			[id.x, id.y]
 		);	
 	}
 	Fog = instance_create_layer(x, y, "OtherO", oFog);

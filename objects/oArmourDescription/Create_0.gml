@@ -1,6 +1,6 @@
 event_inherited();
-armour_description_width = 768 * global.GUIMultiplier;
-armour_description_height = 192 * global.GUIMultiplier;
+armour_description_width = max(896 * global.GUIMultiplier, 1080);
+armour_description_height = max(192 * global.GUIMultiplier, 256);
 
 draw_set_font(set_font("Menu_small"));
 zui_set_size(armour_description_width, armour_description_height);
@@ -29,6 +29,58 @@ with(zui_create(zui_get_width() * .5, zui_get_height() - button_height*1.25, obj
 		}
 	};
 }
+
+with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Equip";
+	callback = function(){
+		if(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotAmount] <= 1){
+			with(oArmourDescription){
+				zui_destroy();
+			}
+		}
+		var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+		switch(global.ItemIndex[#Id, ItemStat.Type]){
+				
+			case "Helmet":
+				
+				#region Helmet use
+				if(global.ArmourID[1] == Item.None){
+					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
+					global.ArmourID[1] = global.Inventory[# oDraw.var_slot, InventoryIndex.SlotID];
+					global.ArmourDurability[1] = global.Inventory[# oDraw.var_slot, InventoryIndex.SlotDurability];
+					ItemAddWeight(oDraw.var_slot);
+					ItemAmountSubstract(oDraw.var_slot, 1);
+				}
+				#endregion
+					
+			break;  
+				
+			case "Armour":
+				
+				#region Armour use
+				if(global.ArmourID[0] == Item.None){
+					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
+					global.ArmourID[0] = global.Inventory[# oDraw.var_slot, InventoryIndex.SlotID];
+					global.ArmourDurability[0] = global.Inventory[# oDraw.var_slot, InventoryIndex.SlotDurability];
+					ItemAddWeight(oDraw.var_slot);
+					ItemAmountSubstract(oDraw.var_slot, 1);
+				}
+				#endregion
+					
+			break;  
+				
+			case "Shield":
+				
+				ItemAmountSubstract(oDraw.var_slot, 1);
+					
+			break;
+		}
+	};
+}
+
 with(zui_create(offset_position_x, offset_position_y, objUIGrid)){
 	zui_set_anchor(0, 0);
 	type = "Armour description";

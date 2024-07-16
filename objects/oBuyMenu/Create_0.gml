@@ -35,12 +35,12 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);
+			buy_item(item_variable);
 		};
 	}
 }
 
-items = [Item.MAC11, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None];
+items = [Item.MAC11, Item.famas, Item.Spas, Item.None, Item.None, Item.None, Item.None];
 position_x = zui_get_width() * .1 + button_width*1.1;
 position_y = zui_get_height() * .1;
 for(i=0;i<item_number;i++){
@@ -61,7 +61,7 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);
+			buy_item(item_variable);
 		};
 	}
 }
@@ -88,7 +88,7 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+			buy_item(item_variable);	
 		};
 	}
 }
@@ -114,12 +114,12 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+			buy_item(item_variable);	
 		};
 	}
 }
 
-items = [Item.Spas, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None];
+items = [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.None, Item.None, Item.None];
 position_x = zui_get_width() * .1 + button_width*1.1*4;
 position_y = zui_get_height() * .1;
 for(i=0;i<item_number;i++){
@@ -140,7 +140,7 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+			buy_item(item_variable);	
 		};
 	}
 }
@@ -166,7 +166,7 @@ for(i=0;i<item_number;i++){
 		sprite_width_size = other.button_width;
 		sprite_height_size = other.button_height;
 		callback = function(){
-			buy_item(item_variable, oPlayer.x, oPlayer.y);	
+			buy_item(item_variable);	
 		};
 	}
 }

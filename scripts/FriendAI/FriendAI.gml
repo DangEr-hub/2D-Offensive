@@ -1,7 +1,6 @@
 function MoveToPoint(PointX, PointY, Accel){
 	var margin = 32;
 	var distance = point_distance(x, y, PointX, PointY);
-	show_debug_message(distance);
 	MoveTime = distance/MaxSpeed;
 	if(distance > margin){
 		MoveDirection = point_direction(x, y, PointX, PointY);

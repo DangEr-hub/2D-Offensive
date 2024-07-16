@@ -21,7 +21,7 @@ with(oSlot){
 	}  
 	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
 		image_blend = MAIN_COLOR;
-		if(mouse_check_button_pressed(mb_left) && global.Inventory[#VarSlot, InventoryIndex.SlotID] != Item.None){
+		if(mouse_check_button_pressed(mb_left)){
 			item_description_destroy();
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;
@@ -115,9 +115,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	
 	#region Draw scope
 	if (oPlayer.ScopeIn == true) {
-		var scope_zoom_value = 2;
 		if(oPlayer.player_has_scope == 0){
-			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*5), 0.175);
+			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)*5), 0.1);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 			var ScopeRadius = sprite_get_width(spr_SniperScope) * 2;
 			if (!surface_exists(BlackoutSurface)) {
@@ -126,8 +125,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				surface_resize(BlackoutSurface, SurfaceWidth, SurfaceHeight);
 			}
 					
-			#region Zoom
-			ZoomValue = lerp(ZoomValue, scope_zoom_value, 0.01);
+			#region Zoom unused
+			/*ZoomValue = lerp(ZoomValue, scope_zoom_value, 0.01);
 		    var captureWidth = ScopeRadius*4;
 		    var captureHeight = ScopeRadius*4;
 		    var captureX = oCrosshair.xx - captureWidth / 2;
@@ -144,6 +143,30 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			shader_set(shd_Zoom);
 			shader_set_uniform_f(shader_get_uniform(shd_Zoom, "u_zoomFactor"), ZoomValue); // Adjust this for the zoom level you want
 		    draw_surface(zoomSurface, captureX, captureY);
+			shader_reset();*/
+			#endregion
+			
+			#region Zoom
+			var scope_zoom_value = 1.5;
+			ZoomValue = lerp(ZoomValue, scope_zoom_value, .01);
+			var captureWidth = ScopeRadius * 4;
+			var captureHeight = ScopeRadius * 4;
+			var captureX = oCrosshair.xx - captureWidth / 2;
+			var captureY = oCrosshair.yy - captureHeight / 2;
+
+			// Check if surface exists and then set its target
+			if (surface_exists(zoomSurface)) {
+			    surface_set_target(zoomSurface);
+			    draw_surface_part_ext(application_surface, captureX, captureY, captureWidth, captureHeight, 0, 0, 1, 1, c_olive, 1);
+			    surface_reset_target();
+			} else {
+			    zoomSurface = surface_create(captureWidth, captureHeight);
+			}
+
+			// Set the fish-eye shader
+			shader_set(shd_FishEye);
+			shader_set_uniform_f(shader_get_uniform(shd_FishEye, "u_zoomFactor"), ZoomValue); // Adjust this for the zoom level you want
+			draw_surface(zoomSurface, captureX, captureY);
 			shader_reset();
 			#endregion
 			
@@ -172,7 +195,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			#endregion
 			
 		}else if(oPlayer.player_has_scope == 1){
-			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)), 0.175);
+			var ScopeBlurValue = min((.005 + (oPlayer.ViewShake / 100)) * (inaccuracy_formula(global.weapon_id[min(oPlayer.WeaponID, 2)], oPlayer)), 0.15);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
@@ -210,6 +233,38 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	#endregion
 	
 	if(oPlayer.player_has_scope != 0 || (oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
+		
+		#region Draw mortar GUI
+		if (oPlayer.moving_state == player_states.mortar_state) {
+		    var mortar_object = instance_nearest(oPlayer.x, oPlayer.y, oMortar);
+		    var camera_width = camera_get_view_width(view_camera[0]) * 3;
+		    var camera_height = camera_get_view_height(view_camera[0]) * 3;
+		    var xx = (mortar_object.x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+		    var yy = (mortar_object.y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+
+		    // Draw the vertical line
+		    draw_line(xx, yy - camera_height, xx, yy + camera_height);
+    
+		    // Draw numbers on the vertical line starting from zero
+		    for (var i = 0; i <= camera_height; i += 100) {
+		        if (i != 0) {
+		            draw_text(xx + 10, yy - i, string(i)); // Positive numbers on top
+		            draw_text(xx + 10, yy + i, string(-i)); // Negative numbers on bottom
+		        }
+		    }
+
+		    // Draw the horizontal line
+		    draw_line(xx - camera_width, yy, xx + camera_width, yy);
+    
+		    // Draw numbers on the horizontal line starting from zero
+		    for (var j = 0; j <= camera_width; j += 100) {
+		        if (j != 0) {
+		            draw_text(xx + j, yy + 10, string(j)); // Positive numbers on right
+		            draw_text(xx - j, yy + 10, string(-j)); // Negative numbers on left
+		        }
+		    }
+		}
+		#endregion
 		
 		#region Bokeh effect
 		if(instance_exists(oLightRenderer)){
@@ -281,15 +336,37 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		}
 		#endregion
 	
-		#region Draw pickup
+		#region Draw use button
 		if!(instance_exists(oInventory)){
 			if(instance_exists(oItems)){
 				with(oItems){
-					xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-					yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+					var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+					var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				    if(distance_to_object(oPlayer) <= oPlayer.PickUpDistance){   
 						draw_text_outlined(round(xx), round(yy), oDraw.Pick, c_white, c_black, 1);
 				    }
+				}
+			}
+			
+			if(oPlayer.moving_state == player_states.none_state){
+				if(instance_exists(oMachineGun)){
+					with(oMachineGun){
+						var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+						var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+					    if(distance_to_object(oPlayer) <= oPlayer.PickUpDistance){   
+							draw_text_outlined(round(xx), round(yy), oDraw.Pick, c_white, c_black, 1);
+					    }
+					}
+				}
+			
+				if(instance_exists(oMortar)){
+					with(oMortar){
+						var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+						var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+					    if(distance_to_object(oPlayer) <= oPlayer.PickUpDistance){   
+							draw_text_outlined(round(xx), round(yy), oDraw.Pick, c_white, c_black, 1);
+					    }
+					}
 				}
 			}
 		}
@@ -300,7 +377,6 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 		    var Id = global.Inventory[#oPlayer.ItemUsePosition, InventoryIndex.SlotID];        
 		    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1);  
-			draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.GUIMultiplier + string_width(global.ItemIndex[#Id, ItemStat.Name]), ItemY + TextHeightSmall*2, UseString, c_white, c_black, 1); 
 			draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.GUIMultiplier, ItemY + TextHeightSmall*2, global.ItemIndex[#Id, ItemStat.Name], c_white, c_black, 1);            
 			draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.GUIMultiplier, ItemY + TextHeightSmall*3, CycleLeftString, c_white, c_black, 1);
 			draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.GUIMultiplier + string_width(CycleLeftString), ItemY + TextHeightSmall*3, CycleRightString, c_white, c_black, 1);
@@ -444,82 +520,20 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var Value = 0;
 			for(var i=0;i<oDraw.HotBarItems - 1;i++){
 				if(global.weapon_id[1 - i] != Item.None){
-					if(mouse_to_gui(
-						HotBarX - sprite_get_width(spr_Items)*global.GUIMultiplier/2,  
-						HotBarY - HotBarOffsetY - Value*HotBarOffsetY - sprite_get_height(spr_Items)/2*global.GUIMultiplier/2, 
-						HotBarX + sprite_get_width(spr_Items)*global.GUIMultiplier/2,
-						HotBarY - HotBarOffsetY - Value*HotBarOffsetY + sprite_get_height(spr_Items)/2*global.GUIMultiplier/2)
-					){
-						
 					
-						#region Draw weapon
-						shader_set(shd_LightGray);
-						if(WeaponID == 1 - i){
-							shader_set_uniform_f(oDraw.BlendColor, 0.1, 0.1, 0.1, 1.0);
-						}else{
-							shader_set_uniform_f(oDraw.BlendColor, r/255, g/255, b/255, 1.0);	
-						}
-						draw_sprite_outlined_ext(
-							spr_Items, global.weapon_id[1 - i], HotBarX, HotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
-							c_black, 5, 1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, 1
-						);
-						shader_reset();
-						#endregion
-						
-						if(global.weapon_id[1 - i] != Item.basic_machine_gun){
-							
-							#region Draw drop text
-							draw_text_outlined(
-								HotBarX - 24 - string_width(oDraw.DropString)/2, HotBarY - HotBarOffsetY/2 - Value*HotBarOffsetY, 
-								oDraw.DropString, c_white, c_black, 1				
-							);
-							#endregion
-					
-							#region Drop weapon		
-							if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyDropMouse]) && keyboard_check(global.KeyBinds[| KeyBind.KeyDrop])){
-								if(oDraw.show_weapon_attachments == true){
-									player_can_shoot = true;
-									oDraw.show_weapon_attachments = false;
-								}
-								player_has_scope = -1;
-								ScopeIn = false;	
-								ItemDrop(
-									global.weapon_id[1 - i], 
-									x, 
-									y, 
-									100,
-									global.Ammo[1 - i], 
-									global.ClipAmmo[1 - i], 
-									0, 
-									1, 
-									global.weapon_attachments[1 - i][weapon_attachments.weapon_scope],
-									global.weapon_attachments[1 - i][weapon_attachments.weapon_barrel],
-									global.weapon_attachments[1 - i][weapon_attachments.weapon_grip],
-									global.weapon_attachments[1 - i][weapon_attachments.weapon_suppressor]
-								);
-								WeaponDrop(1 - i, id);
-							}
-							#endregion
-						
-						}
-					
+					#region Draw weapon
+					shader_set(shd_LightGray);
+					if(WeaponID == 1 - i){
+						shader_set_uniform_f(oDraw.BlendColor, 0.1, 0.1, 0.1, 1.0);
 					}else{
-					
-						#region Draw weapon
-						shader_set(shd_LightGray);
-						if(WeaponID == 1 - i){
-							shader_set_uniform_f(oDraw.BlendColor, 0.1, 0.1, 0.1, 1.0);
-						}else{
-							shader_set_uniform_f(oDraw.BlendColor, r/255, g/255, b/255, 1.0);	
-						}
-						draw_sprite_ext(
-							spr_Items, global.weapon_id[1 - i], HotBarX, HotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
-							1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1
-						);		
-						shader_reset();
-						#endregion
-					
+						shader_set_uniform_f(oDraw.BlendColor, r/255, g/255, b/255, 1.0);	
 					}
+					draw_sprite_ext(
+						spr_Items, global.weapon_id[1 - i], HotBarX, HotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
+						1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1
+					);		
+					shader_reset();
+					#endregion
 					
 					#region Draw no ammo weapon
 					if(global.ClipAmmo[1 - i] <= 0 && global.Ammo[1 - i] <= 0 && global.weapon_id[1 - i] != Item.None){
@@ -566,7 +580,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 						#endregion
 					
 						#region Drop armour				
-						if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyDropMouse]) && keyboard_check(global.KeyBinds[| KeyBind.KeyDrop])){
+						if(keyboard_check(global.KeyBinds[| KeyBind.KeyPickUp]) && keyboard_check(global.KeyBinds[| KeyBind.KeyDrop])){
 							ItemDrop(global.ArmourID[1 - i], x, y, 100, 0, 0, global.ArmourDurability[1 - i]);
 							ArmourDrop(1 - i, oPlayer);
 						}

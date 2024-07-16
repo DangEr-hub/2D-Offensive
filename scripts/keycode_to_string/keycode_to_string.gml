@@ -16,6 +16,7 @@ function keycode_to_string(keycode) {
 		case ord("R"): return "R"; 
 		case ord("V"): return "V"; 
 		case ord("Y"): return "Y"; 
+		case vk_space: return "Space";
         default: return "Key"; 
     }
 }

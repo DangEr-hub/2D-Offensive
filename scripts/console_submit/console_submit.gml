@@ -224,7 +224,16 @@ function console_submit(Console) {
 					case "set_gui_scale":
 						if(no == 1 && string_digits(c[1]) != ""){
 							if(real(c[1]) != global.GUIMultiplier){
-								global.GUIMultiplier = real(c[1]);
+								if(real(c[1]) <= 2){
+									global.GUIMultiplier = real(c[1]);
+								}else{
+									global.GUIMultiplier = 2;
+								}
+								if(real(c[1]) >= 1){
+									global.GUIMultiplier = real(c[1]);
+								}else{
+									global.GUIMultiplier = 1;	
+								}
 								reset_gui();
 							}
 						}
@@ -246,7 +255,7 @@ function console_submit(Console) {
 					case "set_time_speed":
 						if(no == 1 && string_digits(c[1]) != "") then global.TimeSpeed = real(c[1]);
 					break;	
-					case "set_camera_crosshair_shake":
+					case "toggle_camera_crosshair_shake":
 						if(no == 1 && string_digits(c[1]) != "") then global.ViewShake = real(c[1]);
 					break;	
 					case "set_player_inaccuracy":
@@ -388,6 +397,12 @@ function console_submit(Console) {
 							if(instance_exists(oParticleSurface)){
 								oParticleSurface.alarm[0] = global.clear_particles_timer;
 							}
+						}
+					break;
+					
+					case "set_player_money":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.player_stats_struct.Money = real(c[1]);
 						}
 					break;
 	            } 

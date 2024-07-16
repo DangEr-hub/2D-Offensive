@@ -1,9 +1,19 @@
 function can_player_shoot(){
-	return moving_state != player_states.machine_gun_state;	
+	return (moving_state != player_states.machine_gun_state && moving_state != player_states.mortar_state);
 }
 
-function equipped_usable_item(){
-	return (global.ItemIndex[#global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], ItemStat.usable] == true);
+function is_inventory_full(Item = Item.None){
+	var Slot = 0;
+	while(Slot < global.InventorySize){
+		if(global.Inventory[# Slot, InventoryIndex.SlotID] == Item.None || 
+		(global.Inventory[# Slot, InventoryIndex.SlotID] == Item && (global.ItemIndex[# global.Inventory[# Slot, InventoryIndex.SlotID], ItemStat.Type] == "Item" ||
+		global.ItemIndex[# global.Inventory[# Slot, InventoryIndex.SlotID], ItemStat.Type] == "Grenade" || global.ItemIndex[# global.Inventory[# Slot, InventoryIndex.SlotID], ItemStat.Type] == "Landmine"))){
+			return false;
+		}
+		Slot ++;
+	}
+	
+	return true;
 }
 
 function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, Destroy = true) {
@@ -115,7 +125,7 @@ function InventoryInit() {
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4a1, awm, usp, base_explosion,
-		nuclear_explosion, basic_machine_gun, galil, p250, m4_carbine, MolotovGrenade, Total
+		nuclear_explosion, basic_machine_gun, galil, p250, m4_carbine, famas, MolotovGrenade, Total
 	}
 
 	enum ItemStat{

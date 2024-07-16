@@ -281,6 +281,8 @@ if(global.enemy_visibility == false){
 			State == States.ThrowGrenade
 		|| 
 			HPTimer != -1
+		||
+			State == States.LayDownLandMine
 		){
 			var collision_object = collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false);
 			if(collision_object || collision_line(x, y, oPlayer.x, oPlayer.y, oSmokeTile, true, false)){
@@ -471,7 +473,8 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 		}
 		if(FootStepTimer == 0){
 			if(Visible == true){
-				ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
+				particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
+				particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
 			}
 		}
 	}
@@ -586,6 +589,18 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		
 		case "Galil":
 			Weapon.image_index = 12;
+		break;
+		
+		case "P250":
+			Weapon.image_index = 13;
+		break;
+			
+		case "MK18":
+			Weapon.image_index = 14;
+		break;
+			
+		case "FAMAS":
+			Weapon.image_index = 15;
 		break;
 			
 		default:

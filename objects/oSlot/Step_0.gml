@@ -46,7 +46,7 @@ if(DrawItemInfo == true){
 					alpha = global.GUIHUDAlpha * 3;
 				}
 			}
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade"){
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
 			item_description_destroy();
@@ -61,6 +61,15 @@ if(DrawItemInfo == true){
 			item_description_destroy();
 			with(zui_main()){
 				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
+					alpha = global.GUIHUDAlpha * 3;
+				}
+			}
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+			oDraw.var_slot = VarSlot;
+			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			item_description_destroy();
+			with(zui_main()){
+				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
 					alpha = global.GUIHUDAlpha * 3;
 				}
 			}

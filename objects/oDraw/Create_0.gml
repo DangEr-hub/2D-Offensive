@@ -1,17 +1,15 @@
 application_surface_draw_enable(false);
 draw_texture_flush();
 saturation_level = 0;
-//haze_start(true, false);
 KilledByWeapon = "Nothing";
 KilledByName = "No one";
 var_slot = 0;
 item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
-UseString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyUse])) + "]";
 CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] --";
 CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] ++";
 DropString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyDrop])) + "] + " + "[" + 
-string(keycode_to_string(global.KeyBinds[| KeyBind.KeyDropMouse])) + "]";
+string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
 HUDShift = 16;
 
 NightVisionSurface = -1;

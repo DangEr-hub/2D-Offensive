@@ -400,7 +400,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 		}
 		if(FootStepTimer == 0){
 			if(Visible == true){
-				ParticleCreate(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
+				particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
 			}
 		}
 	}

@@ -32,7 +32,7 @@ global.PlayerInaccuracy = 1;
 global.DrawParticles = true;
 global.CameraWidth = 1920/2;
 global.CameraHeight = 1080/2;
-global.GUIMultiplier = display_get_width()/global.CameraWidth;
+global.GUIMultiplier = clamp(display_get_width()/global.CameraWidth, 1, 2);
 global.selected_bots = ds_list_create();
 global.current_selected_bot = -1;
 global.enemy_visibility = false;
@@ -154,18 +154,23 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 
 
 enum KeyBind{
-	KeyUp, KeyLeft, KeyDown, KeyRight, KeyDropMouse, KeyDrop, KeyInventory, KeyPickUp, KeyCycleLeft, KeyCycleRight, KeyUse, KeyShootMouse,
-	KeyReload, KeyRunning, KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode, KeyProne, KeyWeaponAttachments, KeyCommand,
-	KeyGo, KeyBuyMenu, KeyHoldStamina, Total	
+	KeyUp, KeyLeft, KeyDown, KeyRight,
+	KeyInventory, KeyDrop, KeyPickUp, KeyCycleLeft,
+	KeyCycleRight, KeyUse, KeyShootMouse, KeyReload,
+	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
+	KeyProne, KeyWeaponAttachments, KeyCommand, KeyGo, 
+	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, Total
 }
 
 global.KeyBinds = ds_list_create();
 ds_list_add(
-	global.KeyBinds, ord("W"), ord("A"), ord("S"), ord("D"),
-	mb_right, vk_shift, ord("I"), ord("G"), ord("Q"), ord("E"),
-	ord("F"), mb_left, ord("R"), vk_shift, mb_left, vk_escape,
-	ord("N"), ord("V"), ord("Y"), ord("T"), ord("C"), ord("X"),
-	ord("B"), vk_control
+	global.KeyBinds, 
+	ord("W"), ord("A"), ord("S"), ord("D"),
+	ord("I"), vk_control, vk_space, ord("Q"), 
+	ord("E"), ord("F"), mb_left, ord("R"),
+	mb_left, vk_escape, ord("N"), ord("V"),
+	ord("Y"), ord("T"), ord("C"), ord("X"),
+	ord("B"), vk_shift, ord("G")
 );
 
 enum player_textures{
@@ -178,7 +183,8 @@ enum player_states{
 	none_state,
 	running_state,
 	prone_state,
-	machine_gun_state
+	machine_gun_state,
+	mortar_state
 }
 
 enum HitBox{

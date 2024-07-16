@@ -127,6 +127,10 @@ if(instance_exists(oPlayer)){
 	        // If night vision is toggled on, draw the NightVisionSurface with the shader
 	        if(oPlayer.ToggleNightVision) {
 	            shader_set(shd_NightVision);
+				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "u_resolution"),
+					surface_get_width(application_surface),
+					surface_get_height(application_surface)
+				);
 				shader_set_uniform_f(
 					shader_get_uniform(shd_NightVision, "intensity_strength"), 
 					global.ItemIndex[#global.ArmourID[1], ItemStat.NightVisionIntensityPower]
@@ -139,6 +143,10 @@ if(instance_exists(oPlayer)){
 	            shader_reset();
 	        }else if(oPlayer.ToggleInfraVision){
 	            shader_set(shd_InfraVisionSurface);
+				shader_set_uniform_f(shader_get_uniform(shd_InfraVisionSurface, "u_resolution"),
+					surface_get_width(application_surface),
+					surface_get_height(application_surface)
+				);
 	            draw_surface_stretched(NightVisionSurface, 0, 0, global.GuiW, global.GuiH);
 	            shader_reset();			
 			}

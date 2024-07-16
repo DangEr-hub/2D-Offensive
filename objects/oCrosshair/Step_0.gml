@@ -79,7 +79,7 @@ if(instance_exists(oPlayer)){
 			    }					
 
 			    if (oPlayer.KickBack <= KBPhase1) {
-			        targetY -= oPlayer.KickBack * recoilY;
+					targetY = mouse_y - oPlayer.KickBack * recoilY;
 			    } else if (oPlayer.KickBack < KBPhase2) {
 			        targetX -= ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX);
 					targetY = mouse_y - DeltaY;
@@ -92,13 +92,15 @@ if(instance_exists(oPlayer)){
 					targetY = mouse_y - DeltaY;
 			    }
 
-			    x = lerp(x, targetX, recoil_speed);
-			    y = lerp(y, targetY, recoil_speed);
+			    x = lerp(x, targetX, recoil_speed*2);
+			    y = lerp(y, targetY, recoil_speed*2);
 
 			    var newDeltaX = mouse_x - x;
 			    var newDeltaY = mouse_y - y;
-			    DeltaX = lerp(DeltaX, newDeltaX, .1);
-			    DeltaY = lerp(DeltaY, newDeltaY, .1);
+			    DeltaX = newDeltaX;
+				if(oPlayer.KickBack <= KBPhase1){
+				 DeltaY = newDeltaY;
+				}
 				#endregion
 				
 			}else {

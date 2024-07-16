@@ -1,6 +1,6 @@
 if(stats.Health_points <= 0){
 	occluder.Destroy();
-	ExplosionCreate(
+	explosion_create(
 		30,
 		x,
 		y,

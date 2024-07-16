@@ -1,5 +1,5 @@
 if(stats.Item_id == Item.CELandMine){
-	ExplosionCreate(
+	explosion_create(
 		global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID]/5,
 		x,
 		y,

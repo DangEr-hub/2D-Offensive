@@ -1,6 +1,9 @@
 event_inherited();
-pause_width_tab = 768 * global.GUIMultiplier;
-pause_height_tab = 896;
+draw_set_font(set_font("Menu_small"));
+pause_width_tab = 512 * global.GUIMultiplier;
+pause_height_tab = max(512 * global.GUIMultiplier, 968);
+//pause_width_tab = 768 * global.GUIMultiplier;
+//pause_height_tab = 896;
 
 zui_set_size(pause_width_tab, pause_height_tab);
 
@@ -101,7 +104,7 @@ popup_exit_callback_positive = function(){
 };
 
 exit_callback = function(){
-	ui_show_popup("Exit game?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);		
+	ui_show_popup("Exit the game?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);		
 };
 
 popup_main_menu_callback_positive = function(){
@@ -141,7 +144,7 @@ if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 	
 	draw_set_font(set_font("Title_large"));
 	with(zui_main()){
-		with(zui_create(global.GuiW/2 - string_width(oGameEndMenu.rank_string)/2, string_height("a")/2, objUILabel, -10001)){
+		with(zui_create(global.GuiW/2 - string_width(oGameEndMenu.rank_string)/2, string_height("a"), objUILabel, -10001)){
 			alpha = 1;
 			alpha_value = 0;
 			color = oGameEndMenu.rank_string_color;
@@ -249,7 +252,6 @@ with (zui_create(current_rank_x + rank_image_size_width*1.1, rank_y, objUILabel)
 #region Current enemy rank
 rank_previous = get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 rank_position = 0;
-show_debug_message(global.player_elo_struct.Tracking_game);
 if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 	if(global.player_elo_struct.Tracking_game < TRACKING_GAMES/2 - 1){
 		rank_position = get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game + 1]);
