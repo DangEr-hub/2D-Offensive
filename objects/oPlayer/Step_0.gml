@@ -199,6 +199,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			ReloadTime = 0;
 		}
 	}
+	
+	if(item_equip_timer > -1){
+		item_equip_timer --;
+	}
 
 	if(FootStepTimer > -1){
 		FootStepTimer --;	
@@ -977,7 +981,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Shooting
-	if(global.weapon_id[min(WeaponID, 2)] != Item.None && global.Inventory[# ItemUsePosition, InventoryIndex.SlotID] == Item.None && moving_state != player_states.mortar_state){
+	if(global.weapon_id[min(WeaponID, 2)] != Item.None && global.Inventory[# ItemUsePosition, InventoryIndex.SlotID] == Item.None && moving_state != player_states.mortar_state && item_equip_timer == -1){
 		if (player_can_shoot == true && !global.my_console[? "active"]) {
 			if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Ammo[WeaponID] <= 0){
 				audio_play_sound(snd_empty_magazine, 0, false);	
@@ -1495,7 +1499,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 
 		#region Item use
-		
 		if(mouse_check_button_pressed(mb_left) && !instance_exists(oInventory)){
 			var Id = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
 			
@@ -1559,6 +1562,61 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						weapon_attachment_equip(Id, weapon_attachments.weapon_suppressor);
 					break;						
 				}
+				#endregion
+				
+			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+				
+				#region Weapon use
+				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Main"){
+					i = 0;
+				}else{
+					i = 1;
+				}
+				if(global.weapon_id[i] == Item.None){
+					item_equip_timer = item_equip_time;
+					EquipmentAlpha = global.GUIHUDAlpha;
+					global.weapon_id[i] = Id;
+					global.weapon_attachments[i][weapon_attachments.weapon_scope] = global.Inventory[# ItemUsePosition, InventoryIndex.slot_scope];
+					global.weapon_attachments[i][weapon_attachments.weapon_barrel] = global.Inventory[# ItemUsePosition, InventoryIndex.slot_barrel];
+					global.weapon_attachments[i][weapon_attachments.weapon_grip] = global.Inventory[# ItemUsePosition, InventoryIndex.slot_grip];
+					global.weapon_attachments[i][weapon_attachments.weapon_suppressor] = global.Inventory[# ItemUsePosition, InventoryIndex.slot_suppressor];
+					global.Ammo[i] = global.Inventory[# ItemUsePosition, 2];
+					global.ClipAmmo[i] = global.Inventory[# ItemUsePosition, 3];
+					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
+					ItemAmountSubstract(ItemUsePosition, 1);
+				}
+				#endregion
+				
+			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour"){
+				
+				#region Armour use
+				if(global.ArmourID[0] == Item.None){
+					item_equip_timer = item_equip_time;
+					EquipmentAlpha = global.GUIHUDAlpha;
+					global.ArmourID[0] = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
+					global.ArmourDurability[0] = global.Inventory[# ItemUsePosition, InventoryIndex.SlotDurability];
+					ItemAddWeight(ItemUsePosition);
+					ItemAmountSubstract(ItemUsePosition, 1);
+				}
+				#endregion
+				
+			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+				
+				#region Helmet use
+				if(global.ArmourID[1] == Item.None){
+					item_equip_timer = item_equip_time;
+					EquipmentAlpha = global.GUIHUDAlpha;
+					global.ArmourID[1] = global.Inventory[# ItemUsePosition, InventoryIndex.SlotID];
+					global.ArmourDurability[1] = global.Inventory[# ItemUsePosition, InventoryIndex.SlotDurability];
+					ItemAddWeight(ItemUsePosition);
+					ItemAmountSubstract(ItemUsePosition, 1);
+				}
+				#endregion
+				
+			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
+				
+				#region Shield use
+				ItemAmountSubstract(ItemUsePosition, 1);
 				#endregion
 				
 			}

@@ -146,7 +146,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			shader_reset();*/
 			#endregion
 			
-			#region Zoom
+			#region Fish eye zoom
 			var scope_zoom_value = 1.5;
 			ZoomValue = lerp(ZoomValue, scope_zoom_value, .01);
 			var captureWidth = ScopeRadius * 4;
@@ -580,8 +580,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 						#endregion
 					
 						#region Drop armour				
-						if(keyboard_check(global.KeyBinds[| KeyBind.KeyPickUp]) && keyboard_check(global.KeyBinds[| KeyBind.KeyDrop])){
-							ItemDrop(global.ArmourID[1 - i], x, y, 100, 0, 0, global.ArmourDurability[1 - i]);
+						if(keyboard_check(global.KeyBinds[| KeyBind.KeyPickUp]) && keyboard_check(global.KeyBinds[| KeyBind.KeyDrop]) && !is_inventory_full()){
+							GainItem(global.ArmourID[1 - i], 1, 0, 0, global.ArmourDurability[1 - i], -1, -1, -1, -1, false);
+							//ItemDrop(global.ArmourID[1 - i], x, y, 100, 0, 0, global.ArmourDurability[1 - i]);
 							ArmourDrop(1 - i, oPlayer);
 						}
 						#endregion

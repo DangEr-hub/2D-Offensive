@@ -748,7 +748,7 @@ if(stats.Health_points <= 0){
 		Ammo[WeaponPositionID],
 		ClipAmmo[WeaponPositionID],
 		0,
-		-1,
+		1,
 		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_scope],
 		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_barrel],
 		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_grip],

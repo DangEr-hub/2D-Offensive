@@ -1,4 +1,6 @@
 event_inherited();
+item_equip_timer = -1;
+item_equip_time = 10; //Offset kvůli tomu, aby hráč nevystřelil při použití itemu
 mortar_coordinates = [x, y];
 ViewShakeMagnitude = 0;
 stamina_inaccuracy = 1;

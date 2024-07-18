@@ -104,7 +104,7 @@ if(type == "Respawn menu"){
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
 	var statTitles = [
-		"Damage power: ", "Ammo: ", "Clip ammo: ", "Reload time: ", "Max. range: ", "Moving inaccuracy: ", "Inaccuracy: ", "RPM: ", "Inaccuracy/shot: ", "Damage drop: ", "Range drop: ",
+		"Damage power: ", "Ammo: ", "Clip ammo: ", "Reload time: ", "Max. range: ", "Moving inaccuracy: ", "Base inaccuracy: ", "RPM: ", "Inaccuracy/shot: ", "Damage drop: ", "Range drop: ",
 		"Class: ", "Moving speed: ", "Penetration: ", ""
 	];					
 					
@@ -162,7 +162,7 @@ if(type == "Respawn menu"){
 					break;
 									
 					case ItemStat.Inaccuracy:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
 					break;
 									
 					case ItemStat.MovingInaccuracyMultiplier:

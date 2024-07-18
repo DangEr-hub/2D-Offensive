@@ -1,6 +1,5 @@
 /// @description Drawing
-//draw_text(x, y + 25, oCrosshair.DeltaY);
-//draw_triangle_color(cx, cy, ax, ay, bx, by, c_white, c_white, c_white, false);
+draw_text(x, y + 25, global.player_stats_struct.Weight);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;

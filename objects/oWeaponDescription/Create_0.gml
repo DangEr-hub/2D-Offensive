@@ -62,7 +62,6 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 					global.Ammo[i] = global.Inventory[# oDraw.var_slot, 2];
 					global.ClipAmmo[i] = global.Inventory[# oDraw.var_slot, 3];
 					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
-					//global.HardRecoil[i] = global.ItemIndex[#Id, ItemStat.HardRecoil];
 					ItemAmountSubstract(oDraw.var_slot, 1);
 				}
 				#endregion
