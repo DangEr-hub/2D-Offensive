@@ -2,7 +2,7 @@ event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Drop weapon
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full()){
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != player_states.machine_gun_state){
 		player_has_scope = -1;
 		ScopeIn = false;	
 		GainItem(
@@ -457,13 +457,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Assault rifle":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
 						if(Flashed == false){
 							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
 								image_index = player_textures.assault_rifle;
+								BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 								ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
 							}else{
 								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
 								ArmHitBox.image_index = HitBox.ArmReloading;
 							}
 						}else{
@@ -515,13 +516,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Pistol":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
 						if(Flashed == false){
 							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
 								image_index = player_textures.pistol;
+								BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 								ArmHitBox.image_index = HitBox.ArmWithPistol;
 							}else{
 								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
 								ArmHitBox.image_index = HitBox.ArmReloading;
 							}
 						}else{
@@ -574,13 +576,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Submachine gun":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
 						if(Flashed == false){
 							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
 								image_index = player_textures.pistol;
-								ArmHitBox.image_index = HitBox.ArmWithPistol;
+								BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+								ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
 							}else{
 								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
 								ArmHitBox.image_index = HitBox.ArmReloading;
 							}
 						}else{
@@ -632,13 +635,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Sniper rifle":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
 						if(Flashed == false){
 							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
 								image_index = player_textures.assault_rifle;
+								BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 								ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
 							}else{
 								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
 								ArmHitBox.image_index = HitBox.ArmReloading;
 							}
 						}else{
@@ -690,7 +694,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Shotgun":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
+						BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 						if(Flashed == false){
 							image_index = player_textures.assault_rifle;
 							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
@@ -738,7 +742,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				case "Anti-tank missile":
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
-						BodyHitBox.image_index = HitBox.BodyWithWeapon;
+						BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 						if(Flashed == false){
 							image_index = player_textures.assault_rifle;
 							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
@@ -1287,7 +1291,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			var machine_gun = instance_nearest(x, y, oMachineGun);		
 			if(distance_to_object(machine_gun) <= oPlayer.PickUpDistance){
 				if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
-					if(moving_state == player_states.none_state && global.weapon_id[min(WeaponID, 2)] == Item.None){ /// Pokud neběži ani se neplazí
+					if(moving_state == player_states.none_state && global.weapon_id[0] == Item.None){ /// Pokud neběži ani se neplazí
 						
 						#region Equip machine gun
 						EquipmentAlpha = global.GUIHUDAlpha;
@@ -1299,7 +1303,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						global.Ammo[0] = machine_gun.stats.Ammo;
 						global.ClipAmmo[0] = machine_gun.stats.Clip_ammo;
 						global.MaxAmmo[0] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.MaxAmmo];
-						//global.HardRecoil[0] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.HardRecoil];
 						#endregion
 						
 						x = machine_gun.x;
@@ -1441,8 +1444,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		global.player_stats_struct.Xp = 0;
 		global.player_stats_struct.Lvl ++;
 		global.player_stats_struct.Armour += .01;
-		global.player_stats_struct.Max_stamina *= power(1.25, ln(global.player_stats_struct.Lvl));
-		global.player_stats_struct.Max_health *= power(1.25, ln(global.player_stats_struct.Lvl));
+		global.player_stats_struct.Max_stamina *= power(1.05, ln(global.player_stats_struct.Lvl));
+		global.player_stats_struct.Max_health *= power(1.05, ln(global.player_stats_struct.Lvl));
 		global.player_stats_struct.Max_xp *= 2;
 	}
 	#endregion

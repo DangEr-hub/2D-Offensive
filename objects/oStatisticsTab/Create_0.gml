@@ -231,7 +231,7 @@ with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*3, objUILabel
 }
 
 with (zui_create(rank_title_x + label_gap + string_width(health_string), rank_title_y + text_gap*3, objUILabel)) {
-	var bonus_health = (global.player_stats_struct.Max_health * power(1.25, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_health;
+	var bonus_health = (global.player_stats_struct.Max_health * power(1.05, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_health;
 	color = c_green;
 	caption = "(+" + string(bonus_health) + ")";
 }
@@ -244,7 +244,7 @@ with (zui_create(rank_title_x + label_gap, rank_title_y + text_gap*4, objUILabel
 }
 
 with (zui_create(rank_title_x + label_gap + string_width(stamina_string), rank_title_y + text_gap*4, objUILabel)) {
-	var bonus_stamina = (global.player_stats_struct.Max_stamina * power(1.25, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_stamina;
+	var bonus_stamina = (global.player_stats_struct.Max_stamina * power(1.05, ln(global.player_stats_struct.Lvl + 1))) - global.player_stats_struct.Max_stamina;
 	color = c_green;
 	caption = "(+" + string(bonus_stamina) + ")";
 }

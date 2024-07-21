@@ -66,7 +66,7 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
-HelmetID = choose(Item.KevlarHelm, Item.MilitaryHelm);
+HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 

@@ -8,6 +8,7 @@ if(instance_exists(oPlayer)){
 			PlayerVelocity = sqrt(power(oPlayer.XSpeed, 2) + power(oPlayer.YSpeed, 2)) * game_get_speed(gamespeed_fps);
 			rotation_increment = PlayerVelocity/5000;
 			max_rotation = PlayerVelocity/750;
+			if(oPlayer.moving_state == player_states.none_state || oPlayer.moving_state == player_states.prone_state){
 			if (keyboard_check(ord("A"))) {
 			    if (rotation_target > -max_rotation && rotation_direction == 1) {
 			        rotation_target -= rotation_increment;
@@ -57,6 +58,7 @@ if(instance_exists(oPlayer)){
 			        }
 			    }
             } 
+			}
 			
 			if(oPlayer.Moving == false){
 				rotation_target = 0;

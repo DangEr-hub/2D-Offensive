@@ -507,7 +507,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 	}
 	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass]){
 		case "Assault rifle":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
 					image_index = 2;
@@ -524,7 +524,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		break;
 	
 		case "Pistol":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
 					image_index = 1;
@@ -541,7 +541,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		break;
 			
 		case "Submachine gun":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
 					image_index = 1;
@@ -558,7 +558,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		break;
 	
 		case "Sniper rifle":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
 					image_index = 2;
@@ -575,7 +575,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		break;
 			
 		case "Shotgun":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				image_index = 2;
 				ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
@@ -587,7 +587,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		break;
 			
 		case "Anti-tank missile":
-			BodyHitBox.image_index = HitBox.BodyWithWeapon;
+			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
 				image_index = 2;
 				ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;

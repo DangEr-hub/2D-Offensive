@@ -174,7 +174,7 @@ if(type == "Respawn menu"){
 					break;
 					
 					case ItemStat.KickBackInaccuracyMultiplier:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
+						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 3) + " Units";
 					break;
 									
 					default:

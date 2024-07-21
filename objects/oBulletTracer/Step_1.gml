@@ -1,8 +1,8 @@
 var wall_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, oParentTile, false);
 
 if(wall_collision == noone && instance_exists(stats.Object)){
-	if(collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false)){
-		stats.Penetration_damage ++;
+	if(collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false) && stats.Item_id != Item.basic_machine_gun){
+		stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 	}
 }
 
@@ -122,7 +122,7 @@ if(wall_collision != noone){
 			
 			}
 		}
-		stats.Penetration_damage ++;
+		stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		#endregion
 		
 	}else if(image_index == 1){
@@ -134,7 +134,7 @@ if(wall_collision != noone){
 		particle_create(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 
 		random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
 		explosion_create(
-			30, 
+			10, 
 			x, 
 			y, 
 			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 

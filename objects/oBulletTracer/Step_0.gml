@@ -34,7 +34,7 @@ if (instance_exists(oEnemy)) {
 	        if (head_collision != noone) {
 				if(ds_list_find_index(HitList, head_collision.instance_id.MainObject) == -1){
 	                if (ds_list_size(HitList) != 0) {
-	                    stats.Penetration_damage += 0.1 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+	                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 	                }
 	                ds_list_add(HitList, head_collision.instance_id.MainObject);
 	            }
@@ -42,7 +42,7 @@ if (instance_exists(oEnemy)) {
 	        if (body_collision != noone) {
 				if(ds_list_find_index(HitList, body_collision.instance_id.MainObject) == -1){
 	                if (ds_list_size(HitList) != 0) {
-	                    stats.Penetration_damage += 0.1 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+	                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 	                }
 	                ds_list_add(HitList, body_collision.instance_id.MainObject);
 	            }
@@ -50,7 +50,7 @@ if (instance_exists(oEnemy)) {
 	        if (arm_collision != noone) {
 				if(ds_list_find_index(HitList, arm_collision.instance_id.MainObject) == -1){
 	                if (ds_list_size(HitList) != 0) {
-	                    stats.Penetration_damage += 0.1 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+	                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 	                }
 	                ds_list_add(HitList, arm_collision.instance_id.MainObject);
 	            }

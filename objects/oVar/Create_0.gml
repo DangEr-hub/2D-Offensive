@@ -181,7 +181,6 @@ enum player_textures{
 
 enum player_states{
 	none_state,
-	running_state,
 	prone_state,
 	machine_gun_state,
 	mortar_state
@@ -191,7 +190,7 @@ enum HitBox{
 	Head,
 	HeadProne,
 	BodyWithoutWeapon,
-	BodyWithWeapon,
+	BodyReloading,
 	BodyProne,
 	ArmWithoutWeapon,
 	ArmWithPistol,

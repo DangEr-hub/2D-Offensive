@@ -214,8 +214,8 @@ function ItemDataBase(){
 	10, 17, -7, 7, 40, 0.01, 9, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps), .83, 300, 1, 5);
 	global.ItemIndex[#Item.SG550, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
-	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility";
-	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\n-High damage";
+	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility\n-High bullet spread";
+	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "-High range\n-High damage\n-High penetration power";
 	global.ItemIndex[#Item.SG550, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.SG550, ItemStat.AmmoSpriteID] = 4;
 	global.ItemIndex[#Item.SG550, ItemStat.SniperScope] = true;
@@ -282,7 +282,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Javelin, ItemStat.advantages] = "-Homing projectiles\n-High damage";
 	global.ItemIndex[#Item.Javelin, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.Javelin, ItemStat.AmmoSpriteID] = 6;
-	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "High-damage, armor-piercing powerhouse. Mastery requires skill due to its recoil and limited magazine, but in the hands of a skilled player, each shot spells devastation for your enemies.";
+	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "High-damage, armor-piercing powerhouse. Mastery requires skill due to its inaccuracy and limited magazine but in the hands of a skilled player, each shot spells devastation for your enemies.";
 
 	global.ItemIndex[#Item.Glock, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 590, 29, 240, 24, "Secondary", 1, 5, 9, snd_Glock, 3, 1, false,
@@ -305,8 +305,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "MK18 is a potent rifle renowned for its rapid fire rate and exceptional accuracy over longer distances, though with a punchier recoil. While sacrificing some armor penetration, its swift RPM makes it ideal for precise engagements, striking a balance between speed and effectiveness on the battlefield.";
 
 	global.ItemIndex[#Item.m4a1, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 34, 300, 30, "Main", 1, 5, 6, snd_m4a1, 2.5, 1, true,
-	10, 20, -5, 3.9, 30, .01, 8, 3.5, .0025, 1, 7.75, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps), .73, 290, .75, 5);
+	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 34, 300, 25, "Main", 1, 5, 6, snd_m4a1, 2.5, 1, true,
+	10, 15, -5, 3.9, 30, .01, 8, 3.5, .0025, 1, 7.75, .9, 0, "Assault rifle", .89, .7, .00023, .1 * game_get_speed(gamespeed_fps), .73, 290, .75, 5);
 	global.ItemIndex[#Item.m4a1, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.m4a1, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4a1, ItemStat.advantages] = "-Good mobility\n-Low bullet spread\n-Low recoil";
@@ -329,7 +329,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.usp, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 700, 35, 350, 15, "Secondary", 1, 3, 8, snd_usp, 2, 1, false,
-	9, 12, 1, 1, 15, .075, 5.5, 5, .0125, 0, 13, .93, 0, "Pistol", .93, .44, .00025, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8);
+	9, 12, 1, 1, 15, .175, 5.5, 5, .0125, 0, 13, .93, 0, "Pistol", .93, .44, .00025, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8);
 	global.ItemIndex[#Item.usp, ItemStat.KBStabilization] = 10;
 	global.ItemIndex[#Item.usp, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low penetration power";
