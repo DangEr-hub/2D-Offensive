@@ -542,6 +542,8 @@ if (distToGrenade <= 256 || distToLandMine <= 256) {
 
 #region Texture
 if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
+	
+	#region Weapon texture
 	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Name]){
 		case "AKM":
 			Weapon.image_index = 1;
@@ -607,6 +609,9 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			Weapon.image_index = 0;
 		break;
 	}
+	#endregion
+	
+	#region Enemy texture
 	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass]){
 		case "Assault rifle":
 			if(FlashedTimer <= FlashedTime * .25){
@@ -685,8 +690,15 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		case "Shotgun":
 			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
-				image_index = 2;
-				ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
+					image_index = 2;
+					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				}else{
+					image_index = 6;
+					BodyHitBox.image_index = HitBox.BodyReloading;
+					ArmHitBox.image_index = HitBox.ArmReloading;
+				}
 			}else{
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
@@ -697,8 +709,15 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		case "Anti-tank missile":
 			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
-				image_index = 2;
-				ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
+					image_index = 2;
+					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+				}else{
+					image_index = 6;
+					BodyHitBox.image_index = HitBox.BodyReloading;
+					ArmHitBox.image_index = HitBox.ArmReloading;
+				}
 			}else{
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
@@ -718,7 +737,11 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
 		break;
 	}
+	#endregion
+	
 }else{
+	
+	#region Default texture (landmine and grenade)
 	BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 	Weapon.image_index = 0;
 	if(FlashedTimer <= FlashedTime * .25){
@@ -729,6 +752,8 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
 	}
 	WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+	#endregion
+	
 }
 #endregion
 

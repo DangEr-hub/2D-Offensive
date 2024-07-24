@@ -1,3 +1,6 @@
+if(global.draw_other_models == true){
+	draw_spawn_areas(global.MapID);
+}
 if(PauseMenu == true || RespawnMenu == true){
 	if (BackGround != -1) {
 		shader_set(shd_Blur1Pass);

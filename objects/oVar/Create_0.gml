@@ -95,7 +95,7 @@ for (var i = 0; i < 2; i++) {
 
 
 enum MapProperty{
-	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, Total
+	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, SpawnAreas, MaxEnemies, Total
 }
 
 enum MapIndex{
@@ -122,6 +122,13 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .8;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
+global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
+
+var desert_spawn_areas = ds_map_create();
+ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]);
+ds_map_add(desert_spawn_areas, "area2", [900, 1200, 2000, 1800, 10]);
+ds_map_add(desert_spawn_areas, "area3", [900, 100, 1300, 500, 5]);
+global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_areas;
 
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";

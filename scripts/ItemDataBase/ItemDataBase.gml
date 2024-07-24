@@ -116,10 +116,10 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.AKM, ItemStat.Description] = "Known for its challenging handling yet unmatched lethality on the battlefield. Mastering its recoil demands skill, but once tamed, it becomes a devastating tool capable of swiftly dispatching foes with deadly precision.";
 	
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .9, 25);
+	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .95, 25);
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.BaseDurability] = 100;
-	global.ItemIndex[#Item.KevlarHelm, ItemStat.Description] = "This basic helmet provides 10% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained.";
+	global.ItemIndex[#Item.KevlarHelm, ItemStat.Description] = "This basic helmet provides " + string_format((1 - global.ItemIndex[#Item.KevlarHelm, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained.";
 	
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.DesertEagle, "Desert Eagle", 1.75 * game_get_speed(gamespeed_fps), 850, 53, 70, 7, "Secondary", 1, 4, 11, snd_DesertEagle, 7, 2, false,
@@ -133,10 +133,10 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.DesertEagle, ItemStat.Description] = "Known for its high damage and armor penetration, presents a formidable challenge to master due to its recoil and limited magazine capacity. Despite these drawbacks, skilled player harness its power to devastating effect, making each well-placed shot count in engagements.";
 	
 	global.ItemIndex[#Item.KevlarVest, ItemStat.Type] = "Armour";
-	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .9, 50);
+	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .95, 50);
 	global.ItemIndex[#Item.KevlarVest, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.KevlarVest, ItemStat.BaseDurability] = 100;
-	global.ItemIndex[#Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic 10% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
+	global.ItemIndex[#Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic " + string_format((1 - global.ItemIndex[#Item.KevlarVest, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
 	
 	global.ItemIndex[#Item.Spas, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 500, 33, 120, 12, "Main", 5, 5, 30, snd_Spas, 15, 2, false,
@@ -151,16 +151,16 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Spas, ItemStat.Description] = "A lethal close-quarters option, the SPAS-12 shotgun delivers swift takedowns up close but falters at longer distances. Ideal for tight encounters where its devastating power reigns supreme.";
 	
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.MilitaryHelm, "Military helmet", 3, .75, 50);
+	ArmourStats(Item.MilitaryHelm, "Military helmet", 3, .9, 50);
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.MilitaryHelm, ItemStat.BaseDurability] = 100;
-	global.ItemIndex[#Item.MilitaryHelm, ItemStat.Description] = "With a 25% damage reduction, the Military Helmet offers enhanced head protection against moderate threats. A balanced choice for defense and comfort.";
+	global.ItemIndex[#Item.MilitaryHelm, ItemStat.Description] = "With a " + string_format((1 - global.ItemIndex[#Item.MilitaryHelm, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, the Military Helmet offers enhanced head protection against moderate threats. A balanced choice for defense and comfort.";
 	
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.Type] = "Armour";
-	ArmourStats(Item.MilitaryVest, "Military vest", 7, .75, 75);
+	ArmourStats(Item.MilitaryVest, "Military vest", 7, .9, 75);
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[#Item.MilitaryVest, ItemStat.BaseDurability] = 100; 
-	global.ItemIndex[#Item.MilitaryVest, ItemStat.Description] = "Enhanced with 25% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
+	global.ItemIndex[#Item.MilitaryVest, ItemStat.Description] = "Enhanced with " + string_format((1 - global.ItemIndex[#Item.MilitaryVest, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SSG08, "Steyr SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Main", 1, 2, 30, snd_SSG08, 15, 2, false,
@@ -222,16 +222,16 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SG550, ItemStat.Description] = "The SIG 550 comes equipped with a preattached scope, offering exceptional range and damage. However, its high recoil and slower rate of fire demand precision shooting, while its bulkier build limits movement speed. Ideal for those who excel in calculated, long-range engagements.";
 
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.SpecOpsHelm, "Spec ops helmet", 5, .59, 100);
+	ArmourStats(Item.SpecOpsHelm, "Spec ops helmet", 5, .85, 100);
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.ItemColor] = c_dkgray;
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.BaseDurability] = 50;
-	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Description] = "The Spec Ops Helmet, featuring a 41% damage reduction, is designed for intense combat situations but has lower durability. Its heavier construction focuses on maximal protection, demanding strategic use to compensate for its shorter lifespan.";
+	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Description] = "The Spec Ops Helmet, featuring a " + string_format((1 - global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, is designed for intense combat situations but has lower durability. Its heavier construction focuses on maximal protection, demanding strategic use to compensate for its shorter lifespan.";
 	
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.Type] = "Armour";
-	ArmourStats(Item.SpecOpsVest, "Spec ops vest", 8, .59, 125);
+	ArmourStats(Item.SpecOpsVest, "Spec ops vest", 8, .85, 125);
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.ItemColor] = c_dkgray;
 	global.ItemIndex[#Item.SpecOpsVest, ItemStat.BaseDurability] = 50; 
-	global.ItemIndex[#Item.SpecOpsVest, ItemStat.Description] = "Equipped with 41% damage reduction, the Spec Ops Vest offers advanced protection but with lower durability. Ideal for high-risk scenarios, its heavier build prioritizes maximum defense, requiring careful management due to its limited lifespan.";
+	global.ItemIndex[#Item.SpecOpsVest, ItemStat.Description] = "Equipped with " + string_format((1 - global.ItemIndex[#Item.SpecOpsVest, ItemStat.Defense]) * 100, 0, 0) + "% damage reduction, the Spec Ops Vest offers advanced protection but with lower durability. Ideal for high-risk scenarios, its heavier build prioritizes maximum defense, requiring careful management due to its limited lifespan.";
 	
 	global.ItemIndex[#Item.MilitaryNightVision, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.MilitaryNightVision, "Military night vision", 3, .975, 150);

@@ -1,6 +1,18 @@
 global.ParticleSystem = part_system_create();
 part_system_depth(global.ParticleSystem, -10000);
 
+leaf_emitter = part_emitter_create(global.ParticleSystem);
+leaf_particle = part_type_create();
+part_type_sprite(leaf_particle, spr_Leaf, false, false, 1);
+part_type_size(leaf_particle, 0.5, 1.5, 0.01, 0);
+part_type_direction(leaf_particle, 80, 100, 0, 0.05);
+part_type_speed(leaf_particle, 0.1, 0.2, 0.01, 0.01);
+part_type_life(leaf_particle, 30, 50);
+part_type_orientation(leaf_particle, 0, 359, 0.5, 0.5, 1);
+part_type_alpha3(leaf_particle, 0.2, 0.8, 0.4);
+part_type_gravity(leaf_particle, 0.1, 270);
+
+
 //Headshot
 headshot_particle = part_type_create();
 part_type_sprite(headshot_particle, spr_BulletTracer, 0, 0, 0);

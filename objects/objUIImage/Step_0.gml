@@ -3,5 +3,3 @@ if(alpha_value < 1){
 }
 
 
-
-

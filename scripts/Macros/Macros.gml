@@ -1,8 +1,9 @@
+#macro DEBUG_COLOR c_aqua
 #macro STAMINA_HOLD_VALUE 0.5
 #macro LEG_MULTIPLIER 0.7
 #macro ARM_MULTIPLIER 0.9
 #macro BODY_MULTIPLIER 1.1
-#macro HEADSHOT_MULTIPLIER 5
+#macro HEADSHOT_MULTIPLIER 4.1
 #macro CAMERA view_camera[0]
 #macro AMBIENT_OFFSET 1.25
 #macro MAIN_COLOR make_color_rgb(255, 215, 0)

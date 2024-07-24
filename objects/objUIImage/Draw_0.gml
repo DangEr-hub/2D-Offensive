@@ -5,8 +5,9 @@ if(clickable == true){
 		if (zui_get_hover()) {
 			if (pressed)
 				draw_set_color(c_black);
-			else
+			else{
 				draw_set_color(MAIN_COLOR); 
+			}
 		} else {
 			draw_set_color(c_white);
 		}

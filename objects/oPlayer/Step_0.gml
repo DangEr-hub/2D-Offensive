@@ -696,8 +696,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						HeadHitBox.image_index = HitBox.Head;
 						BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 						if(Flashed == false){
-							image_index = player_textures.assault_rifle;
-							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+								image_index = player_textures.assault_rifle;
+								ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+							}else{
+								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
+								ArmHitBox.image_index = HitBox.ArmReloading;
+							}
 						}else{
 							image_index = player_textures.flashed_weapon;
 							ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
@@ -707,8 +713,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						BodyHitBox.image_index = HitBox.BodyProne;
 						var image_index_variable;
 						if(Flashed == false){
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;
+							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.95){
+								image_index_variable = player_textures.prone;
+								ArmHitBox.image_index = HitBox.ArmProne;		
+							}else{
+								image_index_variable = player_textures.reload_prone;
+								ArmHitBox.image_index = HitBox.ArmProneReloading;
+							}
 						}else{
 							image_index_variable = player_textures.flashed_prone;
 							ArmHitBox.image_index = HitBox.ArmProneFlashed;
@@ -744,8 +755,14 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						HeadHitBox.image_index = HitBox.Head;
 						BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 						if(Flashed == false){
-							image_index = player_textures.assault_rifle;
-							ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.75){
+								image_index = player_textures.assault_rifle;
+								ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
+							}else{
+								image_index = player_textures.reload;
+								BodyHitBox.image_index = HitBox.BodyReloading;
+								ArmHitBox.image_index = HitBox.ArmReloading;
+							}
 						}else{
 							image_index = player_textures.flashed_weapon;
 							ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
@@ -755,8 +772,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						BodyHitBox.image_index = HitBox.BodyProne;
 						var image_index_variable;
 						if(Flashed == false){
-							image_index_variable = player_textures.prone;
-							ArmHitBox.image_index = HitBox.ArmProne;
+							if!(ReloadTime >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ReloadSpeed]*.75){
+								image_index_variable = player_textures.prone;
+								ArmHitBox.image_index = HitBox.ArmProne;		
+							}else{
+								image_index_variable = player_textures.reload_prone;
+								ArmHitBox.image_index = HitBox.ArmProneReloading;
+							}
 						}else{
 							image_index_variable = player_textures.flashed_prone;
 							ArmHitBox.image_index = HitBox.ArmProneFlashed;
@@ -858,6 +880,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			}
 		}else{
+			
+			#region No weapon texture
 			if(moving_state != player_states.prone_state){
 				HeadHitBox.image_index = HitBox.Head;
 				BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
@@ -900,6 +924,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				#endregion
 					
 			}
+			#endregion
+			
 		}
 		#endregion
 		
@@ -1486,12 +1512,20 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 		#region Item cycling
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleRight])){
+			if(Healing == true){
+				HealingTime = 0;
+				Healing = false;
+			}
 			ItemUsePosition ++;
 			if(ItemUsePosition > InventoryOtherSlot.ArmourSlot - 1){
 			    ItemUsePosition = 0;
 			}
 		}
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
+			if(Healing == true){
+				HealingTime = 0;
+				Healing = false;
+			}
 			if(ItemUsePosition == 0){ 
 			    ItemUsePosition = InventoryOtherSlot.ArmourSlot - 1;
 			}else{

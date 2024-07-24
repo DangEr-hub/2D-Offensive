@@ -48,7 +48,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.ArmourDurability[0] > 0) || hit_object.ArmourDurability[0] > 0){
-				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .9){
+				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
@@ -62,7 +62,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.ArmourDurability[0] > 0) || hit_object.ArmourDurability[0] > 0){
-				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .9){
+				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
@@ -76,7 +76,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#HelmetID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.ArmourDurability[1] > 0) || hit_object.ArmourDurability[1] > 0){
-				if(global.ItemIndex[#HelmetID, ItemStat.Defense] <= .9){
+				if(global.ItemIndex[#HelmetID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#HelmetID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
@@ -157,7 +157,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 			part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.BloodParticle, BloodParticleNumber);
 		}
 		if(BodyPart != HitBox.Head){
-			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .9 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
+			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .95 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
 				var sound_effect = snd_BulletHit;
 				if!(audio_is_playing(sound_effect)){
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);
@@ -206,7 +206,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 				    part_particles_create(partSystem, posX, posY, partType, 1);
 				}
 			}
-			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .9 || helmet_durability <= 0){
+			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .95 || helmet_durability <= 0){
 				var sound_effect = choose(snd_HeadShot1, snd_HeadShot2);
 				if!(audio_is_playing(sound_effect)){
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);

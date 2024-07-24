@@ -37,7 +37,7 @@ if(global.GUIMultiplier <= 1){
 }
 
 if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_scope] != Item.None){
-	scope_caption = "Drop";
+	scope_caption = "Unequip";
 	with(zui_create(scope_drop_x, scope_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
@@ -50,7 +50,7 @@ if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon
 }
 
 with(zui_create(scope_drop_x, scope_drop_y, objUIButton)){
-	zui_set_size(32 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+	zui_set_size(48 * global.GUIMultiplier, 16 * global.GUIMultiplier);
 	caption_color = MAIN_COLOR;
 	caption = other.scope_caption;
 	callback = function(){
@@ -93,7 +93,7 @@ if(global.GUIMultiplier <= 1){
 }
 
 if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_barrel] != Item.None){
-	barrel_caption = "Drop";
+	barrel_caption = "Unequip";
 	with(zui_create(barrel_drop_x, barrel_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
@@ -106,7 +106,7 @@ if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon
 }
 
 with(zui_create(barrel_drop_x, barrel_drop_y, objUIButton)){
-	zui_set_size(32 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+	zui_set_size(48 * global.GUIMultiplier, 16 * global.GUIMultiplier);
 	caption_color = MAIN_COLOR;
 	caption = other.barrel_caption;
 	callback = function(){
@@ -149,7 +149,7 @@ if(global.GUIMultiplier <= 1){
 }
 
 if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip] != Item.None){
-	grip_caption = "Drop";
+	grip_caption = "Unequip";
 	with(zui_create(grip_drop_x, grip_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
@@ -162,7 +162,7 @@ if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon
 }
 
 with(zui_create(grip_drop_x, grip_drop_y, objUIButton)){
-	zui_set_size(32 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+	zui_set_size(48 * global.GUIMultiplier, 16 * global.GUIMultiplier);
 	caption_color = MAIN_COLOR;
 	caption = other.grip_caption;
 	callback = function(){
@@ -205,7 +205,7 @@ if(global.GUIMultiplier <= 1){
 }
 
 if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None){
-	suppressor_caption = "Drop";
+	suppressor_caption = "Unequip";
 	with(zui_create(suppressor_drop_x, suppressor_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
@@ -218,7 +218,7 @@ if(global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon
 }
 
 with(zui_create(suppressor_drop_x, suppressor_drop_y, objUIButton)){
-	zui_set_size(32 * global.GUIMultiplier, 16 * global.GUIMultiplier);
+	zui_set_size(48 * global.GUIMultiplier, 16 * global.GUIMultiplier);
 	caption_color = MAIN_COLOR;
 	caption = other.suppressor_caption;
 	callback = function(){

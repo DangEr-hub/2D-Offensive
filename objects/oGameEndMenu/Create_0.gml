@@ -123,13 +123,10 @@ main_menu_callback = function(){
 
 #region Rank up title
 if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
-	rank_string_color = c_white;
-	rank_string = "";
 	if(get_rank(global.player_elo_struct.Previous_elo) < get_rank(global.player_elo_struct.Elo)){
 		rank_string_color = MAIN_COLOR;
-		rank_string = "Rank up!";
 		var px = random_range(camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2, camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2);
-		var py = random_range(camera_get_view_y(CAMERA), camera_get_view_y(CAMERA) + string_width(rank_string));
+		var py = zui_get_height() * .2;
 		part_type_direction(oParticleSystem.level_up_particle, 180, 360, 0, 30);
 		part_type_life(oParticleSystem.level_up_particle, 5 * game_get_speed(gamespeed_fps), 15 * game_get_speed(gamespeed_fps));
 		part_type_speed(oParticleSystem.level_up_particle, 1, 2, 0, .5);
@@ -137,20 +134,6 @@ if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 		part_type_direction(oParticleSystem.level_up_particle, 0, 360, 0, 0);
 		part_type_life(oParticleSystem.level_up_particle, oParticleSystem.level_up_life_min, oParticleSystem.level_up_life_max);
 		part_type_speed(oParticleSystem.level_up_particle, oParticleSystem.level_up_speed_min, oParticleSystem.level_up_speed_max, 0, 0);
-	}else if(get_rank(global.player_elo_struct.Previous_elo) > get_rank(global.player_elo_struct.Elo)){
-		rank_string_color = c_red;
-		rank_string = "Rank down";
-	}
-	
-	draw_set_font(set_font("Title_large"));
-	with(zui_main()){
-		with(zui_create(global.GuiW/2 - string_width(oGameEndMenu.rank_string)/2, string_height("a"), objUILabel, -10001)){
-			alpha = 1;
-			alpha_value = 0;
-			color = oGameEndMenu.rank_string_color;
-			caption = oGameEndMenu.rank_string;
-			font = set_font("Title_large");
-		}
 	}
 }
 #endregion
@@ -233,6 +216,7 @@ with (zui_create(current_rank_x + arrow_size/2, rank_y + rank_image_size_height/
 with (zui_create(current_rank_x, rank_y + rank_image_size_height/2*1.21 + arrow_size, objUIImage)) {
 	zui_set_anchor(0, 0);
 	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
+	tag = "rank";
 	sprite = spr_ranks;
 	sprite_image_index = other.rank_previous;
 	sprite_width_size = other.rank_image_size_width;

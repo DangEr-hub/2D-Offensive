@@ -2,6 +2,7 @@
 BackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
 instance_deactivate_object(oCrosshair);
 instance_deactivate_all(true);
+instance_activate_object(oParticleSystem);
 instance_activate_object(oCamera);
 instance_activate_object(oGameEndMenu);
 instance_activate_object(oEggyEloRatingSystem);

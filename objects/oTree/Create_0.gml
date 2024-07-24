@@ -7,6 +7,10 @@ Visible = true;
 Type = "Wood";
 image_speed = 0;
 image_index = irandom(image_number - 1);
+time_modifier = random_range(50.0, 100.0);
+amplitude = random_range(1, 2.5);
+strength = random_range(1.5, 2.5);
+
 
 
 
