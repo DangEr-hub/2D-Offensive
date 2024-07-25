@@ -1,5 +1,3 @@
-/// @description Insert description here
-// You can write your code in this editor
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 	if(other.stats.Object != MainObject || other.stats.Tracer_image == 2){
 		var ObjectArmourID = global.ArmourID[0];
@@ -22,3 +20,4 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 		instance_destroy(other);
 	}
 }
+

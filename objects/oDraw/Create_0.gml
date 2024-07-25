@@ -6,8 +6,6 @@ KilledByName = "No one";
 var_slot = 0;
 item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
-CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] --";
-CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] ++";
 DropString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyDrop])) + "] + " + "[" + 
 string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
 HUDShift = 16;

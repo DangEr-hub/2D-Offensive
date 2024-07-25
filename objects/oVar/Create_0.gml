@@ -8,7 +8,7 @@ global.FlashBangMaxDistance = 512;
 global.DynamicCrosshair = false;
 global.CrosshairAlpha = 1;
 global.weapon_id = [Item.None, Item.None, Item.None];
-global.InventorySize = 26;
+global.InventorySize = 21;
 global.Ammo = [0, 0, 0];
 global.MaxAmmo = [0, 0, 0];
 global.ClipAmmo = [0, 0, 0];
@@ -163,10 +163,11 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight,
 	KeyInventory, KeyDrop, KeyPickUp, KeyCycleLeft,
-	KeyCycleRight, KeyUse, KeyShootMouse, KeyReload,
+	KeyCycleRight, KeyCycleUp, KeyShootMouse, KeyReload,
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
 	KeyProne, KeyWeaponAttachments, KeyCommand, KeyGo, 
-	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, Total
+	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleDown, 
+	Total
 }
 
 global.KeyBinds = ds_list_create();
@@ -176,8 +177,8 @@ ds_list_add(
 	ord("I"), vk_control, vk_space, ord("Q"), 
 	ord("E"), ord("F"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
-	ord("Y"), ord("T"), ord("C"), ord("X"),
-	ord("B"), vk_shift, ord("G")
+	ord("Y"), ord("T"), ord("X"), ord("H"),
+	ord("B"), vk_shift, ord("G"), ord("C")
 );
 
 enum player_textures{

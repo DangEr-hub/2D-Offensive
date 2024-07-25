@@ -374,6 +374,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 
 		#region Draw item switching
 		if(global.Inventory[#oPlayer.ItemUsePosition, InventoryIndex.SlotID] != Item.None){
+			var CycleDownString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Down";
+			var CycleUpString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Up";
+			var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Left";
+			var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] - Right";
 			var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 		    var Id = global.Inventory[#oPlayer.ItemUsePosition, InventoryIndex.SlotID];        
 		    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1);  

@@ -1517,8 +1517,30 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Healing = false;
 			}
 			ItemUsePosition ++;
-			if(ItemUsePosition > InventoryOtherSlot.ArmourSlot - 1){
+			if(ItemUsePosition > global.InventorySize - 1){
 			    ItemUsePosition = 0;
+			}
+		}
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleUp])){
+			if(Healing == true){
+				HealingTime = 0;
+				Healing = false;
+			}
+			if(ItemUsePosition <= INVENTORY_ROW_SIZE - 1){
+				ItemUsePosition = ItemUsePosition + (global.InventorySize - INVENTORY_ROW_SIZE);
+			}else{
+				ItemUsePosition = ItemUsePosition - INVENTORY_ROW_SIZE;
+			}
+		}
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleDown])){
+			if(Healing == true){
+				HealingTime = 0;
+				Healing = false;
+			}
+			if(ItemUsePosition >= 2*INVENTORY_ROW_SIZE){
+				ItemUsePosition = ItemUsePosition - (global.InventorySize - INVENTORY_ROW_SIZE);
+			}else{
+				ItemUsePosition = ItemUsePosition + INVENTORY_ROW_SIZE;
 			}
 		}
 		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
@@ -1527,7 +1549,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Healing = false;
 			}
 			if(ItemUsePosition == 0){ 
-			    ItemUsePosition = InventoryOtherSlot.ArmourSlot - 1;
+			    ItemUsePosition = global.InventorySize - 1;
 			}else{
 			    ItemUsePosition --;
 			}
@@ -1800,12 +1822,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Deactivate out of view
-	var DeactivateMargin = 256;
-	var ActivateMargin = 128;
-	var deactivateLeft = camera_get_view_x(CAMERA) - DeactivateMargin;
-	var deactivateTop = camera_get_view_y(CAMERA) - DeactivateMargin;
-	var deactivateRight = deactivateLeft + camera_get_view_width(CAMERA) + 2 * DeactivateMargin;
-	var deactivateBottom = deactivateTop + camera_get_view_height(CAMERA) + 2 * DeactivateMargin;
+	var deactivateLeft = camera_get_view_x(CAMERA) - DEACTIVATE_MARGIN;
+	var deactivateTop = camera_get_view_y(CAMERA) - DEACTIVATE_MARGIN;
+	var deactivateRight = deactivateLeft + camera_get_view_width(CAMERA) + 2 * DEACTIVATE_MARGIN;
+	var deactivateBottom = deactivateTop + camera_get_view_height(CAMERA) + 2 * DEACTIVATE_MARGIN;
 
 	with (oEnemy) {
 	    if (x < deactivateLeft || x > deactivateRight || y < deactivateTop || y > deactivateBottom) {
@@ -1817,14 +1837,15 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_deactivate_region(deactivateLeft, deactivateTop, deactivateRight - deactivateLeft, deactivateBottom - deactivateTop, false, true);
 	
 
-	// Activate instances within view + ActivateMargin
+	// Activate instances within view ACTIVATE_MARGIN
 	instance_activate_region(
-		camera_get_view_x(CAMERA) - ActivateMargin,
-		camera_get_view_y(CAMERA) - ActivateMargin,
-		camera_get_view_width(CAMERA) + 2 * ActivateMargin,
-		camera_get_view_height(CAMERA) + 2 * ActivateMargin,
+		camera_get_view_x(CAMERA) - ACTIVATE_MARGIN,
+		camera_get_view_y(CAMERA) - ACTIVATE_MARGIN,
+		camera_get_view_width(CAMERA) + 2 * ACTIVATE_MARGIN,
+		camera_get_view_height(CAMERA) + 2 * ACTIVATE_MARGIN,
 		true
 	);
+	instance_activate_object(oParentTile);
 	instance_activate_object(objUITextInput);
 	instance_activate_object(oMortarMenu);
 	instance_activate_object(oWeaponAttachments);
@@ -1843,7 +1864,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(objUIGrid);
 	instance_activate_object(oArmourDescription);
 	instance_activate_object(oEggyEloRatingSystem);
-	instance_activate_object(Legs);
+	//instance_activate_object(Legs);
 	instance_activate_object(oCrosshair);
 	instance_activate_object(oDamageIndicator);
 	instance_activate_object(oDraw);
@@ -1854,8 +1875,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(oConsole);
 	instance_activate_object(oCamera);
 	instance_activate_object(oInventory);
-	instance_activate_object(oItems);
-	//instance_activate_object(oShrapnel);
+	//instance_activate_object(oItems);
 	instance_activate_object(oGrenade);
 	instance_activate_object(oExplosion);
 	#endregion

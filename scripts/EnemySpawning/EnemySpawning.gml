@@ -1,3 +1,24 @@
+function is_player_nearby_area(area) {
+    var player = instance_nearest((area[0] + area[2]) / 2, (area[1] + area[3]) / 2, oPlayer);
+    var distance = DEACTIVATE_MARGIN + 1;
+	
+    if (player != noone) {
+        var player_x = player.x;
+        var player_y = player.y;
+        
+        var left_border = area[0] - distance;
+        var right_border = area[2] + distance;
+        var top_border = area[1] - distance;
+        var bottom_border = area[3] + distance;
+        
+        if (player_x >= left_border && player_x <= right_border && player_y >= top_border && player_y <= bottom_border) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 function is_spawn_point_valid(xx, yy) {
     var spawn_radius = 64;
     var collision_free = true;
@@ -29,35 +50,36 @@ function spawn_enemies(map_index) {
         var area = spawn_areas[? area_key];
         var area_max_enemies = area[4]; // The fifth element is the max number of enemies for this area
 
-        // Determine the number of enemies to spawn in this area
-        var enemies_in_area = min(area_max_enemies, enemies_to_spawn);
-        enemies_to_spawn -= enemies_in_area;
+        //if(is_player_nearby_area(area)){
+	        var enemies_in_area = min(area_max_enemies, enemies_to_spawn);
+	        enemies_to_spawn -= enemies_in_area;
 
-        for (var i = 0; i < enemies_in_area; i += 1) {
-            var spawn_x = 0;
-			var spawn_y = 0;
-            var attempts = 0;
-            var max_attempts = 100; // Limit the number of attempts to find a valid point
+	        for (var i = 0; i < enemies_in_area; i += 1) {
+	            var spawn_x = 0;
+				var spawn_y = 0;
+	            var attempts = 0;
+	            var max_attempts = 100; // Limit the number of attempts to find a valid point
 
-            repeat (max_attempts) {
-                // Generate a random point within the chosen area
-                spawn_x = irandom_range(area[0], area[2]);
-                spawn_y = irandom_range(area[1], area[3]);
+	            repeat (max_attempts) {
+	                // Generate a random point within the chosen area
+	                spawn_x = irandom_range(area[0], area[2]);
+	                spawn_y = irandom_range(area[1], area[3]);
 
-                // Check if the point is valid
-                if (is_spawn_point_valid(spawn_x, spawn_y)) {
-                    break;
-                }
-                attempts += 1;
-            }
+	                // Check if the point is valid
+	                if (is_spawn_point_valid(spawn_x, spawn_y)) {
+	                    break;
+	                }
+	                attempts += 1;
+	            }
 
-            if (attempts < max_attempts) {
-                // Spawn the enemy at the valid point
-                instance_create_layer(spawn_x, spawn_y, "LivingO", oEnemy);
-            } else {
-				return false;
-            }
-        }
+	            if (attempts < max_attempts) {
+	                // Spawn the enemy at the valid point
+	                instance_create_layer(spawn_x, spawn_y, "LivingO", oEnemy);
+	            } else {
+					return false;
+	            }
+	        }
+		//}
 
         // If no more enemies need to be spawned, break out of the loop
         if (enemies_to_spawn <= 0) {

@@ -1,5 +1,5 @@
 /// @description Drawing
-draw_text(x, y + 25, global.player_stats_struct.Weight);
+draw_text(x, y + 25, ItemUsePosition);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;

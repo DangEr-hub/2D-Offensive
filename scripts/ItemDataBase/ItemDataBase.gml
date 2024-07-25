@@ -107,7 +107,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.AKM, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 900, 36, 270, 30, "Main", 1, 8, 6, snd_AKM, 5, 2, true,
-	10, 20, 10, 5.9, 30, .017, 10, 3.5, .0025, 1, 7, .25, 1, "Assault rifle", .81, .775, .00011, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5);
+	10, 20, 10, 5.9, 30, .017, 10, 3.5, .0017, 1, 7, .25, 1, "Assault rifle", .81, .775, .00011, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5);
 	global.ItemIndex[#Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Fast equipping";
@@ -211,7 +211,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.SG550, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 950, 43, 300, 30, "Main", 1, 10, 7, snd_SG550, 2, 1.75, true,
-	10, 17, -7, 7, 40, 0.01, 9, 3.5, .005, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps), .83, 300, 1, 5);
+	10, 17, -7, 7, 40, 0.01, 9, 3.5, .0025, 3, 8, .15, 1, "Assault rifle", .79, .97, .0001, .75 * game_get_speed(gamespeed_fps), .83, 300, 1, 5);
 	global.ItemIndex[#Item.SG550, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility\n-High bullet spread";
