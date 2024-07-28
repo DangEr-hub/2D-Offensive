@@ -66,7 +66,7 @@ function check_if_available(ObjectType) {
         }
         
         return 
-        (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.InSmoke == false && 
+        (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.hidden == false && 
         rotation == true);
     } else {
         return false;

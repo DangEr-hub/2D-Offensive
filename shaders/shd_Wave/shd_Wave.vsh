@@ -18,7 +18,7 @@ void main()
     float wave = sin(in_Position.y * strength + time) * amplitude;
     
     // Adjust position with the wave effect
-    vec4 object_space_pos = vec4( in_Position.x + wave, in_Position.y, in_Position.z, 1.0);
+    vec4 object_space_pos = vec4( in_Position.x + wave, in_Position.y + wave, in_Position.z, 1.0);
     gl_Position = gm_Matrices[MATRIX_WORLD_VIEW_PROJECTION] * object_space_pos;
     
     v_vColour = in_Colour;

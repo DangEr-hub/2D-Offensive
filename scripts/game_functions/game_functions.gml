@@ -482,10 +482,10 @@ function inaccuracy_formula(WID, ObjectType){
 	if(instance_exists(ObjectType)){
 		if(ObjectType.object_index == oPlayer){
 			if(instance_exists(oPlayer)){
-				MovingIn = 1;
-				KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
-				range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
-				moving_state_inaccuracy = 1;
+				var MovingIn = 1;
+				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
+				var range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+				var moving_state_inaccuracy = 1;
 	
 				if(ObjectType.moving_state == player_states.prone_state){
 					moving_state_inaccuracy = .5;	
@@ -495,8 +495,8 @@ function inaccuracy_formula(WID, ObjectType){
 					MovingIn = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
 				}
 			
-				ScopeTimerInaccuracy = 1;
-				ScopeInaccuracy = 1;
+				var ScopeTimerInaccuracy = 1;
+				var ScopeInaccuracy = 1;
 				if(ObjectType.player_has_scope == 0){
 					if(ObjectType.ScopeIn == false){
 						ScopeTimerInaccuracy = 50;
@@ -514,13 +514,19 @@ function inaccuracy_formula(WID, ObjectType){
 			}
 		}else if(ObjectType.object_index == oEnemy){
 			if(instance_exists(oEnemy)){
-				FlashedInaccuracy = 1;
-				InSmokeInaccuracy = 1;
-				EnemyMovingInaccuracy = 1;
-				EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
+				var behind_smoke_inaccuracy = 1;
+				var FlashedInaccuracy = 1;
+				var InSmokeInaccuracy = 1;
+				var EnemyMovingInaccuracy = 1;
+				var EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
 				global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
-			
-				if(oPlayer.InSmoke == true && ObjectType.ChasingObject == oPlayer){
+
+				var smoke_list = ds_list_create();
+				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x, oSmokeTile, true, false, smoke_list, false);
+				behind_smoke_inaccuracy = 5 * smoke_number;
+				ds_list_destroy(smoke_list);
+
+				if(ChasingObject.hidden == true){
 					InSmokeInaccuracy = 5;
 				}
 			
@@ -531,30 +537,17 @@ function inaccuracy_formula(WID, ObjectType){
 				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
 					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
 				}
-				return
-				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
-				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy, 175);
+				
+				var inaccuracy_value = min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
+				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
+				//show_debug_message(inaccuracy_value);
+				show_debug_message(behind_smoke_inaccuracy);
+				return inaccuracy_value;
+
 			}
 		}else if(ObjectType.object_index == oFriend){
 			if(instance_exists(oFriend)){
-				FlashedInaccuracy = 1;
-				InSmokeInaccuracy = 1;
-				EnemyMovingInaccuracy = 1;
-				EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
-				global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
-			
-				if(ObjectType.ChasingObject.InSmoke == true){
-					InSmokeInaccuracy = 5;
-				}
-			
-				if(ObjectType.Flashed == true){
-					FlashedInaccuracy = 5;
-				}
-			
-				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
-					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
-				}
-				return EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy;
+				
 			}
 		}
 	}else{
@@ -564,13 +557,10 @@ function inaccuracy_formula(WID, ObjectType){
 
 function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
 	if(instance_exists(instance_id)){
-	    //ds_map_add(global.sound_emitters, instance_id.Emitter, Sound);
 	    var playerInstance = instance_find(oPlayer, 0);
 	    audio_emitter_position(instance_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
 	    audio_emitter_falloff(instance_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
 	    audio_play_sound_on(instance_id.Emitter, Sound, Priority, false);
-	    //var alarmTime = audio_sound_length(Sound) * game_get_speed(gamespeed_fps) / 1000;
-		//instance_id.alarm[5] = alarmTime;
 	}
 }
 	

@@ -126,8 +126,10 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
 
 var desert_spawn_areas = ds_map_create();
 ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]);
-ds_map_add(desert_spawn_areas, "area2", [900, 1200, 2000, 1800, 10]);
-ds_map_add(desert_spawn_areas, "area3", [900, 100, 1300, 500, 5]);
+ds_map_add(desert_spawn_areas, "area2", [900, 1200, 1500, 1800, 3]);
+ds_map_add(desert_spawn_areas, "area3", [900, 100, 1900, 500, 5]);
+ds_map_add(desert_spawn_areas, "area4", [2300, 400, 3000, 1000, 5]);
+ds_map_add(desert_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);
 global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_areas;
 
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
@@ -167,6 +169,7 @@ enum KeyBind{
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
 	KeyProne, KeyWeaponAttachments, KeyCommand, KeyGo, 
 	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleDown, 
+	KeyCycleInvLeft, KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown,
 	Total
 }
 
@@ -178,7 +181,8 @@ ds_list_add(
 	ord("E"), ord("F"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
 	ord("Y"), ord("T"), ord("X"), ord("H"),
-	ord("B"), vk_shift, ord("G"), ord("C")
+	ord("B"), vk_shift, ord("G"), ord("C"),
+	ord("A"), ord("D"), ord("W"), ord("S"),
 );
 
 enum player_textures{

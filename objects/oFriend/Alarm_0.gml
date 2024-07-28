@@ -1,6 +1,6 @@
 /// @description Movement
 function decide_movement() {
-    if (InSmoke == false) {
+    if (hidden == false) {
         handle_basic_movement();
     } else {
         handle_smoke_movement();
@@ -73,7 +73,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 								reload_ai();
 							}				
 						}else{	
-							if(InSmoke == false){
+							if(hidden == false){
 					
 							#region Basic movement
 							if(percent_chance(50)){

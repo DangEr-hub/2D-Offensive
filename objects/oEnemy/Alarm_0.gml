@@ -1,6 +1,6 @@
 /// @description Movement
 function decide_movement() {
-    if (InSmoke == false) {
+    if (hidden == false) {
         handle_basic_movement();
     } else {
         handle_smoke_movement();

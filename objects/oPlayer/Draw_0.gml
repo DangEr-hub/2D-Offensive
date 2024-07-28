@@ -1,5 +1,5 @@
 /// @description Drawing
-draw_text(x, y + 25, ItemUsePosition);
+draw_text(x, y + 25, hidden);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;

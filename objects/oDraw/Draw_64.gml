@@ -72,23 +72,6 @@ with(oSlot){
 
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
 	
-	#region Draw ranked score
-	if(global.ranked_game == true && !instance_exists(oInventory)){
-		draw_set_font(set_font("Title"));
-		var player_score = string(global.player_elo_struct.Rounds_win);
-		var enemy_score = string(global.player_elo_struct.Rounds_lost);
-		var separator = "/";
-		var score_string_width = string_width(player_score + enemy_score + separator);
-		var player_score_string_width = string_width(player_score);
-		var position_y = oDraw.HUDShift*2;
-		var position_x = global.GuiW/2 - score_string_width/2; 
-		draw_text_outlined(position_x, position_y, player_score, MAIN_COLOR, c_black, 1);
-		draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
-		draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
-		draw_set_font(set_font("Console"));
-	}
-	#endregion
-	
 	#region Draw shooting mode
 	if(global.weapon_id[min(oPlayer.WeaponID, 2)] != Item.None){ 
 		var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootingMode], oPlayer.weapon_shooting_mode) + 
@@ -234,6 +217,23 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	
 	if(oPlayer.player_has_scope != 0 || (oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
 		
+		#region Draw item switching inside of inventory
+		if(instance_exists(oInventory)){
+			draw_set_font(set_font("Console"));
+			var CycleUpString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvUp])) + "] - Cycle up";
+			var CycleDownString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvDown])) + "] - Cycle down";
+			var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvLeft])) + "] - Cycle left";
+			var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvRight])) + "] - Cycle right";
+			var position_y = oDraw.HUDShift*2;
+			var position_x = global.GuiW/2 - string_width(CycleRightString)/2; 
+			draw_text_outlined(position_x, position_y, CycleUpString, c_white, c_black, 1);
+			draw_text_outlined(position_x, position_y + string_height("A"), CycleLeftString, c_white, c_black, 1);
+			draw_text_outlined(position_x, position_y + string_height("A")*2, CycleDownString, c_white, c_black, 1);
+			draw_text_outlined(position_x, position_y + string_height("A")*3, CycleRightString, c_white, c_black, 1);
+			//draw_set_font(set_font("Console"));
+		}
+		#endregion
+		
 		#region Draw mortar GUI
 		if (oPlayer.moving_state == player_states.mortar_state) {
 		    var mortar_object = instance_nearest(oPlayer.x, oPlayer.y, oMortar);
@@ -372,11 +372,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		}
 		#endregion
 
-		#region Draw item switching
+		#region Draw item switching outside of inventory
 		if(global.Inventory[#oPlayer.ItemUsePosition, InventoryIndex.SlotID] != Item.None){
-			var CycleDownString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Down";
-			var CycleUpString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Up";
-			var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Left";
+			var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Left ";
 			var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] - Right";
 			var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 		    var Id = global.Inventory[#oPlayer.ItemUsePosition, InventoryIndex.SlotID];        
@@ -624,9 +622,43 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	}
 
 }
-if(instance_exists(oPlayer) && !instance_exists(oBuyMenu)){
+if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments)){
 	
-	#region Draw admin HUD
+	#region Fps
+	draw_set_font(set_font("Console"));
+	draw_text_outlined(50, 50, "Fps: " + string(fps), c_white, c_black, 1);
+	draw_text_outlined(50, 50 + TextHeightSmall, "Real fps: " + string(fps_real), c_white, c_black, 1);
+	#endregion
+
+	#region Time
+	if(instance_exists(oLightRenderer)){
+		draw_set_font(set_font("Console"));
+		var hour_str = (oLightRenderer.CurrentHour < 10 ? "0" + string(oLightRenderer.CurrentHour) : string(oLightRenderer.CurrentHour));
+		var minute_str = (oLightRenderer.CurrentMinute < 10 ? "0" + string(oLightRenderer.CurrentMinute) : string(oLightRenderer.CurrentMinute));
+		draw_text_outlined(50, 50 + TextHeightSmall*2, "Time: " + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);
+	}
+	#endregion
+	
+	if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false){
+	
+		#region Draw ranked score
+		if(global.ranked_game == true){
+			draw_set_font(set_font("Title"));
+			var player_score = string(global.player_elo_struct.Rounds_win);
+			var enemy_score = string(global.player_elo_struct.Rounds_lost);
+			var separator = "/";
+			var score_string_width = string_width(player_score + enemy_score + separator);
+			var player_score_string_width = string_width(player_score);
+			var position_y = oDraw.HUDShift*2;
+			var position_x = global.GuiW/2 - score_string_width/2; 
+			draw_text_outlined(position_x, position_y, player_score, MAIN_COLOR, c_black, 1);
+			draw_text_outlined(position_x + player_score_string_width, position_y, separator, c_dkgray, c_black, 1);
+			draw_text_outlined(position_x + player_score_string_width + string_width(separator), position_y, enemy_score, c_dkgray, c_black, 1);
+			draw_set_font(set_font("Console"));
+		}
+		#endregion
+	
+		#region Draw admin HUD
 	if(global.AdminHUD == true){
 				
 		var AdminHUDX = global.GuiW - HUDShift;
@@ -681,6 +713,8 @@ if(instance_exists(oPlayer) && !instance_exists(oBuyMenu)){
 		
 	}
 	#endregion
+	
+	}
 
 }
 
@@ -696,25 +730,6 @@ if(RespawnMenu == false){
 	}
 }
 #endregion
-
-if(!instance_exists(oBuyMenu)){
-	
-	#region Fps
-	draw_set_font(set_font("Console"));
-	draw_text_outlined(50, 50, "Fps: " + string(fps), c_white, c_black, 1);
-	draw_text_outlined(50, 50 + TextHeightSmall, "Real fps: " + string(fps_real), c_white, c_black, 1);
-	#endregion
-
-	#region Time
-	if(instance_exists(oLightRenderer)){
-		draw_set_font(set_font("Console"));
-		var hour_str = (oLightRenderer.CurrentHour < 10 ? "0" + string(oLightRenderer.CurrentHour) : string(oLightRenderer.CurrentHour));
-		var minute_str = (oLightRenderer.CurrentMinute < 10 ? "0" + string(oLightRenderer.CurrentMinute) : string(oLightRenderer.CurrentMinute));
-		draw_text_outlined(50, 50 + TextHeightSmall*2, "Time: " + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);
-	}
-	#endregion
-
-}
 
 #region Console
 console_draw(global.my_console, global.ConsoleHeight * global.GUIMultiplier,c_gray,c_silver,c_white,c_white, global.GUIHUDAlpha*2, global.ConsoleWidth * global.GUIMultiplier);

@@ -1,6 +1,31 @@
 event_inherited();
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
+	#region Hidden flag boolean variable
+	var hidden_in_smoke = false;
+	if (instance_exists(oFog)) {
+	    var smoke_object = instance_nearest(x, y, oFog);
+	    if (distance_to_object(smoke_object) <= smoke_object.radius) {
+			if(smoke_object.alarm[0] > 1){
+				if(hidden_in_smoke == false){
+					hidden_in_smoke = true;	
+				}
+			}else{
+				if(hidden_in_smoke == true){
+					hidden_in_smoke = false;
+				}
+			}
+		}else{
+			if(hidden_in_smoke == true){
+				hidden_in_smoke = false;	
+			}
+		}
+	}
+
+	var hidden_in_grass = place_meeting(x, y, oGrass);
+	hidden = hidden_in_smoke || hidden_in_grass;
+	#endregion
+	
 	#region Drop weapon
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != player_states.machine_gun_state){
 		player_has_scope = -1;
@@ -1510,8 +1535,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 		#endregion
 
-		#region Item cycling
-		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleRight])){
+		if(instance_exists(oInventory)){
+		
+			#region Item cycling in inventory
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvRight])){
 			if(Healing == true){
 				HealingTime = 0;
 				Healing = false;
@@ -1521,7 +1548,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			    ItemUsePosition = 0;
 			}
 		}
-		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleUp])){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvUp])){
 			if(Healing == true){
 				HealingTime = 0;
 				Healing = false;
@@ -1532,7 +1559,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				ItemUsePosition = ItemUsePosition - INVENTORY_ROW_SIZE;
 			}
 		}
-		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleDown])){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvDown])){
 			if(Healing == true){
 				HealingTime = 0;
 				Healing = false;
@@ -1543,7 +1570,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				ItemUsePosition = ItemUsePosition + INVENTORY_ROW_SIZE;
 			}
 		}
-		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvLeft])){
 			if(Healing == true){
 				HealingTime = 0;
 				Healing = false;
@@ -1556,6 +1583,34 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 
 		#endregion
+		
+		}else{
+				
+			#region Item cycling outside inventory
+			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleRight])){
+				if(Healing == true){
+					HealingTime = 0;
+					Healing = false;
+				}
+				ItemUsePosition ++;
+				if(ItemUsePosition > global.InventorySize - 1){
+				    ItemUsePosition = 0;
+				}
+			}			
+			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
+				if(Healing == true){
+					HealingTime = 0;
+					Healing = false;
+				}
+				if(ItemUsePosition == 0){ 
+					ItemUsePosition = global.InventorySize - 1;
+				}else{
+					ItemUsePosition --;
+				}
+			}
+			#endregion
+		
+		}
 
 		#region Item use
 		if(mouse_check_button_pressed(mb_left) && !instance_exists(oInventory)){

@@ -101,11 +101,20 @@ if(instance_exists(oPlayer)){
 		    surface_set_target(NightVisionSurface);
 		}
 
+		if(global.BloomShader == false){
+			shader_set(shd_Saturation);
+			shader_set_uniform_f(shader_get_uniform(shd_Saturation, "color_saturation"), saturation_level);
+		}
+
 		// Player effects and application_surface drawing
 		if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true) {
 		    draw_surface_stretched(BlurSurface, 0, 0, global.GuiW, global.GuiH);
 		} else {
 		    draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
+		}
+		
+		if(global.BloomShader == false){
+			shader_reset();	
 		}
         
 		if(global.BloomShader == true){

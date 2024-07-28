@@ -197,17 +197,17 @@ if(instance_exists(oFog)){
 	if(instance_exists(NearestFog)){
 		if(distance_to_object(NearestFog) <= NearestFog.radius){
 			if(NearestFog.alarm[0] > 1){
-				if(InSmoke == false){
-					InSmoke = true;	
+				if(hidden == false){
+					hidden = true;	
 				}
 			}else{
-				if(InSmoke == true){
-					InSmoke = false;
+				if(hidden == true){
+					hidden = false;
 				}
 			}
 		}else{
-			if(InSmoke == true){
-				InSmoke = false;	
+			if(hidden == true){
+				hidden = false;	
 			}
 		}
 	}

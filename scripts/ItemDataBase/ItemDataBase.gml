@@ -403,7 +403,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Description] = "The red dot sight offers improved aiming, but is lacking magnification.";
 
 	global.ItemIndex[#Item.two_scope, ItemStat.Type] = "Item";
-	global.ItemIndex[#Item.two_scope, ItemStat.Name] = "2x scope";
+	global.ItemIndex[#Item.two_scope, ItemStat.Name] = "Sniper scope";
 	global.ItemIndex[#Item.two_scope, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.two_scope, ItemStat.Description] = "This item provides double magnification for a high-range engagements.";
 	

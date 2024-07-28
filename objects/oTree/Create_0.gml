@@ -1,6 +1,6 @@
 event_inherited();
 randomize();
-image_yscale = random_range(.5, 1);
+image_yscale = random_range(0.9, 1);
 image_xscale = image_yscale;
 image_angle = random(360);
 Visible = true;

@@ -20,19 +20,20 @@ for (var i = 0; i < num_cloud_particles; i++)
     }
 }
 
+/*
 if(distance_to_object(oPlayer) <= radius){
 	if(alarm[0] > 1){
-		if(oPlayer.InSmoke == false){
-			oPlayer.InSmoke = true;	
+		if(oPlayer.hidden == false){
+			oPlayer.hidden = true;	
 		}
 	}else{
-		if(oPlayer.InSmoke == true){
-			oPlayer.InSmoke = false;
+		if(oPlayer.hidden == true){
+			oPlayer.hidden = false;
 		}
 	}
 }else{
-	if(oPlayer.InSmoke == true){
-		oPlayer.InSmoke = false;	
+	if(oPlayer.hidden == true){
+		oPlayer.hidden = false;	
 	}
 }
 

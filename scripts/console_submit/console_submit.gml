@@ -1,3 +1,11 @@
+function return_logical_value(input){
+	var output = 0;
+	if(input >= .5){
+		output = 1;
+	}
+	return output;
+}
+
 function console_submit(Console) {
 	global.console= Console;
 
@@ -161,17 +169,17 @@ function console_submit(Console) {
 	                case "op_game_end": game_end(); break;
 					case "set_dynamic_crosshair": 
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.DynamicCrosshair = real(c[1]);
+							global.DynamicCrosshair = return_logical_value(real(c[1]));
 						}
 					break;
 					case "set_crosshair_alpha": 
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.CrosshairAlpha = real(c[1]);
+							global.CrosshairAlpha = clamp(real(c[1]), 0, 1);
 						}
 					break;
 					case "draw_bullet_impact": 
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.DrawBulletImpact = real(c[1]);
+							global.DrawBulletImpact = return_logical_value(real(c[1]));
 						}
 					break;
 					case "give_id":
@@ -182,18 +190,18 @@ function console_submit(Console) {
 					break;
 					case "draw_admin_hud": 
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.AdminHUD = real(c[1]);
+							global.AdminHUD = return_logical_value(real(c[1]));
 						}
 					break;
 					case "set_hitbox_alpha":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.HitBoxAlpha = real(c[1]);	
+							global.HitBoxAlpha = clamp(real(c[1]), 0, 1);
 						}
 					break;
 	                case "op_room_restart": room_restart(); break;
 					case "op_godmode":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.GodMode = real(c[1]);
+							global.GodMode = return_logical_value(real(c[1]));
 						}
 					break;
 	                case "set_window_fullscreen": 
@@ -210,39 +218,30 @@ function console_submit(Console) {
 						}
 					break;
 					case "hostage":
-						if(no == 1 && string_digits(c[1]) != "") then global.Hostage = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.Hostage = return_logical_value(real(c[1]));
 					break;
 					case "enemy_can_move":
-						if(no == 1 && string_digits(c[1]) != "") then global.EnemyCanMove = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.EnemyCanMove = return_logical_value(real(c[1]));
 					break;
 					case "set_console_height":
-						if(no == 1 && string_digits(c[1]) != "") then global.ConsoleHeight = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.ConsoleHeight = clamp(real(c[1]), 128, display_get_height());
 					break;
 					case "set_console_width":
-						if(no == 1 && string_digits(c[1]) != "") then global.ConsoleWidth = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.ConsoleWidth = clamp(real(c[1]), 128, display_get_width());
 					break;
 					case "set_gui_scale":
 						if(no == 1 && string_digits(c[1]) != ""){
 							if(real(c[1]) != global.GUIMultiplier){
-								if(real(c[1]) <= 2){
-									global.GUIMultiplier = real(c[1]);
-								}else{
-									global.GUIMultiplier = 2;
-								}
-								if(real(c[1]) >= 1){
-									global.GUIMultiplier = real(c[1]);
-								}else{
-									global.GUIMultiplier = 1;	
-								}
+								global.GUIMultiplier = clamp(real(c[1]), 1, 2);
 								reset_gui();
 							}
 						}
 					break;
 					case "set_fov_angle":
-						if(no == 1 && string_digits(c[1]) != "") then global.FieldOfView = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.FieldOfView = real(c[1]) % 360;
 					break;
 					case "toggle_bloom_shader":
-						if(no == 1 && string_digits(c[1]) != "") then global.BloomShader = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.BloomShader = return_logical_value(real(c[1]));
 					break;
 					case "set_time":
 						if(no == 1 && string_digits(c[1]) != ""){
@@ -256,7 +255,7 @@ function console_submit(Console) {
 						if(no == 1 && string_digits(c[1]) != "") then global.TimeSpeed = real(c[1]);
 					break;	
 					case "toggle_camera_crosshair_shake":
-						if(no == 1 && string_digits(c[1]) != "") then global.ViewShake = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.ViewShake = return_logical_value(real(c[1]));
 					break;	
 					case "set_player_inaccuracy":
 						if(no == 1 && string_digits(c[1]) != "") then global.PlayerInaccuracy = real(c[1]);
@@ -291,7 +290,7 @@ function console_submit(Console) {
 									instance_create_layer(oPlayer.x, oPlayer.y, "OtherO", oParticleSystem);
 								}
 							}
-							global.DrawParticles = real(c[1]);
+							global.DrawParticles = return_logical_value(real(c[1]));
 						}
 					break;	
 					
@@ -343,13 +342,13 @@ function console_submit(Console) {
 					break;
 					
 					case "draw_other_models":
-						if(no == 1 && string_digits(c[1]) != "") then global.draw_other_models = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "") then global.draw_other_models = return_logical_value(real(c[1]));
 					break;
 					
 					case "set_window_size":
 					    if (no >= 2 && string_digits(c[1]) != "" && string_digits(c[2]) != "") {
-					        global.window_width = real(string_digits(c[1]));
-					        global.window_height = real(string_digits(c[2]));
+					        global.window_width = clamp(real(string_digits(c[1])), 540, display_get_width());
+					        global.window_height = clamp(real(string_digits(c[2])), 480, display_get_height());
 							
 							if(window_get_fullscreen() == false){
 								display_set_gui_size(global.window_width, global.window_height);
@@ -368,7 +367,7 @@ function console_submit(Console) {
 					
 					case "set_enemy_visibility":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.enemy_visibility = real(c[1]);
+							global.enemy_visibility = return_logical_value(real(c[1]));
 						}
 					break;
 					
