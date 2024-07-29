@@ -1,5 +1,5 @@
-headshot_x = x - 20;
-headshot_y = y - 18;
+headshot_x = x + 3;
+headshot_y = y - 17;
 
 if(object_index == oEnemy || object_index == oFriend){
 	

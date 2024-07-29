@@ -523,10 +523,10 @@ function inaccuracy_formula(WID, ObjectType){
 
 				var smoke_list = ds_list_create();
 				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x, oSmokeTile, true, false, smoke_list, false);
-				behind_smoke_inaccuracy = 5 * smoke_number;
+				behind_smoke_inaccuracy = 5 * smoke_number + 1;
 				ds_list_destroy(smoke_list);
 
-				if(ChasingObject.hidden == true){
+				if(ObjectType.ChasingObject.hidden == true){
 					InSmokeInaccuracy = 5;
 				}
 			

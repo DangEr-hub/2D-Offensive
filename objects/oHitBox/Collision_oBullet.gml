@@ -16,7 +16,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 				}
 			}
 		}
-		hit_entity(MainObject, image_index, other, ObjectArmourID, ObjectHelmetID);
+		hit_living_object(MainObject, image_index, other, ObjectArmourID, ObjectHelmetID);
 		instance_destroy(other);
 	}
 }

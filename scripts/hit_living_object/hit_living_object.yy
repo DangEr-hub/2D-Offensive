@@ -1,7 +1,7 @@
 {
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
-  "name": "hit_entity",
+  "name": "hit_living_object",
   "isCompatibility": false,
   "isDnD": false,
   "parent": {

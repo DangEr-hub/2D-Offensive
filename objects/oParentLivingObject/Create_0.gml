@@ -1,4 +1,5 @@
 event_inherited();
+aimpunch_speed_multiplier = 1; //Musí se definovat v create eventu, protože s ním pracujeme i mimo klasický scope
 attack_damage = 0;
 RotationAngle = random(360);
 FlashLightX = 0;
@@ -15,8 +16,8 @@ FlashLight.xscale = 2;
 FlashLight.yscale = 2;
 FlashLight.blend = c_white;
 InfraVisionIntensity = 2;
-headshot_x = x - 20;
-headshot_y = y - 18;
+headshot_x = x + 3;
+headshot_y = y - 17;
 Visible = false;
 infra_vision_light = undefined;
 hidden = false;

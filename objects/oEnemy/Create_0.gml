@@ -2,6 +2,8 @@
 // You can write your code in this editor
 event_inherited();
 randomize();
+check_other_enemies_time = game_get_speed(gamespeed_fps);
+alarm[5] = check_other_enemies_time;
 hidden = false;
 check_smokes_timer = -1;
 EquippedLandMine = Item.None;

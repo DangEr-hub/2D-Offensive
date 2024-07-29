@@ -18,7 +18,7 @@ function enemy_initalized(hitObj, enemyId) {
 	}
 }
 
-function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
+function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer) && instance_exists(hit_object)){
 		var Damage = Bullet.stats.Damage * power(1 - global.ItemIndex[#Bullet.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, Bullet.stats.Starting_x, Bullet.stats.Starting_y));
 		if(hit_object.object_index == oEnemy){
@@ -35,6 +35,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 		if(BodyPart >= HitBox.LegProne){
 			DamageMultiplier = LEG_MULTIPLIER;
 			BloodColor = c_red;
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
@@ -44,6 +45,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 		}else if(BodyPart >= HitBox.ArmWithoutWeapon){
 			DamageMultiplier = ARM_MULTIPLIER;
 			BloodColor = c_red;
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
@@ -58,6 +60,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 		}else if(BodyPart >= HitBox.BodyWithoutWeapon){
 			DamageMultiplier = BODY_MULTIPLIER;
 			BloodColor = c_red;
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
@@ -72,6 +75,7 @@ function hit_entity(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplas
 		}else if(BodyPart >= HitBox.Head){
 			DamageMultiplier = HEADSHOT_MULTIPLIER;
 			BloodColor = c_maroon;
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#HelmetID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;	
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#HelmetID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);

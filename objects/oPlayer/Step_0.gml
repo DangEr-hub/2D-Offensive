@@ -147,9 +147,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
 	stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
 	stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);
-	headshot_x = x - 10;
-	headshot_y = y - 18;
+	headshot_x = x + 3;
+	headshot_y = y - 17;
 	audio_listener_position(x, y, 0);
+	
 	
 	#region Health timer
 	if(HPTimer == 0){
@@ -217,6 +218,11 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		StaminaHealingTimer --;	
 	}
 	#endregion
+	
+	if(moving_state == player_states.prone_state){
+		headshot_x = x + 67;
+		headshot_y = y - 12;
+	}
 	
 	if(global.Inventory[# ItemUsePosition, InventoryIndex.SlotID] != Item.None){
 		if(Reloading == true){
@@ -1138,10 +1144,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		var move_ypos = abs(ypos);
 	
 		#region Move speed multiplier
-		var AimPunchSpeedMultiplier = 1;
-		if(AimPunchTimer > -1){
-			AimPunchSpeedMultiplier = .1;
-		}	
+		if(AimPunchTimer == -1){
+			aimpunch_speed_multiplier = 1;
+		}
+		//var aimpunch_speed_multiplier = 1;
+		//if(AimPunchTimer > -1){
+		//	aimpunch_speed_multiplier = .1;
+		//}	
 		var ShootingSpeedMultiplier = 1;
 		if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/2){
 			ShootingSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 2)], ItemStat.ShootSpdMul];
@@ -1162,7 +1171,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			WeaponSpeedMultiplier = global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.MovingSpdMul];
 		}
 	
-		SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * AimPunchSpeedMultiplier * moving_speed_multiplier * WeightSpeedMultiplier * WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
+		SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * aimpunch_speed_multiplier * moving_speed_multiplier * WeightSpeedMultiplier * WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
 
 		#endregion
 
