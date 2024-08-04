@@ -16,7 +16,7 @@ with(oEnemy){
 }
 
 with(oPlayer){
-	if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer]/1.5 && Healing == false && stats.Health_points > 0){
+	if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.ShootTimer]/1.5 && Healing == false && stats.Health_points > 0){
 		draw_sprite_ext(spr_MuzzleFlash, 0, FlashLightX, 
 		FlashLightY, 1, 1, RotationAngle, c_white, 1);
 	}

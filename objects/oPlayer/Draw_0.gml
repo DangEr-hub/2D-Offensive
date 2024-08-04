@@ -1,5 +1,5 @@
 /// @description Drawing
-draw_text(x, y + 70, aimpunch_speed_multiplier);
+draw_text(x, y + 70, WeaponID);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -13,7 +13,7 @@ if(stats.Health_points > 0){
 		armour_sprite_index = 3;
 	}else if(image_index == player_textures.flashed_no_weapon){
 		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload){
+	}else if(image_index == player_textures.reload || image_index == player_textures.knife){
 		armour_sprite_index = 7;
 	}else if(image_index >= player_textures.prone){
 		armour_sprite_index = 5;
@@ -24,6 +24,10 @@ if(stats.Health_points > 0){
 	}
 	
 	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
+		armour_sprite_index = 8;
+	}
+
+	if(image_index == player_textures.knife_prone || image_index == player_textures.knife_prone_second || image_index == player_textures.knife_prone_third){
 		armour_sprite_index = 8;
 	}
 
@@ -56,24 +60,27 @@ if(stats.Health_points > 0){
 	}else if(global.ArmourID[1] == Item.InfraredVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
-	
-	if(global.Inventory[# ItemUsePosition, InventoryIndex.SlotID] != Item.None){
-		var distance = sqrt(power(90, 2) + power(30, 2));
-		var rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(0, 90));
-		var rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(0, 90));
-		if(moving_state != player_states.prone_state){
-			distance = sqrt(power(45, 2) + power(15, 2));
-		    rotated_dx = lengthdir_x(distance, RotationAngle - darctan2(-15, 45));
-		    rotated_dy = lengthdir_y(distance, RotationAngle - darctan2(-15, 45));
+		  
+	#region Draw usable item
+	if(global.Inventory[# ItemUsePosition, Index.SlotID] != Item.None){
+		var item_offset_x = 40;
+		var item_offset_y = -10;
+		if(moving_state == player_states.prone_state){
+			item_offset_x = 100;
+			item_offset_y = -3;
 		}
-	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, InventoryIndex.SlotID], x + rotated_dx, y + rotated_dy, 1, 1, grenade_angle, c_white, 1); 
+		var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
+		var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
+	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, Index.SlotID], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
 	}
+	#endregion
 	
-	if!(WeaponID >= 2){
-		if(global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor] != Item.None && global.Inventory[# ItemUsePosition, InventoryIndex.SlotID] == Item.None){
+	#region Draw suppressor attachment on equipped weapon
+	if(WeaponID <= 1){
+		if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None && global.Inventory[# ItemUsePosition, Index.SlotID] == Item.None){
 			draw_sprite_ext(
 				spr_Items,
-				global.weapon_attachments[WeaponID][weapon_attachments.weapon_suppressor],
+				global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor],
 				Weapon.x + lengthdir_x(WeaponDistance*.95, RotationAngle),
 				Weapon.y + lengthdir_y(WeaponDistance*.95, RotationAngle),
 				.5,
@@ -84,5 +91,6 @@ if(stats.Health_points > 0){
 			);
 		}
 	}
+	#endregion
 	
 }

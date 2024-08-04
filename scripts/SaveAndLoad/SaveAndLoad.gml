@@ -140,7 +140,7 @@ function load_game(){
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 
 		global.weapon_attachments = array_create(2);
-		for (var i = 0; i < 2; i++) {
+		for (var i = 0; i < 3; i++) {
 		    global.weapon_attachments[i] = array_create(4);
 		    for (var j = 0; j < 4; j++) {
 		        var key = "weapon_attachment_" + string(i) + "_" + string(j);

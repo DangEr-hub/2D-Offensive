@@ -36,12 +36,12 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 	zui_set_height(other.button_height);
 	caption = "Use";
 	callback = function(){
-		if(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotAmount] <= 1){
+		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
 			with(oItemDescription){
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+		var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Item":
@@ -98,5 +98,5 @@ with(zui_create(offset_position_x, offset_position_y + offset_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
 }

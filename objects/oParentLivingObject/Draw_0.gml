@@ -1,5 +1,6 @@
 event_inherited();
 if(Visible == true){
+	
 	if(oPlayer.ToggleInfraVision == true){
 		shader_set(shd_InfraVision);
 		shader_set_uniform_f(shader_get_uniform(shd_InfraVision, "u_intensity"), InfraVisionIntensity);

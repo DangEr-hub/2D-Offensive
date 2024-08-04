@@ -63,7 +63,7 @@ statistics_callback = function(){
 				zui_destroy();
 			}
 			
-			with (zui_create(zui_get_width() * .55, zui_get_height() * 0.5, oStatisticsTab, -1)) {
+			with (zui_create(zui_get_width() * .59, zui_get_height() * 0.5, oStatisticsTab, -1)) {
 				window_id = id;
 			}
 		}

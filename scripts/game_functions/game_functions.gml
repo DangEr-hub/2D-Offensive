@@ -366,16 +366,16 @@ function player_shooting(){
 	#endregion
 						
 	#region Create bullet casing
-	if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID] != -1){
-		particle_create(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.BulletCasingID], x, y, 1, 60);
+	if(global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.BulletCasingID] != -1){
+		particle_create(global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.BulletCasingID], x, y, 1, 60);
 	}
 	#endregion
 				
 	#region Create flash effect
 	if(stats.Health_points > 0){
 		if(DestroyTimer == -1){
-			DestroyTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.ShootTimer] * 2);
+			DestroyTimer = ceil(global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.ShootTimer] * 2);
 			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 			MuzzleFlashLight.angle = RotationAngle;
 			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
@@ -384,7 +384,7 @@ function player_shooting(){
 	}
 	#endregion
 								
-	for(i=0;i<global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Bullets];i++){
+	for(i=0;i<global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.Bullets];i++){
 						
 		#region Determine shot position
 							
@@ -396,7 +396,7 @@ function player_shooting(){
 		if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None){
 			suppressor_multiplier = global.ItemIndex[#global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.Defense];	
 		}
-		var current_weapon_id = global.weapon_id[min(WeaponID, 2)];
+		var current_weapon_id = global.weapon_id[min(WeaponID, 1)];
 		var kb_phase_1 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback;
 		var kb_phase_2 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback;
 		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
@@ -404,7 +404,7 @@ function player_shooting(){
 		var horizontal_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackInaccuracyMultiplier];
 		var vertical_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackPower];		
 
-		if (global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.random_bullet_spread] == true) {
+		if (global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.random_bullet_spread] == true) {
 			ShotX = random_range(
 				oCrosshair.x - inaccuracy_formula(current_weapon_id, id), 
 				oCrosshair.x + inaccuracy_formula(current_weapon_id, id)
@@ -434,19 +434,19 @@ function player_shooting(){
 		}
 		#endregion
 			
-		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
+		if(global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			create_bullet_tracer(
 				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
 				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
 				ShotX,
 				ShotY,
 				1,
-				global.weapon_id[min(WeaponID, 2)],
+				global.weapon_id[min(WeaponID, 1)],
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				25,
 				-1,
 				id,
-				global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				stats.Name,
 				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
@@ -460,12 +460,12 @@ function player_shooting(){
 				ShotX,
 				ShotY,
 				0,
-				global.weapon_id[min(WeaponID, 2)],
+				global.weapon_id[min(WeaponID, 1)],
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				global.BulletSpeed,
 				-1,
 				id,
-				global.ItemIndex[#global.weapon_id[min(WeaponID, 2)], ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#global.weapon_id[min(WeaponID, 1)], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				stats.Name,
 				noone,
@@ -764,7 +764,7 @@ function reset_gui(){
 			if(oDraw.DrawInfo == true){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
-					var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+					var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
 							alpha = global.GUIHUDAlpha * 3;

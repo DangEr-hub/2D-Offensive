@@ -4,39 +4,71 @@ var xx1 = (global.InventoryLeftTopCorner[0] - oDraw.ViewX) * (global.GuiW / oDra
 var yy1 = (global.InventoryLeftTopCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 var xx2 = (global.InventoryRightBottomCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 var yy2 = (global.InventoryRightBottomCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-if!(mouse_to_gui(xx1, yy1, xx2, yy2)){
-	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[#0, InventoryIndex.SlotID] != Item.None){
+var xx12 = (global.InventoryEquipLeftTopCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+var yy12 = (global.InventoryEquipLeftTopCorner[1] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+var xx22 = (global.InventoryEquipRightBottomCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+
+if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
+	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[#0, Index.SlotID] != Item.None){
 		ItemDrop(
-			global.MouseSlot[# 0, InventoryIndex.SlotID],
+			global.MouseSlot[# 0, Index.SlotID],
 			oPlayer.x,
 			oPlayer.y,
 			100,
-			global.MouseSlot[# 0, InventoryIndex.SlotAmmo],
-			global.MouseSlot[# 0, InventoryIndex.SlotClipAmmo],
-			global.MouseSlot[# 0, InventoryIndex.SlotDurability],
-			global.MouseSlot[# 0, InventoryIndex.SlotAmount]
+			global.MouseSlot[# 0, Index.SlotAmmo],
+			global.MouseSlot[# 0, Index.SlotClipAmmo],
+			global.MouseSlot[# 0, Index.SlotDurability],
+			global.MouseSlot[# 0, Index.SlotAmount]
 		);	
 		
-		for(i=0;i<ds_grid_height(global.MouseSlot);i++){
+		for(var i=0;i<ds_grid_height(global.MouseSlot);i++){
 			global.MouseSlot[# 0, i] = 0;
 		}
 	}
 }
 
-
-if(VarSlot == oPlayer.ItemUsePosition){
-    image_index = 1;
-}else{
-    image_index = 0;
+switch(VarSlot){
+	case oPlayer.ItemUsePosition:
+		image_index = 1;
+	break;
+	
+	case OtherSlot.Primary:
+		image_index = 2;
+	break;
+	
+	case OtherSlot.Secondary:
+		image_index = 3;
+	break;
+	
+	case OtherSlot.Knife:
+		image_index = 4;
+	break;
+	
+	case OtherSlot.Helmet:
+		image_index = 5;
+	break;
+	
+	case OtherSlot.Armour:
+		image_index = 6;
+	break;
+	
+	case OtherSlot.Shield:
+		image_index = 7;
+	break;
+	
+	default:
+		image_index = 0;
+	break;
 }
 
-if(global.Inventory[#VarSlot, InventoryIndex.SlotID] == Item.None){
+if(global.Inventory[#VarSlot, Index.SlotID] == Item.None){
 	DrawItemInfo = false;
 }
 
 if(DrawItemInfo == true){
 	if(oDraw.DrawInfo == false){
-		var Id = global.Inventory[#VarSlot, InventoryIndex.SlotID];
+		var Id = global.Inventory[#VarSlot, Index.SlotID];
 		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];

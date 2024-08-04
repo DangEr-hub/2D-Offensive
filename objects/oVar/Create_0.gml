@@ -2,13 +2,14 @@ global.my_console = console_create();
 global.gold_color = make_color_rgb(255, 215, 0);
 global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 global.saturation_level = 1.9;
+global.InventoryEquipLeftTopCorner = [-1, -1];
+global.InventoryEquipRightBottomCorner = [-1, -1];
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
 global.FlashBangMaxDistance = 512;
 global.DynamicCrosshair = false;
 global.CrosshairAlpha = 1;
-global.weapon_id = [Item.None, Item.None, Item.None];
-global.InventorySize = 21;
+global.weapon_id = [Item.None, Item.None, Item.steel_knife];
 global.Ammo = [0, 0, 0];
 global.MaxAmmo = [0, 0, 0];
 global.ClipAmmo = [0, 0, 0];
@@ -89,7 +90,7 @@ enum weapon_attachments{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total
 }
 
-for (var i = 0; i < 2; i++) {
+for (var i = 0; i < 3; i++) {
     global.weapon_attachments[i] = array_create(weapon_attachments.Total, Item.None);
 }
 
@@ -188,7 +189,7 @@ ds_list_add(
 enum player_textures{
 	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, 
 	prone, prone_second, prone_third, flashed_prone, flashed_prone_second, flashed_prone_third, 
-	reload_prone, reload_prone_second, reload_prone_third
+	reload_prone, reload_prone_second, reload_prone_third, knife, knife_prone, knife_prone_second, knife_prone_third,
 }
 
 enum player_states{

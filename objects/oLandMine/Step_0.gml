@@ -2,7 +2,7 @@ if (alpha_timer > -1) {
     alpha_timer--;
 } else {
     image_alpha -= .05;
-    image_alpha = max(image_alpha, .1);
+    image_alpha = max(image_alpha, min_alpha);
 }
 
 if (!explode) {

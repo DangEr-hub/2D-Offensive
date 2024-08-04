@@ -14,7 +14,7 @@ if(Visible == true){
 		armour_sprite_index = 3;
 	}else if(image_index == player_textures.flashed_no_weapon){
 		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload){
+	}else if(image_index == player_textures.reload || image_index == player_textures.knife){
 		armour_sprite_index = 7;
 	}else if(image_index >= player_textures.prone){
 		armour_sprite_index = 5;
@@ -25,6 +25,10 @@ if(Visible == true){
 	}
 	
 	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
+		armour_sprite_index = 8;
+	}
+	
+	if(image_index == player_textures.knife_prone || image_index == player_textures.knife_prone_second || image_index == player_textures.knife_prone_third){
 		armour_sprite_index = 8;
 	}
 

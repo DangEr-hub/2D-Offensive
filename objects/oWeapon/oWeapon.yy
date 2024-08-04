@@ -29,8 +29,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_DrawWeapon",
-    "path": "sprites/spr_DrawWeapon/spr_DrawWeapon.yy",
+    "name": "spr_Weapon",
+    "path": "sprites/spr_Weapon/spr_Weapon.yy",
   },
   "spriteMaskId": null,
   "visible": true,

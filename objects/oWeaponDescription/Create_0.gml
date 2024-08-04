@@ -36,18 +36,18 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 	zui_set_height(other.button_height);
 	caption = "Equip";
 	callback = function(){
-		if(global.Inventory[#oDraw.var_slot, InventoryIndex.SlotAmount] <= 1){
+		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
 			with(oWeaponDescription){
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID];
+		var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Weapon":
 				
 				#region Weapon use
-				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Main"){
+				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Primary"){
 					i = 0;
 				}else{
 					i = 1;
@@ -55,10 +55,10 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				if(global.weapon_id[i] == Item.None){
 					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
 					global.weapon_id[i] = Id;
-					global.weapon_attachments[i][weapon_attachments.weapon_scope] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_scope];
-					global.weapon_attachments[i][weapon_attachments.weapon_barrel] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_barrel];
-					global.weapon_attachments[i][weapon_attachments.weapon_grip] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_grip];
-					global.weapon_attachments[i][weapon_attachments.weapon_suppressor] = global.Inventory[# oDraw.var_slot, InventoryIndex.slot_suppressor];
+					global.weapon_attachments[i][weapon_attachments.weapon_scope] = global.Inventory[# oDraw.var_slot, Index.slot_scope];
+					global.weapon_attachments[i][weapon_attachments.weapon_barrel] = global.Inventory[# oDraw.var_slot, Index.slot_barrel];
+					global.weapon_attachments[i][weapon_attachments.weapon_grip] = global.Inventory[# oDraw.var_slot, Index.slot_grip];
+					global.weapon_attachments[i][weapon_attachments.weapon_suppressor] = global.Inventory[# oDraw.var_slot, Index.slot_suppressor];
 					global.Ammo[i] = global.Inventory[# oDraw.var_slot, 2];
 					global.ClipAmmo[i] = global.Inventory[# oDraw.var_slot, 3];
 					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
@@ -88,5 +88,5 @@ with(zui_create(description_position_x, description_position_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, InventoryIndex.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
 }

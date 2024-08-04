@@ -520,7 +520,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 		break;
 	
 		case "Pistol":
@@ -537,7 +537,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .75;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
 		break;
 			
 		case "Submachine gun":
@@ -554,7 +554,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .75;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
 		break;
 	
 		case "Sniper rifle":
@@ -571,7 +571,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .95;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .95;
 		break;
 			
 		case "Shotgun":
@@ -583,7 +583,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 		break;
 			
 		case "Anti-tank missile":
@@ -595,7 +595,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 4;
 				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
 			}
-			WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 		break;
 
 		default:
@@ -607,7 +607,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 				image_index = 5;
 				ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
 			}
-			WeaponDistance = sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon) * .85;
+			WeaponDistance = sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon) * .85;
 		break;
 	}
 }else{
@@ -620,7 +620,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		image_index = 5;
 		ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
 	}
-	WeaponDistance = (sprite_get_bbox_right(spr_DrawWeapon) - sprite_get_bbox_left(spr_DrawWeapon)) * .85;
+	WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 }
 #endregion
 
