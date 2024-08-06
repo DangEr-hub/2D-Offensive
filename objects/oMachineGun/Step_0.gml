@@ -1,5 +1,5 @@
 if (instance_exists(stats.Object)) {
-    if (global.weapon_id[0] == stats.Id) {
+    if (global.Inventory[# OtherSlot.Primary, Index.slot_id] == stats.Id) {
 		with(Floor){
 			occluder.Destroy();
 			oLightRenderer.lighting.RefreshStaticOccluders();

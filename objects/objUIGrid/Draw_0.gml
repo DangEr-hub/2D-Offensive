@@ -118,7 +118,7 @@ if(type == "Respawn menu"){
 			draw_set_color(c_white);
 							
 			draw_set_font(set_font("GUI_grid"));
-			var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
+			var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
 			var text = "";
 			var statIndex = ItemStat.Damage + i * columns + j;
 			if (statIndex <= array_length(statTitles)){
@@ -126,11 +126,11 @@ if(type == "Respawn menu"){
 				switch(statIndex){
 										
 					case ItemStat.Ammo:
-						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.SlotAmmo]);
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_ammo]);
 					break;
 										
 					case ItemStat.ClipAmmo:
-						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.SlotClipAmmo]);
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_clip_ammo]);
 					break;
 									
 					case ItemStat.ReloadSpeed:
@@ -210,7 +210,7 @@ if(type == "Respawn menu"){
 			draw_set_color(c_white);
 							
 			draw_set_font(set_font("GUI_grid"));
-			var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
+			var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
 			var text = "";
 			var statIndex = ItemStat.Weight + i * columns + j;
 			if (statIndex - ItemStat.Weight <= array_length(statTitles)){
@@ -262,15 +262,15 @@ if(type == "Respawn menu"){
 			
 			switch(statTitles[j]){			
 				case "Damage: ":
-					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Damage]);
+					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Damage]);
 				break;
 				
 				case "Penetration power: ":
-					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.PenetrationPower]*100) + "%";
+					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.PenetrationPower]*100) + "%";
 				break;
 				
 				case "Damage drop: ":
-					text = statTitles[2] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.DamageDrop]*100) + "%/Unit";
+					text = statTitles[2] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.DamageDrop]*100) + "%/Unit";
 				break;
 			}
 			

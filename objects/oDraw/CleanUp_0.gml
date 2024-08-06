@@ -2,10 +2,10 @@ if(player_has_machine_gun()){
 	for(var i = 0;i<weapon_attachments.Total;i++){
 		global.weapon_attachments[0][i] = Item.None;
 	}
-	global.weapon_id[0] = Item.None;
-	global.ClipAmmo[0] = 0;
-	global.Ammo[0] = 0;
-	global.MaxAmmo[0] = 0;
+	global.Inventory[# OtherSlot.Primary, Index.slot_id] = Item.None;
+	global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = 0;
+	global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = 0;
+	global.ItemIndex[# global.Inventory[# OtherSlot.Primary, Index.slot_id], ItemStat.MaxAmmo] = 0;
 }
 with(zui_main()){
 	zui_destroy();

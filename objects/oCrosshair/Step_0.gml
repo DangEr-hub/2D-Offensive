@@ -1,12 +1,9 @@
-xx = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-yy = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
-if(global.ItemIndex[#oPlayer.WeaponID, ItemStat.WeaponTypeClass] == "Pistol"){
+if(global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol"){
 	recoil_speed = 10;
-	WobbleResetSpeed = 20;
+	WobbleResetSpeed = 25;
 	StabilizationSpeed = 75;
 }
 
@@ -17,7 +14,7 @@ if(HitMarker > -1){
 	}
 }
 
-if(instance_exists(oPlayer)){
+if(instance_exists(oPlayer) ){
 	
 	#region Wobble
 	if(oPlayer.CrosshairShake > 0){
@@ -52,25 +49,26 @@ if(instance_exists(oPlayer)){
 	#endregion
 
 	#region Recoil
-	var horizontal_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackInaccuracyMultiplier];
-	var vertical_recoil_multiplier = global.ItemIndex[# global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip], ItemStat.KickBackPower];	
-	var recoilY = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.RecoilY] * horizontal_recoil_multiplier;
-	var recoilX = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.RecoilX] * vertical_recoil_multiplier;
-	if(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.HardRecoil] == true){
+	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
+	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_grip], ItemStat.KickBackPower];	
+	var recoilY = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilY] * horizontal_recoil_multiplier;
+	var recoilX = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilX] * vertical_recoil_multiplier;
+	
+	if(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.HardRecoil] == true){
 		
 		#region Hard recoil
 		if(oPlayer.KickBack > 0){
 			
 			#region Variables
-			var KBPhase1 = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.KBPhase1];
-			var KBPhase2 = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.KBPhase2];
-			var MaxKickBack = global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.MaxKickBack];
+			var KBPhase1 = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.KBPhase1];
+			var KBPhase2 = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.KBPhase2];
+			var MaxKickBack = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.MaxKickBack];
 			#endregion
 
-			if ((!oPlayer.CanShoot && oPlayer.ShootTimer >= global.ItemIndex[# global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.ShootTimer] / 2 && global.ItemIndex[# oPlayer.WeaponID, ItemStat.WeaponTypeClass] == "Pistol") || (oPlayer.shooting && global.ItemIndex[# oPlayer.WeaponID, ItemStat.WeaponTypeClass] != "Pistol")) {
+			if ((!oPlayer.CanShoot && oPlayer.ShootTimer >= global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootTimer] / 2 && global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol") || (oPlayer.shooting && global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != "Pistol")) {
 				
 				#region Recoil mechanic
-			    axis_multiplier[1] = -sign(global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.RecoilY]);
+			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilY]);
 			    var targetX = mouse_x;
 			    var targetY = mouse_y;
 				
@@ -147,9 +145,9 @@ if(instance_exists(oPlayer)){
 		#endregion
 		
 	}else{
-		
+
 		#region Basic recoil
-		if(oPlayer.CanShoot == false && oPlayer.ShootTimer >= global.ItemIndex[#global.weapon_id[min(oPlayer.WeaponID, 1)], ItemStat.ShootTimer]/2){
+		if(oPlayer.CanShoot == false && oPlayer.ShootTimer >= global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootTimer]/2){
 			if(RecoilTimer[0] == -1){
 				RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
 			}
@@ -157,6 +155,7 @@ if(instance_exists(oPlayer)){
 				RecoilTimer[1] = floor(abs(recoilX)/StabilizationSpeed);
 			}
 		}
+		
 		
 		#region Recoil Y
 		if(RecoilTimer[0] > -1){
@@ -171,7 +170,7 @@ if(instance_exists(oPlayer)){
 		
 		#region Recoil X
 		if(RecoilTimer[1] > -1){
-			if(global.Ammo[min(oPlayer.WeaponID, 1)] % 2 == 0){ 
+			if(global.Inventory[# oPlayer.WeaponID, Index.slot_ammo] % 2 == 0){ 
 				Recoil[1] += StabilizationSpeed * sign(recoilX);
 				Recoil[1] = min(Recoil[1], recoilX * oPlayer.KickBack);
 			}else{
@@ -184,6 +183,7 @@ if(instance_exists(oPlayer)){
 			Recoil[1] = max(0, Recoil[1]);
 		}
 		#endregion
+		
 		
 		x = lerp(x, mouse_x - Recoil[1], WobbleResetSpeed*2);
 		y = lerp(y, mouse_y - Recoil[0], WobbleResetSpeed*2);

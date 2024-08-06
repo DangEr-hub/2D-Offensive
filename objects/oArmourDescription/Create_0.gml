@@ -41,7 +41,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
+		var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Helmet":
@@ -49,7 +49,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				#region Helmet use
 				if(global.ArmourID[1] == Item.None){
 					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[1] = global.Inventory[# oDraw.var_slot, Index.SlotID];
+					global.ArmourID[1] = global.Inventory[# oDraw.var_slot, Index.slot_id];
 					global.ArmourDurability[1] = global.Inventory[# oDraw.var_slot, Index.SlotDurability];
 					ItemAddWeight(oDraw.var_slot);
 					ItemAmountSubstract(oDraw.var_slot, 1);
@@ -63,7 +63,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				#region Armour use
 				if(global.ArmourID[0] == Item.None){
 					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[0] = global.Inventory[# oDraw.var_slot, Index.SlotID];
+					global.ArmourID[0] = global.Inventory[# oDraw.var_slot, Index.slot_id];
 					global.ArmourDurability[0] = global.Inventory[# oDraw.var_slot, Index.SlotDurability];
 					ItemAddWeight(oDraw.var_slot);
 					ItemAmountSubstract(oDraw.var_slot, 1);
@@ -98,5 +98,5 @@ with(zui_create(description_position_x, description_position_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
 }

@@ -47,5 +47,5 @@ with(zui_create(description_position_x, description_position_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
 }

@@ -41,12 +41,12 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
+		var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Weapon":
 				
-				#region Weapon use
+				/*#region Weapon use
 				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Primary"){
 					i = 0;
 				}else{
@@ -64,7 +64,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
 					ItemAmountSubstract(oDraw.var_slot, 1);
 				}
-				#endregion
+				#endregion*/
 					
 			break;
 		}
@@ -88,5 +88,5 @@ with(zui_create(description_position_x, description_position_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
 }

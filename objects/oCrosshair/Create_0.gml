@@ -1,7 +1,5 @@
 /// @description Insert description here
 // You can write your code in this editor
-xx = 0;
-yy = 0;
 DeltaX = 0; DeltaY = 0;
 recoil_speed = .1;
 x = mouse_x;

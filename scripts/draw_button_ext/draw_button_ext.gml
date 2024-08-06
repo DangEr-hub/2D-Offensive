@@ -36,14 +36,14 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 			
 			case "description_drop":
 				if(instance_exists(oDraw) && instance_exists(oSlot)){
-					ItemDrop(global.Inventory[#VarSlot, Index.SlotID], oPlayer.x, oPlayer.y, 100, global.Inventory[#VarSlot, Index.SlotAmmo], global.Inventory[#VarSlot, Index.SlotClipAmmo], global.Inventory[#VarSlot, Index.SlotDurability], 1);	
+					ItemDrop(global.Inventory[#VarSlot, Index.slot_id], oPlayer.x, oPlayer.y, 100, global.Inventory[#VarSlot, Index.slot_ammo], global.Inventory[#VarSlot, Index.slot_clip_ammo], global.Inventory[#VarSlot, Index.SlotDurability], 1);	
 					ItemAmountSubstract(VarSlot, 1);
 				}
 			break;
 			
 			case "weapon_scope_dequip":
 				GainItem(
-					global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_scope],
+					global.Inventory[# oPlayer.WeaponID, Index.slot_scope],
 					1,
 					0,
 					0,
@@ -54,12 +54,12 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					false
 				);
-				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_scope] = Item.None;
+				global.Inventory[# oPlayer.WeaponID, Index.slot_scope] = Item.None;
 			break;
 			
 			case "weapon_barrel_dequip":
 				GainItem(
-					global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_barrel],
+					global.Inventory[# oPlayer.WeaponID, Index.slot_barrel],
 					1,
 					0,
 					0,
@@ -70,12 +70,12 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					false
 				);
-				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_barrel] = Item.None;
+				global.Inventory[# oPlayer.WeaponID, Index.slot_barrel] = Item.None;
 			break;
 
 			case "weapon_grip_dequip":
 				GainItem(
-					global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip],
+					global.Inventory[# oPlayer.WeaponID, Index.slot_grip],
 					1,
 					0,
 					0,
@@ -86,12 +86,12 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0, 
 					false
 				);
-				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_grip] = Item.None;
+				global.Inventory[# oPlayer.WeaponID, Index.slot_grip] = Item.None;
 			break;
 			
 			case "weapon_suppressor_dequip":
 				GainItem(
-					global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_suppressor],
+					global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor],
 					1,
 					0,
 					0,
@@ -102,7 +102,7 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 					0,
 					false
 				);
-				global.weapon_attachments[min(oPlayer.WeaponID, 1)][weapon_attachments.weapon_suppressor] = Item.None;
+				global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor] = Item.None;
 			break;
 		}
     }

@@ -1,22 +1,17 @@
 function calculate_star_rating(DamageDrop) {
-    // Define min and max damage drop values
     var min_drop = 0.00001;
     var max_drop = 0.00125;
 
-    // Ensure DamageDrop is within acceptable bounds
-    if (DamageDrop < min_drop) return 5; // Perfect rating for minimum drop
-    if (DamageDrop > max_drop) return 1; // Lowest rating for maximum drop
+    if (DamageDrop <= min_drop) return 5;
+    if (DamageDrop >= max_drop) return 1;
 
     // Normalize the damage drop to a 0-1 scale
     var normalized_drop = (DamageDrop - min_drop) / (max_drop - min_drop);
 
     // Apply a non-linear transformation (e.g., quadratic scaling)
     var scaled_drop = power(normalized_drop, 0.5); // Square root scaling for better differentiation
-
-    // Calculate star rating
     var star_rating = 5 - 4 * scaled_drop;
 
-    // Return the clamped and rounded star rating
     return clamp(round(star_rating), 1, 5);
 }
 

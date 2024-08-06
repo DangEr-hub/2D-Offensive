@@ -5,19 +5,19 @@ var yy1 = (global.InventoryLeftTopCorner[1] - oDraw.ViewY) * (global.GuiH / oDra
 var xx2 = (global.InventoryRightBottomCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 var yy2 = (global.InventoryRightBottomCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 var xx12 = (global.InventoryEquipLeftTopCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-var yy12 = (global.InventoryEquipLeftTopCorner[1] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+var yy12 = (global.InventoryEquipLeftTopCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 var xx22 = (global.InventoryEquipRightBottomCorner[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 
 if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
-	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[#0, Index.SlotID] != Item.None){
+	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[#0, Index.slot_id] != Item.None){
 		ItemDrop(
-			global.MouseSlot[# 0, Index.SlotID],
+			global.MouseSlot[# 0, Index.slot_id],
 			oPlayer.x,
 			oPlayer.y,
 			100,
-			global.MouseSlot[# 0, Index.SlotAmmo],
-			global.MouseSlot[# 0, Index.SlotClipAmmo],
+			global.MouseSlot[# 0, Index.slot_ammo],
+			global.MouseSlot[# 0, Index.slot_clip_ammo],
 			global.MouseSlot[# 0, Index.SlotDurability],
 			global.MouseSlot[# 0, Index.SlotAmount]
 		);	
@@ -29,7 +29,7 @@ if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
 }
 
 switch(VarSlot){
-	case oPlayer.ItemUsePosition:
+	case oPlayer.item_use_position:
 		image_index = 1;
 	break;
 	
@@ -62,13 +62,13 @@ switch(VarSlot){
 	break;
 }
 
-if(global.Inventory[#VarSlot, Index.SlotID] == Item.None){
+if(global.Inventory[#VarSlot, Index.slot_id] == Item.None){
 	DrawItemInfo = false;
 }
 
 if(DrawItemInfo == true){
 	if(oDraw.DrawInfo == false){
-		var Id = global.Inventory[#VarSlot, Index.SlotID];
+		var Id = global.Inventory[#VarSlot, Index.slot_id];
 		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];

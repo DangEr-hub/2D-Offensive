@@ -5,9 +5,9 @@ function can_player_shoot(){
 function is_inventory_full(Item = Item.None){
 	var Slot = 0;
 	while(Slot < INVENTORY_SIZE){
-		if(global.Inventory[# Slot, Index.SlotID] == Item.None || 
-		(global.Inventory[# Slot, Index.SlotID] == Item && (global.ItemIndex[# global.Inventory[# Slot, Index.SlotID], ItemStat.Type] == "Item" ||
-		global.ItemIndex[# global.Inventory[# Slot, Index.SlotID], ItemStat.Type] == "Grenade" || global.ItemIndex[# global.Inventory[# Slot, Index.SlotID], ItemStat.Type] == "Landmine"))){
+		if(global.Inventory[# Slot, Index.slot_id] == Item.None || 
+		(global.Inventory[# Slot, Index.slot_id] == Item && (global.ItemIndex[# global.Inventory[# Slot, Index.slot_id], ItemStat.Type] == "Item" ||
+		global.ItemIndex[# global.Inventory[# Slot, Index.slot_id], ItemStat.Type] == "Grenade" || global.ItemIndex[# global.Inventory[# Slot, Index.slot_id], ItemStat.Type] == "Landmine"))){
 			return false;
 		}
 		Slot ++;
@@ -161,10 +161,9 @@ function InventoryInit() {
 	}
 	
 	enum Index{
-		SlotID, SlotAmount, SlotAmmo, SlotClipAmmo, SlotDurability, SlotShootingType, slot_scope, slot_barrel, slot_grip, slot_suppressor, Total
+		slot_id, SlotAmount, slot_ammo, slot_clip_ammo, SlotDurability, SlotShootingType, slot_scope, slot_barrel, slot_grip, slot_suppressor, Total
 	}
 	
-	//global.InventorySize = OtherSlot.Shield;
 	global.Inventory = ds_grid_create(OtherSlot.Total, Index.Total);
 	global.ItemIndex = ds_grid_create(Item.Total, ItemStat.Total);
 	global.MouseSlot = ds_grid_create(1, Index.Total);
@@ -211,8 +210,8 @@ function ItemAmountSubstract(ID, Amount){
 }
 
 function ItemAddWeight(ID){
-	if(global.player_stats_struct.Weight <= global.player_stats_struct.Max_weight - global.ItemIndex[#global.Inventory[#ID, Index.SlotID], ItemStat.Weight]){
-		global.player_stats_struct.Weight += global.ItemIndex[#global.Inventory[#ID, Index.SlotID], ItemStat.Weight];
+	if(global.player_stats_struct.Weight <= global.player_stats_struct.Max_weight - global.ItemIndex[#global.Inventory[#ID, Index.slot_id], ItemStat.Weight]){
+		global.player_stats_struct.Weight += global.ItemIndex[#global.Inventory[#ID, Index.slot_id], ItemStat.Weight];
 	}	
 }
 
@@ -263,13 +262,9 @@ function WeaponDrop(ID, ObjectType){
 	if(ObjectType.object_index == oPlayer){
 		ObjectType.Reloading = false;
 		ObjectType.ReloadTime = 0;
-		for(var i = 0;i<weapon_attachments.Total;i++){
-			global.weapon_attachments[ID][i] = Item.None;
+		for(var i = 0;i<Index.Total;i++){
+			global.Inventory[# ID, i] = 0;
 		}
-		global.weapon_id[ID] = Item.None;
-		global.ClipAmmo[ID] = 0;
-		global.Ammo[ID] = 0;
-		global.MaxAmmo[ID] = 0;
 	}else{
 		
 	}
@@ -293,13 +288,13 @@ function switch_weapon_number(){
 	if(CanShoot == true){
 		switch(WeaponNumber){
 			case 0:
-				if(WeaponID != 0){
+				if(WeaponID != OtherSlot.Primary){
 					weapon_shooting_mode = 0;
 					ReloadTime = 0;
 					ReloadTimer = -1;
-					WeaponID = 0;
+					WeaponID = OtherSlot.Primary;
 					Reloading = false;
-					if(global.weapon_id[min(WeaponID, 1)] != Item.None){
+					if(global.Inventory[# WeaponID, Index.slot_id] != Item.None){
 						EquipmentAlpha = global.GUIHUDAlpha;
 					}
 					if(kick_back_timer != -1){
@@ -309,13 +304,13 @@ function switch_weapon_number(){
 			break;
 			
 			case 1:
-				if(WeaponID != 1){
+				if(WeaponID != OtherSlot.Secondary){
 					weapon_shooting_mode = 0;
 					ReloadTime = 0;
 					ReloadTimer = -1;
-					WeaponID = 1;
+					WeaponID = OtherSlot.Secondary;
 					Reloading = false;
-					if(global.weapon_id[min(WeaponID, 1)] != Item.None){
+					if(global.Inventory[# WeaponID, Index.slot_id] != Item.None){
 						EquipmentAlpha = global.GUIHUDAlpha;
 					}
 					if(kick_back_timer != -1){
@@ -325,13 +320,13 @@ function switch_weapon_number(){
 			break;
 
 			case 2:
-				if(WeaponID != 2){
+				if(WeaponID != OtherSlot.Knife){
 					weapon_shooting_mode = 0;
 					ReloadTime = 0;
 					ReloadTimer = -1;
-					WeaponID = 2;
+					WeaponID = OtherSlot.Knife;
 					Reloading = false;
-					if(global.weapon_id[min(WeaponID, 1)] != Item.None){
+					if(global.Inventory[# WeaponID, Index.slot_id] != Item.None){
 						EquipmentAlpha = global.GUIHUDAlpha;
 					}
 					if(kick_back_timer != -1){
@@ -341,6 +336,78 @@ function switch_weapon_number(){
 			break;
 		}
 	}
+}
+	
+function item_swap(type, slot_type){
+	if!(instance_exists(oInventory)){
+		oPlayer.item_equip_timer = oPlayer.item_equip_time;
+		oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
+	}
+	TempArray = array_create(Index.Total - 1, 0);
+	TempArray[Index.slot_id] = global.Inventory[# slot_type, Index.slot_id];
+	TempArray[Index.SlotAmount] = global.Inventory[# slot_type, Index.SlotAmount];
+	TempArray[Index.slot_ammo] = global.Inventory[# slot_type, Index.slot_ammo];
+	TempArray[Index.slot_clip_ammo] = global.Inventory[# slot_type, Index.slot_clip_ammo];
+	TempArray[Index.SlotDurability] = global.Inventory[# slot_type, Index.SlotDurability];
+	TempArray[Index.SlotShootingType] = global.Inventory[# slot_type, Index.SlotShootingType];
+	TempArray[Index.slot_barrel] = global.Inventory[# slot_type, Index.slot_barrel];
+	TempArray[Index.slot_grip] = global.Inventory[# slot_type, Index.slot_grip];
+	TempArray[Index.slot_scope] = global.Inventory[# slot_type, Index.slot_scope];
+	TempArray[Index.slot_suppressor] = global.Inventory[# slot_type, Index.slot_suppressor];
+	show_debug_message(TempArray[Index.slot_scope]);
+	
+	if(type == "mouse"){
+		
+		global.Inventory[# slot_type, Index.slot_id] = global.MouseSlot[# 0, Index.slot_id];
+		global.Inventory[# slot_type, Index.SlotAmount] = global.MouseSlot[# 0, Index.SlotAmount];
+		global.Inventory[# slot_type, Index.slot_ammo] = global.MouseSlot[# 0, Index.slot_ammo];
+		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.MouseSlot[# 0, Index.slot_clip_ammo];
+		global.Inventory[# slot_type, Index.SlotDurability] = global.MouseSlot[# 0, Index.SlotDurability];
+		global.Inventory[# slot_type, Index.SlotShootingType] = global.MouseSlot[# 0, Index.SlotShootingType];
+		global.Inventory[# slot_type, Index.slot_barrel] = global.MouseSlot[# 0, Index.slot_barrel];
+		global.Inventory[# slot_type, Index.slot_grip] = global.MouseSlot[# 0, Index.slot_grip];
+		global.Inventory[# slot_type, Index.slot_suppressor] = global.MouseSlot[# 0, Index.slot_suppressor];
+		global.Inventory[# slot_type, Index.slot_scope] = global.MouseSlot[# 0, Index.slot_scope];	
+		show_debug_message(global.Inventory[# slot_type, Index.slot_scope]);
+	
+		global.MouseSlot[# 0, Index.slot_id] = TempArray[Index.slot_id];
+		global.MouseSlot[# 0, Index.SlotAmount] = TempArray[Index.SlotAmount];
+		global.MouseSlot[# 0, Index.slot_ammo] = TempArray[Index.slot_ammo];
+		global.MouseSlot[# 0, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
+		global.MouseSlot[# 0, Index.SlotDurability] = TempArray[Index.SlotDurability];
+		global.MouseSlot[# 0, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
+		global.MouseSlot[# 0, Index.slot_barrel] = TempArray[Index.slot_barrel];
+		global.MouseSlot[# 0, Index.slot_grip] = TempArray[Index.slot_grip];
+		global.MouseSlot[# 0, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
+		global.MouseSlot[# 0, Index.slot_scope] = TempArray[Index.slot_scope];
+		show_debug_message(global.MouseSlot[# 0, Index.slot_scope]);
+		
+	}else if(type == "item_use_position"){
+		
+		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# oPlayer.item_use_position, Index.slot_id];
+		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# oPlayer.item_use_position, Index.SlotAmount];
+		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# oPlayer.item_use_position, Index.slot_ammo];
+		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# oPlayer.item_use_position, Index.slot_clip_ammo];
+		global.Inventory[# slot_type, Index.SlotDurability] = global.Inventory[# oPlayer.item_use_position, Index.SlotDurability];
+		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# oPlayer.item_use_position, Index.SlotShootingType];
+		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# oPlayer.item_use_position, Index.slot_barrel];
+		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# oPlayer.item_use_position, Index.slot_grip];
+		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# oPlayer.item_use_position, Index.slot_suppressor];
+		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# oPlayer.item_use_position, Index.slot_scope];	
+	
+		global.Inventory[# oPlayer.item_use_position, Index.slot_id] = TempArray[Index.slot_id];
+		global.Inventory[# oPlayer.item_use_position, Index.SlotAmount] = TempArray[Index.SlotAmount];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_ammo] = TempArray[Index.slot_ammo];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
+		global.Inventory[# oPlayer.item_use_position, Index.SlotDurability] = TempArray[Index.SlotDurability];
+		global.Inventory[# oPlayer.item_use_position, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_barrel] = TempArray[Index.slot_barrel];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_grip] = TempArray[Index.slot_grip];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
+		global.Inventory[# oPlayer.item_use_position, Index.slot_scope] = TempArray[Index.slot_scope];
+	}
+	
+	TempArray = undefined;	
 }
 
 

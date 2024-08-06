@@ -41,7 +41,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, Index.SlotID];
+		var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Item":
@@ -49,27 +49,27 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				#region Item use 
 				switch(Id){						
 					case Item.red_dot_scope:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_scope);
+						weapon_attachment_equip(Id, Index.slot_scope);
 					break;
 						
 					case Item.two_scope:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_scope);
+						weapon_attachment_equip(Id, Index.slot_scope);
 					break;
 						
 					case Item.adaptive_chambering:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_barrel);
+						weapon_attachment_equip(Id, Index.slot_barrel);
 					break;
 						
 					case Item.vertical_grip:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_grip);
+						weapon_attachment_equip(Id, Index.slot_grip);
 					break;
 						
 					case Item.horizontal_grip:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_grip);
+						weapon_attachment_equip(Id, Index.slot_grip);
 					break;
 						
 					case Item.military_suppressor:
-						weapon_attachment_equip(Id, weapon_attachments.weapon_suppressor);
+						weapon_attachment_equip(Id, Index.slot_suppressor);
 					break;						
 				}
 				#endregion
@@ -98,5 +98,5 @@ with(zui_create(offset_position_x, offset_position_y + offset_y, objUILabel)){
 	font = set_font("GUI_grid");
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.SlotID], ItemStat.Description];
+	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
 }

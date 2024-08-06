@@ -10,14 +10,6 @@ function save_game(){
 	ini_write_real("Vars", "time_speed", global.TimeSpeed);
 	ini_write_real("Vars", "godmode", global.GodMode);
 	ini_write_real("Vars", "map_id", global.MapID);
-	ini_write_real("Vars", "weapon_id_0", global.weapon_id[0]);
-	ini_write_real("Vars", "weapon_id_1", global.weapon_id[1]);		
-	ini_write_real("Vars", "weapon_clip_ammo_0", global.ClipAmmo[0]);
-	ini_write_real("Vars", "weapon_clip_ammo_1", global.ClipAmmo[1]);
-	ini_write_real("Vars", "weapon_ammo_0", global.Ammo[0]);
-	ini_write_real("Vars", "weapon_ammo_1", global.Ammo[1]);
-	ini_write_real("Vars", "weapon_max_ammo_0", global.MaxAmmo[0]);
-	ini_write_real("Vars", "weapon_max_ammo_1", global.MaxAmmo[1]);
 	ini_write_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
 	ini_write_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 	ini_write_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
@@ -41,12 +33,12 @@ function save_game(){
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	
-	for (var i = 0; i < array_length(global.weapon_attachments); i++) {
+	/*for (var i = 0; i < array_length(global.weapon_attachments); i++) {
 	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
 	        var key = "weapon_attachment_" + string(i) + "_" + string(j);
 	        ini_write_real("Attachments", key, global.weapon_attachments[i][j]);
 	    }
-	}
+	}*/
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -108,14 +100,6 @@ function load_game(){
 		global.TimeSpeed = ini_read_real("Vars", "time_speed", global.TimeSpeed);
 		global.GodMode = ini_read_real("Vars", "godmode", global.GodMode);
 		global.MapID = ini_read_real("Vars", "map_id", global.MapID);	
-		global.weapon_id[0] = ini_read_real("Vars", "weapon_id_0", global.weapon_id[0]);
-		global.weapon_id[1] = ini_read_real("Vars", "weapon_id_1", global.weapon_id[1]);
-		global.ClipAmmo[0] = ini_read_real("Vars", "weapon_clip_ammo_0", global.ClipAmmo[0]);
-		global.ClipAmmo[1] = ini_read_real("Vars", "weapon_clip_ammo_1", global.ClipAmmo[1]);
-		global.Ammo[0] = ini_read_real("Vars", "weapon_ammo_0", global.Ammo[0]);
-		global.Ammo[1] = ini_read_real("Vars", "weapon_ammo_1", global.Ammo[1]);
-		global.MaxAmmo[0] = ini_read_real("Vars", "weapon_max_ammo_0", global.MaxAmmo[0]);
-		global.MaxAmmo[1] = ini_read_real("Vars", "weapon_max_ammo_1", global.MaxAmmo[1]);
 		global.CrosshairAlpha = ini_read_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
 		global.DynamicCrosshair = ini_read_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 		global.PlayerInaccuracy = ini_read_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
@@ -139,14 +123,14 @@ function load_game(){
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 
-		global.weapon_attachments = array_create(2);
+		/*global.weapon_attachments = array_create(2);
 		for (var i = 0; i < 3; i++) {
 		    global.weapon_attachments[i] = array_create(4);
 		    for (var j = 0; j < 4; j++) {
 		        var key = "weapon_attachment_" + string(i) + "_" + string(j);
 		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None);
 		    }
-		}
+		}*/
 		
 		global.map_rounds = array_create(MapIndex.Total);
 		for (var i = 0; i < MapIndex.Total; i++) {

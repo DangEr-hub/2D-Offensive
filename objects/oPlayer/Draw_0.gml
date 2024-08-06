@@ -1,5 +1,7 @@
 /// @description Drawing
-draw_text(x, y + 70, WeaponID);
+draw_text(x, y + 270, RotationAngle);
+draw_text(x, y + 170, WeaponID);
+//draw_text(x, y + 70, WeaponID);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -62,7 +64,7 @@ if(stats.Health_points > 0){
 	}
 		  
 	#region Draw usable item
-	if(global.Inventory[# ItemUsePosition, Index.SlotID] != Item.None){
+	if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
 		var item_offset_x = 40;
 		var item_offset_y = -10;
 		if(moving_state == player_states.prone_state){
@@ -71,16 +73,16 @@ if(stats.Health_points > 0){
 		}
 		var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
 		var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
-	    draw_sprite_ext(spr_Items, global.Inventory[# ItemUsePosition, Index.SlotID], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
+	    draw_sprite_ext(spr_Items, global.Inventory[# item_use_position, Index.slot_id], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
 	}
 	#endregion
 	
 	#region Draw suppressor attachment on equipped weapon
-	if(WeaponID <= 1){
-		if(global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor] != Item.None && global.Inventory[# ItemUsePosition, Index.SlotID] == Item.None){
+	if(WeaponID <= OtherSlot.Secondary){
+		if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 			draw_sprite_ext(
 				spr_Items,
-				global.weapon_attachments[min(WeaponID, 1)][weapon_attachments.weapon_suppressor],
+				global.Inventory[# WeaponID, Index.slot_suppressor],
 				Weapon.x + lengthdir_x(WeaponDistance*.95, RotationAngle),
 				Weapon.y + lengthdir_y(WeaponDistance*.95, RotationAngle),
 				.5,

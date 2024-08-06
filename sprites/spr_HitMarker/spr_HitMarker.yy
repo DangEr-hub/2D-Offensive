@@ -33,7 +33,7 @@
   "origin": 9,
   "parent": {
     "name": "GUI",
-    "path": "folders/Sprites/HUD/GUI.yy",
+    "path": "folders/Sprites/GUI.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

@@ -27,43 +27,43 @@ function get_shooting_modes_string(weapon) {
 }
 
 function weapon_attachment_equip(ID, AttachmentPosition, ObjectType = oPlayer) {
-    var weapon_id = global.weapon_id[ObjectType.WeaponID];
+    var weapon_id = global.Inventory[# ObjectType.WeaponID, Index.slot_id];
     var possible_attachments = ds_list_create();
     var weaponTypeClass = global.ItemIndex[#weapon_id, ItemStat.WeaponTypeClass];
 	
     switch(weaponTypeClass) {
         case "Shotgun":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip);
+            ds_list_add(possible_attachments, Index.slot_barrel, Index.slot_grip);
         break;
         case "Assault rifle":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_scope, Index.slot_barrel, Index.slot_grip,Index.slot_suppressor);
         break;
         case "Pistol":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_grip, Index.slot_suppressor);
         break;
         case "Sniper rifle":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_scope, Index.slot_barrel, Index.slot_grip,Index.slot_suppressor);
         break;
         case "Submachine gun":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_barrel, Index.slot_grip,Index.slot_suppressor);
         break;
         case "Anti-tank missile":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_scope, Index.slot_barrel, Index.slot_grip,Index.slot_suppressor);
         break;
         case "Machine gun":
-            ds_list_add(possible_attachments, weapon_attachments.weapon_scope, weapon_attachments.weapon_barrel, weapon_attachments.weapon_grip, weapon_attachments.weapon_suppressor);
+            ds_list_add(possible_attachments, Index.slot_scope, Index.slot_barrel, Index.slot_grip,Index.slot_suppressor);
         break;
 		case "Knife":
 			ds_list_add(possible_attachments, -1);
 		break;
     }
 
-    var canEquip = (weapon_id != Item.None) && (ds_list_find_index(possible_attachments, AttachmentPosition) != -1) && (global.weapon_attachments[ObjectType.WeaponID][AttachmentPosition] == Item.None);
+    var canEquip = (weapon_id != Item.None) && (ds_list_find_index(possible_attachments, AttachmentPosition) != -1) && (global.Inventory[# ObjectType.WeaponID, AttachmentPosition] == Item.None);
 
     if (canEquip) {
-        global.weapon_attachments[ObjectType.WeaponID][AttachmentPosition] = ID;
+        global.Inventory[# ObjectType.WeaponID, AttachmentPosition] = ID;
 		with(oPlayer){
-			ItemAmountSubstract(ItemUsePosition, 1);
+			ItemAmountSubstract(item_use_position, 1);
 		}
     }
 	
@@ -101,7 +101,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.galil, ["Auto", "Safety"]);
 	add_shooting_modes(Item.p250, ["Semi", "Safety"]);
 	add_shooting_modes(Item.m4_carbine, ["Auto", "Semi", "Burst", "Safety"]);
-	add_shooting_modes(Item.steel_knife, ["Semi"]);
+	add_shooting_modes(Item.steel_knife, ["Semi", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -481,8 +481,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.galil, ItemStat.Description] = "Galil is a fierce contender known for its unruly recoil and limited armor penetration. Despite its challenges, mastering this weapon unlocks a devastating force on the battlefield, swiftly eliminating targets with precision and agility.";
 
 	global.ItemIndex[#Item.steel_knife, ItemStat.Type] = "Weapon";
-	global.ItemIndex[#Item.steel_knife, ItemStat.WeaponTypeClass] = "Knife";
-	global.ItemIndex[#Item.steel_knife, ItemStat.Name] = "Steel knife";
+	WeaponStats(Item.steel_knife, "Steel knife", 1, 48, 54, 1, 1, "Tertiary", 1, 1, 10, snd_galil, 5, 2, false,
+	1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0, "Knife", .95, 1, 1, .25 * game_get_speed(gamespeed_fps), 1, 1, 1, 8);
 	global.ItemIndex[#Item.steel_knife, ItemStat.disadvantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.advantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.ItemColor] = c_ltgray;
