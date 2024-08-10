@@ -769,7 +769,7 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
             }
         }
         
-        var _i = 0;
+        _i = 0; ///Feather opravil "var"
         repeat(array_length(__sunlightArray))
         {
             var _weak = __sunlightArray[_i];
@@ -934,7 +934,7 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
             }
         }
         
-        var _i = 0;
+        i = 0; ///Feather opravil "var"
         repeat(array_length(__sunlightArray))
         {
             var _weak = __sunlightArray[_i];

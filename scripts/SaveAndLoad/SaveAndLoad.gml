@@ -13,10 +13,6 @@ function save_game(){
 	ini_write_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
 	ini_write_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 	ini_write_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
-	ini_write_real("Vars", "armour_id", global.ArmourID[0]);
-	ini_write_real("Vars", "helmet_id", global.ArmourID[1]);
-	ini_write_real("Vars", "armour_durability", global.ArmourDurability[0]);
-	ini_write_real("Vars", "helmet_durability", global.ArmourDurability[1]);
 	ini_write_real("Vars", "enemy_can_move", global.EnemyCanMove);
 	ini_write_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
 	ini_write_real("Vars", "camera_crosshair_shake", global.ViewShake);
@@ -32,13 +28,6 @@ function save_game(){
 	ini_write_real("Vars", "window_height", global.window_height);
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
-	
-	/*for (var i = 0; i < array_length(global.weapon_attachments); i++) {
-	    for (var j = 0; j < array_length(global.weapon_attachments[i]); j++) {
-	        var key = "weapon_attachment_" + string(i) + "_" + string(j);
-	        ini_write_real("Attachments", key, global.weapon_attachments[i][j]);
-	    }
-	}*/
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -103,10 +92,6 @@ function load_game(){
 		global.CrosshairAlpha = ini_read_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
 		global.DynamicCrosshair = ini_read_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 		global.PlayerInaccuracy = ini_read_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
-		global.ArmourID[0] = ini_read_real("Vars", "armour_id", global.ArmourID[0]);
-		global.ArmourID[1] = ini_read_real("Vars", "helmet_id", global.ArmourID[1]);
-		global.ArmourDurability[0] = ini_read_real("Vars", "armour_durability", global.ArmourDurability[0]);
-		global.ArmourDurability[1] = ini_read_real("Vars", "helmet_durability", global.ArmourDurability[1]);
 		global.EnemyCanMove = ini_read_real("Vars", "enemy_can_move", global.EnemyCanMove);
 		global.DrawBulletImpact = ini_read_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
 		global.ViewShake = ini_read_real("Vars", "camera_crosshair_shake", global.ViewShake);
@@ -122,15 +107,6 @@ function load_game(){
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
-
-		/*global.weapon_attachments = array_create(2);
-		for (var i = 0; i < 3; i++) {
-		    global.weapon_attachments[i] = array_create(4);
-		    for (var j = 0; j < 4; j++) {
-		        var key = "weapon_attachment_" + string(i) + "_" + string(j);
-		        global.weapon_attachments[i][j] = ini_read_real("Attachments", key, Item.None);
-		    }
-		}*/
 		
 		global.map_rounds = array_create(MapIndex.Total);
 		for (var i = 0; i < MapIndex.Total; i++) {

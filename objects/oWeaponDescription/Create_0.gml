@@ -34,7 +34,10 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Equip";
+	caption = "Dequip";
+	if(oDraw.var_slot < OtherSlot.Primary){
+		caption = "Equip";
+	}
 	callback = function(){
 		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
 			with(oWeaponDescription){
@@ -45,27 +48,27 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Weapon":
+			
+			#region Primary equip and dequip
+			var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+			if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+				item_swap("item_use_position", OtherSlot.Primary);
+				primary_slot_id = Item.None;
+			} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+				item_swap("item_use_position", OtherSlot.Primary);
+			}
+			#endregion
 				
-				/*#region Weapon use
-				if(global.ItemIndex[#Id, ItemStat.WeaponType] == "Primary"){
-					i = 0;
-				}else{
-					i = 1;
-				}
-				if(global.weapon_id[i] == Item.None){
-					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
-					global.weapon_id[i] = Id;
-					global.weapon_attachments[i][weapon_attachments.weapon_scope] = global.Inventory[# oDraw.var_slot, Index.slot_scope];
-					global.weapon_attachments[i][weapon_attachments.weapon_barrel] = global.Inventory[# oDraw.var_slot, Index.slot_barrel];
-					global.weapon_attachments[i][weapon_attachments.weapon_grip] = global.Inventory[# oDraw.var_slot, Index.slot_grip];
-					global.weapon_attachments[i][weapon_attachments.weapon_suppressor] = global.Inventory[# oDraw.var_slot, Index.slot_suppressor];
-					global.Ammo[i] = global.Inventory[# oDraw.var_slot, 2];
-					global.ClipAmmo[i] = global.Inventory[# oDraw.var_slot, 3];
-					global.MaxAmmo[i] = global.ItemIndex[#Id, ItemStat.MaxAmmo];
-					ItemAmountSubstract(oDraw.var_slot, 1);
-				}
-				#endregion*/
-					
+			#region Secondary equip and dequip
+			var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
+			if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+				item_swap("item_use_position", OtherSlot.Secondary);
+				secondary_slot_id = Item.None;
+			} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+				item_swap("item_use_position", OtherSlot.Secondary);
+			}
+			#endregion
+				
 			break;
 		}
 	};

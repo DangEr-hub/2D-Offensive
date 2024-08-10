@@ -1,3 +1,23 @@
+function array_min(arr) {
+    var min_value = arr[0];
+    for (var i = 1; i < array_length(arr); i++) {
+        if (arr[i] < min_value) {
+            min_value = arr[i];
+        }
+    }
+    return min_value;
+}
+
+function array_max(arr) {
+    var max_value = arr[0];
+    for (var i = 1; i < array_length(arr); i++) {
+        if (arr[i] > max_value) {
+            max_value = arr[i];
+        }
+    }
+    return max_value;
+}
+
 function player_has_machine_gun(){
 	return global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.basic_machine_gun;
 }
@@ -124,7 +144,6 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		}
 	}
 }
-
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
     var collision_info = find_collision_point(starting_x, starting_y, target_x, target_y, object_type);
     if (array_length(collision_info) > 0) {
@@ -672,6 +691,7 @@ function pause(ObjectType){
 			window_id = id;
 		}
 	}
+	camera_set_view_angle(CAMERA, 0);
 	ObjectType.alarm[0] = 1;
 }
 

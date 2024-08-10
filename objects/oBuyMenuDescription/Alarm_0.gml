@@ -1,14 +1,17 @@
 function calculate_star_rating(DamageDrop) {
-    var min_drop = 0.00001;
-    var max_drop = 0.00125;
+	var weapon_drops = [];
+	for(var i=0;i<Item.Total;i++){
+		if(global.ItemIndex[# i, ItemStat.Type] == "Weapon" && global.ItemIndex[# i, ItemStat.DamageDrop] > -1){
+			weapon_drops[i] = global.ItemIndex[# i, ItemStat.DamageDrop]; 
+		}
+	}
+    var min_drop = array_min(weapon_drops);
+    var max_drop = array_max(weapon_drops);
 
     if (DamageDrop <= min_drop) return 5;
     if (DamageDrop >= max_drop) return 1;
 
-    // Normalize the damage drop to a 0-1 scale
     var normalized_drop = (DamageDrop - min_drop) / (max_drop - min_drop);
-
-    // Apply a non-linear transformation (e.g., quadratic scaling)
     var scaled_drop = power(normalized_drop, 0.5); // Square root scaling for better differentiation
     var star_rating = 5 - 4 * scaled_drop;
 

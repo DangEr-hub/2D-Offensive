@@ -221,7 +221,7 @@ if(type == "Respawn menu"){
 					case ItemStat.BaseDurability:
 						text = 
 							statTitles[statIndex - ItemStat.Weight] + 
-							string(global.Inventory[#oDraw.var_slot, Index.SlotDurability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
+							string(global.Inventory[#oDraw.var_slot, Index.slot_durability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
 							"%";
 					break;
 					default:

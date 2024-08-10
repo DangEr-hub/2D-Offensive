@@ -111,7 +111,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.AKM, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 900, 36, 270, 30, "Primary", 1, 8, 6, snd_AKM, 5, 1.25, true,
-	10, 20, 10, 5.9, 30, .017, 10, 3.5, .0017, 1, 7, .25, 1, "Assault rifle", .81, .795, .00011, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5);
+	10, 20, 10, 5.9, 30, .015, 10, 3.5, .0011, 1, 7, .25, 1, "Assault rifle", .81, .795, .00011, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5);
 	global.ItemIndex[#Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Fast equipping";
@@ -481,8 +481,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.galil, ItemStat.Description] = "Galil is a fierce contender known for its unruly recoil and limited armor penetration. Despite its challenges, mastering this weapon unlocks a devastating force on the battlefield, swiftly eliminating targets with precision and agility.";
 
 	global.ItemIndex[#Item.steel_knife, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.steel_knife, "Steel knife", 1, 48, 54, 1, 1, "Tertiary", 1, 1, 10, snd_galil, 5, 2, false,
-	1, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 0, "Knife", .95, 1, 1, .25 * game_get_speed(gamespeed_fps), 1, 1, 1, 8);
+	WeaponStats(Item.steel_knife, "Steel knife", .5 * game_get_speed(gamespeed_fps), 48, 54, 0, -1, "Tertiary", 0, 1, 10, snd_knife, 5, 2, false,
+	0, 0, 0, 0, 10, 0, 0, 10, 0, 0, 0, 0, 0, "Knife", .97, 0, -1, .25 * game_get_speed(gamespeed_fps), 0, 0, 1, 15);
 	global.ItemIndex[#Item.steel_knife, ItemStat.disadvantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.advantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.ItemColor] = c_ltgray;

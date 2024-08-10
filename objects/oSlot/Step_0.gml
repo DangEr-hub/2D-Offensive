@@ -18,7 +18,7 @@ if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
 			100,
 			global.MouseSlot[# 0, Index.slot_ammo],
 			global.MouseSlot[# 0, Index.slot_clip_ammo],
-			global.MouseSlot[# 0, Index.SlotDurability],
+			global.MouseSlot[# 0, Index.slot_durability],
 			global.MouseSlot[# 0, Index.SlotAmount]
 		);	
 		

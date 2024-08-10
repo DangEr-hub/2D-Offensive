@@ -1,7 +1,5 @@
 /// @description Drawing
-draw_text(x, y + 270, RotationAngle);
-draw_text(x, y + 170, WeaponID);
-//draw_text(x, y + 70, WeaponID);
+draw_text(x, y + 70, global.player_stats_struct.Weight);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -33,11 +31,11 @@ if(stats.Health_points > 0){
 		armour_sprite_index = 8;
 	}
 
-	if(global.ArmourID[0] == Item.KevlarVest){
+	if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.KevlarVest){
 		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(global.ArmourID[0] == Item.MilitaryVest){
+	}else if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.MilitaryVest){
 		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(global.ArmourID[0] == Item.SpecOpsVest){
+	}else if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.SpecOpsVest){
 		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 	}
 
@@ -49,17 +47,17 @@ if(stats.Health_points > 0){
 		helmet_sprite_index = 6;	
 	}
 
-	if(global.ArmourID[1] == Item.KevlarHelm){
+	if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.KevlarHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);	
-	}else if(global.ArmourID[1] == Item.MilitaryHelm){
+	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.MilitaryHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 1, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.ArmourID[1] == Item.SpecOpsHelm){
+	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.SpecOpsHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 2, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.ArmourID[1] == Item.MilitaryNightVision){
+	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.MilitaryNightVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 3, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.ArmourID[1] == Item.BasicNightVision){
+	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.BasicNightVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.ArmourID[1] == Item.InfraredVision){
+	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.InfraredVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 		  

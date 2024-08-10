@@ -1,7 +1,7 @@
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && visible == true){
 	if(other.stats.Object != MainObject || other.stats.Tracer_image == 2){
-		var ObjectArmourID = global.ArmourID[0];
-		var ObjectHelmetID = global.ArmourID[1];
+		var ObjectArmourID = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+		var ObjectHelmetID = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
 		if(MainObject.object_index != oPlayer){ ///Pokud to neni hitbox hrace
 			ObjectArmourID = MainObject.ArmourID;
 			ObjectHelmetID = MainObject.HelmetID;

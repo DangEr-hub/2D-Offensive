@@ -35,7 +35,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			1,
 			global.Inventory[# WeaponID, Index.slot_ammo], 
 			global.Inventory[# WeaponID, Index.slot_clip_ammo], 
-			global.Inventory[# WeaponID, Index.SlotDurability],
+			global.Inventory[# WeaponID, Index.slot_durability],
 			global.Inventory[# WeaponID, Index.slot_scope],
 			global.Inventory[# WeaponID, Index.slot_barrel],
 			global.Inventory[# WeaponID, Index.slot_grip],
@@ -142,7 +142,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	#region Timers
+	#region Timers and other
 	stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
 	stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
 	stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
@@ -219,6 +219,20 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
+	
+	if(knife_attack_timer > -1){
+		knife_attack_timer --;	
+	}
+	
+	if(player_can_shoot == false){
+		RelativeSpeedX = 0;
+		RelativeSpeedY = 0;
+		Moving = false;
+		Legs.image_speed = 0;
+		XSpeed = 0;
+		YSpeed = 0;
+	}
+	
 	if(moving_state == player_states.prone_state){
 		headshot_x = x + 67;
 		headshot_y = y - 12;
@@ -251,10 +265,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		BloodTimer --;
 	}
 	
-	if(EquipmentAlpha > 0){
-		EquipmentAlpha -= .001;
-	}
-	
 	if(instance_exists(oBulletTracer)){
 		var BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
 		if(BulletTracerNearby.stats.Object != id && distance_to_object(BulletTracerNearby) <= 64){
@@ -281,6 +291,12 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Camera shake
 	if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false && stats.Health_points > 0 && global.ViewShake == true){
+		
+		#region Camera shake variables
+		var LowStaminaViewAngleFrequency = 0;
+		var PlayerVelocity = sqrt(power(XSpeed, 2) + power(YSpeed, 2)) * game_get_speed(gamespeed_fps);
+		var rotation_increment = 0;
+		var max_rotation = 0;	
 		var LowHPViewAngleFrequency = 0;
 		var ExplosionViewAngleFrequency = 0;
 		var AimPunchStrength = 5;
@@ -293,49 +309,68 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		var ViewAngleCurrent = 0;
 		var GunViewAngleFrequency = 0;
 		var AimPunchViewAngleFrequency = 0;
+		#endregion
 		
 		#region Camera shake using camera angle
-		if (CanShoot == false && ShootTimer >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/2) {
-			GunCrossShake = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CrosshairShake];
-		    ViewAngleAmplitude += global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
-		    GunViewAngleFrequency = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
-		}
 		
-		if(AimPunchTimer > -1){
-			AimPunchCrossShake = AimPunchStrength*5 * AimPunchMultiplier;
-			ViewAngleAmplitude += AimPunchStrength * AimPunchMultiplier;
-			AimPunchViewAngleFrequency = AimPunchStrength*.5 * AimPunchMultiplier;
-		}
+			#region Low stamina camera shake
+			LowStaminaViewAngleFrequency = 10 - ((stats.Stamina_points/global.player_stats_struct.Max_stamina)*10);
+			ViewAngleAmplitude += 1 - (stats.Stamina_points/global.player_stats_struct.Max_stamina);
+			#endregion
 		
-		near_explosion = false;
-		if(instance_exists(oGrenade)){
-			var HEGrenade = instance_nearest(x, y, oGrenade);
-			if(HEGrenade.stats.Item_id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.stats.Speed < .1){
-				if(distance_to_object(HEGrenade) <= 1024){
-					near_explosion = true;
-					ExplosionCrossShake = max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
-					ViewAngleAmplitude += max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
-					ExplosionViewAngleFrequency = 1;
+			#region Gun camera shake
+			if (CanShoot == false && ShootTimer >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/2) {
+				GunCrossShake = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CrosshairShake];
+			    ViewAngleAmplitude += global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
+			    GunViewAngleFrequency = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
+			}
+			#endregion
+		
+			#region Aimpunch camera shake
+			if(AimPunchTimer > -1){
+				AimPunchCrossShake = AimPunchStrength*5 * AimPunchMultiplier;
+				ViewAngleAmplitude += AimPunchStrength * AimPunchMultiplier;
+				AimPunchViewAngleFrequency = AimPunchStrength*.5 * AimPunchMultiplier;
+			}
+			#endregion
+		
+			#region Explosion camera shake
+			near_explosion = false;
+			if(instance_exists(oGrenade)){
+				var HEGrenade = instance_nearest(x, y, oGrenade);
+				if(HEGrenade.stats.Item_id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.stats.Speed < .1){
+					if(distance_to_object(HEGrenade) <= 1024){
+						near_explosion = true;
+						ExplosionCrossShake = max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
+						ViewAngleAmplitude += max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
+						ExplosionViewAngleFrequency = 1;
+					}
 				}
 			}
-		}
+			#endregion
 		
-		if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/3)){
-			LowHPCrossShake = 1;
-			ViewAngleAmplitude += 1;
-			LowHPViewAngleFrequency = 100;
-		}
+			#region Low health camera shake
+			if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/3)){
+				LowHPCrossShake = 1;
+				ViewAngleAmplitude += 1;
+				LowHPViewAngleFrequency = 100;
+			}
+			#endregion
+			
 		
-		var ViewAngleFrequency = GunViewAngleFrequency + AimPunchViewAngleFrequency + ExplosionViewAngleFrequency + LowHPViewAngleFrequency;
-		ViewAngleAmplitude *= ViewAngleDamping;
+			#region Final calculation
+			var ViewAngleFrequency = GunViewAngleFrequency + AimPunchViewAngleFrequency + ExplosionViewAngleFrequency + LowHPViewAngleFrequency;
+			ViewAngleAmplitude *= ViewAngleDamping;
 		
-		if (ViewAngleAmplitude > 0.01) {
-		    ViewAngleCurrent = ViewAngleAmplitude * sin(degtorad(current_time * ViewAngleFrequency));
-		}else{
-			ViewAngleFrequency = 0;
-		    ViewAngleAmplitude = 0;
-		    ViewAngleCurrent = 0;
-		}
+			if (ViewAngleAmplitude > 0.01) {
+			    ViewAngleCurrent = ViewAngleAmplitude * sin(degtorad(current_time * ViewAngleFrequency));
+			}else{
+				ViewAngleFrequency = 0;
+			    ViewAngleAmplitude = 0;
+			    ViewAngleCurrent = 0;
+			}
+			#endregion
+		
 		#endregion
 		
 		#region Camera shake using camera position
@@ -367,14 +402,82 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 		#endregion
 		
+		#region Final formula
 		if (abs(ViewShakeValuePower) < 1) {
 		    ViewShakeValuePower = 0;
 		}
-
 		CrosshairShake = GunCrossShake + AimPunchCrossShake + ExplosionCrossShake + LowHPCrossShake;
 		ViewAngle = ViewAngleCurrent;
 		camera_set_view_angle(CAMERA, ViewAngle);
 		camera_set_view_pos(CAMERA, camera_get_view_x(CAMERA) + ViewShakeValuePower, camera_get_view_y(CAMERA) + ViewShakeValuePower); 
+		#endregion
+		
+		#region Moving camera shake (different approach)
+		if (player_can_shoot == true && !global.my_console[? "active"]) {
+			rotation_increment = PlayerVelocity/5000;
+			max_rotation = PlayerVelocity/750;
+			if(moving_state == player_states.none_state || moving_state == player_states.prone_state){
+				if (keyboard_check(ord("A"))) {
+					if (rotation_target > -max_rotation && rotation_direction == 1) {
+						rotation_target -= rotation_increment;
+						if (rotation_target <= -max_rotation) {
+							rotation_direction = -1;
+						}
+					} else {
+						rotation_target += rotation_increment;
+						if (rotation_target >= max_rotation) {
+							rotation_direction = 1;
+						}
+					}
+				} else if (keyboard_check(ord("D"))) {
+					if (rotation_target < max_rotation && rotation_direction == 1) {
+						rotation_target += rotation_increment;
+						if (rotation_target >= max_rotation) {
+							rotation_direction = -1;
+						}
+					} else {
+						rotation_target -= rotation_increment;
+						if (rotation_target <= -max_rotation) {
+							rotation_direction = 1;
+						}
+					}
+				} else if (keyboard_check(ord("W"))) {
+					if (rotation_target > -max_rotation && rotation_direction == 1) {
+						rotation_target -= rotation_increment;
+						if (rotation_target <= -max_rotation) {
+							rotation_direction = -1;
+						}
+					} else {
+						rotation_target += rotation_increment;
+						if (rotation_target >= max_rotation) {
+							rotation_direction = 1;
+						}
+					}
+				} else if (keyboard_check(ord("S"))) {
+					if (rotation_target < max_rotation && rotation_direction == 1) {
+						rotation_target += rotation_increment;
+						if (rotation_target >= max_rotation) {
+							rotation_direction = -1;
+						}
+					} else {
+						rotation_target -= rotation_increment;
+						if (rotation_target <= -max_rotation) {
+							rotation_direction = 1;
+						}
+					}
+				} 
+			}
+			
+			if(Moving == false){
+				rotation_target = 0;
+			}
+
+			// Smooth rotation transition
+			rotation_angle = lerp(rotation_angle, rotation_target, .5);
+			camera_set_view_angle(view_camera[0], camera_get_view_angle(view_camera[0]) + rotation_angle);
+		}
+		#endregion
+		
 	}
 		
 	#endregion
@@ -402,10 +505,36 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
 	#endregion
 	
+	#region Knife attacking
+	
+		if(Knife.image_index != 0){
+			
+			#region Light attack
+			if(mouse_check_button_pressed(mb_left) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
+				if(knife_attack_timer == -1){
+					knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed];
+					stats.Stamina_points -= STAMINA_KNIFE_LIGHT;
+				}
+			}
+			#endregion
+		
+			#region Heavy attack
+			if(mouse_check_button_pressed(mb_right) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
+				if(knife_attack_timer == -1){
+					knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] * 2;
+					stats.Stamina_points -= STAMINA_KNIFE_HEAVY;
+				}
+			}
+			#endregion
+		
+		}
+		
+	#endregion
+	
 	#region Texture
 	
 		#region Knife texture
-		if(WeaponID != OtherSlot.Knife){
+		if(WeaponID != OtherSlot.Knife || global.Inventory[# item_use_position, Index.slot_id] != Item.None){
 			Knife.image_index = 0;
 		}else{		
 			switch(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Name]){
@@ -1058,69 +1187,71 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Shooting
-	if(global.Inventory[# WeaponID, Index.slot_id] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != player_states.mortar_state && item_equip_timer == -1){
-		if (player_can_shoot == true && !global.my_console[? "active"]) {
-			if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
-				audio_play_sound(snd_empty_magazine, 0, false);	
-			}
-		    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense] == 1))){
+	if!(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.MaxAmmo] == -1){
+		if(global.Inventory[# WeaponID, Index.slot_id] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != player_states.mortar_state && item_equip_timer == -1){
+			if (player_can_shoot == true && !global.my_console[? "active"]) {
+				if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
+					audio_play_sound(snd_empty_magazine, 0, false);	
+				}
+			    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense] == 1))){
 				
-				if(global.Inventory[# WeaponID, Index.slot_ammo] > 0){
-					shooting = true;
+					if(global.Inventory[# WeaponID, Index.slot_ammo] > 0){
+						shooting = true;
 				
-					#region Fractionating reloading stop
-					if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense] == 1){
-						ReloadTimer = -1;
-						Reloading = false;
-						ReloadTime = 0;
-					}
-					#endregion	
-				
-			        if(CanShoot == true){
-					
-						randomize();
-					
-						if(shooting_mode == "Burst"){
-						
-							#region Burstfire
-					        if (burst_fire == false) {
-					            burst_fire = true;
-					            burst_shots_fired = 0;
-					            burst_fire_timer = max(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/2, 5);
-					        }
-							#endregion
-						
-						}else{
-						
-							#region Normal fire
-							var sound_id = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.SoundID];
-							if(global.Inventory[# WeaponID, Index.slot_suppressor] == Item.military_suppressor){
-								sound_id = snd_Silencer;
-							}
-							ShootTimer = ceil(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
-							player_shooting();
-							audio_play_sound(sound_id, false, 0);
-							Weapon.KickBackEffect = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.KickBackPower];
-							KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
-							KickBack ++;
-							global.Inventory[# WeaponID, Index.slot_ammo] --;
-							CanShoot = false;
-							#endregion
-						
+						#region Fractionating reloading stop
+						if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense] == 1){
+							ReloadTimer = -1;
+							Reloading = false;
+							ReloadTime = 0;
 						}
+						#endregion	
+				
+				        if(CanShoot == true){
 					
-						#region Scope in logic
-						if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Sniper rifle"){
-							if(ScopeIn == true){
-								ScopeIn = false;
+							randomize();
+					
+							if(shooting_mode == "Burst"){
+						
+								#region Burstfire
+						        if (burst_fire == false) {
+						            burst_fire = true;
+						            burst_shots_fired = 0;
+						            burst_fire_timer = max(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/2, 5);
+						        }
+								#endregion
+						
+							}else{
+						
+								#region Normal fire
+								var sound_id = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.SoundID];
+								if(global.Inventory[# WeaponID, Index.slot_suppressor] == Item.military_suppressor){
+									sound_id = snd_Silencer;
+								}
+								ShootTimer = ceil(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
+								player_shooting();
+								audio_play_sound(sound_id, false, 0);
+								Weapon.KickBackEffect = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.KickBackPower];
+								KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
+								KickBack ++;
+								global.Inventory[# WeaponID, Index.slot_ammo] --;
+								CanShoot = false;
+								#endregion
+						
 							}
-						}
-						#endregion
 					
+							#region Scope in logic
+							if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Sniper rifle"){
+								if(ScopeIn == true){
+									ScopeIn = false;
+								}
+							}
+							#endregion
+					
+						}
 					}
 				}
-			}
 
+			}
 		}
 	}
 	if(shooting == false){
@@ -1364,7 +1495,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					if(moving_state == player_states.none_state && global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None){ /// Pokud neběži ani se neplazí
 						
 						#region Equip machine gun
-						EquipmentAlpha = global.GUIHUDAlpha;
 						global.Inventory[# OtherSlot.Primary, Index.slot_id] = machine_gun.stats.Id;
 						global.weapon_attachments[0][weapon_attachments.weapon_scope] = machine_gun.stats.Slot_scope;
 						global.weapon_attachments[0][weapon_attachments.weapon_barrel] = machine_gun.stats.Slot_barrel;
@@ -1464,7 +1594,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 	
 	#region Toggle night vision and infrared vision
-	if(global.ArmourID[1] == Item.None){
+	if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.None){
 		if(ToggleNightVision == true){
 			play_sound(x, y, snd_ToggleNightVision);
 			ToggleNightVision = false;	
@@ -1476,22 +1606,22 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyToggleNightVision]) && !global.my_console[? "active"]){
-		if(global.ArmourDurability[1] > 0){
-			if(string_pos("night vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
+		if(global.Inventory[# OtherSlot.Helmet, Index.slot_durability] > 0){
+			if(string_pos("night vision", global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.Name]) > 0){
 				play_sound(x, y, snd_ToggleNightVision);
 				ToggleNightVision = !ToggleNightVision;	
-			}else if(string_pos("Infrared vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
+			}else if(string_pos("Infrared vision", global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.Name]) > 0){
 				play_sound(x, y, snd_ToggleNightVision);
 				ToggleInfraVision = !ToggleInfraVision;	
 			}
 		}
 	}
 	
-	if(global.ArmourDurability[1] <= 0 && (ToggleNightVision == true || ToggleInfraVision == true)){
-		if(string_pos("night vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
+	if(global.Inventory[# OtherSlot.Helmet, Index.slot_durability] <= 0 && (ToggleNightVision == true || ToggleInfraVision == true)){
+		if(string_pos("night vision", global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.Name]) > 0){
 			play_sound(x, y, snd_ToggleNightVision);
 			ToggleNightVision = false;	
-		}if(string_pos("Infrared vision", global.ItemIndex[#global.ArmourID[1], ItemStat.Name]) > 0){
+		}if(string_pos("Infrared vision", global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.Name]) > 0){
 				play_sound(x, y, snd_ToggleNightVision);
 				ToggleInfraVision = false;	
 			}
@@ -1772,27 +1902,33 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				
 			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" && !instance_exists(oWeaponAttachments)){
 				
-				#region Armour use
-				if(global.ArmourID[0] == Item.None){
+				#region Armour equip and dequip
+				var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+				if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
 					item_equip_timer = item_equip_time;
-					EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[0] = global.Inventory[# item_use_position, Index.slot_id];
-					global.ArmourDurability[0] = global.Inventory[# item_use_position, Index.SlotDurability];
-					ItemAddWeight(item_use_position);
-					ItemAmountSubstract(item_use_position, 1);
+					ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
+					item_swap("item_use_position", OtherSlot.Armour);
+					armour_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
+					item_equip_timer = item_equip_time;
+					ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
+					item_swap("item_use_position", OtherSlot.Armour);
 				}
 				#endregion
 				
 			}else if(global.ItemIndex[#Id, ItemStat.Type] == "Helmet" && !instance_exists(oWeaponAttachments)){
 				
-				#region Helmet use
-				if(global.ArmourID[1] == Item.None){
+				#region Helmet equip and dequip
+				var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+				if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
 					item_equip_timer = item_equip_time;
-					EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[1] = global.Inventory[# item_use_position, Index.slot_id];
-					global.ArmourDurability[1] = global.Inventory[# item_use_position, Index.SlotDurability];
-					ItemAddWeight(item_use_position);
-					ItemAmountSubstract(item_use_position, 1);
+					ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], helmet_slot_id);
+					item_swap("item_use_position", OtherSlot.Helmet);
+					helmet_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
+					item_equip_timer = item_equip_time;
+					ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], helmet_slot_id);
+					item_swap("item_use_position", OtherSlot.Helmet);
 				}
 				#endregion
 				
@@ -1800,7 +1936,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				
 				#region Shield use
 				item_equip_timer = item_equip_time;
-				ItemAmountSubstract(item_use_position, 1);
 				#endregion
 				
 			}
@@ -1934,7 +2069,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	  }
 	  global.AmmoNeeded = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.MaxAmmo] - global.Inventory[# WeaponID, Index.slot_ammo];
 
-	  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
+	  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyReload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None && FlashedAlpha <= 0){
 	    Reloading = true;
 	    ReloadTimer = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed];
 	  }
@@ -1978,7 +2113,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(oBuyMenu);
 	instance_activate_object(oWeaponDescription);
 	instance_activate_object(oLightRenderer);
-	instance_activate_object(oHazeController);
 	instance_activate_object(oDamageTable);
 	instance_activate_object(oItemDescription);
 	instance_activate_object(objUIWindowCaption);
@@ -1988,7 +2122,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(objUIGrid);
 	instance_activate_object(oArmourDescription);
 	instance_activate_object(oEggyEloRatingSystem);
-	//instance_activate_object(Legs);
 	instance_activate_object(oCrosshair);
 	instance_activate_object(oDamageIndicator);
 	instance_activate_object(oDraw);
@@ -1999,7 +2132,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	instance_activate_object(oConsole);
 	instance_activate_object(oCamera);
 	instance_activate_object(oInventory);
-	//instance_activate_object(oItems);
 	instance_activate_object(oGrenade);
 	instance_activate_object(oExplosion);
 	#endregion

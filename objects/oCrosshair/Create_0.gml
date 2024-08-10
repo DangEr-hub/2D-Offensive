@@ -1,5 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
+crosshair_x = x;
+crosshair_y = y;
 DeltaX = 0; DeltaY = 0;
 recoil_speed = .1;
 x = mouse_x;

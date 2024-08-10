@@ -1,9 +1,10 @@
+crosshair_x = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
 if(global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol"){
 	recoil_speed = 10;
-	WobbleResetSpeed = 25;
 	StabilizationSpeed = 75;
 }
 

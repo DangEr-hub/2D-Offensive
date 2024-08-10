@@ -49,7 +49,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
-			if((hit_object.object_index == oPlayer && global.ArmourDurability[0] > 0) || hit_object.ArmourDurability[0] > 0){
+			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Armour, Index.slot_durability] > 0) || hit_object.ArmourDurability[0] > 0){
 				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
@@ -64,7 +64,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
-			if((hit_object.object_index == oPlayer && global.ArmourDurability[0] > 0) || hit_object.ArmourDurability[0] > 0){
+			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Armour, Index.slot_durability] > 0) || hit_object.ArmourDurability[0] > 0){
 				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
@@ -79,7 +79,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			hit_object.attack_damage = Damage;	
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 			hit_object.AimPunchMultiplier = global.ItemIndex[#HelmetID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
-			if((hit_object.object_index == oPlayer && global.ArmourDurability[1] > 0) || hit_object.ArmourDurability[1] > 0){
+			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Helmet, Index.slot_durability] > 0) || hit_object.ArmourDurability[1] > 0){
 				if(global.ItemIndex[#HelmetID, ItemStat.Defense] <= .95){
 					hit_object.attack_damage = Damage * global.ItemIndex[#HelmetID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
 				}
@@ -98,8 +98,8 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			armour_durability = hit_object.ArmourDurability[0];
 			hit_object.enemy_aimpunch = hit_object.attack_damage;
 		}else{
-			helmet_durability = global.ArmourDurability[1];
-			armour_durability = global.ArmourDurability[0];
+			helmet_durability = global.Inventory[# OtherSlot.Helmet, Index.slot_durability];
+			armour_durability = global.Inventory[# OtherSlot.Armour, Index.slot_durability];
 		}
 		
 	// When an enemy hits the hit_object
@@ -168,8 +168,8 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				}
 			}else{
 				if(hit_object.object_index == oPlayer){
-					global.ArmourDurability[0] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];	
-					global.ArmourDurability[0] = max(global.ArmourDurability[0], 0);
+					global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];	
+					global.Inventory[# OtherSlot.Armour, Index.slot_durability] = max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], 0);
 				}else{
 					hit_object.ArmourDurability[0] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];
 					hit_object.ArmourDurability[0] = max(hit_object.ArmourDurability[0], 0);
@@ -217,8 +217,8 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				}
 			}else{
 				if(hit_object.object_index == oPlayer){
-					global.ArmourDurability[1] -= hit_object.attack_damage/50/global.ItemIndex[#HelmetID, ItemStat.Defense];	
-					global.ArmourDurability[1] = max(global.ArmourDurability[1], 0);
+					global.Inventory[# OtherSlot.Helmet, Index.slot_durability] -= hit_object.attack_damage/50/global.ItemIndex[#HelmetID, ItemStat.Defense];	
+					global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability], 0);
 				}else{
 					hit_object.ArmourDurability[1] -= hit_object.attack_damage/50/global.ItemIndex[#HelmetID, ItemStat.Defense];
 					hit_object.ArmourDurability[1] = max(hit_object.ArmourDurability[1], 0);

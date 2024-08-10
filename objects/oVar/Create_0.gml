@@ -19,8 +19,6 @@ global.Hostage = false;
 global.ConsoleHeight = 256;
 global.ConsoleWidth = 512;
 global.GUIHUDAlpha = .33;
-global.ArmourDurability = [0, 0];
-global.ArmourID = [Item.None, Item.None];
 global.FieldOfView = 10;
 global.BloomShader = true;
 global.TimeSpeed = 15;
@@ -161,7 +159,7 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight,
-	KeyInventory, KeyDrop, KeyPickUp, KeyCycleLeft,
+	KeyInventory, KeyPickUp, KeyCycleLeft,
 	KeyCycleRight, KeyCycleUp, KeyShootMouse, KeyReload,
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
 	KeyProne, KeyWeaponAttachments, KeyCommand, KeyGo, 
@@ -174,7 +172,7 @@ global.KeyBinds = ds_list_create();
 ds_list_add(
 	global.KeyBinds, 
 	ord("W"), ord("A"), ord("S"), ord("D"),
-	ord("I"), vk_control, vk_space, ord("Q"), 
+	ord("I"), vk_space, ord("Q"), 
 	ord("E"), ord("F"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
 	ord("Y"), ord("T"), ord("X"), ord("H"),

@@ -138,11 +138,11 @@ if(instance_exists(oPlayer)){
 			);
 			shader_set_uniform_f(
 				shader_get_uniform(shd_NightVision, "intensity_strength"), 
-				global.ItemIndex[#global.ArmourID[1], ItemStat.NightVisionIntensityPower]
+				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionIntensityPower]
 			);
 			shader_set_uniform_f(
 				shader_get_uniform(shd_NightVision, "noise_strength"), 
-				global.ItemIndex[#global.ArmourID[1], ItemStat.NightVisionNoisePower]
+				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionNoisePower]
 			);
 		    draw_surface_stretched(NightVisionSurface, 0, 0, global.GuiW, global.GuiH);
 		    shader_reset();

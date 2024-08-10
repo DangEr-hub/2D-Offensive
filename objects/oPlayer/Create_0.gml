@@ -1,4 +1,7 @@
 event_inherited();
+rotation_direction = 1; ///Pro view bobbing
+rotation_angle = 0; ///Pro view bobbing
+rotation_target = 0; ///Pro view bobbing
 knife_attack_timer = -1;
 item_equip_timer = -1;
 item_equip_time = 10; //Offset kvůli tomu, aby hráč nevystřelil při použití itemu
@@ -36,7 +39,6 @@ ScopeInaccuracyTimer = -1;
 EquippedGrenadeTimer = -1;
 EquippedGrenadeTime = game_get_speed(gamespeed_fps) * .25;
 BloodTimer = -1;
-EquipmentAlpha = 0;
 ReloadTimer = -1;
 FlashedAlpha = 0;
 FlashedBackGround = -1;

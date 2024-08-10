@@ -33,8 +33,11 @@ with(zui_create(zui_get_width() * .5, zui_get_height() - button_height*1.25, obj
 with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
-	zui_set_height(other.button_height);
-	caption = "Equip";
+	zui_set_height(other.button_height);	
+	caption = "Dequip";
+	if(oDraw.var_slot < OtherSlot.Primary){
+		caption = "Equip";
+	}	
 	callback = function(){
 		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
 			with(oArmourDescription){
@@ -46,13 +49,15 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				
 			case "Helmet":
 				
-				#region Helmet use
-				if(global.ArmourID[1] == Item.None){
-					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[1] = global.Inventory[# oDraw.var_slot, Index.slot_id];
-					global.ArmourDurability[1] = global.Inventory[# oDraw.var_slot, Index.SlotDurability];
-					ItemAddWeight(oDraw.var_slot);
-					ItemAmountSubstract(oDraw.var_slot, 1);
+				#region Helmet equip and dequip
+				var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+				if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
+					ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], helmet_slot_id);
+					item_swap("item_use_position", OtherSlot.Helmet);
+					helmet_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
+					ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], helmet_slot_id);
+					item_swap("item_use_position", OtherSlot.Helmet);
 				}
 				#endregion
 					
@@ -60,22 +65,23 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				
 			case "Armour":
 				
-				#region Armour use
-				if(global.ArmourID[0] == Item.None){
-					oPlayer.EquipmentAlpha = global.GUIHUDAlpha;
-					global.ArmourID[0] = global.Inventory[# oDraw.var_slot, Index.slot_id];
-					global.ArmourDurability[0] = global.Inventory[# oDraw.var_slot, Index.SlotDurability];
-					ItemAddWeight(oDraw.var_slot);
-					ItemAmountSubstract(oDraw.var_slot, 1);
+				#region Armour equip and dequip
+				var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+				if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
+					ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], armour_slot_id);
+					item_swap("item_use_position", OtherSlot.Armour);
+					armour_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
+					ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], armour_slot_id);
+					item_swap("item_use_position", OtherSlot.Armour);
 				}
 				#endregion
 					
 			break;  
 				
 			case "Shield":
-				
-				ItemAmountSubstract(oDraw.var_slot, 1);
-					
+			
+			
 			break;
 		}
 	};

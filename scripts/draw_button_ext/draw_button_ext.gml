@@ -36,7 +36,7 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 			
 			case "description_drop":
 				if(instance_exists(oDraw) && instance_exists(oSlot)){
-					ItemDrop(global.Inventory[#VarSlot, Index.slot_id], oPlayer.x, oPlayer.y, 100, global.Inventory[#VarSlot, Index.slot_ammo], global.Inventory[#VarSlot, Index.slot_clip_ammo], global.Inventory[#VarSlot, Index.SlotDurability], 1);	
+					ItemDrop(global.Inventory[#VarSlot, Index.slot_id], oPlayer.x, oPlayer.y, 100, global.Inventory[#VarSlot, Index.slot_ammo], global.Inventory[#VarSlot, Index.slot_clip_ammo], global.Inventory[#VarSlot, Index.slot_durability], 1);	
 					ItemAmountSubstract(VarSlot, 1);
 				}
 			break;

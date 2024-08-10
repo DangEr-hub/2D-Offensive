@@ -9,6 +9,7 @@ if(instance_exists(oPlayer)){
 	
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu)){
 		if(PauseMenu == false){
+
 			pause(id);
 			PauseMenu = true;	
 		}else{
