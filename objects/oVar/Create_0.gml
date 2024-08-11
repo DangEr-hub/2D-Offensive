@@ -183,7 +183,7 @@ ds_list_add(
 enum player_textures{
 	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, 
 	prone, prone_second, prone_third, flashed_prone, flashed_prone_second, flashed_prone_third, 
-	reload_prone, reload_prone_second, reload_prone_third, knife, knife_prone, knife_prone_second, knife_prone_third,
+	reload_prone, reload_prone_second, reload_prone_third, knife_prone, knife_prone_second, knife_prone_third, knife
 }
 
 enum player_states{
@@ -210,7 +210,9 @@ enum HitBox{
 	ArmProneReloading,
 	LegProne,
 	LegProne_second,
-	LegProne_third
+	LegProne_third,
+	ArmKnife,
+	ArmProneKnife,
 }
 
 enum States{

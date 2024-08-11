@@ -260,6 +260,7 @@
     {"name":"snd_Famas","order":17,"path":"sounds/snd_Famas/snd_Famas.yy",},
     {"name":"spr_Weapon","order":1,"path":"sprites/spr_Weapon/spr_Weapon.yy",},
     {"name":"oEnemyDead","order":17,"path":"objects/oEnemyDead/oEnemyDead.yy",},
+    {"name":"hitboxes","order":25,"path":"scripts/hitboxes/hitboxes.yy",},
     {"name":"oMachineGun","order":5,"path":"objects/oMachineGun/oMachineGun.yy",},
     {"name":"oInventory","order":8,"path":"objects/oInventory/oInventory.yy",},
     {"name":"oStatisticsTab","order":14,"path":"objects/oStatisticsTab/oStatisticsTab.yy",},

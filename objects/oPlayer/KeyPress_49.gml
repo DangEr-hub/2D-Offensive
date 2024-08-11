@@ -1,4 +1,4 @@
-/// @description Insert description here
+/// @description Equip primary weapon
 // You can write your code in this editor
 if(WeaponNumber != 0 && equip_timer == -1 && shooting == false){
 	WeaponNumber = 0;

@@ -1,6 +1,10 @@
 headshot_x = x + 3;
 headshot_y = y - 17;
 
+if(hit_timer > -1){
+	hit_timer --;
+}
+
 if(object_index == oEnemy || object_index == oFriend){
 	
 	#region Wall collision

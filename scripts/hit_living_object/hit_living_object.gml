@@ -129,10 +129,10 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 					oEggyEloRatingSystem.kills ++;
 				}
 			}	
-			var death_sound_effect = choose(snd_Death1, snd_Death2);
-			if!(audio_is_playing(death_sound_effect)){
-				play_sound(BloodSplashX, BloodSplashY, death_sound_effect, Bullet.stats.Object);
-			}
+			//var death_sound_effect = choose(snd_Death1, snd_Death2);
+			//if!(audio_is_playing(death_sound_effect)){
+			//	play_sound(BloodSplashX, BloodSplashY, death_sound_effect, Bullet.stats.Object);
+			//}
 			hit_object.KilledByName = Bullet.stats.Object_name;
 			hit_object.KilledByWeapon = global.ItemIndex[#Bullet.stats.Item_id, ItemStat.Name];
 			hit_object.stats.Health_points = -1;

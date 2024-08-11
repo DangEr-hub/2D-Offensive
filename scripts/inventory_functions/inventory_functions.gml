@@ -389,6 +389,12 @@ function item_swap(type, slot_type){
 		global.Inventory[# oPlayer.item_use_position, Index.slot_grip] = TempArray[Index.slot_grip];
 		global.Inventory[# oPlayer.item_use_position, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
 		global.Inventory[# oPlayer.item_use_position, Index.slot_scope] = TempArray[Index.slot_scope];
+	}else if(type == "description_button"){
+		
+		for(var i=0;i<Index.Total;i++){
+			global.Inventory[# slot_type, i] = 0;
+		}
+		
 	}
 	
 	TempArray = undefined;	

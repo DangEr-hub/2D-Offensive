@@ -312,15 +312,26 @@ function percent_chance(argument0) {
 function statistics_hit(Type, Damage, ObjectType){
 	switch(Type){
 		case "Health":
-			ObjectType.stats.Health_points -= Damage;
+			if(ObjectType.stats.Health_points >= Damage){
+				ObjectType.attack_damage = Damage*.5;
+				ObjectType.stats.Health_points -= Damage;
+			}else{
+				ObjectType.attack_damage = ObjectType.stats.Health_points;
+				ObjectType.stats.Health_points = 0;
+			}
 			if(ObjectType.HPTimer == -1){
 				ObjectType.HPTimer = game_get_speed(gamespeed_fps)*.5;
 			}
 		break;
 		
 		case "Stamina":
-			ObjectType.StaminaDamage = Damage;
-			ObjectType.stats.Stamina_points -= StaminaDamage;
+			if(ObjectType.stats.Stamina_points >= Damage){
+				ObjectType.StaminaDamage = Damage*.5;
+				ObjectType.stats.Stamina_points -= Damage;
+			}else{
+				ObjectType.StaminaDamage = ObjectType.stats.Stamina_points;
+				ObjectType.stats.Stamina_points = 0;
+			}
 			if(ObjectType.StaminaTimer == -1){
 				ObjectType.StaminaTimer = game_get_speed(gamespeed_fps)*.5;	
 			}
@@ -560,7 +571,6 @@ function inaccuracy_formula(WID, ObjectType){
 				var inaccuracy_value = min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
 				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
 				//show_debug_message(inaccuracy_value);
-				show_debug_message(behind_smoke_inaccuracy);
 				return inaccuracy_value;
 
 			}
@@ -577,6 +587,8 @@ function inaccuracy_formula(WID, ObjectType){
 function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
 	if(instance_exists(instance_id)){
 	    var playerInstance = instance_find(oPlayer, 0);
+		audio_emitter_gain(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
+		audio_emitter_pitch(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
 	    audio_emitter_position(instance_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
 	    audio_emitter_falloff(instance_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
 	    audio_play_sound_on(instance_id.Emitter, Sound, Priority, false);

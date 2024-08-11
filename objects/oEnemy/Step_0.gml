@@ -557,7 +557,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			Weapon.image_index = 3;
 		break;
 			
-		case "Steyr SSG 08":
+		case "SSG 08":
 			Weapon.image_index = 4;
 		break;
 			
@@ -569,7 +569,7 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			Weapon.image_index = 6;
 		break;
 			
-		case "FGM-148 Javelin":
+		case "FGM-148":
 			Weapon.image_index = 7;
 		break;
 			
@@ -759,6 +759,8 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 
 #region Death
 if(stats.Health_points <= 0){
+	var death_sound_effect = choose(snd_Death1, snd_Death2);
+	play_sound(x, y, death_sound_effect);
     if (ChasingObject.HitMap[? id]) {
         ds_map_delete(ChasingObject.HitMap, id);
     }

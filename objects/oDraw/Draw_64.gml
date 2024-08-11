@@ -1,174 +1,8 @@
 draw_set_font(set_font("Console"));
 var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
-	
-#region Slot
-with(oSlot){
-	var scale = 1 * global.GUIMultiplier;
-	var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-	var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-	var Id = global.Inventory[# VarSlot, Index.slot_id];
-	var Amount = global.Inventory[# VarSlot, Index.SlotAmount];
-	var xx2 = (mouse_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-	var yy2 = (mouse_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-	var Ammo = global.Inventory[# VarSlot, Index.slot_ammo];
-	var ClipAmmo = global.Inventory[# VarSlot, Index.slot_clip_ammo];
-	var Durability = global.Inventory[# VarSlot, Index.slot_durability];
-	var MouseID = global.MouseSlot[# 0, Index.slot_id];
-	var MouseAmount = global.MouseSlot[# 0, Index.SlotAmount];
-	var slot_alpha = global.GUIHUDAlpha*2.75;
-
-	draw_sprite_ext(sprite_index, image_index, xx, yy, scale, scale, 0, image_blend, slot_alpha);
-	if (Id != Item.None){ 
-	    draw_sprite_ext(spr_Items, Id, xx + sprite_get_width(spr_Slot)/2*scale, yy + sprite_get_height(spr_Slot)/2*scale, scale, scale, 0, c_white, slot_alpha);
-		draw_set_alpha(slot_alpha);
-		
-		if(VarSlot < OtherSlot.Primary){
-			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
-		}
-		
-		draw_set_alpha(1);
-	}
-	
-	if(instance_exists(oPlayer)){
-		if(VarSlot == oPlayer.WeaponID){
-			draw_sprite_ext(sprite_index, 8, xx, yy, scale, scale, 0, image_blend, slot_alpha);
-		}
-	}
-	
-	if (global.MouseSlot[# 0, Index.slot_id] != Item.None){
-	    draw_sprite_ext(spr_Items, global.MouseSlot[# 0, Index.slot_id], xx2, yy2, scale, scale, 0, c_white, slot_alpha);
-	} 
-	
-	
-	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
-		image_blend = MAIN_COLOR;
-		
-		if(mouse_check_button_pressed(mb_left) && MouseID == Item.None){
-			item_description_destroy();
-			if(oDraw.DrawInfo == true){
-				oDraw.DrawInfo = false;
-			}
-			with(oSlot){
-				DrawItemInfo = false;
-			}
-			if(VarSlot < OtherSlot.Primary){
-				oPlayer.item_use_position = VarSlot;
-			}
-			DrawItemInfo = true;	
-		}
-		
-		if(mouse_check_button_pressed(mb_right)){
-			item_description_destroy();
-			if(oDraw.DrawInfo == true){
-				oDraw.DrawInfo = false;
-			}
-			with(oSlot){
-				DrawItemInfo = false;
-			}
-
-			if(VarSlot <= INVENTORY_SIZE){
-				
-				#region Usable slots item switching
-				if (Id == 0 || MouseID == 0 || Id != MouseID || (Id == MouseID && global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield" || global.ItemIndex[#Id, ItemStat.Type] == "Weapon")){
-					item_swap("mouse", VarSlot);
-				}else if (Id == MouseID){
-					global.Inventory[# VarSlot, 1] += global.MouseSlot[# 0, Index.SlotAmount];
-					global.MouseSlot[# 0, Index.slot_id] = Item.None;
-					global.MouseSlot[# 0, Index.SlotAmount] = 0;
-				}
-				#endregion
-			
-			}else if(VarSlot == OtherSlot.Primary){
-			
-				#region Primary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary")) {
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary") {
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}else if(VarSlot == OtherSlot.Secondary){
-				
-				#region Secondary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary")) {
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary") {
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}else if(VarSlot == OtherSlot.Knife){
-				
-				#region Knife equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary")) {
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary") {
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}else if(VarSlot == OtherSlot.Helmet){
-				
-				#region Helmet equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet")) {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet") {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}else if(VarSlot == OtherSlot.Armour){
-				
-				#region Armour equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Armour")) {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Armour") {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}else if(VarSlot == OtherSlot.Shield){
-				
-				#region Shield equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Shield")) {
-				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Shield") {
-				    item_swap("mouse", VarSlot);
-				}
-				#endregion
-				
-			}		
-		}
-	}else{
-		image_blend = c_white;
-	}
-}
-
-#endregion
 
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
-	
-	#region Draw shooting mode
-	if(global.Inventory[# oPlayer.WeaponID, Index.slot_id] != Item.None && !instance_exists(oInventory)){ 
-		var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootingMode], oPlayer.weapon_shooting_mode) + 
-									"[" + keycode_to_string(global.KeyBinds[| KeyBind.KeyChangeMode]) + "]";
-		var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
-		var shooting_mode_y = display_get_gui_height() - HUDShift*2;
-		draw_text_outlined(shooting_mode_x, shooting_mode_y, shooting_mode_string, c_white, c_black, 1);
-	}
-	#endregion
 	
 	#region Draw lens flare
 	if(instance_exists(oObjectLamp)){
@@ -470,6 +304,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 
 		if!(instance_exists(oInventory)){
 			
+			#region Draw shooting mode
+			if(global.Inventory[# oPlayer.WeaponID, Index.slot_id] != Item.None){ 
+				var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootingMode], oPlayer.weapon_shooting_mode) + 
+											"[" + keycode_to_string(global.KeyBinds[| KeyBind.KeyChangeMode]) + "]";
+				var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
+				var shooting_mode_y = display_get_gui_height() - HUDShift*2;
+				draw_text_outlined(shooting_mode_x, shooting_mode_y, shooting_mode_string, c_white, c_black, 1);
+			}
+			#endregion
+			
 			#region Draw item switching outside of inventory
 			if(global.Inventory[#oPlayer.item_use_position, Index.slot_id] != Item.None){
 				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Left ";
@@ -764,6 +608,162 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 	}
 
 }
+
+#region Slot
+with(oSlot){
+	var scale = 1 * global.GUIMultiplier;
+	var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+	var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+	var Id = global.Inventory[# VarSlot, Index.slot_id];
+	var Amount = global.Inventory[# VarSlot, Index.SlotAmount];
+	var xx2 = (mouse_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+	var yy2 = (mouse_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+	var Ammo = global.Inventory[# VarSlot, Index.slot_ammo];
+	var ClipAmmo = global.Inventory[# VarSlot, Index.slot_clip_ammo];
+	var Durability = global.Inventory[# VarSlot, Index.slot_durability];
+	var MouseID = global.MouseSlot[# 0, Index.slot_id];
+	var MouseAmount = global.MouseSlot[# 0, Index.SlotAmount];
+	var slot_alpha = global.GUIHUDAlpha*2.75;
+
+	draw_sprite_ext(sprite_index, image_index, xx, yy, scale, scale, 0, image_blend, slot_alpha);
+	if (Id != Item.None){ 
+	    draw_sprite_ext(spr_Items, Id, xx + sprite_get_width(spr_Slot)/2*scale, yy + sprite_get_height(spr_Slot)/2*scale, scale, scale, 0, c_white, slot_alpha);
+		draw_set_alpha(slot_alpha);
+		
+		if(VarSlot < OtherSlot.Primary){
+			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
+		}
+		
+		draw_set_alpha(1);
+	}
+	
+	if(instance_exists(oPlayer)){
+		if(VarSlot == oPlayer.WeaponID){
+			draw_sprite_ext(sprite_index, 8, xx, yy, scale, scale, 0, image_blend, slot_alpha);
+		}
+	}
+	
+	if (global.MouseSlot[# 0, Index.slot_id] != Item.None){
+	    draw_sprite_ext(spr_Items, global.MouseSlot[# 0, Index.slot_id], xx2, yy2, scale, scale, 0, c_white, slot_alpha);
+	} 
+	
+	
+	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
+		image_blend = MAIN_COLOR;
+		
+		if(mouse_check_button_pressed(mb_left) && MouseID == Item.None){
+			item_description_destroy();
+			if(oDraw.DrawInfo == true){
+				oDraw.DrawInfo = false;
+			}
+			with(oSlot){
+				DrawItemInfo = false;
+			}
+			if(VarSlot < OtherSlot.Primary){
+				oPlayer.item_use_position = VarSlot;
+			}
+			DrawItemInfo = true;	
+		}
+		
+		if(mouse_check_button_pressed(mb_right)){
+			item_description_destroy();
+			if(oDraw.DrawInfo == true){
+				oDraw.DrawInfo = false;
+			}
+			with(oSlot){
+				DrawItemInfo = false;
+			}
+
+			if(VarSlot <= INVENTORY_SIZE){
+				
+				#region Usable slots item switching
+				if (Id == 0 || MouseID == 0 || Id != MouseID || (Id == MouseID && global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield" || global.ItemIndex[#Id, ItemStat.Type] == "Weapon")){
+					item_swap("mouse", VarSlot);
+				}else if (Id == MouseID){
+					global.Inventory[# VarSlot, 1] += global.MouseSlot[# 0, Index.SlotAmount];
+					global.MouseSlot[# 0, Index.slot_id] = Item.None;
+					global.MouseSlot[# 0, Index.SlotAmount] = 0;
+				}
+				#endregion
+			
+			}else if(VarSlot == OtherSlot.Primary){
+			
+				#region Primary equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary")) {
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary") {
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}else if(VarSlot == OtherSlot.Secondary){
+				
+				#region Secondary equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary")) {
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary") {
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}else if(VarSlot == OtherSlot.Knife){
+				
+				#region Knife equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary")) {
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary") {
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}else if(VarSlot == OtherSlot.Helmet){
+				
+				#region Helmet equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet")) {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet") {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}else if(VarSlot == OtherSlot.Armour){
+				
+				#region Armour equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Armour")) {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Armour") {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}else if(VarSlot == OtherSlot.Shield){
+				
+				#region Shield equip and dequip
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Shield")) {
+				    item_swap("mouse", VarSlot);
+				    Id = Item.None;
+				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Shield") {
+				    item_swap("mouse", VarSlot);
+				}
+				#endregion
+				
+			}		
+		}
+	}else{
+		image_blend = c_white;
+	}
+}
+
+#endregion
 
 #region Flashed
 if(RespawnMenu == false){

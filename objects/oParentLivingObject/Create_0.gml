@@ -1,4 +1,6 @@
 event_inherited();
+hit_timer = -1;
+WeaponDistance = 0;
 aimpunch_speed_multiplier = 1; //Musí se definovat v create eventu, protože s ním pracujeme i mimo klasický scope
 attack_damage = 0;
 RotationAngle = random(360);

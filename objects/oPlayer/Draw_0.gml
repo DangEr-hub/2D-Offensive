@@ -1,5 +1,3 @@
-/// @description Drawing
-draw_text(x, y + 70, global.player_stats_struct.Weight);
 event_inherited();
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -13,10 +11,12 @@ if(stats.Health_points > 0){
 		armour_sprite_index = 3;
 	}else if(image_index == player_textures.flashed_no_weapon){
 		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload || image_index == player_textures.knife){
+	}else if(image_index == player_textures.reload){
 		armour_sprite_index = 7;
-	}else if(image_index >= player_textures.prone){
+	}else if(image_index >= player_textures.prone && image_index < player_textures.knife){
 		armour_sprite_index = 5;
+	}else if(image_index == player_textures.knife){
+		armour_sprite_index = 9;
 	}
 	
 	if(image_index == player_textures.flashed_prone || image_index == player_textures.flashed_prone_second || image_index == player_textures.flashed_prone_third){
@@ -43,7 +43,7 @@ if(stats.Health_points > 0){
 	
 	
 	var helmet_sprite_index = 0;
-	if(image_index >= player_textures.prone){
+	if(image_index >= player_textures.prone && image_index < player_textures.knife){
 		helmet_sprite_index = 6;	
 	}
 

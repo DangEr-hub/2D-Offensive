@@ -321,6 +321,7 @@
     {"id":{"name":"snd_Famas","path":"sounds/snd_Famas/snd_Famas.yy",},},
     {"id":{"name":"spr_Weapon","path":"sprites/spr_Weapon/spr_Weapon.yy",},},
     {"id":{"name":"oEnemyDead","path":"objects/oEnemyDead/oEnemyDead.yy",},},
+    {"id":{"name":"hitboxes","path":"scripts/hitboxes/hitboxes.yy",},},
     {"id":{"name":"oMachineGun","path":"objects/oMachineGun/oMachineGun.yy",},},
     {"id":{"name":"oInventory","path":"objects/oInventory/oInventory.yy",},},
     {"id":{"name":"oStatisticsTab","path":"objects/oStatisticsTab/oStatisticsTab.yy",},},

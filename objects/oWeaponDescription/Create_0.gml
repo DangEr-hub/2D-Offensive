@@ -34,7 +34,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Dequip";
+	caption = "Unequip";
 	if(oDraw.var_slot < OtherSlot.Primary){
 		caption = "Equip";
 	}
@@ -48,26 +48,96 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 		switch(global.ItemIndex[#Id, ItemStat.Type]){
 				
 			case "Weapon":
-			
-			#region Primary equip and dequip
-			var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
-			if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
-				item_swap("item_use_position", OtherSlot.Primary);
-				primary_slot_id = Item.None;
-			} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
-				item_swap("item_use_position", OtherSlot.Primary);
-			}
-			#endregion
+						
+			if(oDraw.var_slot < OtherSlot.Primary){
 				
-			#region Secondary equip and dequip
-			var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
-			if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
-				item_swap("item_use_position", OtherSlot.Secondary);
-				secondary_slot_id = Item.None;
-			} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
-				item_swap("item_use_position", OtherSlot.Secondary);
+				#region Primary equip
+				var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+					item_swap("item_use_position", OtherSlot.Primary);
+					primary_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+					item_swap("item_use_position", OtherSlot.Primary);
+				}
+				#endregion
+				
+				#region Secondary equip
+				var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
+				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+					item_swap("item_use_position", OtherSlot.Secondary);
+					secondary_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+					item_swap("item_use_position", OtherSlot.Secondary);
+				}
+				#endregion
+				
+				#region Knife equip
+				var knife_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
+				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
+					item_swap("item_use_position", OtherSlot.Knife);
+					knife_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
+					item_swap("item_use_position", OtherSlot.Knife);
+				}
+				#endregion
+				
+			}else{
+				
+				#region Primary dequip
+				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary"){
+					GainItem(
+						Id,
+						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
+						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_durability],
+						global.Inventory[# oDraw.var_slot, Index.slot_scope],
+						global.Inventory[# oDraw.var_slot, Index.slot_barrel],
+						global.Inventory[# oDraw.var_slot, Index.slot_grip],
+						global.Inventory[# oDraw.var_slot, Index.slot_suppressor],
+						false
+					);
+					item_swap("description_button", OtherSlot.Primary);
+				}
+				#endregion
+				
+				#region Secondary dequip
+				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary"){
+					GainItem(
+						Id,
+						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
+						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_durability],
+						global.Inventory[# oDraw.var_slot, Index.slot_scope],
+						global.Inventory[# oDraw.var_slot, Index.slot_barrel],
+						global.Inventory[# oDraw.var_slot, Index.slot_grip],
+						global.Inventory[# oDraw.var_slot, Index.slot_suppressor],
+						false
+					);
+					item_swap("description_button", OtherSlot.Secondary);
+				}
+				#endregion
+				
+				#region Knife dequip
+				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary"){
+					GainItem(
+						Id,
+						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
+						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo],
+						global.Inventory[# oDraw.var_slot, Index.slot_durability],
+						global.Inventory[# oDraw.var_slot, Index.slot_scope],
+						global.Inventory[# oDraw.var_slot, Index.slot_barrel],
+						global.Inventory[# oDraw.var_slot, Index.slot_grip],
+						global.Inventory[# oDraw.var_slot, Index.slot_suppressor],
+						false
+					);
+					item_swap("description_button", OtherSlot.Knife);
+				}
+				#endregion
+				
 			}
-			#endregion
 				
 			break;
 		}

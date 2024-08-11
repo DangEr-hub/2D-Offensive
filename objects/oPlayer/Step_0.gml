@@ -50,7 +50,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	stamina_inaccuracy = 1;
 	if (!global.my_console[? "active"] && global.Inventory[# WeaponID, Index.slot_id] != Item.None){
 		if(keyboard_check(global.KeyBinds[| KeyBind.KeyHoldStamina]) && stats.Stamina_points > 0){
-			stats.Stamina_points -= STAMINA_HOLD_VALUE;
+			statistics_hit("Stamina", STAMINA_HOLD_VALUE, id);
 			stamina_inaccuracy = .5;
 		}
 	}
@@ -313,9 +313,19 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		
 		#region Camera shake using camera angle
 		
+			#region Knife camera shake
+			if(knife_attack_timer >= global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] * .5){
+				GunCrossShake = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CrosshairShake];
+			    ViewAngleAmplitude += global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
+			    GunViewAngleFrequency = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.CameraShake];
+			}
+			#endregion
+		
 			#region Low stamina camera shake
-			LowStaminaViewAngleFrequency = 10 - ((stats.Stamina_points/global.player_stats_struct.Max_stamina)*10);
-			ViewAngleAmplitude += 1 - (stats.Stamina_points/global.player_stats_struct.Max_stamina);
+			if(stats.Stamina_points <= global.player_stats_struct.Max_stamina * .75){
+				LowStaminaViewAngleFrequency = 2 - ((stats.Stamina_points/global.player_stats_struct.Max_stamina));
+				ViewAngleAmplitude += 1 - (stats.Stamina_points/global.player_stats_struct.Max_stamina);
+			}
 			#endregion
 		
 			#region Gun camera shake
@@ -359,7 +369,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 		
 			#region Final calculation
-			var ViewAngleFrequency = GunViewAngleFrequency + AimPunchViewAngleFrequency + ExplosionViewAngleFrequency + LowHPViewAngleFrequency;
+			var ViewAngleFrequency = GunViewAngleFrequency + AimPunchViewAngleFrequency + ExplosionViewAngleFrequency + LowHPViewAngleFrequency + LowStaminaViewAngleFrequency;
 			ViewAngleAmplitude *= ViewAngleDamping;
 		
 			if (ViewAngleAmplitude > 0.01) {
@@ -505,32 +515,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
 	#endregion
 	
-	#region Knife attacking
-	
-		if(Knife.image_index != 0){
-			
-			#region Light attack
-			if(mouse_check_button_pressed(mb_left) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
-				if(knife_attack_timer == -1){
-					knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed];
-					stats.Stamina_points -= STAMINA_KNIFE_LIGHT;
-				}
-			}
-			#endregion
-		
-			#region Heavy attack
-			if(mouse_check_button_pressed(mb_right) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
-				if(knife_attack_timer == -1){
-					knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] * 2;
-					stats.Stamina_points -= STAMINA_KNIFE_HEAVY;
-				}
-			}
-			#endregion
-		
-		}
-		
-	#endregion
-	
 	#region Texture
 	
 		#region Knife texture
@@ -563,7 +547,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Weapon.image_index = 3;
 			break;
 			
-			case "Steyr SSG 08":
+			case "SSG 08":
 				Weapon.image_index = 4;
 			break;
 			
@@ -575,7 +559,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				Weapon.image_index = 6;
 			break;
 			
-			case "FGM-148 Javelin":
+			case "FGM-148":
 				Weapon.image_index = 7;
 			break;
 			
@@ -984,7 +968,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				break;
 				#endregion
 			
-				#region Machine gun
+				#region Machine gun texture
 				case "Machine gun":
 					HeadHitBox.image_index = HitBox.Head;
 					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
@@ -1004,8 +988,29 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					WeaponDistance = 150;
 				break;
 				#endregion
+				
+				#region Knife texture
+				case "Knife":
+					HeadHitBox.image_index = HitBox.Head;
+					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+					if(Flashed == false){
+						if(knife_attack_timer == -1){
+							image_index = player_textures.no_weapon;
+							ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+						}else{
+							image_index = player_textures.knife;
+							ArmHitBox.image_index = HitBox.ArmKnife;
+						}
+					}else{
+						image_index = player_textures.flashed_no_weapon;
+						ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
+					}
+				
+					WeaponDistance = 0;
+				break;
+				#endregion
 
-				#region Default, knife texture
+				#region Default texture
 				default:
 					if(moving_state != player_states.prone_state){
 						HeadHitBox.image_index = HitBox.Head;
@@ -1170,8 +1175,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					sound_id = snd_Silencer;
 				}
 				ShootTimer = ceil(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);
-				player_shooting();									
-				audio_play_sound(sound_id, false, 0);
+				player_shooting();		
+				play_sound(x, y, sound_id);
 				Weapon.KickBackEffect = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.KickBackPower];
 				KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 				KickBack ++;
@@ -1191,7 +1196,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		if(global.Inventory[# WeaponID, Index.slot_id] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != player_states.mortar_state && item_equip_timer == -1){
 			if (player_can_shoot == true && !global.my_console[? "active"]) {
 				if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
-					audio_play_sound(snd_empty_magazine, 0, false);	
+					play_sound(x, y, snd_empty_magazine);
 				}
 			    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense] == 1))){
 				
@@ -1229,7 +1234,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 								}
 								ShootTimer = ceil(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
 								player_shooting();
-								audio_play_sound(sound_id, false, 0);
+								play_sound(x, y, sound_id);
 								Weapon.KickBackEffect = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.KickBackPower];
 								KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 								KickBack ++;
@@ -1414,6 +1419,64 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 	#endregion
 	
+	#region Knife
+	
+	if(knife_attack_timer >= global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] - 1){
+		var wall_object = instance_nearest(Knife.x, Knife.y, oParentTile);
+		if(instance_exists(wall_object)){
+			var hitbox_corners = get_hitbox_corners(Knife, 25, 50, 20, Knife.stats.Object.RotationAngle);
+			var min_x = min(hitbox_corners[0][0], hitbox_corners[1][0], hitbox_corners[2][0], hitbox_corners[3][0]);
+			var max_x = max(hitbox_corners[0][0], hitbox_corners[1][0], hitbox_corners[2][0], hitbox_corners[3][0]);
+			var min_y = min(hitbox_corners[0][1], hitbox_corners[1][1], hitbox_corners[2][1], hitbox_corners[3][1]);
+			var max_y = max(hitbox_corners[0][1], hitbox_corners[1][1], hitbox_corners[2][1], hitbox_corners[3][1]);
+
+			 if (collision_rectangle(min_x, min_y, max_x, max_y, wall_object, true, false)) {
+				var wall_sound = snd_BulletConcrete;
+				var wall_particles = irandom_range(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage], global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage]*2);
+				if(wall_object.Type == "Metal"){
+					wall_sound = snd_BulletMetal;
+				}
+				if!(audio_is_playing(wall_sound)){
+					play_sound(Knife.x, Knife.y, wall_sound);
+				}	
+			}
+		}
+	}
+	
+	if(Knife.image_index != 0){
+		
+		if(player_can_shoot == true){
+			
+		#region Light attack
+		if(mouse_check_button_pressed(mb_left) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
+			if(knife_attack_timer == -1){
+				knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed];
+				Knife.stats.Reward = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.reward];
+				Knife.stats.Hit_timer = knife_attack_timer*2;
+				Knife.stats.Damage = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage];	
+				statistics_hit("Stamina", STAMINA_KNIFE_LIGHT * global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ClipAmmo], id);
+			}
+		}
+		#endregion
+		
+		#region Heavy attack
+		if(mouse_check_button_pressed(mb_right) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
+			if(knife_attack_timer == -1){
+				knife_attack_timer = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed];
+				Knife.stats.Reward = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.reward];
+				Knife.stats.Hit_timer = knife_attack_timer*2;
+				Knife.stats.Damage = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage]*2;	
+				statistics_hit("Stamina", STAMINA_KNIFE_HEAVY * global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ClipAmmo], id);
+			}
+		}
+		#endregion
+		
+		}
+		
+	}
+		
+	#endregion
+	
 	#region Object push player
 	if(place_meeting(x, y, oEnemy)) {
 	    var Enemy = instance_nearest(x, y, oEnemy);
@@ -1500,8 +1563,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						global.weapon_attachments[0][weapon_attachments.weapon_barrel] = machine_gun.stats.Slot_barrel;
 						global.weapon_attachments[0][weapon_attachments.weapon_grip] = machine_gun.stats.Slot_grip;
 						global.weapon_attachments[0][weapon_attachments.weapon_suppressor] = machine_gun.stats.Slot_suppressor;
-						global.Inventory[# Other.Primary, Index.slot_ammo] = machine_gun.stats.Ammo;
-						global.Inventory[# Other.Primary, Index.slot_clip_ammo] = machine_gun.stats.Clip_ammo;
+						global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = machine_gun.stats.Ammo;
+						global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = machine_gun.stats.Clip_ammo;
 						global.ItemIndex[# global.Inventory[# OtherSlot.Primary, Index.slot_id], ItemStat.MaxAmmo] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.MaxAmmo];
 						#endregion
 						
@@ -1520,8 +1583,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						machine_gun.stats.Slot_barrel = global.weapon_attachments[0][weapon_attachments.weapon_barrel];
 						machine_gun.stats.Slot_grip = global.weapon_attachments[0][weapon_attachments.weapon_grip];
 						machine_gun.stats.Slot_suppressor = global.weapon_attachments[0][weapon_attachments.weapon_suppressor];
-						machine_gun.stats.Ammo = global.Inventory[# Other.Primary, Index.slot_ammo];
-						machine_gun.stats.Clip_ammo = global.Inventory[# Other.Primary, Index.slot_clip_ammo];
+						machine_gun.stats.Ammo = global.Inventory[# OtherSlot.Primary, Index.slot_ammo];
+						machine_gun.stats.Clip_ammo = global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo];
 						if(oDraw.show_weapon_attachments == true){
 							player_can_shoot = true;
 							oDraw.show_weapon_attachments = false;
@@ -1568,31 +1631,6 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	#endregion
 	
-	#region Knife
-	var knife_offset_x = 40;
-	var knife_offset_y = -5;
-	if(knife_attack_timer != -1 || Flashed == true){
-		knife_offset_x = 35;
-		knife_offset_y = 17;
-	}
-	
-	if(moving_state == player_states.prone_state){
-		knife_offset_x = 100;
-		knife_offset_y = -3;
-		
-		if(knife_attack_timer != -1 || Flashed == true){
-			knife_offset_x = 100;
-			knife_offset_y = 34;
-		}
-	}
-	var knife_x = x + lengthdir_x(knife_offset_x, RotationAngle) - lengthdir_y(knife_offset_y, RotationAngle);
-	var knife_y = y + lengthdir_y(knife_offset_x, RotationAngle) + lengthdir_x(knife_offset_y, RotationAngle);
-
-	// Update the knife's position
-	Knife.x = knife_x;
-	Knife.y = knife_y;
-	#endregion
-	
 	#region Toggle night vision and infrared vision
 	if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.None){
 		if(ToggleNightVision == true){
@@ -1630,6 +1668,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Flashed
 	if(Flashed == true){
+		knife_attack_timer = -1;
 		if(Reloading == true){
 			ReloadTime = 0;
 			Reloading = false;
@@ -1638,9 +1677,12 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	}
 	if(FlashedAlpha <= 0.075){
 		if(sprite_exists(FlashedBackGround) && FlashedBackGround != -1){sprite_delete(FlashedBackGround);}
+		flashed_muffled_sounds = 1;
 		FlashedAlpha = 0;
 		Flashed = false;
 		FlashedBackGround = -1;
+	}else{
+		flashed_muffled_sounds = lerp(flashed_muffled_sounds, FLASHED_MUFFLE_VALUE, 0.01);	
 	}
 	#endregion
 	

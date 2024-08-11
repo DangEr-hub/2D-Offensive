@@ -23,7 +23,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -other.button_height/4 - 8;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -49,7 +49,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -76,7 +76,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -102,7 +102,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -128,7 +128,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);
@@ -154,7 +154,7 @@ for(i=0;i<item_number;i++){
 		zui_set_anchor(0.5, 0);
 		caption_color = MAIN_COLOR;
 		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]) + " (" + string(global.ItemIndex[#other.items[other.i], ItemStat.Cost]) + ")";
+		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
 	}
 	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
 		zui_set_size(other.button_width, other.button_height);

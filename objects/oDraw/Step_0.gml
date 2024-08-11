@@ -7,7 +7,7 @@ if(instance_exists(oPlayer)){
 		bloom_threshold = .35;
 	}
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu)){
+	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
 		if(PauseMenu == false){
 
 			pause(id);
@@ -22,6 +22,14 @@ if(instance_exists(oPlayer)){
 		if(oPlayer.player_can_shoot == false){
 			oPlayer.player_can_shoot = true;
 		}
+		
+		if(instance_exists(oMortarMenu)){
+			with(oMortarMenu){
+				zui_destroy();
+			}
+			oPlayer.moving_state = player_states.none_state;
+		}
+		
 		if(instance_exists(oBuyMenu)){
 			if(instance_exists(oBuyMenuDescription)){
 				with(oBuyMenuDescription){

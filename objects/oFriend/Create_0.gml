@@ -23,7 +23,6 @@ Weapon = noone;
 WX = 8;
 WY = 8;
 KickBackAngle = 0;
-WeaponDistance = 0;
 WeaponNumber = 0;
 WeaponNumberMax = 5;
 HPTimer = -1;

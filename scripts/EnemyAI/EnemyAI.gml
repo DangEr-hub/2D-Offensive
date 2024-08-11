@@ -2,7 +2,7 @@
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enemy"){
 	
-	var shoot_inaccuracy = 1;
+	var shoot_inaccuracy = .5;
 	if(Type == "Enemy"){
 		if(collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false)){
 			shoot_inaccuracy = random_range(5, 7) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
