@@ -1,6 +1,8 @@
+randomize();
 global.my_console = console_create();
 global.gold_color = make_color_rgb(255, 215, 0);
 global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
+global.aberration_level = 0;
 global.saturation_level = 1.9;
 global.InventoryEquipLeftTopCorner = [-1, -1];
 global.InventoryEquipRightBottomCorner = [-1, -1];

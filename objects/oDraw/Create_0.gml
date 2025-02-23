@@ -1,6 +1,8 @@
 application_surface_draw_enable(false);
 draw_texture_flush();
+aberration_level = 0;
 saturation_level = 0;
+bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
 KilledByWeapon = "Nothing";
 KilledByName = "No one";
 var_slot = 0;
@@ -20,7 +22,7 @@ show_weapon_attachments = false;
 #endregion
 
 #region Bokeh effect
-randomize();
+
 numParticles = 50; 
 for (var i = 0; i < numParticles; i++) {
     bokehProperties[i, 0] = random(global.GuiW);

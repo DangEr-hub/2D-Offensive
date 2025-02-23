@@ -360,10 +360,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			#endregion
 		
 			#region Low health camera shake
-			if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/3)){
+			if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/2)){
 				LowHPCrossShake = 1;
-				ViewAngleAmplitude += 1;
-				LowHPViewAngleFrequency = 100;
+				ViewAngleAmplitude += 0.5;
+				LowHPViewAngleFrequency = 75;
 			}
 			#endregion
 			
@@ -593,6 +593,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 			case "FAMAS":
 				Weapon.image_index = 15;
+			break;
+			
+			case "TEC-9":
+				Weapon.image_index = 16;
 			break;
 			
 			default:
@@ -1213,7 +1217,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				
 				        if(CanShoot == true){
 					
-							randomize();
+							
 					
 							if(shooting_mode == "Burst"){
 						
@@ -1421,7 +1425,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Knife
 	
-	if(knife_attack_timer >= global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] - 1){
+	if(knife_attack_timer >= global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed] - 1 && global.Inventory[# WeaponID, Index.slot_id] != Item.None){
 		var wall_object = instance_nearest(Knife.x, Knife.y, oParentTile);
 		if(instance_exists(wall_object)){
 			var hitbox_corners = get_hitbox_corners(Knife, 25, 50, 20, Knife.stats.Object.RotationAngle);
@@ -1842,7 +1846,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					global.ItemIndex[#Id, ItemStat.BulletCasingID], global.ItemIndex[#Id, ItemStat.ReloadSpeed], oCrosshair.x, oCrosshair.y, Id);						
 					ItemAmountSubstract(item_use_position, 1);
 					EquippedGrenadeTimer = EquippedGrenadeTime;
-					randomize();
+					
 					grenade_angle = random(360);
 				}
 				#endregion
@@ -2146,6 +2150,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		camera_get_view_height(CAMERA) + 2 * ACTIVATE_MARGIN,
 		true
 	);
+	instance_activate_object(obj_hazeC);
 	instance_activate_object(oParentTile);
 	instance_activate_object(objUITextInput);
 	instance_activate_object(oMortarMenu);

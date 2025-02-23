@@ -114,7 +114,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 		ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
 	}
 		
-		randomize();
+		
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
 			if(hit_object.object_index == oEnemy){
 				global.player_stats_struct.Money += global.ItemIndex[#Bullet.stats.Item_id, ItemStat.reward];
@@ -144,7 +144,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 
 	
 		if(hit_object.object_index == oPlayer){
-			hit_object.AimPunchDir = irandom(3);
+			hit_object.AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
 		}else{
 			if(global.ranked_game == true){
 				global.player_stats_struct.Hit_shots ++;
@@ -229,7 +229,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				}
 			}
 		}
-		damage_indicator("-" + string(hit_object.attack_damage), BloodSplashX, BloodSplashY, c_white, spr_Icons, icons.health);
+		damage_indicator("-" + string(ceil(hit_object.attack_damage)), BloodSplashX, BloodSplashY, c_white, spr_Icons, icons.health);
 		hit_object.attack_damage = 0; ///Nezapomenout vynulovat!!!!!
 	}
 }

@@ -35,7 +35,7 @@ function choose_offensive_action() {
     }
 }
 
-randomize();
+
 alarm[0] = random_range(15, 25);
 if(instance_exists(ChasingObject) && ChasingObject != noone){
 	if(check_if_available(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){

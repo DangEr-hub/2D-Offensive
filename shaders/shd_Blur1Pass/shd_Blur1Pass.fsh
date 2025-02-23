@@ -1,6 +1,6 @@
 varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
-uniform vec3 size;//width,height,radius
+uniform vec3 size;
 
 const int Quality = 4;
 const int Directions = 4;

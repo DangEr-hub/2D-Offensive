@@ -64,6 +64,8 @@ function check_if_available(ObjectType) {
         if (angle_diff > -90 && angle_diff < 90) {
             rotation = true;
         }
+		
+		
         
         return 
         (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.hidden == false && 
@@ -90,7 +92,7 @@ function ChasingObjectSpot(Time){
 }
 
 function bot_move_shooting(DangerX, DangerY){
-	randomize();
+	
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		SideStepMin = 45;
 		SideStepMax = 180 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
@@ -198,7 +200,7 @@ function EnemyShooting(DangerX, DangerY){
 }
 	
 function MoveRandom(){
-	randomize();
+	
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		MoveDirection = random(360);
 		MoveTime = random_range(50, 90) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
@@ -255,7 +257,7 @@ function move_predictive(PositionX, PositionY) {
 
 
 function MoveIdle(){
-	randomize();
+	
 	var margin = 32;
 	var distance = random_range(0, 128);
 	MoveDirection = random(360);
@@ -285,7 +287,7 @@ function set_state(state){
 }
 
 function MoveTowards(DangerX, DangerY, Accel, SideStepMin = 1, SideStepMax = 90){	
-	randomize();
+	
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == "Assault rifle"){
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 		MoveTime = random_range(25, 45);
@@ -349,7 +351,7 @@ function reload_ai(){
 }
 	
 function EnemyThrowGrenade(DangerX, DangerY){
-	randomize();
+	
 	SideStepMin = 0;
 	SideStepMax = 30;
 	MoveDirection = point_direction(x, y, DangerX, DangerY) - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
@@ -360,7 +362,7 @@ function EnemyThrowGrenade(DangerX, DangerY){
 }
 
 function EnemyLayDownLandMine(){
-	randomize();
+	
 	SideStepMin = 0;
 	SideStepMax = 30;
 	MoveDirection = MoveDirection - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
@@ -371,7 +373,7 @@ function EnemyLayDownLandMine(){
 }
 
 function ChooseGrenade(){
-	randomize();
+	
 	Grenade = irandom(2);
 	
 	switch(Grenade){
@@ -392,7 +394,7 @@ function ChooseGrenade(){
 }
 
 function ChooseLandMine(){
-	randomize();
+	
 	LandMine = choose(0, 4, 8);
 	
 	switch(LandMine){

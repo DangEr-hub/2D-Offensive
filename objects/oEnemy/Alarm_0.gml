@@ -60,7 +60,7 @@ function choose_offensive_action() {
 
 
 if(instance_exists(ChasingObject) && ChasingObject != noone){
-    randomize();
+    
     alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 	
 	if(check_if_available(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
@@ -279,29 +279,6 @@ if(global.EnemyCanMove == true){
 	#endregion	
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	
 }

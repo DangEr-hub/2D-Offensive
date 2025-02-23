@@ -1,6 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
-randomize();
+
 var cam_x = camera_get_view_x(CAMERA);
 var cam_y = camera_get_view_y(CAMERA);
 var cam_width = camera_get_view_width(CAMERA);

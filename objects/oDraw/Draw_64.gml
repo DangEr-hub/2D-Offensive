@@ -29,27 +29,6 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			} else if (surface_get_width(BlackoutSurface) != SurfaceWidth || surface_get_height(BlackoutSurface) != SurfaceHeight) {
 				surface_resize(BlackoutSurface, SurfaceWidth, SurfaceHeight);
 			}
-					
-			#region Zoom unused
-			/*ZoomValue = lerp(ZoomValue, scope_zoom_value, 0.01);
-		    var captureWidth = ScopeRadius*4;
-		    var captureHeight = ScopeRadius*4;
-		    var captureX = oCrosshair.crosshair_x - captureWidth / 2;
-		    var captureY = oCrosshair.crosshair_y - captureHeight / 2;
-
-		    // Check if surface exists and then set its target
-		    if (surface_exists(zoomSurface)) {
-		        surface_set_target(zoomSurface);
-		        draw_surface_part_ext(application_surface, captureX, captureY, captureWidth, captureHeight, 0, 0, 1, 1, c_olive, 1);
-		        surface_reset_target();
-		    }else{
-				zoomSurface = surface_create(captureWidth, captureHeight);
-			}
-			shader_set(shd_Zoom);
-			shader_set_uniform_f(shader_get_uniform(shd_Zoom, "u_zoomFactor"), ZoomValue); // Adjust this for the zoom level you want
-		    draw_surface(zoomSurface, captureX, captureY);
-			shader_reset();*/
-			#endregion
 			
 			#region Fish eye zoom
 			var scope_zoom_value = 1.5;
@@ -296,8 +275,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		#region Draw aimpunch
 		if(instance_exists(oPlayer)){
 			if(oPlayer.AimPunchTimer > -1){
+				var scale = choose(-1, 1);
 				draw_sprite_ext(spr_AimPunch, oPlayer.AimPunchDir, 0, 0, global.GuiW/sprite_get_width(spr_AimPunch),
-				global.GuiH/sprite_get_height(spr_AimPunch), 0, c_white, .75);	
+				global.GuiH/sprite_get_height(spr_AimPunch), 0, c_white, 1);	
 			}
 		}
 		#endregion	

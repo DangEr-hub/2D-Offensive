@@ -140,7 +140,7 @@ function InventoryInit() {
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4a1, awm, usp, base_explosion,
-		nuclear_explosion, basic_machine_gun, galil, p250, m4_carbine, famas, MolotovGrenade, steel_knife, Total
+		nuclear_explosion, basic_machine_gun, galil, p250, m4_carbine, famas, MolotovGrenade, steel_knife, tec9, Total
 	}
 
 	enum ItemStat{

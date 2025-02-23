@@ -1,5 +1,5 @@
 event_inherited();
-randomize();
+
 Visible = true;
 Type = "Metal";
 image_index = choose(0, 1);
@@ -12,5 +12,7 @@ stats = {
 	Object: noone,
 	Health_points: 100 * (image_index + 1),
 };
+
+//haze = haze_circle_add(x, y, sprite_width*1.5);
 
 stats.Damage = global.ItemIndex[#stats.Item_id, ItemStat.Damage];

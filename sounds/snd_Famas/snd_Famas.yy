@@ -17,7 +17,7 @@
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_Famas",
+  "soundFile": "snd_Famas.wav",
   "type": 0,
   "volume": 0.25,
 }

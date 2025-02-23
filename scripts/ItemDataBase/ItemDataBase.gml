@@ -102,6 +102,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.p250, ["Semi", "Safety"]);
 	add_shooting_modes(Item.m4_carbine, ["Auto", "Semi", "Burst", "Safety"]);
 	add_shooting_modes(Item.steel_knife, ["Semi", "Safety"]);
+	add_shooting_modes(Item.tec9, ["Semi", "Safety"]);
 	
 	///Define stats for Item.None because multiplying by zero
 	global.ItemIndex[#Item.None, ItemStat.Defense] = 1;
@@ -168,7 +169,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.SSG08, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.SSG08, "SSG 08", 3 * game_get_speed(gamespeed_fps), 1000, 110, 100, 10, "Primary", 1, 2, 30, snd_SSG08, 15, 2, false,
-	0, 0, 10, 20, 10, 50, 5, 7.5, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00011, 1 * game_get_speed(gamespeed_fps), .5, 170, 2, 7);
+	0, 0, 10, 20, 10, 50, 10, 10, .001, 0, 0, .25, 1, "Sniper rifle", .87, .85, .00011, 1 * game_get_speed(gamespeed_fps), .5, 170, 2, 7);
 	global.ItemIndex[#Item.SSG08, ItemStat.difficulty] = 5;
 	global.ItemIndex[#Item.SSG08, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
@@ -321,7 +322,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.awm, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 1150, 118, 50, 5, "Primary", 1, 1, 30, snd_awm, 30, 2, false,
-	0, 0, 25, 50, 5, 50, 10, 7.5, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2, 5);
+	0, 0, 25, 50, 5, 50, 25, 7.5, .0005, 0, 0, .05, 1, "Sniper rifle", .77, .99, .00001, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2, 5);
 	global.ItemIndex[#Item.awm, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.awm, ItemStat.has_scope] = Item.two_scope;
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
@@ -344,7 +345,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.usp, ItemStat.Description] = "Is a precision weapon, excelling in accuracy with its first shot and boasting considerable damage, yet its lackluster armor penetration. Enhanced with a preattached silencer, offering skilled players a tactical advantage despite its limitations against heavily protected foes.";
 	
 	global.ItemIndex[#Item.p250, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 700, 33, 105 , 15, "Secondary", 1, 2, 7, snd_p250, 2, 1, false,
+	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 700, 33, 105, 15, "Secondary", 1, 2, 7, snd_p250, 2, 1, false,
 	15, 15, 1, 4, 15, .5, 3.75, 2, .005, 0, 5.9, .99, 0, "Pistol", .88, .5, .00025, ceil(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7);
 	global.ItemIndex[#Item.p250, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.p250, ItemStat.disadvantages] = "-Low penetration power";
@@ -352,6 +353,16 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.p250, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.p250, ItemStat.AmmoSpriteID] = 13;
 	global.ItemIndex[#Item.p250, ItemStat.Description] = "With sharp first-shot accuracy, the P250 is ideal for quick surprises on a budget. Despite its recoil, skilled hands can make it work. While it lacks armor penetration, its tactical edge remains in sudden encounters.";
+	
+	global.ItemIndex[#Item.tec9, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 715, 29, 180, 18, "Secondary", 1, 5, 7, snd_Tec9, 2, 1.1, false,
+	7, 12, 1, 3, 18, .025, 2.75, 3, .005, 2, 10, .95, 0, "Pistol", .95, .71, .00037, ceil(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7);
+	global.ItemIndex[#Item.tec9, ItemStat.difficulty] = 2;
+	global.ItemIndex[#Item.tec9, ItemStat.disadvantages] = "-Lower damage\n-High bullet spread";
+	global.ItemIndex[#Item.tec9, ItemStat.advantages] = "-Great mobility\n-Good armour penetration";
+	global.ItemIndex[#Item.tec9, ItemStat.ItemColor] = c_gray;
+	global.ItemIndex[#Item.tec9, ItemStat.AmmoSpriteID] = 15;
+	global.ItemIndex[#Item.tec9, ItemStat.Description] = "";
 
 	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Name] = "HE landmine";

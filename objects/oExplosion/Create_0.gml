@@ -1,7 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-randomize();
 alarm[1] = audio_sound_length(snd_Explosion) * game_get_speed(gamespeed_fps) * .75;
 LightObject = noone;
 infra_vision_light = noone;

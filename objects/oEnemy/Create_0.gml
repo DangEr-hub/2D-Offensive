@@ -1,7 +1,7 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-randomize();
+
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
 alarm[5] = check_other_enemies_time;
@@ -96,7 +96,7 @@ Legs.Object = id;
 
 #region Weapon equip
 WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.m4_carbine, Item.famas);
-WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250);
+WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250, Item.tec9);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
 MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];

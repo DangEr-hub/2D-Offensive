@@ -284,7 +284,6 @@ image_yscale = scale;
 if(stuck == false){
 	
 	#region Collision with wall
-	x += lengthdir_x(stats.Speed, stats.Direction);
 	if (place_meeting(x, y, oParentTile)) {
 		// Reflect off wall
 		stats.Speed *= .75;
@@ -292,7 +291,6 @@ if(stuck == false){
 		x -= lengthdir_x(stats.Speed, stats.Direction);  // Move out of collision
 	}
 
-	y += lengthdir_y(stats.Speed, stats.Direction);
 	if (place_meeting(x, y, oParentTile)) {
 		stats.Speed *= .75;
 		stats.Direction = (180 - stats.Direction) * random_range(.9, 1);

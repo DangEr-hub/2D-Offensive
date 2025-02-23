@@ -183,7 +183,7 @@ if(instance_exists(oPlayer) ){
 			RecoilTimer[1] --;
 		}else{
 			Recoil[1] -= StabilizationSpeed * sign(recoilX);
-			Recoil[1] = max(0, Recoil[1]);
+			Recoil[1] = clamp(Recoil[1], 0, mouse_x);
 		}
 		#endregion
 		

@@ -8,7 +8,7 @@ if(wall_collision == noone && instance_exists(stats.Object)){
 
 if(wall_collision != noone){
 	
-	randomize();
+	
 	
 	#region Variables
 	var wall_sound = snd_BulletConcrete;

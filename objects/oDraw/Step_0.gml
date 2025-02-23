@@ -2,6 +2,14 @@ ViewX = camera_get_view_x(CAMERA);
 ViewY = camera_get_view_y(CAMERA);
 
 if(instance_exists(oPlayer)){
+	if (bird_snd_timer > 0) {
+	    bird_snd_timer--;
+	} else {
+	    var bird_sound = choose(snd_Bird1, snd_Bird2, snd_Bird3, snd_Bird4, snd_Bird5);
+	    play_sound(oPlayer.x, oPlayer.y, bird_sound, oPlayer.id);
+	    bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
+	}
+	
 	bloom_threshold = .29;
 	if(oPlayer.ToggleInfraVision == true){
 		bloom_threshold = .35;

@@ -1,4 +1,7 @@
 event_inherited();
+//draw_text(x, y - 70, global.saturation_level);
+
+
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
 	if(image_index == player_textures.no_weapon){

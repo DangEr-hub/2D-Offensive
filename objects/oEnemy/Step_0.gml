@@ -17,7 +17,7 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 	
 #region Shooting state
 if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
-	var shooting_chance;
+	var shooting_chance = 0;
 	switch(State){
 		case States.MoveAway:
 			if(ReactionTimer <= 0){
@@ -408,9 +408,19 @@ if(instance_exists(oBullet)){
 		}
 	}
 }
+
+// Hear the player
+if(ChasingObject.object_index == oPlayer && distance_to_object(ChasingObject) <= ChasingDistance*.75){
+	var PlayerVelocity = sqrt(power(ChasingObject.XSpeed, 2) + power(ChasingObject.YSpeed, 2)) * game_get_speed(gamespeed_fps);
+	if(ChasingObject.Moving == true && PlayerVelocity >= ChasingObject.MoveSpeed/2 && percent_chance(1 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		if(ChasingObjectSpotted == false){
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+		}
+	}
+}
 	
-if(ChasingObject.stats.Health_points <= 0 && instance_exists(oPlayer)){
-	ChasingObject = oPlayer;	
+if(ChasingObject.stats.Health_points <= 0){
+	ChasingObject = instance_nearest(x, y, oPlayer);	
 }
 #endregion
 
@@ -603,6 +613,10 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 			
 		case "FAMAS":
 			Weapon.image_index = 15;
+		break;
+		
+		case "TEC-9":
+			Weapon.image_index = 16;
 		break;
 			
 		default:

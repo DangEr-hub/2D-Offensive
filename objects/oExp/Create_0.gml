@@ -1,4 +1,4 @@
-randomize();
+
 value = 0;
 PushForce = 0;
 LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);

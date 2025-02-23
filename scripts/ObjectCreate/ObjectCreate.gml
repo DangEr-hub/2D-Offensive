@@ -38,7 +38,7 @@ function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness
 }
 
 function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
-	randomize();
+	
 	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
 	Explosion.Angle = random(360);	

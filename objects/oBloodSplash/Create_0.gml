@@ -1,4 +1,4 @@
-randomize();
+
 movDir = random(360);
 movSpd = random_range(7, 21);
 fric = random_range(movSpd / 10, movSpd / 5);

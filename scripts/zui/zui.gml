@@ -83,7 +83,7 @@ function zui_update() {
 	__mx = global.__zui_mx - rx;
 	__my = global.__zui_my - ry;
 
-	if (__visible && __enabled && global.__zui_mx >= rx && global.__zui_my >= ry && global.__zui_mx < rx + __width * __sx && global.__zui_my < ry + __height * __sy) { 
+	if (__visible && __enabled && global.__zui_mx >= (rx*0.97) && global.__zui_my >= (ry*0.98) && global.__zui_mx < (rx + __width * __sx)*1.015 && global.__zui_my < (ry + __height * __sy)*1.015) {
 		var child_count = array_length(__children);
 
 		for (var i = child_count - 1; i >= 0; --i) {

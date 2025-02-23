@@ -1,3 +1,4 @@
+//haze_start(true, false);
 event_inherited();
 flashed_muffled_sounds = 1; ///Pro efekt muffled soundu u flashbangu
 rotation_direction = 1; ///Pro view bobbing
@@ -120,11 +121,10 @@ ViewShakeValuePower = 0;
 #region Movement vars
 MoveSpeed = 700;
 SpeedMul = 1;
-Moving = false;
 RelativeSpeedValue = MoveSpeed * 0.1;
 RelativeSpeedX = 0;
 RelativeSpeedY = 0;
-MovingStabilizationTime = .05 * game_get_speed(gamespeed_fps);
+MovingStabilizationTime = ceil(.025 * game_get_speed(gamespeed_fps));
 MovingStabilizationTimer = -1;
 
 #endregion

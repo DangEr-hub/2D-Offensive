@@ -8,11 +8,30 @@ if(instance_exists(oPlayer) && (oPlayer.ToggleNightVision || oPlayer.ToggleInfra
     }
 }
 
+var blur_intensity = 0;
+var vignette_level = 1.05;
 if(instance_exists(oPlayer)){
+	aberration_level = global.aberration_level;
 	saturation_level = global.saturation_level;
 	if(oPlayer.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2)){
+		aberration_level = clamp(oPlayer.stats.Health_points/500, 0.01, 0.05);
 		saturation_level = min(0 + oPlayer.stats.Health_points/100, global.saturation_level);
 	}
+	
+	var vignette_aimpunch = 0;
+	var vignette_explosion = 0;
+	if(oPlayer.near_explosion == true){
+		aberration_level = 0.02;
+		vignette_explosion = 0.5;
+	}
+	
+	if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
+		vignette_aimpunch = 0.25;
+		blur_intensity = 0.05;
+	}
+	var hp_ratio = clamp(oPlayer.stats.Health_points / global.player_stats_struct.Max_health, 0, 1);
+	var vignette_hp = lerp(1.1, 0, hp_ratio);
+	vignette_level = 1.05 + vignette_explosion + vignette_aimpunch + vignette_hp;
 }
 
 if(global.BloomShader == true){
@@ -43,19 +62,6 @@ if(global.BloomShader == true){
 }
 if(instance_exists(oPlayer)){	
 	if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
-		// Previous conditionals for blurring
-		if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
-		    if (!surface_exists(BlurSurface)){
-		        BlurSurface = surface_create(global.GuiW, global.GuiH);
-		    }
-		    shader_set(shd_Blur1Pass);
-		    shader_set_uniform_f(usize, 8, 8, .05);
-		    surface_set_target(BlurSurface);
-		    draw_surface(application_surface, 0, 0);
-		    surface_reset_target();
-		    shader_reset();
-		}
-		
 
 		if(global.BloomShader == true){
 			// Bloom luminescence
@@ -88,7 +94,10 @@ if(instance_exists(oPlayer)){
 
 			// Bloom blend effect
 			shader_set(shader_bloom_blend);
-			shader_set_uniform_f(shader_get_uniform(shd_BloomBlend, "color_saturation"), saturation_level);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "vignette_strength"), vignette_level);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "size"), 16, 16, blur_intensity);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
 				
 			shader_set_uniform_f(u_bloom_intensity, bloom_intensity);
 			shader_set_uniform_f(u_bloom_darken, bloom_darken);
@@ -100,22 +109,9 @@ if(instance_exists(oPlayer)){
 		if(oPlayer.ToggleNightVision || oPlayer.ToggleInfraVision) {
 		    surface_set_target(NightVisionSurface);
 		}
-
-		if(global.BloomShader == false){
-			shader_set(shd_Saturation);
-			shader_set_uniform_f(shader_get_uniform(shd_Saturation, "color_saturation"), saturation_level);
-		}
-
-		// Player effects and application_surface drawing
-		if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true) {
-		    draw_surface_stretched(BlurSurface, 0, 0, global.GuiW, global.GuiH);
-		} else {
-		    draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
-		}
+		    
+		draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
 		
-		if(global.BloomShader == false){
-			shader_reset();	
-		}
         
 		if(global.BloomShader == true){
 			// Bloom surface effect
@@ -157,9 +153,6 @@ if(instance_exists(oPlayer)){
 		}
 			
 		// Cleanup surfaces
-		if(oPlayer.AimPunchTimer <= -1 && oPlayer.near_explosion == false && surface_exists(BlurSurface)){
-		    surface_free(BlurSurface);
-		}
 		if((oPlayer.ToggleNightVision == false || oPlayer.ToggleInfraVision) && surface_exists(NightVisionSurface)){
 			surface_free(NightVisionSurface);
 		}

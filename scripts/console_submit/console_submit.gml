@@ -389,6 +389,12 @@ function console_submit(Console) {
 						}
 					break;
 					
+					case "set_chromatic_aberration_level":
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.aberration_level = real(c[1]);
+						}
+					break;
+					
 					case "set_clear_particles_timer":
 						if(no == 1 && string_digits(c[1]) != ""){
 							global.clear_particles_timer = real(c[1]);

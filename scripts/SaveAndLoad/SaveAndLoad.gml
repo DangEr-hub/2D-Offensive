@@ -7,6 +7,8 @@ function save_game(){
 		file_delete("save_game.ini");
 	}
 	ini_open("save_game.ini");
+	ini_write_real("Vars", "aberration_level", global.aberration_level);
+	ini_write_real("Vars", "saturation_level", global.saturation_level);
 	ini_write_real("Vars", "time_speed", global.TimeSpeed);
 	ini_write_real("Vars", "godmode", global.GodMode);
 	ini_write_real("Vars", "map_id", global.MapID);
@@ -86,6 +88,8 @@ function load_game(){
 	#region Load game
 	if(file_exists("save_game.ini")){
 		ini_open("save_game.ini");
+		global.aberration_level = ini_read_real("Vars", "aberration_level", global.aberration_level);
+		global.saturation_level = ini_read_real("Vars", "saturation_level", global.saturation_level);
 		global.TimeSpeed = ini_read_real("Vars", "time_speed", global.TimeSpeed);
 		global.GodMode = ini_read_real("Vars", "godmode", global.GodMode);
 		global.MapID = ini_read_real("Vars", "map_id", global.MapID);	

@@ -14,3 +14,5 @@ Inaccuracy = 2;
 infra_vision_light = undefined;
 image_speed = 0;
 HitList = ds_list_create();
+
+//create_haze_effect(x, y, 2 * game_get_speed(gamespeed_fps), id, "Circle", true, 128);

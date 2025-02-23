@@ -21,6 +21,16 @@ function array_max(arr) {
 function player_has_machine_gun(){
 	return global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.basic_machine_gun;
 }
+	
+function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_type = "Circle", update_haze_pos = true, haze_width = 64, haze_height = 64){
+	var haze = instance_create_layer(pos_x, pos_y, "OtherO", oHazeObject);	
+	haze.stats.haze_type = haze_type;
+	haze.stats.update_haze_pos = update_haze_pos;
+	haze.stats.haze_width = haze_width;
+	haze.stats.haze_height = haze_height;
+	haze.stats.timer = haze_timer;
+	haze.stats.follow_object = haze_follow_object;
+}
 
 function buy_item(ItemID){
 	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID)){
@@ -305,16 +315,16 @@ function get_angle(desiredDirection, maxTurn) {
 }
 
 function percent_chance(argument0) {
-	randomize();
+	
 	return (random(100) <= argument0);
 }
 	
 function statistics_hit(Type, Damage, ObjectType){
 	switch(Type){
 		case "Health":
-			if(ObjectType.stats.Health_points >= Damage){
-				ObjectType.attack_damage = Damage*.5;
-				ObjectType.stats.Health_points -= Damage;
+			if(ObjectType.stats.Health_points >= ceil(Damage)){
+				ObjectType.attack_damage = ceil(Damage);
+				ObjectType.stats.Health_points -= ceil(Damage);
 			}else{
 				ObjectType.attack_damage = ObjectType.stats.Health_points;
 				ObjectType.stats.Health_points = 0;
@@ -326,7 +336,7 @@ function statistics_hit(Type, Damage, ObjectType){
 		
 		case "Stamina":
 			if(ObjectType.stats.Stamina_points >= Damage){
-				ObjectType.StaminaDamage = Damage*.5;
+				ObjectType.StaminaDamage = Damage;
 				ObjectType.stats.Stamina_points -= Damage;
 			}else{
 				ObjectType.StaminaDamage = ObjectType.stats.Stamina_points;

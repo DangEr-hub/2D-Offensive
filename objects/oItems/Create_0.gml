@@ -1,4 +1,4 @@
-randomize();
+
 PushForce = 0;
 scope_attachment = -1;
 barrel_attachment = -1;
