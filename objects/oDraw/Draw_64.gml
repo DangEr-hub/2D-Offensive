@@ -54,6 +54,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			shader_reset();
 			#endregion
 			
+			
 			#region Draw black surface
 			surface_set_target(BlackoutSurface);
 			draw_clear_alpha(c_black, 1);

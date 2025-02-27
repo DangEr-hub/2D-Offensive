@@ -1,6 +1,7 @@
 event_inherited();
 respawn_menu_width_tab = 768 * global.GUIMultiplier;
 respawn_menu_height_tab = 512 * global.GUIMultiplier;
+alpha = 1;
 
 draw_set_font(set_font("Menu_small"));
 zui_set_size(respawn_menu_width_tab, respawn_menu_height_tab);

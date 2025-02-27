@@ -1,5 +1,6 @@
 //haze_start(true, false);
 event_inherited();
+in_water_timer = -1;
 flashed_muffled_sounds = 1; ///Pro efekt muffled soundu u flashbangu
 rotation_direction = 1; ///Pro view bobbing
 rotation_angle = 0; ///Pro view bobbing

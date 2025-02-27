@@ -1,16 +1,12 @@
-if(instance_exists(oPlayer) && (oPlayer.ToggleNightVision || oPlayer.ToggleInfraVision)) {
-    if(!surface_exists(NightVisionSurface)){
-        NightVisionSurface = surface_create(global.GuiW, global.GuiH);
-    }
-} else {
-    if(surface_exists(NightVisionSurface)){
-        surface_free(NightVisionSurface);
-    }
-}
-
+#region Player variables
 var blur_intensity = 0;
-var vignette_level = 1.05;
+var vignette_level = 0.75;
 if(instance_exists(oPlayer)){
+	if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
+	    if(!surface_exists(nightvision_surface)){
+	        nightvision_surface = surface_create(global.GuiW, global.GuiH);
+	    }
+	}
 	aberration_level = global.aberration_level;
 	saturation_level = global.saturation_level;
 	if(oPlayer.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2)){
@@ -25,50 +21,40 @@ if(instance_exists(oPlayer)){
 		vignette_explosion = 0.5;
 	}
 	
-	if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true){
+	if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true || oPlayer.in_water == true){
 		vignette_aimpunch = 0.25;
 		blur_intensity = 0.05;
 	}
 	var hp_ratio = clamp(oPlayer.stats.Health_points / global.player_stats_struct.Max_health, 0, 1);
-	var vignette_hp = lerp(1.1, 0, hp_ratio);
-	vignette_level = 1.05 + vignette_explosion + vignette_aimpunch + vignette_hp;
+	var vignette_hp = lerp(1.05, 0, hp_ratio);
+	vignette_level = 0.75 + vignette_explosion + vignette_aimpunch + vignette_hp;
 }
+#endregion
 
-if(global.BloomShader == true){
-	if(!surface_exists(Surface1)){
-	    Surface1 = surface_create(global.GuiW, global.GuiH);
-	    bloom_texture = surface_get_texture(Surface1);
-	    surface_set_target(Surface1);
-	    draw_clear_alpha(0, 0);
-	    draw_texture_flush();
-	    surface_reset_target();
-	}
-
-	if(!surface_exists(Surface2)){
-	    Surface2 = surface_create(global.GuiW, global.GuiH);
-	    bloom_texture = surface_get_texture(Surface1);
-	    surface_set_target(Surface1);
-	    draw_clear_alpha(0, 0);
-	    draw_texture_flush();
-	    surface_reset_target();
-	}
-	
-	surface_set_target(Surface1);
-	draw_clear_alpha(c_black, 0);
-	surface_reset_target();
-	surface_set_target(Surface2);
-	draw_clear_alpha(c_black, 0);
-	surface_reset_target();
-}
 if(instance_exists(oPlayer)){	
 	if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
 
 		if(global.BloomShader == true){
+			if(!surface_exists(bloom_surface1)){
+			    bloom_surface1 = surface_create(global.GuiW, global.GuiH);
+			}
+
+			if(!surface_exists(bloom_surface2)){
+			    bloom_surface2 = surface_create(global.GuiW, global.GuiH);
+			}
+	
+			surface_set_target(bloom_surface1);
+			draw_clear_alpha(c_black, 0);
+			surface_reset_target();
+			surface_set_target(bloom_surface2);
+			draw_clear_alpha(c_black, 0);
+			surface_reset_target(); 
+			
 			// Bloom luminescence
 			shader_set(shader_bloom_lum);
 			shader_set_uniform_f(u_bloom_threshold, bloom_threshold);
 			shader_set_uniform_f(u_bloom_range, bloom_range);
-			surface_set_target(Surface1);
+			surface_set_target(bloom_surface1);
 			draw_surface(application_surface, 0, 0);
 			surface_reset_target();
 			shader_reset();
@@ -81,13 +67,13 @@ if(instance_exists(oPlayer)){
 			shader_set_uniform_f(u_blur_vector, 1, 0);	
 			shader_set_uniform_f(u_texel_size, texel_w, texel_h);	
 
-			surface_set_target(Surface2);
-			draw_surface(Surface1, 0, 0);
+			surface_set_target(bloom_surface2);
+			draw_surface(bloom_surface1, 0, 0);
 			surface_reset_target();
 
 			shader_set_uniform_f(u_blur_vector, 0, 1);
-			surface_set_target(Surface1);
-			draw_surface(Surface2, 0, 0);
+			surface_set_target(bloom_surface1);
+			draw_surface(bloom_surface2, 0, 0);
 			surface_reset_target();    
 			gpu_set_tex_filter(false);	
 			shader_reset();
@@ -98,35 +84,49 @@ if(instance_exists(oPlayer)){
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "size"), 16, 16, blur_intensity);
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
+
+			if (oPlayer.in_water == true) {
+			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000.0);
+			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (oPlayer.in_water_timer + 1) / game_get_speed(gamespeed_fps)));
+			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 2.5);
+			} else {
+			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0.0);
+			}
 				
 			shader_set_uniform_f(u_bloom_intensity, bloom_intensity);
 			shader_set_uniform_f(u_bloom_darken, bloom_darken);
 			shader_set_uniform_f(u_bloom_saturation, bloom_saturation);
-			texture_set_stage(u_bloom_texture, bloom_texture);
+			texture_set_stage(u_bloom_texture, surface_get_texture(bloom_surface1)); //je jedno jestli bloom_surface1 nebo bloom_surface2
 		}
 
-		// Draw to the NightVisionSurface if night vision is toggled on
-		if(oPlayer.ToggleNightVision || oPlayer.ToggleInfraVision) {
-		    surface_set_target(NightVisionSurface);
+
+		// Vykreslení night vision surface
+		if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
+		    surface_set_target(nightvision_surface);
 		}
 		    
 		draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
 		
         
 		if(global.BloomShader == true){
+			
+			#region Bloom add effect
 			// Bloom surface effect
 			gpu_set_blendmode(bm_add);
-			draw_surface_stretched(Surface1, 0, 0, global.GuiW, global.GuiH);
+			draw_surface_stretched(bloom_surface1, 0, 0, global.GuiW, global.GuiH); //je jedno jestli bloom_sruface1 nebo bloom_surface2
 			gpu_set_blendmode(bm_normal);
 			shader_reset();
+			#endregion
+			
 		}
 		
-		if(oPlayer.ToggleNightVision || oPlayer.ToggleInfraVision) {
+		if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
 		    surface_reset_target();
 		}
 
-		// If night vision is toggled on, draw the NightVisionSurface with the shader
 		if(oPlayer.ToggleNightVision) {
+			
+			#region Night vision effect
 		    shader_set(shd_NightVision);
 			shader_set_uniform_f(shader_get_uniform(shd_NightVision, "u_resolution"),
 				surface_get_width(application_surface),
@@ -140,26 +140,34 @@ if(instance_exists(oPlayer)){
 				shader_get_uniform(shd_NightVision, "noise_strength"), 
 				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionNoisePower]
 			);
-		    draw_surface_stretched(NightVisionSurface, 0, 0, global.GuiW, global.GuiH);
+		    draw_surface_stretched(nightvision_surface, 0, 0, global.GuiW, global.GuiH);
 		    shader_reset();
+			#endregion
+			
 		}else if(oPlayer.ToggleInfraVision){
+			
+			#region Infra vision effect
 		    shader_set(shd_InfraVisionSurface);
 			shader_set_uniform_f(shader_get_uniform(shd_InfraVisionSurface, "u_resolution"),
 				surface_get_width(application_surface),
 				surface_get_height(application_surface)
 			);
-		    draw_surface_stretched(NightVisionSurface, 0, 0, global.GuiW, global.GuiH);
-		    shader_reset();			
-		}
+		    draw_surface_stretched(nightvision_surface, 0, 0, global.GuiW, global.GuiH);
+		    shader_reset();		
+			#endregion
 			
-		// Cleanup surfaces
-		if((oPlayer.ToggleNightVision == false || oPlayer.ToggleInfraVision) && surface_exists(NightVisionSurface)){
-			surface_free(NightVisionSurface);
 		}
 		
-		if(global.BloomShader == false){
-			surface_free(Surface1);	
-			surface_free(Surface2);
-		}
 	}
 }
+
+
+if (oPlayer.in_water == true) {
+    var alpha = 0.25 * (oPlayer.in_water_timer + 1) / game_get_speed(gamespeed_fps);
+    
+    draw_set_alpha(alpha);
+    draw_set_color(c_aqua);
+    draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
+    draw_set_alpha(1);
+}
+

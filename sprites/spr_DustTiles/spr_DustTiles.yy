@@ -2,7 +2,7 @@
   "resourceType": "GMSprite",
   "resourceVersion": "1.0",
   "name": "spr_DustTiles",
-  "bbox_bottom": 255,
+  "bbox_bottom": 307,
   "bbox_left": 0,
   "bbox_right": 495,
   "bbox_top": 0,

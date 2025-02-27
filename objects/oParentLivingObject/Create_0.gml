@@ -1,4 +1,5 @@
 event_inherited();
+in_water = false;
 hit_timer = -1;
 WeaponDistance = 0;
 aimpunch_speed_multiplier = 1; //Musí se definovat v create eventu, protože s ním pracujeme i mimo klasický scope

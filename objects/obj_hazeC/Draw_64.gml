@@ -118,17 +118,11 @@ shader_reset();
 
 //Points
 shader_set(sh_mask);
-if (!debugMode) gpu_set_blendmode_ext(bm_zero, bm_src_color);
+gpu_set_blendmode_ext(bm_zero, bm_src_color);
 draw_surface(pointSurf, 0, 0);
 gpu_set_blendmode(bm_normal);
 shader_reset();
 
-//Debug
-if (debugMode){
-    draw_set_color(c_red);
-    draw_rectangle(0, 0, 4, 4, false);
-    draw_set_color(c_white);
-}
 
 surface_reset_target();
 
@@ -136,14 +130,4 @@ surface_free(pointSurf);
 
 //Draw haze surface
 draw_surface(hazeSurf, 0, 0);
-
-//Debug
-if (debugMode){
-    draw_set_color(c_red);
-
-    draw_text(5, 5, "App surf: " + string(surfW) + ", " + string(surfH) + "\nGUI layer: "
-        + string(display_get_gui_width()) + ", " + string(display_get_gui_height()));
-        
-    draw_set_color(c_white);
-}
 

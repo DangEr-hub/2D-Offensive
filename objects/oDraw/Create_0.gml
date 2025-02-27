@@ -65,13 +65,71 @@ usize = shader_get_uniform(shd_Blur1Pass, "size");
 BlurValue = 0;
 #endregion
 
+// hlavní postprocessing surface
+post_surface = -1;
+
+// Nightvision
+nightvision_surface = -1;
+
+#region Haze
+/// @description Customize here
+//Tweak these vars:-------------------------
+hazeSpeed = 0.5; //Speed of the haze animation
+hazeSize = 0.75; //Size of the haze disturbances
+hazeWaveLength = 1; //Wavelength of the haze
+                    //or, Size of the haze map
+
+viewN = 0; //View number, if using views
+
+//-----------END----------------------------
+
+//vars
+cameraUsed = false;
+coverScreen = false;
+debugMode = false;
+
+//surface
+surfW = surface_get_width(application_surface);
+surfH = surface_get_height(application_surface);
+
+haze_point_surface = -1;
+
+haze_final_surface = surface_create(surfW, surfH);
+haze_surf_clear(haze_final_surface);
+
+//points
+hazePoints = ds_list_create();
+//0 - X
+//1 - Y
+//2 - Radius
+hazeAreas = ds_list_create();
+//0 - X
+//1 - Y
+//2 - W
+//3 - H
+
+//shader
+uniTime = shader_get_uniform(sh_haze, "Time");
+uniSamp = shader_get_sampler_index(sh_haze, "Noise");
+uniSampSize = shader_get_sampler_index(sh_haze, "NoiseSize");
+
+uniSpeed = shader_get_uniform(sh_haze, "Speed");
+uniSize = shader_get_uniform(sh_haze, "Size");
+uniFreq = shader_get_uniform(sh_haze, "Freq");
+
+
+/* */
+/*  */
+
+#endregion
+
 #region Bloom
 shader_bloom_lum = shd_BloomTwo;
 u_bloom_threshold = shader_get_uniform(shader_bloom_lum, "bloom_threshold");
 u_bloom_range = shader_get_uniform(shader_bloom_lum, "bloom_range");
-bloom_texture = -1;
-Surface1 = -1;
-Surface2 = -1;
+bloom_surface1 = -1;
+bloom_surface2 = -1;
+final_surface = -1;
 ViewW = camera_get_view_width(CAMERA);
 ViewH = camera_get_view_height(CAMERA);
 ViewX = camera_get_view_x(CAMERA);
@@ -81,7 +139,7 @@ u_bloom_intensity = shader_get_uniform(shader_bloom_blend, "bloom_intensity");
 u_bloom_darken = shader_get_uniform(shader_bloom_blend, "bloom_darken");
 u_bloom_saturation = shader_get_uniform(shader_bloom_blend, "bloom_saturation");
 u_bloom_texture = shader_get_sampler_index(shader_bloom_blend, "bloom_texture");
-bloom_threshold = 0.29;//0.35;
+bloom_threshold = 0.29;
 bloom_intensity = .05;
 bloom_saturation = 5;
 shader_blur = shd_BlurLerp;

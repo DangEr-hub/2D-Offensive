@@ -19,14 +19,25 @@ const int Quality = 2;    // kolik vzorků na směr při rozostření (vyšší 
 const int Directions = 2; // počet směrů bluru
 const float Pi = 3.1415926535; // hodnota pi
 
+// Vodní efekt
+uniform float water_time;
+uniform float water_strength;
+uniform float water_speed;
+
 
 void main()
 {
     vec2 uv = v_vTexcoord;
-    vec2 aberration_offset = (uv - 0.5) * aberration_strength; // uv je od 0 do 1 přes obrazovku, tudíž -0.5 zajistí vzdálenost od středu obrazovky
-    vec2 radius = size.z / size.xy;
+	
+    // ** Vodní zkreslení UV souřadnic **
+    float wave_x = sin(uv.y * 20.0 + water_time * water_speed) * water_strength;
+    float wave_y = cos(uv.x * 20.0 + water_time * water_speed * 0.75) * water_strength;
+    uv += vec2(wave_x, wave_y);
+
 
     // Aplikace chromatické aberace na UV souřadnice
+    vec2 aberration_offset = (uv - 0.5) * aberration_strength; // uv je od 0 do 1 přes obrazovku, tudíž -0.5 zajistí vzdálenost od středu obrazovky
+    vec2 radius = size.z / size.xy;
     vec2 uv_r = uv + aberration_offset; // posuv červené složky pixelu
     vec2 uv_b = uv - aberration_offset; // posuv modré složky pixelu
 
@@ -78,47 +89,3 @@ void main()
 
     gl_FragColor = v_vColour * base_col;
 }
-
-
-
-/*varying vec2 v_vTexcoord;
-varying vec4 v_vColour;
-
-
-uniform float color_saturation;
-
-
-uniform float bloom_intensity;
-uniform float bloom_darken;
-uniform float bloom_saturation;
-
-uniform sampler2D bloom_texture;
-
-uniform float aberration_strength;
-
-void main()
-{
-		
-	    vec2 uv = v_vTexcoord;
-	    vec2 aberration_offset = (uv - 0.5) * aberration_strength; // Směr od středu obrazovky
-    
-	    // Vzorkování s aberací (r, g, b odděleně)
-	    vec4 base_col;
-	    base_col.r = texture2D(gm_BaseTexture, uv + aberration_offset).r;
-	    base_col.g = texture2D(gm_BaseTexture, uv).g;
-	    base_col.b = texture2D(gm_BaseTexture, uv - aberration_offset).b;
-	    base_col.a = texture2D(gm_BaseTexture, uv).a;
-	
-		vec3 bloom_col = texture2D(bloom_texture, uv).rgb;
-		
-		float lum = dot(bloom_col, vec3(0.299, 0.587, 0.114));
-		bloom_col = mix(vec3(lum), bloom_col, bloom_saturation);
-		
-		base_col.rgb = base_col.rgb * bloom_darken + bloom_col + bloom_intensity;
-		
-	    // Apply color saturation enhancement
-	    float avg = (base_col.r + base_col.g + base_col.b) / 3.0;
-	    base_col.rgb = mix(vec3(avg), base_col.rgb, color_saturation);
-		
-		gl_FragColor = v_vColour * base_col;
-}*/

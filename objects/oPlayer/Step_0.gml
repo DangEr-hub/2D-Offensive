@@ -26,6 +26,19 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	hidden = hidden_in_smoke || hidden_in_grass;
 	#endregion
 	
+	#region In water logic
+	if(place_meeting(x, y, oWater)){
+		in_water = true;
+		in_water_timer = game_get_speed(gamespeed_fps);
+	}else{
+		if(in_water_timer > -1){
+			in_water_timer --;
+		}else{
+			in_water = false;
+		}
+	}
+	#endregion
+	
 	#region Drop weapon
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != player_states.machine_gun_state){
 		player_has_scope = -1;

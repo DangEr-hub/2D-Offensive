@@ -1,5 +1,5 @@
 event_inherited();
-//draw_text(x, y - 70, global.saturation_level);
+draw_text(x, y - 70, in_water_timer);
 
 
 if(stats.Health_points > 0){

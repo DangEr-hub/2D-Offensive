@@ -1,1 +1,1 @@
-AimPunchTimer = AimPunchTime;
+in_water = !in_water;
