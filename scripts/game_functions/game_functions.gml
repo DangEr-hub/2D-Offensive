@@ -7,6 +7,25 @@ function array_min(arr) {
     }
     return min_value;
 }
+	
+function window_resize(){
+	var window_h_before = window_get_height();
+	var display_h_before = display_get_height();
+	var extra_h = display_h_before - window_h_before; // Výška titulku a okrajů
+	var window_scale = 2;
+	
+	if(window_get_fullscreen() == true){
+		extra_h = 0;
+	}
+
+	// Nastavit velikost okna tak, aby vnitřní část byla přesně velikost displeje
+	window_set_size(global.window_width, global.window_height + extra_h);
+	window_set_rectangle(0, extra_h, global.window_width, global.window_height + extra_h);
+	surface_resize(application_surface, global.CameraWidth*window_scale, global.CameraHeight*window_scale + extra_h);
+	display_set_gui_size(global.window_width, global.window_height + extra_h);
+	camera_set_view_size(CAMERA, global.CameraWidth, global.CameraHeight);	
+	window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
+}
 
 function array_max(arr) {
     var max_value = arr[0];

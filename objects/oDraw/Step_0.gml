@@ -1,7 +1,30 @@
 ViewX = camera_get_view_x(CAMERA);
 ViewY = camera_get_view_y(CAMERA);
 
+
 if(instance_exists(oPlayer)){
+	
+	#region Bird spawning
+	if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
+		var birds = random_range(1, 3);
+		var offset = 8;
+		var areas = {
+		    top:    [ViewX - offset, ViewY - offset * 2, ViewX + global.CameraWidth, ViewY - offset],
+		    left:   [ViewX - offset * 2, ViewY, ViewX - offset, ViewY + global.CameraHeight],
+		    bottom: [ViewX - offset, ViewY + global.CameraHeight - offset * 2, ViewX + global.CameraWidth, ViewY + global.CameraHeight - offset],
+		    right:  [ViewX + global.CameraWidth - offset * 2, ViewY, ViewX + global.CameraWidth - offset, ViewY + global.CameraHeight]
+		};
+	
+
+	
+		repeat(birds){
+			var area_key = choose("top", "left", "bottom", "right");
+			var area = areas[$ area_key];
+			instance_create_depth(random_range(area[0], area[2]), random_range(area[1], area[3]), -100, oBird);	
+		}
+	}
+	#endregion
+
 	if (bird_snd_timer > 0) {
 	    bird_snd_timer--;
 	} else {

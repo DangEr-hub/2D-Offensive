@@ -18,9 +18,16 @@ function enemy_initalized(hitObj, enemyId) {
 	}
 }
 
-function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
+function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if(hit_object.stats.Health_points > 0 && ((hit_object.object_index == oPlayer && global.GodMode == false) || hit_object.object_index != oPlayer) && instance_exists(hit_object)){
-		var Damage = Bullet.stats.Damage * power(1 - global.ItemIndex[#Bullet.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, Bullet.stats.Starting_x, Bullet.stats.Starting_y));
+		var Damage = attacking_item.stats.Damage * power(1 - global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, attacking_item.stats.Starting_x, attacking_item.stats.Starting_y));
+		
+		if(global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.WeaponTypeClass] == "Knife"){
+			if(hit_object.ChasingObjectSpotted == false){
+				Damage *= STEALTH_DMG_MOD;
+			}
+		}
+		
 		if(hit_object.object_index == oEnemy){
 			with(hit_object){
 				if(ChasingObjectSpotted == false){
@@ -35,61 +42,61 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 		if(BodyPart >= HitBox.LegProne){
 			DamageMultiplier = LEG_MULTIPLIER;
 			BloodColor = c_red;
-			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
-			hit_object.AimPunchMultiplier = global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
-			if(hit_object.object_index != oPlayer && Bullet.stats.Object_index == oPlayer){
+			hit_object.AimPunchMultiplier = global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1);
+			if(hit_object.object_index != oPlayer && attacking_item.stats.Object_index == oPlayer){
 				oCrosshair.HitMarker = 0;	
 			}
 		}else if(BodyPart >= HitBox.ArmWithoutWeapon){
 			DamageMultiplier = ARM_MULTIPLIER;
 			BloodColor = c_red;
-			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
-			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
+			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Armour, Index.slot_durability] > 0) || hit_object.ArmourDurability[0] > 0){
 				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
-					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
+					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
-			if(hit_object.object_index != oPlayer && Bullet.stats.Object_index == oPlayer){
+			if(hit_object.object_index != oPlayer && attacking_item.stats.Object_index == oPlayer){
 				oCrosshair.HitMarker = 0;	
 			}
 		}else if(BodyPart >= HitBox.BodyWithoutWeapon){
 			DamageMultiplier = BODY_MULTIPLIER;
 			BloodColor = c_red;
-			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#ArmourID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
-			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
+			hit_object.AimPunchMultiplier = global.ItemIndex[#ArmourID, ItemStat.Defense]/2 * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Armour, Index.slot_durability] > 0) || hit_object.ArmourDurability[0] > 0){
 				if(global.ItemIndex[#ArmourID, ItemStat.Defense] <= .95){
-					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
+					hit_object.attack_damage = Damage * global.ItemIndex[#ArmourID, ItemStat.Defense] * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
-			if(hit_object.object_index != oPlayer && Bullet.stats.Object_index == oPlayer){
+			if(hit_object.object_index != oPlayer && attacking_item.stats.Object_index == oPlayer){
 				oCrosshair.HitMarker = 0;	
 			}
 		}else if(BodyPart >= HitBox.Head){
 			DamageMultiplier = HEADSHOT_MULTIPLIER;
 			BloodColor = c_maroon;
-			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#HelmetID, ItemStat.Defense]);
+			hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / (1 - global.player_stats_struct.Armour) / global.ItemIndex[#HelmetID, ItemStat.Defense]);
 			hit_object.attack_damage = Damage;	
 			hit_object.AimPunchTimer = hit_object.AimPunchTime;
-			hit_object.AimPunchMultiplier = global.ItemIndex[#HelmetID, ItemStat.Defense]/2 * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower] / (Bullet.stats.Penetration_damage + 1);
+			hit_object.AimPunchMultiplier = global.ItemIndex[#HelmetID, ItemStat.Defense]/2 * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1);
 			if((hit_object.object_index == oPlayer && global.Inventory[# OtherSlot.Helmet, Index.slot_durability] > 0) || hit_object.ArmourDurability[1] > 0){
 				if(global.ItemIndex[#HelmetID, ItemStat.Defense] <= .95){
-					hit_object.attack_damage = Damage * global.ItemIndex[#HelmetID, ItemStat.Defense] * global.ItemIndex[#Bullet.stats.Item_id, ItemStat.PenetrationPower];
+					hit_object.attack_damage = Damage * global.ItemIndex[#HelmetID, ItemStat.Defense] * global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower];
 				}
 			}
-			if(hit_object.object_index != oPlayer && Bullet.stats.Object_index == oPlayer){
+			if(hit_object.object_index != oPlayer && attacking_item.stats.Object_index == oPlayer){
 				oCrosshair.HitMarker = 4;	
 			}
 		}
 		
-		hit_object.attack_damage *= DamageMultiplier / (Bullet.stats.Penetration_damage + 1);
+		hit_object.attack_damage *= DamageMultiplier / (attacking_item.stats.Penetration_damage + 1);
 		hit_object.attack_damage = ceil(hit_object.attack_damage);
 		
 		var armour_durability, helmet_durability;
@@ -103,13 +110,13 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 		}
 		
 	// When an enemy hits the hit_object
-	if(instance_exists(Bullet.stats.Object) && instance_exists(hit_object)){
-		var enemyStatsMap = enemy_initalized(hit_object, Bullet.stats.Object);
+	if(instance_exists(attacking_item.stats.Object) && instance_exists(hit_object)){
+		var enemyStatsMap = enemy_initalized(hit_object, attacking_item.stats.Object);
 		ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
 		ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
 
-		// When the hit_object hits back the Bullet.stats.Object
-		var hitObjectStatsMap = enemy_initalized(Bullet.stats.Object, hit_object.id);
+		// When the hit_object hits back the attacking_item.stats.Object
+		var hitObjectStatsMap = enemy_initalized(attacking_item.stats.Object, hit_object.id);
 		ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
 		ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
 	}
@@ -117,7 +124,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 		
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
 			if(hit_object.object_index == oEnemy){
-				global.player_stats_struct.Money += global.ItemIndex[#Bullet.stats.Item_id, ItemStat.reward];
+				global.player_stats_struct.Money += global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.reward];
 				if(BodyPart <= HitBox.HeadProne){
 					if(global.ranked_game == true){
 						global.player_stats_struct.Headshots ++;
@@ -129,18 +136,18 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 					oEggyEloRatingSystem.kills ++;
 				}
 			}	
-			//var death_sound_effect = choose(snd_Death1, snd_Death2);
-			//if!(audio_is_playing(death_sound_effect)){
-			//	play_sound(BloodSplashX, BloodSplashY, death_sound_effect, Bullet.stats.Object);
-			//}
-			hit_object.KilledByName = Bullet.stats.Object_name;
-			hit_object.KilledByWeapon = global.ItemIndex[#Bullet.stats.Item_id, ItemStat.Name];
+			var death_sound_effect = choose(snd_Death1, snd_Death2);
+			if!(audio_is_playing(death_sound_effect)){
+				play_sound(BloodSplashX, BloodSplashY, death_sound_effect, attacking_item.stats.Object);
+			}
+			hit_object.KilledByName = attacking_item.stats.Object_name;
+			hit_object.KilledByWeapon = global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.Name];
 			hit_object.stats.Health_points = -1;
 		}else{
 			statistics_hit("Health", hit_object.attack_damage, hit_object);
 		}
-		BloodSplashNumber = ceil(hit_object.attack_damage / 5);
-		BloodParticleNumber = ceil(hit_object.attack_damage / 2);
+		var BloodSplashNumber = ceil(hit_object.attack_damage / 5);
+		var BloodParticleNumber = ceil(hit_object.attack_damage / 2);
 
 	
 		if(hit_object.object_index == oPlayer){
@@ -164,7 +171,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .95 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
 				var sound_effect = snd_BulletHit;
 				if!(audio_is_playing(sound_effect)){
-					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);
+					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}else{
 				if(hit_object.object_index == oPlayer){
@@ -174,7 +181,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 					hit_object.ArmourDurability[0] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];
 					hit_object.ArmourDurability[0] = max(hit_object.ArmourDurability[0], 0);
 				}
-				if(instance_exists(oParticleSystem) && instance_exists(Bullet.stats.Object)){
+				if(instance_exists(oParticleSystem) && instance_exists(attacking_item.stats.Object)){
 					var posX = BloodSplashX;
 					var posY = BloodSplashY;
 					var partSystem = global.ParticleSystem;
@@ -182,7 +189,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 					var numParticles = ceil(max(hit_object.attack_damage / 5, 10));
 
 					for (var i = 0; i < numParticles; i++) {
-					    var randomDirection = random_range(Bullet.stats.Object.RotationAngle - 180 - 90, Bullet.stats.Object.RotationAngle - 180 + 90);
+					    var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
 						part_type_color1(partType, c_gray);
 					    part_type_direction(partType, randomDirection, randomDirection, 0, 0);
 					    part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
@@ -192,11 +199,11 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				}
 				var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
 				if!(audio_is_playing(sound_effect)){
-					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);
+					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}
 		}else{
-			if(instance_exists(oParticleSystem) && instance_exists(Bullet.stats.Object)){
+			if(instance_exists(oParticleSystem) && instance_exists(attacking_item.stats.Object)){
 				var posX = BloodSplashX;
 				var posY = BloodSplashY;
 				var partSystem = global.ParticleSystem;
@@ -204,7 +211,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				var numParticles = ceil(max(hit_object.attack_damage / 5, 10));
 
 				for (var i = 0; i < numParticles; i++) {
-				    var randomDirection = random_range(Bullet.stats.Object.RotationAngle - 180 - 90, Bullet.stats.Object.RotationAngle - 180 + 90);
+				    var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
 				    part_type_direction(partType, randomDirection, randomDirection, 0, 0);
 				    part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
 				    part_particles_create(partSystem, posX, posY, partType, 1);
@@ -213,7 +220,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 			if(global.ItemIndex[#HelmetID, ItemStat.Defense] > .95 || helmet_durability <= 0){
 				var sound_effect = choose(snd_HeadShot1, snd_HeadShot2);
 				if!(audio_is_playing(sound_effect)){
-					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);
+					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}else{
 				if(hit_object.object_index == oPlayer){
@@ -225,7 +232,7 @@ function hit_living_object(hit_object, BodyPart, Bullet, ArmourID, HelmetID, Blo
 				}
 				var sound_effect = snd_HeadShotHelmet;
 				if!(audio_is_playing(sound_effect)){
-					play_sound(BloodSplashX, BloodSplashY, sound_effect, Bullet.stats.Object);
+					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}
 		}

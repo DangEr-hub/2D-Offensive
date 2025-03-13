@@ -207,14 +207,7 @@ function console_submit(Console) {
 	                case "set_window_fullscreen": 
 	                    if(no == 1 && string_digits(c[1]) != ""){
 							window_set_fullscreen(real(c[1])); 
-							
-							if(real(c[1]) == 0){
-								display_set_gui_size(global.window_width, global.window_height);
-								surface_resize(application_surface, global.window_width, global.window_height);
-								window_set_size(global.window_width, global.window_height);
-								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
-								
-							}
+							oConsole.alarm[0] = 10; //Proč to musí byt tolik? Nikdo neví
 						}
 					break;
 					case "hostage":
@@ -234,6 +227,7 @@ function console_submit(Console) {
 							if(real(c[1]) != global.GUIMultiplier){
 								global.GUIMultiplier = clamp(real(c[1]), 1, 2);
 								reset_gui();
+								window_resize();
 							}
 						}
 					break;

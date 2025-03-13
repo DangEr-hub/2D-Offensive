@@ -19,7 +19,7 @@ function is_player_nearby_area(area) {
     return false;
 }
 
-function is_spawn_point_valid(xx, yy) {
+function is_place_free(xx, yy) {
     var spawn_radius = 64;
     var collision_free = true;
 
@@ -66,7 +66,7 @@ function spawn_enemies(map_index) {
 	                spawn_y = irandom_range(area[1], area[3]);
 
 	                // Check if the point is valid
-	                if (is_spawn_point_valid(spawn_x, spawn_y)) {
+	                if (is_place_free(spawn_x, spawn_y)) {
 	                    break;
 	                }
 	                attempts += 1;

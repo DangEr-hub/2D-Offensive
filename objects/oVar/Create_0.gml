@@ -1,6 +1,5 @@
 randomize();
 global.my_console = console_create();
-global.gold_color = make_color_rgb(255, 215, 0);
 global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 global.aberration_level = 0;
 global.saturation_level = 1.8;
@@ -20,7 +19,7 @@ global.GodMode = false;
 global.Hostage = false;
 global.ConsoleHeight = 256;
 global.ConsoleWidth = 512;
-global.GUIHUDAlpha = .33;
+global.GUIHUDAlpha = .75;
 global.FieldOfView = 10;
 global.BloomShader = true;
 global.TimeSpeed = 15;
@@ -122,12 +121,13 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
 
 var desert_spawn_areas = ds_map_create();
-ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]);
+ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]); //x1, y1, x2, y2, enemy number
 ds_map_add(desert_spawn_areas, "area2", [900, 1200, 1500, 1800, 3]);
 ds_map_add(desert_spawn_areas, "area3", [900, 100, 1900, 500, 5]);
 ds_map_add(desert_spawn_areas, "area4", [2300, 400, 3000, 1000, 5]);
 ds_map_add(desert_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);
 global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_areas;
+
 
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";

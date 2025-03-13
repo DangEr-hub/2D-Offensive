@@ -339,7 +339,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 			
 			draw_text_outlined(money_x, money_y, "Money: ", c_white, c_black, 1);
-			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats_struct.Money), global.gold_color, c_black, 1);
+			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats_struct.Money), MAIN_COLOR, c_black, 1);
 			draw_sprite_ext(spr_Coin, 0, money_x + 8 + string_width(money_string)*1.1, money_y, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 
 			draw_set_color(c_black);

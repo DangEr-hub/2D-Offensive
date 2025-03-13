@@ -49,27 +49,35 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	);
 }
 
+function check_enemy_rotation(EnemyObject, ChasingObject){
+	// return true - enemy vidí chasing object
+	// return false - enemy nevidí chasing object
+    var rotation = false;
+    var enemy_x = EnemyObject.x;
+    var enemy_y = EnemyObject.y;
+        
+    var angle_to_player = point_direction(enemy_x, enemy_y, ChasingObject.x, ChasingObject.y);
+    var angle_diff = angle_to_player - EnemyObject.RotationAngle;
+    angle_diff = angle_diff % 360;
+    if (angle_diff > 180) angle_diff -= 360;
+    if (angle_diff < -180) angle_diff += 360;
+
+    if (angle_diff > -90 && angle_diff < 90) {
+        rotation = true;
+    }	
+	
+	return rotation;
+}
+	
+
 function check_if_available(ObjectType) {
     if (instance_exists(ObjectType) && ObjectType != noone) {
-        var rotation = false;
-        var enemy_x = x;
-        var enemy_y = y;
-        
-        var angle_to_player = point_direction(enemy_x, enemy_y, ObjectType.x, ObjectType.y);
-        var angle_diff = angle_to_player - RotationAngle;
-        angle_diff = angle_diff % 360;
-        if (angle_diff > 180) angle_diff -= 360;
-        if (angle_diff < -180) angle_diff += 360;
-
-        if (angle_diff > -90 && angle_diff < 90) {
-            rotation = true;
-        }
 		
 		
         
         return 
         (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.hidden == false && 
-        rotation == true);
+        check_enemy_rotation(id, ObjectType) == true);
     } else {
         return false;
     }

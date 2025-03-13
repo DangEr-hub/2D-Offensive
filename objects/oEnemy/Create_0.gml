@@ -1,7 +1,6 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
 alarm[5] = check_other_enemies_time;

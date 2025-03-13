@@ -1,7 +1,7 @@
 event_inherited();
 draw_set_font(set_font("Menu_small"));
-pause_width_tab = 512 * global.GUIMultiplier;
-pause_height_tab = max(512 * global.GUIMultiplier, 968);
+pause_width_tab = 384 * global.GUIMultiplier;
+pause_height_tab = max(512 * global.GUIMultiplier, 768);
 //pause_width_tab = 768 * global.GUIMultiplier;
 //pause_height_tab = 896;
 
@@ -13,8 +13,7 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 }
 
 title_position_x = zui_get_width() * .5;
-title_position_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
-base_position_y = zui_get_height() * .2 + 24/global.GUIMultiplier;
+title_position_y = zui_get_height() * .2 + 24/global.GUIMultiplier;
 gap = 128;
 
 #region Rank callbacks
@@ -180,8 +179,8 @@ draw_set_font(set_font("Menu_small"));
 
 #region Current player rank
 draw_set_font(set_font("Title"));
-arrow_size = 32 * global.GUIMultiplier;
-rank_y = base_position_y + arrow_size;
+prev_rank_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
+current_rank_y = zui_get_height() * .35 + 24/global.GUIMultiplier;
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 rank_previous = get_rank(global.player_elo_struct.Previous_elo);
 rank_position = 0;
@@ -191,9 +190,9 @@ if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks) * global.GUIMultiplier;
-current_rank_x = zui_get_width() * .5 - (rank_image_size_width*2.21 + string_width("VS"))/2;
+rank_x = zui_get_width() * .5 - (rank_image_size_width + string_width("VS"))/2;
 
-with (zui_create(current_rank_x, rank_y - rank_image_size_height/2, objUIImage)) {
+with (zui_create(rank_x, current_rank_y, objUIImage)) {
 	zui_set_anchor(0, 0);
 	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
 	sprite = spr_ranks;
@@ -202,18 +201,8 @@ with (zui_create(current_rank_x, rank_y - rank_image_size_height/2, objUIImage))
 	sprite_height_size = other.rank_image_size_height;
     callback = other.rank_callbacks[other.rank_position];
 }
-	
-with (zui_create(current_rank_x + arrow_size/2, rank_y + rank_image_size_height/2*1.1, objUIImage)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(other.arrow_size, other.arrow_size);
-	clickable = false;
-	sprite = spr_Arrow;
-	sprite_image_index = 2;
-	sprite_width_size = other.arrow_size;
-	sprite_height_size = other.arrow_size;
-}
 
-with (zui_create(current_rank_x, rank_y + rank_image_size_height/2*1.21 + arrow_size, objUIImage)) {
+with (zui_create(rank_x, prev_rank_y, objUIImage)) {
 	zui_set_anchor(0, 0);
 	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
 	tag = "rank";
@@ -226,16 +215,18 @@ with (zui_create(current_rank_x, rank_y + rank_image_size_height/2*1.21 + arrow_
 #endregion
 
 #region VS text
-with (zui_create(current_rank_x + rank_image_size_width*1.1, rank_y, objUILabel)) {
+with (zui_create(rank_x + rank_image_size_width, prev_rank_y, objUILabel)) {
 	font = set_font("Title");
 	color = MAIN_COLOR;
 	caption = "VS";
 }
 #endregion
 
-#region Current enemy rank
+#region Enemy rank
+
 rank_previous = get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
 rank_position = 0;
+
 if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 	if(global.player_elo_struct.Tracking_game < TRACKING_GAMES/2 - 1){
 		rank_position = get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game + 1]);
@@ -245,27 +236,8 @@ if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
 }
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks) * global.GUIMultiplier;
-with (zui_create(current_rank_x + rank_image_size_width*1.1*1.1 + string_width("VS"), rank_y - rank_image_size_height/2, objUIImage)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
-	sprite = spr_ranks;
-	sprite_image_index = other.rank_position;
-	sprite_width_size = other.rank_image_size_width;
-	sprite_height_size = other.rank_image_size_height;
-    callback = other.rank_callbacks[other.rank_position];
-}
-	
-with (zui_create(current_rank_x + rank_image_size_width*1.1*1.1 + string_width("VS") + arrow_size/2, rank_y + rank_image_size_height/2*1.1, objUIImage)) {
-	zui_set_anchor(0, 0);
-	zui_set_size(other.arrow_size, other.arrow_size);
-	clickable = false;
-	sprite = spr_Arrow;
-	sprite_image_index = 2;
-	sprite_width_size = other.arrow_size;
-	sprite_height_size = other.arrow_size;
-}
 
-with (zui_create(current_rank_x + rank_image_size_width*1.1*1.1 + string_width("VS"), rank_y + rank_image_size_height/2*1.21 + arrow_size, objUIImage)) {
+with (zui_create(rank_x + rank_image_size_width + string_width("VS"), prev_rank_y, objUIImage)) {
 	zui_set_anchor(0, 0);
 	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
 	sprite = spr_ranks;
@@ -273,6 +245,16 @@ with (zui_create(current_rank_x + rank_image_size_width*1.1*1.1 + string_width("
 	sprite_width_size = other.rank_image_size_width;
 	sprite_height_size = other.rank_image_size_height;
     callback = other.rank_callbacks[other.rank_previous];
+}
+
+with (zui_create(rank_x + rank_image_size_width + string_width("VS"), current_rank_y, objUIImage)) {
+	zui_set_anchor(0, 0);
+	zui_set_size(other.rank_image_size_width, other.rank_image_size_height);
+	sprite = spr_ranks;
+	sprite_image_index = other.rank_position;
+	sprite_width_size = other.rank_image_size_width;
+	sprite_height_size = other.rank_image_size_height;
+    callback = other.rank_callbacks[other.rank_position];
 }
 #endregion
 

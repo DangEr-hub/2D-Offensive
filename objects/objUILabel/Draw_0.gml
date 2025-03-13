@@ -1,7 +1,4 @@
-gpu_set_tex_filter(true);
-if(window_get_fullscreen() == true){
-	gpu_set_tex_filter(false);
-}
+
 draw_set_alpha(alpha * alpha_value);
 draw_set_font(font);
 

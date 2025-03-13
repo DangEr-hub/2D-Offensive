@@ -12,7 +12,7 @@ if(instance_exists(MainObject)){
 		#region Knife hit
 		var knife_object = instance_nearest(x, y, oKnife);
 		if (instance_exists(knife_object)) {
-		    if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object.object_index == oPlayer) {
+		    if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer) {
 		        if (knife_object.stats.Object.knife_attack_timer >= 5 && MainObject.hit_timer == -1) {
 		            var hitbox_corners = get_hitbox_corners(knife_object, 25, 50, 20, knife_object.stats.Object.RotationAngle);
 
@@ -23,11 +23,8 @@ if(instance_exists(MainObject)){
 		            var max_y = max(hitbox_corners[0][1], hitbox_corners[1][1], hitbox_corners[2][1], hitbox_corners[3][1]);
 
 		            if (collision_rectangle(min_x, min_y, max_x, max_y, id, true, false)) {
-						if(MainObject.stats.Health_points <= knife_object.stats.Damage){
-							global.player_stats_struct.Money += knife_object.stats.Reward;
-						}
-						
-		                statistics_hit("Health", knife_object.stats.Damage, MainObject);
+						// Znemožnění dát hlavu s nožem - max(image_index, HitBox.BodyWithoutWeapon)
+						hit_living_object(MainObject, max(image_index, HitBox.BodyWithoutWeapon), knife_object, MainObject.ArmourID, MainObject.HelmetID);
 						
 						MainObject.hit_timer = knife_object.stats.Hit_timer;
 		            }

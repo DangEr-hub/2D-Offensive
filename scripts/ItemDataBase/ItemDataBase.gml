@@ -493,7 +493,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[#Item.steel_knife, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.steel_knife, "Steel knife", .5 * game_get_speed(gamespeed_fps), 48, 27, 3, -1, "Tertiary", 0, 1, 10, snd_knife, 5, 2, false,
-	0, 0, 0, 0, 10, 0, 0, 10, 0, 0, 0, 0, 0, "Knife", .97, 0, -1, .25 * game_get_speed(gamespeed_fps), 0, 0, 1, 15);
+	0, 0, 0, 0, 10, 0, 0, 10, 0, 0, 0, 0, 0, "Knife", .97, 1, 0, .25 * game_get_speed(gamespeed_fps), 0, 0, 1, 15);
 	global.ItemIndex[#Item.steel_knife, ItemStat.disadvantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.advantages] = "";
 	global.ItemIndex[#Item.steel_knife, ItemStat.ItemColor] = c_ltgray;

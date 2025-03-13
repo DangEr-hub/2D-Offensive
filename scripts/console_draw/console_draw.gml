@@ -7,6 +7,7 @@
 /// @param text_color2
 /// @param alpha
 function console_draw(c,h,b1,b2,t1,t2,a,w) {
+	gpu_set_tex_filter(false);
 	/*var c,h,b1,b2,t1,t2,a;
 
 	c = argument0;

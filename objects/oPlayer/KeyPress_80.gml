@@ -1,1 +1,1 @@
-in_water = !in_water;
+instance_create_depth(x, y, -100, oBird);
