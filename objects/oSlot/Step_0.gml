@@ -29,10 +29,6 @@ if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
 }
 
 switch(VarSlot){
-	case oPlayer.item_use_position:
-		image_index = 1;
-	break;
-	
 	case OtherSlot.Primary:
 		image_index = 2;
 	break;

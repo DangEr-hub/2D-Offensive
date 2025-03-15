@@ -10,6 +10,9 @@ function ini_player_struct_create(){
 		"Rounds_win": 0,
 		"Rounds_lost": 0,
 		"Played_games": 0,
+		"Won_games": 0,
+		"Lost_games": 0,
+		"Tied_games": 0,
 		"Recent_games": array_create(TRACKING_GAMES/2, -1),
 		"Expected_games": array_create(TRACKING_GAMES/2, -1),
 		"Kills_per_round": array_create(MAX_ROUNDS, 0),
@@ -47,6 +50,14 @@ function update_eggy_rating_system(game_result, enemy_elo, map){
 	global.player_elo_struct.Local_volatility = calculate_local_volatility(global.player_elo_struct.Headshots_per_round, global.player_elo_struct.Kills_per_round);
 	global.player_elo_struct.Game_volatility = calculate_volatility(global.player_elo_struct.Recent_games, global.player_elo_struct.Expected_games);
 	global.player_elo_struct.Recent_games = array_shift_left(global.player_elo_struct.Recent_games, game_result);
+	
+	if(game_result < 0.5){
+		global.player_elo_struct.Lost_games ++;
+	}else if(game_result == 0.5){
+		global.player_elo_struct.Tied_games ++;
+	}else{
+		global.player_elo_struct.Won_games ++;
+	}
 
 
 	var total_kills = sum(global.player_elo_struct.Kills_per_round);

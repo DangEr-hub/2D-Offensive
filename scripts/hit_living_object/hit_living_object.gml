@@ -120,17 +120,11 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
 		ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
 	}
-		
+	
 		
 		if(hit_object.stats.Health_points <= hit_object.attack_damage){
 			if(hit_object.object_index == oEnemy){
 				global.player_stats_struct.Money += global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.reward];
-				if(BodyPart <= HitBox.HeadProne){
-					if(global.ranked_game == true){
-						global.player_stats_struct.Headshots ++;
-						oEggyEloRatingSystem.headshots ++;
-					}
-				}
 				if(global.ranked_game == true){
 					global.player_stats_struct.Kills ++;
 					oEggyEloRatingSystem.kills ++;
@@ -156,6 +150,10 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			if(global.ranked_game == true){
 				global.player_stats_struct.Hit_shots ++;
 				oEggyEloRatingSystem.hit_shots ++;
+				if(BodyPart <= HitBox.HeadProne){
+					global.player_stats_struct.Headshots ++;
+					oEggyEloRatingSystem.headshots ++;
+				}
 			}
 		}
 

@@ -1,5 +1,7 @@
 ViewX = camera_get_view_x(CAMERA);
 ViewY = camera_get_view_y(CAMERA);
+global.GuiW = display_get_gui_width();
+global.GuiH = display_get_gui_height();
 
 
 if(instance_exists(oPlayer)){
@@ -122,12 +124,14 @@ if(instance_exists(oPlayer)){
 	if(RespawnMenu == true && BackGround == -1 && alarm[0] == -1){
 		with(zui_main()){
 			if(other.GameEndMenu == true){
+				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 					alpha_value = 0;
 					alpha = global.GUIHUDAlpha * 2.25; 
 					window_id = id;
 				}
 			}else{
+				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 					alpha_value = 0;
 					alpha = global.GUIHUDAlpha * 2.25; 

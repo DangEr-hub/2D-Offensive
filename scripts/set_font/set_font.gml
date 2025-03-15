@@ -11,14 +11,6 @@ function set_font(Font){
 			}
 		break;
 		
-		case "GUI_button":
-			if(global.GUIMultiplier >= 2){
-				draw_font = fnt_GUIButtonMedium;
-			}else if(global.GUIMultiplier < 2){
-				draw_font = fnt_GUIButtonSmall;
-			}
-		break;
-		
 		case "GUI_grid":
 			if(global.GUIMultiplier >= 2){
 				draw_font = fnt_GUIGridMedium;

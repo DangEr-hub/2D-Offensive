@@ -352,7 +352,6 @@
     {"id":{"name":"console_get_cmd","path":"scripts/console_get_cmd/console_get_cmd.yy",},},
     {"id":{"name":"snd_Glock","path":"sounds/snd_Glock/snd_Glock.yy",},},
     {"id":{"name":"string_wrap","path":"scripts/string_wrap/string_wrap.yy",},},
-    {"id":{"name":"fnt_GUIButtonSmall","path":"fonts/fnt_GUIButtonSmall/fnt_GUIButtonSmall.yy",},},
     {"id":{"name":"Haze_Documentation","path":"scripts/Haze_Documentation/Haze_Documentation.yy",},},
     {"id":{"name":"oSettings","path":"objects/oSettings/oSettings.yy",},},
     {"id":{"name":"haze_rect_delete","path":"scripts/haze_rect_delete/haze_rect_delete.yy",},},

@@ -2197,6 +2197,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 #region Death
 if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
+	flashed_muffled_sounds = 1;
 	oDraw.KilledByWeapon = KilledByWeapon;
 	oDraw.KilledByName = KilledByName;
 	Weapon.image_index = 0;

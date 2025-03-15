@@ -78,7 +78,7 @@ global.player_stats_struct = {
 global.player_elo_struct = ini_player_struct_create();
 
 enum icons{
-	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, total
+	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, total
 }
 
 enum weapon_attachments{

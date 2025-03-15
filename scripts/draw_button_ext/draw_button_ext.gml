@@ -1,4 +1,5 @@
 // draw_button_ext(x, y, width, height, text, normal_color, hover_color)
+/*
 function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_color, type) {
     
     // Check if mouse is over the button

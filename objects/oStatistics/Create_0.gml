@@ -1,19 +1,20 @@
 event_inherited();
-respawn_menu_width_tab = 768 * global.GUIMultiplier;
-respawn_menu_height_tab = 512 * global.GUIMultiplier;
+statistics_width_tab = clamp(768 * global.GUIMultiplier, 768, 1080);
+statistics_height_tab = max(192 * global.GUIMultiplier, 224);
 alpha = 1;
+black = -1;
 
 draw_set_font(set_font("Menu_small"));
-zui_set_size(respawn_menu_width_tab, respawn_menu_height_tab);
+zui_set_size(statistics_width_tab, statistics_height_tab);
 
 statistics_x = zui_get_width() * .25;
-statistics_y = 96;
+statistics_y = max(zui_get_height() * .2, 64);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
 
 #region Statistics
 statistics_number = 3;
-text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
+text_gap = sprite_get_height(spr_Icons)*1.1 * global.GUIMultiplier;
 average_playing_time = average(global.player_elo_struct.Playing_time_per_round, false);
 total_headshots = sum(global.player_elo_struct.Headshots_per_round);
 total_kills = sum(global.player_elo_struct.Kills_per_round);
@@ -68,6 +69,9 @@ with(zui_create(zui_get_width() * .5, statistics_y + statistics_number*sprite_ge
 	zui_set_height(other.button_height);
 	caption = "Close";
 	callback = function(){
+		with(oStatistics.black){
+			zui_destroy();
+		}
 		with(oStatistics){
 			zui_destroy();
 		}

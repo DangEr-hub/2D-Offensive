@@ -711,6 +711,7 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
 }
 
 function pause(ObjectType){
+	//part_particles_clear(global.ParticleSystem);
 	if(instance_exists(oWeaponAttachments)){
 		oPlayer.player_can_shoot = true;
 		with(oWeaponAttachments){
@@ -727,6 +728,7 @@ function pause(ObjectType){
 		}
 	}
 	with(zui_main()){
+		zui_create(0, 0, objUIBlack, -1000);
 		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
 			alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
 			window_id = id;
@@ -734,10 +736,11 @@ function pause(ObjectType){
 	}
 	camera_set_view_angle(CAMERA, 0);
 	ObjectType.alarm[0] = 1;
+	window_resize();
 }
 
 function unpause(ObjectType){
-	with(objZUIMain){
+	with(zui_main()){
 		zui_destroy();
 	}
 	with(ObjectType){
@@ -806,12 +809,14 @@ function reset_gui(){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
 					if(other.GameEndMenu == true){
+						zui_create(0, 0, objUIBlack, -1000);
 						with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 							alpha_value = 0;
 							alpha = global.GUIHUDAlpha * 2.25; 
 							window_id = id;
 						}
 					}else{
+						zui_create(0, 0, objUIBlack, -1000);
 						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 							alpha_value = 0;
 							alpha = global.GUIHUDAlpha * 2.25; 

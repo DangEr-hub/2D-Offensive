@@ -178,6 +178,4 @@ function load_game(){
 	}
 	#endregion
 	
-	oVar.alarm[0] = 2;
-	
 }

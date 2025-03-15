@@ -85,12 +85,13 @@ function InventoryCreate() {
 	var SlotRowSize = 7;
 	var SlotColumnSize = 3;
 	
+	var slot_width = sprite_get_width(spr_Slot)/2*global.GUIMultiplier;
+	var slot_height = sprite_get_height(spr_Slot)/2*global.GUIMultiplier;
+	var start_x = camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2 - (SlotRowSize*slot_width/2);
+	var start_y = camera_get_view_y(CAMERA) + camera_get_view_height(CAMERA)/1.3 - (SlotColumnSize*slot_height/2);
+	
 	for(var i=0;i<SlotRowSize;i++){
-		Instance = instance_create_layer(
-		    camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2 - (SlotRowSize/2*sprite_get_width(spr_Slot)/2*global.GUIMultiplier)+i*sprite_get_width(spr_Slot)/2*global.GUIMultiplier, 
-		    camera_get_view_y(CAMERA) + camera_get_view_height(CAMERA)/1.375 + 32 - SlotColumnSize/2*sprite_get_height(spr_Slot)/2*global.GUIMultiplier,
-		    "OtherO", oSlot
-		);
+		Instance = instance_create_layer(start_x + i*slot_width, start_y, "OtherO", oSlot);
 		Instance.VarSlot = i;
 		if(i == 0){
 			global.InventoryLeftTopCorner = [Instance.x, Instance.y];
@@ -98,38 +99,27 @@ function InventoryCreate() {
 	}
 	
 	for(var i=0;i<SlotRowSize;i++){
-		Instance = instance_create_layer(
-		    camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2 - (SlotRowSize/2*sprite_get_width(spr_Slot)/2*global.GUIMultiplier)+i*sprite_get_width(spr_Slot)/2*global.GUIMultiplier, 
-		    camera_get_view_y(CAMERA) + camera_get_view_height(CAMERA)/1.375 + 32 - SlotColumnSize/2*sprite_get_height(spr_Slot)/2*global.GUIMultiplier + sprite_get_height(spr_Slot)/2*global.GUIMultiplier,
-		    "OtherO", oSlot
-		);
+		Instance = instance_create_layer(start_x + i*slot_width, start_y + slot_height, "OtherO", oSlot);
 		Instance.VarSlot = i + SlotRowSize;
 	}
 	
 	for(var i=0;i<SlotRowSize;i++){
-		Instance = instance_create_layer(
-		    camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2 - (SlotRowSize/2*sprite_get_width(spr_Slot)/2*global.GUIMultiplier)+i*sprite_get_width(spr_Slot)/2*global.GUIMultiplier, 
-		    camera_get_view_y(CAMERA) + camera_get_view_height(CAMERA)/1.375 + 32 - SlotColumnSize/2*sprite_get_height(spr_Slot)/2*global.GUIMultiplier + sprite_get_height(spr_Slot)*2/2*global.GUIMultiplier,
-		    "OtherO", oSlot
-		);
+		Instance = instance_create_layer(start_x + i*slot_width, start_y + slot_height*2, "OtherO", oSlot);
 		Instance.VarSlot = i + SlotRowSize*2;
 		if(i == SlotRowSize - 1){
-			global.InventoryRightBottomCorner = [Instance.x + sprite_get_width(spr_Slot)/2*global.GUIMultiplier, Instance.y + sprite_get_height(spr_Slot)/2*global.GUIMultiplier];
+			global.InventoryRightBottomCorner = [Instance.x + slot_width, Instance.y + slot_height];
 		}
 	}
 	
-	for(var i = 0;i<OtherSlot.Total - INVENTORY_SIZE - 1;i++){
-		Instance = instance_create_layer(
-		    camera_get_view_x(CAMERA) + sprite_get_width(spr_Slot)/4*global.GUIMultiplier + camera_get_view_width(CAMERA)/2 - (SlotRowSize/2*sprite_get_width(spr_Slot)/2*global.GUIMultiplier)+i*sprite_get_width(spr_Slot)/2*global.GUIMultiplier, 
-		    camera_get_view_y(CAMERA) + camera_get_view_height(CAMERA)/1.375 + 32 - SlotColumnSize/2*sprite_get_height(spr_Slot)/2*global.GUIMultiplier - sprite_get_height(spr_Slot)*2/2.5*global.GUIMultiplier,
-		    "OtherO", oSlot
-		);
+	var equipment_slot_size = OtherSlot.Total - INVENTORY_SIZE - 1;
+	for(var i = 0;i<equipment_slot_size;i++){
+		Instance = instance_create_layer(start_x + i*slot_width + ((SlotRowSize-equipment_slot_size)*slot_width/2), start_y - slot_height*1.25, "OtherO", oSlot);
 		Instance.VarSlot = i + OtherSlot.Primary;
 		Instance.image_index = i + 2;
 		if(i == 0){
 			global.InventoryEquipLeftTopCorner = [Instance.x, Instance.y];
 		}else if(i == OtherSlot.Total - INVENTORY_SIZE - 2){
-			global.InventoryEquipRightBottomCorner = [Instance.x + sprite_get_width(spr_Slot)/2*global.GUIMultiplier, Instance.y + sprite_get_height(spr_Slot)/2*global.GUIMultiplier];
+			global.InventoryEquipRightBottomCorner = [Instance.x + slot_width, Instance.y + slot_height];
 		}
 	}
 }

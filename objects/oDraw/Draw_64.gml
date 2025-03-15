@@ -592,7 +592,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 
 #region Slot
 with(oSlot){
-	var scale = 1 * global.GUIMultiplier;
+	var scale = min(1 * global.GUIMultiplier, 1.5 * global.GUIMultiplier);
 	var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 	var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 	var Id = global.Inventory[# VarSlot, Index.slot_id];
@@ -619,8 +619,8 @@ with(oSlot){
 	}
 	
 	if(instance_exists(oPlayer)){
-		if(VarSlot == oPlayer.WeaponID){
-			draw_sprite_ext(sprite_index, 8, xx, yy, scale, scale, 0, image_blend, slot_alpha);
+		if(VarSlot == oPlayer.WeaponID || oPlayer.item_use_position == VarSlot){
+			draw_sprite_ext(sprite_index, 1, xx, yy, scale, scale, 0, image_blend, slot_alpha);
 		}
 	}
 	
@@ -757,10 +757,6 @@ if(RespawnMenu == false){
 		}
 	}
 }
-#endregion
-
-#region Console
-console_draw(global.my_console, global.ConsoleHeight * global.GUIMultiplier,c_gray,c_silver,c_white,c_white, global.GUIHUDAlpha*2, global.ConsoleWidth * global.GUIMultiplier);
 #endregion
 
 #region Crosshair

@@ -289,7 +289,6 @@
     {"name":"console_get_cmd","order":12,"path":"scripts/console_get_cmd/console_get_cmd.yy",},
     {"name":"snd_Glock","order":7,"path":"sounds/snd_Glock/snd_Glock.yy",},
     {"name":"string_wrap","order":11,"path":"scripts/string_wrap/string_wrap.yy",},
-    {"name":"fnt_GUIButtonSmall","order":1,"path":"fonts/fnt_GUIButtonSmall/fnt_GUIButtonSmall.yy",},
     {"name":"Haze_Documentation","order":6,"path":"scripts/Haze_Documentation/Haze_Documentation.yy",},
     {"name":"oSettings","order":16,"path":"objects/oSettings/oSettings.yy",},
     {"name":"haze_rect_delete","order":8,"path":"scripts/haze_rect_delete/haze_rect_delete.yy",},

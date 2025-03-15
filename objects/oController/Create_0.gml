@@ -1,13 +1,9 @@
 application_surface_draw_enable(true);
 draw_set_valign(1);
 
-alarm[0] = 1;
+alarm[0] = 10;
 surf_horizontal = -1;
 surf_vertical = -1;
-
-//if(window_get_fullscreen() == false){
-//	global.GUIMultiplier *= 1.02;	
-//}
 
 
 if!(instance_exists(oConsole)){
@@ -19,7 +15,7 @@ popup_exit_callback_positive = function () {
 }
 				
 exit_callback = function(){
-	ui_show_popup("Are you sure?", "Exit", "Yes", "No", 256 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);
+	ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);
 }
 
 play_unranked_callback = function(){
@@ -89,7 +85,7 @@ settings_callback = function(){
 
 with (zui_main()) {
 	var window_id = noone;
-	var button_width = 128 * global.GUIMultiplier;
+	var button_width = max(128 * global.GUIMultiplier, 192);
 	var button_height = 32 * global.GUIMultiplier;
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1, objUIButton)){
 		zui_set_anchor(0.5, 0);

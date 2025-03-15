@@ -1,11 +1,13 @@
 event_inherited();
-respawn_menu_width_tab = 768 * global.GUIMultiplier;
-respawn_menu_height_tab = 512 * global.GUIMultiplier;
+damage_table_width_tab = min(768 * global.GUIMultiplier, 1080);
+damage_table_height_tab = max(128 * global.GUIMultiplier + ((ds_map_size(oPlayer.HitMap) + 2)*32*global.GUIMultiplier), 352);
 alpha = 1;
+black = -1;
 
 draw_set_font(set_font("Menu_small"));
-zui_set_size(respawn_menu_width_tab, respawn_menu_height_tab);
+zui_set_size(damage_table_width_tab, damage_table_height_tab);
 
+killed_by_y = max(zui_get_height() * .1, 64);
 offset_position_y = 32;
 offset_position_x = 32;
 grid_height = min((ds_map_size(oPlayer.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
@@ -17,7 +19,7 @@ if(oEggyEloRatingSystem.player_win == false){
 	killed_by_name = oDraw.KilledByName;
 	KilledByString = "killed by: " + string(killed_by_name) + " by " + string(killed_by_weapon);
 	
-	with (zui_create(zui_get_width() * .5 - string_width(KilledByString)/2, zui_get_height() * .1, objUILabel)) {
+	with (zui_create(zui_get_width() * .5 - string_width(KilledByString)/1.75, killed_by_y, objUILabel)) {
 		caption = "You died - " + other.KilledByString;
 	}
 }
@@ -32,6 +34,9 @@ with(zui_create(zui_get_width() * .5, offset_position_y + grid_height, objUIButt
 	zui_set_height(other.button_height);
 	caption = "Close";
 	callback = function(){
+		with(oDamageTable.black){
+			zui_destroy();
+		}
 		with(oDamageTable){
 			zui_destroy();
 		}
