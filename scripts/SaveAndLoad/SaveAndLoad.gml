@@ -62,12 +62,12 @@ function save_game(){
 	ini_close();
 	#endregion
 	
-	#region Save player elo stats
-	if(file_exists("player_elo_stats.json")){
-		file_delete("player_elo_stats.json");
+	#region Save player ep stats
+	if(file_exists("player_rating_stats.json")){
+		file_delete("player_rating_stats.json");
 	}
-	var json_string = json_stringify(global.player_elo_struct);
-	var file = file_text_open_write("player_elo_stats.json");
+	var json_string = json_stringify(global.player_rating_struct);
+	var file = file_text_open_write("player_rating_stats.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
 	#endregion
@@ -150,12 +150,12 @@ function load_game(){
 	}
 	#endregion
 	
-	#region Load player elo stats
-	if (file_exists("player_elo_stats.json")) {
-	    var file = file_text_open_read("player_elo_stats.json");
+	#region Load player ep stats
+	if (file_exists("player_rating_stats.json")) {
+	    var file = file_text_open_read("player_rating_stats.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
-	    global.player_elo_struct = json_parse(json_string);
+	    global.player_rating_struct = json_parse(json_string);
 	}
 	#endregion
 	

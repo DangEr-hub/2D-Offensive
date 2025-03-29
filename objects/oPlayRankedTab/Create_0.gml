@@ -19,10 +19,10 @@ map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
 if(global.MapID != -1){
-	global.map_rounds[global.MapID][0] = global.player_elo_struct.Rounds_win;
-	global.map_rounds[global.MapID][1] = global.player_elo_struct.Rounds_lost;
-	global.player_elo_struct.Rounds_win = 0;
-	global.player_elo_struct.Rounds_lost = 0;	
+	global.map_rounds[global.MapID][0] = global.player_rating_struct.Rounds_win;
+	global.map_rounds[global.MapID][1] = global.player_rating_struct.Rounds_lost;
+	global.player_rating_struct.Rounds_win = 0;
+	global.player_rating_struct.Rounds_lost = 0;	
 }
 
 for(var j=0;j<MapIndex.Total;j++){
@@ -33,28 +33,28 @@ for(var j=0;j<MapIndex.Total;j++){
 map_callbacks = [
     function() { 
 		set_map_rounds(MapIndex.Desert);
-		if(global.player_elo_struct.Played_games <= 0){
+		if(global.player_rating_struct.Played_games <= 0){
 			update_player_expected_games();
 		}
 		room_goto(rm_Desert);
 	},
     function() { 
 		set_map_rounds(MapIndex.RainForest);
-		if(global.player_elo_struct.Played_games <= 0){
+		if(global.player_rating_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
 		room_goto(rm_RainForest); 
 	},
     function() { 
 		set_map_rounds(MapIndex.City);
-		if(global.player_elo_struct.Played_games <= 0){
+		if(global.player_rating_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
 		room_goto(rm_Desert); 
 	},
     function() { 
 		set_map_rounds(MapIndex.Nuclear);
-		if(global.player_elo_struct.Played_games <= 0){
+		if(global.player_rating_struct.Played_games <= 0){
 			update_player_expected_games();
 		} 
 		room_goto(rm_Desert); 

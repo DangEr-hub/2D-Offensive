@@ -8,9 +8,9 @@ for (var i = 0; i < enemy_count; i++) {
 	    if (other_enemy != id) {
 	        var dist = point_distance(x, y, other_enemy.x, other_enemy.y);
 
-	        if (dist <= 128 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) {
+	        if (dist <= 128 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) {
 	            if (other_enemy.ChasingObjectSpotted == true) {
-	                ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+	                ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
 	            }
 	        }
 	   }

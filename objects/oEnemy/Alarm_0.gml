@@ -9,29 +9,29 @@ function decide_movement() {
 
 function handle_basic_movement() {
 	if(stats.Health_points <= stats.Max_health_points / 3){
-	    if (percent_chance(25 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
+	    if (percent_chance(25 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MoveAway) {
 	        State = States.MoveAway;
-	    } else if (percent_chance(40 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveShoot) {
+	    } else if (percent_chance(40 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MoveShoot) {
 	        State = States.MoveShoot;
-	    } else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MovePredictive){
+	    } else if(percent_chance(50 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MovePredictive){
 			State = States.MovePredictive;
 		} else {
 	        choose_offensive_action();
 	    }
 	}else{
-		if(percent_chance(10 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		if(percent_chance(10 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 			if(State != States.Move){
 				State = States.Move;
 			}
-		}else if(percent_chance(10 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		}else if(percent_chance(10 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 			if(State != States.MoveShoot){
 				State = States.MoveShoot;	
 			}
-		}else if(percent_chance(75 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+		}else if(percent_chance(75 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 			if(State != States.MoveToward){
 				State = States.MoveToward;	
 			}
-	    } else if(percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MovePredictive){
+	    } else if(percent_chance(50 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MovePredictive){
 			State = States.MovePredictive;
 		}else{
 			choose_offensive_action();
@@ -40,9 +40,9 @@ function handle_basic_movement() {
 }
 
 function handle_smoke_movement() {
-    if (percent_chance(75 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveInSmoke) {
+    if (percent_chance(75 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MoveInSmoke) {
         State = States.MoveInSmoke;
-    } else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])) && State != States.MoveAway) {
+    } else if (percent_chance(50 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])) && State != States.MoveAway) {
         State = States.MoveAway;
     } else if (State != States.MoveShoot) {
         State = States.MoveShoot;
@@ -61,12 +61,12 @@ function choose_offensive_action() {
 
 if(instance_exists(ChasingObject) && ChasingObject != noone){
     
-    alarm[0] = random_range(15, 25) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]);
+    alarm[0] = random_range(15, 25) * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]);
 	
 	if(check_if_available(ChasingObject) || ChasingObjectSpotted == true && global.EnemyCanMove == true){
 		if(ChasingObjectSpotted == false){
 			ReactionTimer = ReactionTime;
-			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game])));
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
 		}
 		if(ReactionTimer <= 0){
 			if(State != States.Chase){	
@@ -78,7 +78,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 						if (stats.Health_points <= stats.Max_health_points / 3) {
 						    if (Ammo[WeaponPositionID] <= 0 && Reloading == false) {
 						        reload_ai();
-						    } else if (healing == false && percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))) {
+						    } else if (healing == false && percent_chance(50 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))) {
 						        if (health_packs > 0) {
 									healing_ai();
 						            healing = true;
@@ -116,11 +116,11 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 							
 								#region Basic movement
 								if(NearestDangerObject != id){
-									if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+									if(percent_chance(50 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 										if(State != States.MoveAwayFromGrenade){
 											State = States.MoveAwayFromGrenade;
 										}
-									}else if (percent_chance(50 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+									}else if (percent_chance(50 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 										if(State != States.MoveShoot){
 											State = States.MoveShoot;	
 										}
@@ -213,7 +213,7 @@ if(global.EnemyCanMove == true){
 		break;
 		
 		case States.Idle:
-			if(percent_chance(10 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+			if(percent_chance(10 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 				MoveIdle();
 			}
 		break;
@@ -250,7 +250,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				if(percent_chance(50 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+				if(percent_chance(50 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
 			}
@@ -258,7 +258,7 @@ if(global.EnemyCanMove == true){
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				if(percent_chance(10 * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]))){
+				if(percent_chance(10 * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
 					MoveIdle();
 				}
 			}

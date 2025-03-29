@@ -62,7 +62,7 @@ if(description = ""){
 		var advantages_x = x;
 		var advantages_y = y + offset_y;
 		draw_text_outlined(disadvantages_x, advantages_y, disadvantages_string, c_red, c_black, 1);
-		draw_text_outlined(advantages_x, advantages_y, advantages_string, c_green, c_black, 1);
+		draw_text_outlined(advantages_x, advantages_y, advantages_string, c_yellow, c_black, 1);
 						
 						
 		draw_set_font(set_font("Console"));

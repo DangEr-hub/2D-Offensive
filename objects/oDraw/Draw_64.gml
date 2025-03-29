@@ -220,7 +220,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				}
 					
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, get_rank(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_ranks, get_rank(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 				}
 			}
 		}
@@ -482,8 +482,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 			
 			var rank_position = 0;
-			if(global.player_elo_struct.Played_games >= TRACKING_GAMES/2){
-				rank_position = get_rank(global.player_elo_struct.Elo);	
+			if(global.player_rating_struct.Played_games >= TRACKING_GAMES/2){
+				rank_position = get_rank(global.player_rating_struct.Ep);	
 			}
 			if!(instance_exists(oInventory)){
 				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -516,8 +516,8 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		#region Draw ranked score
 		if(global.ranked_game == true){
 			draw_set_font(set_font("Title"));
-			var player_score = string(global.player_elo_struct.Rounds_win);
-			var enemy_score = string(global.player_elo_struct.Rounds_lost);
+			var player_score = string(global.player_rating_struct.Rounds_win);
+			var enemy_score = string(global.player_rating_struct.Rounds_lost);
 			var separator = "/";
 			var score_string_width = string_width(player_score + enemy_score + separator);
 			var player_score_string_width = string_width(player_score);
@@ -555,16 +555,16 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 			draw_text_outlined(AdminHUDX - string_width(inaccuracy_string), AdminHUDY + TextHeightSmall*3, inaccuracy_string, c_white, c_black, 1);	
 		
 			if(global.ranked_game == true){
-				//Elo
-				var player_elo = global.player_elo_struct.Elo;
+				//Ep
+				var player_elo = global.player_rating_struct.Ep;
 				var elo_string = "EP: " + string_format(convert_back(player_elo), 0, 1);
 				var elo_string_eggy_scale = "EP (eggy scale): " + string_format(player_elo, 0, 1);
 				draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
 				draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
 		
 				//Volatility
-				var player_game_volatility = global.player_elo_struct.Local_volatility;
-				var player_volatility = global.player_elo_struct.Game_volatility;
+				var player_game_volatility = global.player_rating_struct.Local_volatility;
+				var player_volatility = global.player_rating_struct.Game_volatility;
 				var volatility_string = "Global volatility: " + string_format(player_volatility, 0, 1);
 				var game_volatility_string = "Local volatility: " + string_format(player_game_volatility, 0, 1);
 				draw_text_outlined(AdminHUDX - string_width(volatility_string), AdminHUDY + TextHeightSmall*6, volatility_string, c_white, c_black, 1);	
@@ -572,11 +572,11 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 			
 				//Enemy elos
 				var enemy_elos_string = "Enemy EP: [ ";
-				var enemy_elos_string_eggy_scale = "Enemy EP (eggy scale): " + string(global.player_elo_struct.Enemy_elo);
+				var enemy_elos_string_eggy_scale = "Enemy EP (eggy scale): " + string(global.player_rating_struct.Enemy_ep);
 			
-				for (var i = 0; i < array_length(global.player_elo_struct.Enemy_elo); i++) {
-				    var converted_elo = convert_back(global.player_elo_struct.Enemy_elo[i]);
-				    enemy_elos_string += string(converted_elo) + (i < array_length(global.player_elo_struct.Enemy_elo) - 1 ? "," : "");
+				for (var i = 0; i < array_length(global.player_rating_struct.Enemy_ep); i++) {
+				    var converted_elo = convert_back(global.player_rating_struct.Enemy_ep[i]);
+				    enemy_elos_string += string(converted_elo) + (i < array_length(global.player_rating_struct.Enemy_ep) - 1 ? "," : "");
 				}
 				enemy_elos_string += " ]";
 				draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*8, enemy_elos_string, c_white, c_black, 1);	

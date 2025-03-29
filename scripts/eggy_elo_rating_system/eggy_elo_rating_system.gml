@@ -1,11 +1,48 @@
+function rd_weight(rd){
+	return 1 / (1 + rd);
+}
+
+function eggy_weight(ep_diff, rd_player, rd_enemy) {
+    var alpha = 1 / (1 + exp(-ep_diff / 10));
+    return alpha * rd_weight(rd_player) + (1 - alpha) * rd_weight(rd_enemy);
+}
+
+function calculate_probability(player_ep, enemy_ep, rd_player, rd_enemy) {
+	var ep_diff = player_ep - enemy_ep;
+    var weight = -eggy_weight(ep_diff, rd_player, rd_enemy);
+    var rd_diff = rd_player - rd_enemy;
+    var offset = RD_OFFSET;
+    var scale = 1;
+
+    if ((abs(rd_diff) <= offset && rd_player < offset) || rd_enemy < offset) {
+        scale = (ep_diff > 0) ? 0.75 : 1.0;
+    } else if (rd_diff < 0) {
+        scale = (ep_diff > 0) ? 1.5 : 1.0;
+    }
+
+    return 1 / (1 + power(exp(1), weight * ep_diff * scale));
+}
+
+function calculate_game_information(rd_enemy){
+	var information_sum = 0;
+	for(var i = 0; i < TRACKING_GAMES/2; i ++){
+		prob_win = calculate_probability();
+		information_sum += rd_weight(rd_enemy[i]) * prob_win[i] * (1 - prob_win[i]);
+	}
+	
+	return information_sum;
+}
+
+
 function ini_player_struct_create(){
 	var player_struct = {
-		"Previous_elo": convert_to_eggy_scale(PLAYER_STARTING_ELO + 1),
+		"Player_ep": array_create(TRACKING_GAMES, MIN_EP),
+		"Previous_ep": convert_to_eggy_scale(MIN_EP),
 		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
 		"Game_volatility": PLAYER_STARTING_VOLATILITY,
 		"Local_volatility": PLAYER_STARTING_VOLATILITY,
-		"Elo": convert_to_eggy_scale(PLAYER_STARTING_ELO), ///Eggy scale
-		"Tracking_game": 0,
+		"Ep": convert_to_eggy_scale(MIN_EP), ///Eggy scale
+		"Current_game": 0,
 		"Current_round": 0,
 		"Rounds_win": 0,
 		"Rounds_lost": 0,
@@ -13,11 +50,13 @@ function ini_player_struct_create(){
 		"Won_games": 0,
 		"Lost_games": 0,
 		"Tied_games": 0,
-		"Recent_games": array_create(TRACKING_GAMES/2, -1),
-		"Expected_games": array_create(TRACKING_GAMES/2, -1),
+		"Player_rd": array_create(TRACKING_GAMES, RD_START),
+		"Recent_results": array_create(TRACKING_GAMES/2, -1),
+		"Expected_results": array_create(TRACKING_GAMES/2, -1),
 		"Kills_per_round": array_create(MAX_ROUNDS, 0),
 		"Headshots_per_round": array_create(MAX_ROUNDS, 0),
-		"Enemy_elo": array_create(TRACKING_GAMES/2, -1),
+		"Enemy_ep": array_create(TRACKING_GAMES/2, -1),
+		"Enemy_rd": array_create(TRACKING_GAMES/2, RD_START)
 	}
 	
 	return player_struct;
@@ -26,132 +65,225 @@ function ini_player_struct_create(){
 function set_map_rounds(Map){
 	global.MapID = Map;
 	if(global.map_rounds[Map][2] == -1){
-		global.map_rounds[Map][2] = global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game];
+		global.map_rounds[Map][2] = global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game];
 	}
 	if(global.map_rounds[Map][0] != -1){
-		global.player_elo_struct.Rounds_win = global.map_rounds[Map][0];
-		global.player_elo_struct.Rounds_lost = global.map_rounds[Map][1];
+		global.player_rating_struct.Rounds_win = global.map_rounds[Map][0];
+		global.player_rating_struct.Rounds_lost = global.map_rounds[Map][1];
 	}
 }
 
 function clear_player_statistics(total_rounds){
-	global.player_elo_struct.Rounds_win = 0;
-	global.player_elo_struct.Rounds_lost = 0;
-	global.player_elo_struct.Current_round = 0;
+	global.player_rating_struct.Rounds_win = 0;
+	global.player_rating_struct.Rounds_lost = 0;
+	global.player_rating_struct.Current_round = 0;
 	for(var i=0;i<total_rounds;i++){
-		global.player_elo_struct.Headshots_per_round[i] = 0
-		global.player_elo_struct.Kills_per_round[i] = 0;
-		global.player_elo_struct.Playing_time_per_round[i] = 0;
+		global.player_rating_struct.Headshots_per_round[i] = 0;
+		global.player_rating_struct.Kills_per_round[i] = 0;
+		global.player_rating_struct.Playing_time_per_round[i] = 0;
 	}
 }
 
-function update_eggy_rating_system(game_result, enemy_elo, map){
-	global.player_elo_struct.Played_games ++;
-	global.player_elo_struct.Local_volatility = calculate_local_volatility(global.player_elo_struct.Headshots_per_round, global.player_elo_struct.Kills_per_round);
-	global.player_elo_struct.Game_volatility = calculate_volatility(global.player_elo_struct.Recent_games, global.player_elo_struct.Expected_games);
-	global.player_elo_struct.Recent_games = array_shift_left(global.player_elo_struct.Recent_games, game_result);
+function clear_tracking_period(){
+	for(var i=0;i<TRACKING_GAMES;i++){
+		global.player_rating_struct.Recent_results[i] = -1;
+		global.player_rating_struct.Expected_results[i] = -1;
+	}
+}
+
+function update_eggy_rating_system(game_result, Enemy_ep, Enemy_rd, map){
+	var player_ep = global.player_rating_struct.Player_ep[global.player_rating_struct.Current_game];
+	var player_rd = global.player_rating_struct.Player_rd[global.player_rating_struct.Current_game];
+	var enemy_ep = global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game];
+	var enemy_rd = global.player_rating_struct.Enemy_rd[global.player_rating_struct.Current_game];
+	var expected_result = calculate_probability(player_ep, enemy_ep, player_rd, enemy_rd);
+	global.player_rating_struct.Played_games ++;
+	global.player_rating_struct.Local_volatility = calculate_local_volatility(global.player_rating_struct.Headshots_per_round, global.player_rating_struct.Kills_per_round);
+	global.player_rating_struct.Recent_results = array_shift_left(global.player_rating_struct.Recent_results, game_result);
+	global.player_rating_struct.Expected_results = array_shift_left(global.player_rating_struct.Expected_results, expected_result);	
+	
+	if(global.player_rating_struct.Current_game % TRACKING_GAMES == 0){
+		global.player_rating_struct.Game_volatility = calculate_global_volatility(global.player_rating_struct.Recent_results, global.player_rating_struct.Expected_results);	
+		global.player_rating_struct.Current_game = 0;
+		clear_tracking_period();
+	}
+	
+	global.player_rating_struct.Current_game ++;
 	
 	if(game_result < 0.5){
-		global.player_elo_struct.Lost_games ++;
+		global.player_rating_struct.Lost_games ++;
 	}else if(game_result == 0.5){
-		global.player_elo_struct.Tied_games ++;
+		global.player_rating_struct.Tied_games ++;
 	}else{
-		global.player_elo_struct.Won_games ++;
+		global.player_rating_struct.Won_games ++;
 	}
 
-
-	var total_kills = sum(global.player_elo_struct.Kills_per_round);
-	var total_headshots = sum(global.player_elo_struct.Headshots_per_round);
-	var elo_bonus = get_elo_current(
-		calculate_probability(global.player_elo_struct.Elo, enemy_elo),
+	var ep_change = calculate_ep_change(
+		expected_result,
 		game_result, 
-		global.player_elo_struct.Game_volatility, 
-		global.player_elo_struct.Local_volatility, 
-		total_kills, 
-		total_headshots, 
-		global.player_elo_struct.Elo, 
-		map,
-		enemy_elo
+		global.player_rating_struct.Game_volatility, 
+		global.player_rating_struct.Local_volatility, 
+		sum(global.player_rating_struct.Kills_per_round), 
+		sum(global.player_rating_struct.Headshots_per_round), 
+		player_ep, 
+		player_rd,
+		enemy_ep,
+		enemy_rd,
+		map	
 	);
 	
-	global.player_elo_struct.Previous_elo = global.player_elo_struct.Elo;
-	global.player_elo_struct.Elo += elo_bonus;
-	global.player_elo_struct.Elo = max(global.player_elo_struct.Elo, convert_to_eggy_scale(1));
+	global.player_rating_struct.Previous_ep = global.player_rating_struct.Ep;
+	global.player_rating_struct.Ep += ep_change;
 }
 
 function update_tracking_games(){
-	global.player_elo_struct.Tracking_game ++;
+	global.player_rating_struct.Current_game ++;
 	
-	if(global.player_elo_struct.Played_games % (TRACKING_GAMES/2) == 0 || global.player_elo_struct.Played_games == 1){
-		global.player_elo_struct.Tracking_game = 0;
+	if(global.player_rating_struct.Played_games % TRACKING_GAMES == 0){
+		global.player_rating_struct.Current_game = 0;
 		update_player_expected_games();	
 	}
 }
 
-function get_enemy_elo(player_elo){
-	return max(random_range(player_elo * .75, player_elo * 1.5), 0);	
+function get_enemy_ep(player_ep){
+	return max(random_range((player_ep + 1) * .75, (player_ep + 1) * 1.5), 0);	
+}
+
+function get_enemy_rd(player_rd){
+	return max(random_range(player_rd * .5, (player_rd * 5.0)), 0);	
 }
 
 function update_player_expected_games(){
-	for(var i=0;i<TRACKING_GAMES/2;i++){
-		global.player_elo_struct.Enemy_elo[i] = get_enemy_elo(global.player_elo_struct.Elo);
-		global.player_elo_struct.Expected_games[i] = calculate_probability(global.player_elo_struct.Elo, global.player_elo_struct.Enemy_elo[i]);
+	/* Updatovaní každou hru */
+	for(var i=0;i<array_length(global.player_rating_struct.Expected_results);i++){
+		global.player_rating_struct.Enemy_ep[i] = get_enemy_ep(global.player_rating_struct.Ep);
+		global.player_rating_struct.Enemy_rd[i] = get_enemy_rd(global.player_rating_struct.Rd);
+		global.player_rating_struct.Expected_results[i] = calculate_probability(
+															global.player_rating_struct.Ep, global.player_rating_struct.Enemy_ep[i],
+															global.player_rating_struct.Rd,
+															global.player_rating_struct.Enemy_rd[i]
+														);
 	}
 }
 
-function convert_to_eggy_scale(elo) {
-    var elo_offset = 100;
-    var max_elo = 1900;
-    var min_elo = 0;
-    var normalized_elo = (elo - min_elo + elo_offset) / (max_elo - min_elo + elo_offset);
-    var power_variable = 2;
-    var eggy_scale = power(normalized_elo, 1 / power_variable);
-    return abs(eggy_scale * max_elo);
+function convert_to_eggy_scale(ep) {
+    return (ep - MIN_EP) / ES_MODIFIER;
 }
 
-function convert_back(eggy_elo) {
-    var elo_offset = 100;
-    var max_elo = 1900;
-    var min_elo = 0;
-    var power_variable = 2;
-    var normalized_eggy = eggy_elo / max_elo;
-    var normalized_elo = power(normalized_eggy, power_variable);
-    return abs(normalized_elo * (max_elo - min_elo + elo_offset) - elo_offset + min_elo);
+function convert_back(eggy_ep) {
+    return (eggy_ep * ES_MODIFIER + MIN_EP);
 }
 
-function calculate_probability(player_elo, enemy_elo) {
-    var exponent = (enemy_elo - player_elo) / 400;
-    return 1 / (1 + power(2, exponent));
-}
 
-function get_elo_current(probability_of_winning, game_result, volatility, game_volatility, player_kills, player_headshots, player_elo_scale, map, enemy_elo_scale, base_k=4) {
-    var kill_weight = 0.2;
-    var headshot_weight = 0.3;	
-    var average_kills = get_average_kills(map);
-    var average_headshots = get_average_headshots(player_elo_scale, average_kills * 0.1, average_kills, convert_to_eggy_scale(GLOBAL_MASTER_ELO)); ///Eggy scale
-    var kill_ratio = get_performance_ratio(player_kills, average_kills);
-    var headshot_ratio = get_performance_ratio(player_headshots, average_headshots);
-    var kill_bonus = kill_ratio * kill_weight;
-    var headshot_bonus = headshot_ratio * headshot_weight;
-    var total_bonus = kill_bonus + headshot_bonus;	
-	var elo_ratio_weight = 5;
-	var elo_difference = enemy_elo_scale - player_elo_scale;
-	var elo_scale_factor = 1 / (1 + exp(-abs(elo_difference) / 400));
-	var elo_ratio = 1;
+function std(array){
+	var avg = average(array);
+	var sum_array = 0;
+	var n = array_length(array);
+	if (n <= 1) return 0;
 	
-	if (elo_difference > 0) {
-	    elo_ratio = elo_ratio_weight * elo_scale_factor;
-	} else {
-	    elo_ratio = elo_ratio_weight / elo_scale_factor;
+	for(var i = 0;i<n;i++){
+		sum_array += power(array[i] - avg, 2);
 	}
-		
-	var game_result_weight = 7;	
-	var elo_game_result = (game_result - probability_of_winning) * game_result_weight;
-    var K = base_k * (1 + volatility) * (1 + game_volatility);
-    return K * ((elo_game_result + total_bonus) * elo_ratio);
+	
+	return sqrt(sum_array/(n-1));
 }
 
-function calculate_volatility(player_recent_results, player_recent_expected) {
+function calculate_rd(){
+		
+}
+
+function calculate_team_ep(enemy_ep, enemy_rd){
+	var ep_sum = 0;
+	var rd_sum = 0
+	
+	for(var i = 0; i < array_length(enemy_ep); i ++){
+		ep_sum += (enemy_ep[i]/power(enemy_rd[i], 2));	
+		rd_sum += (1/power(enemy_rd[i], 2));	
+	}
+	
+	var ep_opponent = ep_sum/rd_sum;
+	return ep_opponent;
+}
+
+function ep_diff_modifier(rd, ep_diff, game_result) {
+    var result_diff = sign(game_result - 0.5);
+    var uncertainty_factor = 1 / (1 + rd);
+    var sigmoid_component = 1 / (1 + exp(result_diff * diff * 0.5));
+    return sigmoid_component * uncertainty_factor * 0.5;
+}
+
+function calculate_team_rd(rd){	
+	return average(rd) + 0.5 * std(rd);
+}
+
+function calculate_ep_change(prob_win, game_result, volatility_l, volatility_g, your_kills, your_hs, A_ep, A_rd, B_ep, B_rd, map, team_kills = -1, team_hs = -1) {
+	
+   #region Statistics modifier
+	var kill_weight = 0.25;
+    var headshot_weight = 0.5;	
+	
+	//Pseudo-výpočet průměrných killů pro singleplayer
+	var average_kills = get_average_kills(map);
+	if(is_array(team_kills)){
+		average_kills = average(team_kills);	
+	}
+	
+	//Pseudo-výpočet průměrných headshotů pro singleplayer
+	var average_hs = get_average_headshots(A_ep, average_kills * .1, average_kills, convert_to_eggy_scale(GLOBAL_MASTER_EP)); // Průměrně minimálně 10% killů jsou headshoty
+	if(is_array(team_hs)){
+		average_hs = average(team_hs);	
+	}
+
+    var kill_ratio = your_kills/average_kills;
+    var headshot_ratio = your_hs/average_hs;
+    var kill_modifier = kill_ratio * kill_weight;
+    var headshot_modifier = headshot_ratio * headshot_weight;
+    var statistics_modifier = kill_modifier + headshot_modifier;
+	#endregion
+	
+	#region EP difference modifier
+	var B_eggy_points = B_ep;
+	var B_rating_d = B_rd;
+	var A_eggy_points = A_ep;
+	var A_rating_d = A_rd;
+	
+	// Pokud je A team, vypočti jejich EP na základě jejich RD
+	if(is_array(A_ep) && is_array(A_rd)){
+		A_eggy_points = calculate_team_ep(A_ep, A_rd);
+	}
+	
+	// Pokud je B team, vypočti jejich EP na základě jejich RD
+	if(is_array(B_ep) && is_array(B_rd)){
+		B_eggy_points = calculate_team_ep(B_ep, B_rd);
+		B_rating_d = calculate_team_rd(B_rd);
+	}
+	
+	var ep_difference = B_eggy_points - A_eggy_points;
+	var ep_modifier_diff = ep_diff_modifier(B_rating_d, ep_difference, game_result);
+	#endregion
+	
+	#region Game result modifier	
+	var result = game_result - 0.5; // 0 je remíza, > 0 je výhra, < 0 je prohra
+	
+	var ep_game_result_modifier = game_result - prob_win;
+	#endregion
+	
+	#region RD modifier
+	var total_volatility = 1 + volatility_g + volatility_l * volatility_g;
+	var rd_modifier = 1;
+	#endregion
+	
+	var base_modifier = (1 + ep_modifier_diff + statistics_modifier);
+	var base = 0.25;
+	
+	if(result < 0){
+		base_modifier = 1 / base_modifier;
+	}
+	
+    return base + (game_result - prob_win);
+}
+
+function calculate_global_volatility(player_recent_results, player_recent_expected) {
 	var valid_entries = 0;
     var sum_abs_diff = 0;
     var n = array_length(player_recent_results);
@@ -161,11 +293,11 @@ function calculate_volatility(player_recent_results, player_recent_expected) {
             continue;
         }
         var diff = player_recent_results[i] - player_recent_expected[i];
-        sum_abs_diff += abs(diff);
+        sum_abs_diff += power(diff, 2);
         valid_entries++;
     }
 	
-    var volatility = valid_entries > 0 ? sum_abs_diff / valid_entries : PLAYER_STARTING_VOLATILITY;
+    var volatility = valid_entries > 0 ? sqrt(sum_abs_diff / valid_entries) : PLAYER_STARTING_VOLATILITY;
     return volatility;
 }
 
@@ -191,22 +323,14 @@ function get_average_kills(map) {
     return average_kills;
 }
 
-/// @desc Estimate the average number of headshots for a given Elo using an exponential model
-function get_average_headshots(player_elo, base_headshots, max_headshots, max_elo) {
-    var normalized_elo = player_elo / max_elo;
-    var growth_factor = (exp(normalized_elo * 10) - 1) / (exp(10) - 1);
+/// @desc Estimate the average number of headshots for a given Ep using an exponential model
+function get_average_headshots(player_ep, base_headshots, max_headshots, max_ep) {
+    var normalized_ep = player_ep / max_ep;
+    var growth_factor = (exp(normalized_ep * 10) - 1) / (exp(10) - 1);
     var average_headshots = base_headshots + growth_factor * (max_headshots - base_headshots);
     return average_headshots;
 }
 
-/// @desc Calculate the expected results for games against multiple enemies
-function calculate_expected_results(player_elo, enemy_elos) {
-    var expected_results = [];
-    for (var i = 0; i < array_length(enemy_elos); i++) {
-		expected_results[i] = calculate_probability(player_elo, enemy_elos[i]);
-    }
-    return expected_results;
-}
 
 /// @desc Calculate local volatility
 function calculate_local_volatility(headshots_per_round, kills_per_round) {
@@ -216,26 +340,28 @@ function calculate_local_volatility(headshots_per_round, kills_per_round) {
     var valid_kills = 0;
 
     // Calculate variance for headshots
+	var avg_hs = average(headshots_per_round);
     for (var i = 0; i < array_length(headshots_per_round); i++) {
         if (headshots_per_round[i] != -1) {
-            var diff_headshots = headshots_per_round[i] - average(headshots_per_round);
-            sum_headshot_variances += diff_headshots * diff_headshots;
+            var diff_headshots = headshots_per_round[i] - avg_hs;
+            sum_headshot_variances += power(diff_headshots, 2);
             valid_headshots++;
         }
     }
 
     // Calculate variance for kills
+	var avg_kills = average(kills_per_round);
     for (var i = 0; i < array_length(kills_per_round); i++) {
         if (kills_per_round[i] != -1) {
-            var diff_kills = kills_per_round[i] - average(kills_per_round);
-            sum_kill_variances += diff_kills * diff_kills;
+            var diff_kills = kills_per_round[i] - avg_kills;
+            sum_kill_variances += power(diff_kills, 2);
             valid_kills++;
         }
     }
 
     // Calculate volatilities
-    var headshot_volatility = valid_headshots > 0 ? sqrt(sum_headshot_variances / valid_headshots) : PLAYER_STARTING_VOLATILITY;
-    var kill_volatility = valid_kills > 0 ? sqrt(sum_kill_variances / valid_kills) : PLAYER_STARTING_VOLATILITY;
+    var headshot_volatility = valid_headshots > 0 ? sqrt(sum_headshot_variances / (valid_headshots - 1)) : PLAYER_STARTING_VOLATILITY;
+    var kill_volatility = valid_kills > 0 ? sqrt(sum_kill_variances / (valid_kills - 1)) : PLAYER_STARTING_VOLATILITY;
 
     return (headshot_volatility + kill_volatility) / 2;
 }
@@ -243,10 +369,13 @@ function calculate_local_volatility(headshots_per_round, kills_per_round) {
 
 /// @desc Calculate the game result from 0 to 1 based on scores
 function calculate_game_result(player_win_rounds, enemy_win_rounds) {
-    var max_rounds_difference = MAX_ROUNDS/2;
-    var rounds_difference = player_win_rounds - enemy_win_rounds;
-    var game_result = (max_rounds_difference / 10) + ((2 * max_rounds_difference / 100) * rounds_difference);
-    return max(0, min(game_result, 1));
+    //var max_rounds_difference = MAX_ROUNDS/2;
+    var rounds_difference = player_win_rounds - enemy_win_rounds;	
+	var game_result = 0.5 + (rounds_difference/(MAX_ROUNDS + 2));
+	return game_result;
+	
+    //var game_result = (max_rounds_difference / 10) + ((2 * max_rounds_difference / 100) * rounds_difference);
+   // return max(0, min(game_result, 1));
 }
 
 function round_end(round_result){
@@ -268,7 +397,7 @@ function RankStats(RankID, LessMod, BoostMod, RankName, MinElo){
 	global.RankIndex[#RankID, RankStat.LessModifier] = LessMod;
 	global.RankIndex[#RankID, RankStat.BoostModifier] = BoostMod;
 	global.RankIndex[#RankID, RankStat.Name] = RankName;
-	global.RankIndex[#RankID, RankStat.Elo] = MinElo;
+	global.RankIndex[#RankID, RankStat.Ep] = MinElo;
 }
 
 function rank_database(){
@@ -282,41 +411,41 @@ function rank_database(){
 		SupremeMaster, GlobalMaster, Total
 	}
 	enum RankStat{
-		LessModifier, BoostModifier, Name, Elo, Total
+		LessModifier, BoostModifier, Name, Ep, Total
 	}
 	
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 	
-	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", PLAYER_STARTING_ELO);
-	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_ELO);	
-	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_ELO);
-	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_ELO);
-	RankStats(RankType.SilverIV, 1.2, 0.93, "Silver IV", SILVERIV_ELO);
-	RankStats(RankType.SilverV, 1.1, 0.94, "Silver V", SILVERV_ELO);
-	RankStats(RankType.SilverMaster, 1.07, 1, "Silver master", SILVER_MASTER_ELO);
-	RankStats(RankType.GoldI, 1, 1.01, "Gold I", GOLDI_ELO);
-	RankStats(RankType.GoldII, 0.95, 1.03, "Gold II", GOLDII_ELO);
-	RankStats(RankType.GoldIII, 0.93, 1.05, "Gold III", GOLDIII_ELO);
-	RankStats(RankType.GoldIV, 0.85, 1.07, "Gold IV", GOLDIV_ELO);
-	RankStats(RankType.GoldMaster, 0.83, 1.11, "Gold master", GOLD_MASTER_ELO);
-	RankStats(RankType.DiamondI, 0.8, 1.14, "Diamond I", DIAMONDI_ELO);
-	RankStats(RankType.DiamondII, 0.77, 1.15, "Diamond II", DIAMONDII_ELO);
-	RankStats(RankType.DiamondIII, 0.73, 1.18, "Diamond III", DIAMONDIII_ELO);
-	RankStats(RankType.DiamondMaster, 0.7, 1.2, "Diamond master", DIAMOND_MASTER_ELO);
-	RankStats(RankType.AssaultEliteI, 0.69, 1.21, "Assault elite I", ASSAULT_ELITEI_ELO);
-	RankStats(RankType.AssaultEliteII, 0.67, 1.22, "Assault elite II", ASSAULT_ELITEII_ELO);
-	RankStats(RankType.AssaultMaster, 0.63, 1.23, "Assault master", ASSAULT_MASTER_ELO);
-	RankStats(RankType.VersatileMaster, 0.61, 1.25, "Versatile master", VERSATILE_MASTER_ELO);
-	RankStats(RankType.ExperiencedVersatileMaster, 0.59, 1.3, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_ELO);
-	RankStats(RankType.SupremeMaster, 0.53, 1.35, "Supreme master", SUPREME_MASTER_ELO);
-	RankStats(RankType.GlobalMaster, 0.5, 1.75, "Global master", GLOBAL_MASTER_ELO);
+	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", MIN_EP);
+	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_EP);	
+	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_EP);
+	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_EP);
+	RankStats(RankType.SilverIV, 1.2, 0.93, "Silver IV", SILVERIV_EP);
+	RankStats(RankType.SilverV, 1.1, 0.94, "Silver V", SILVERV_EP);
+	RankStats(RankType.SilverMaster, 1.07, 1, "Silver master", SILVER_MASTER_EP);
+	RankStats(RankType.GoldI, 1, 1.01, "Gold I", GOLDI_EP);
+	RankStats(RankType.GoldII, 0.95, 1.03, "Gold II", GOLDII_EP);
+	RankStats(RankType.GoldIII, 0.93, 1.05, "Gold III", GOLDIII_EP);
+	RankStats(RankType.GoldIV, 0.85, 1.07, "Gold IV", GOLDIV_EP);
+	RankStats(RankType.GoldMaster, 0.83, 1.11, "Gold master", GOLD_MASTER_EP);
+	RankStats(RankType.DiamondI, 0.8, 1.14, "Diamond I", DIAMONDI_EP);
+	RankStats(RankType.DiamondII, 0.77, 1.15, "Diamond II", DIAMONDII_EP);
+	RankStats(RankType.DiamondIII, 0.73, 1.18, "Diamond III", DIAMONDIII_EP);
+	RankStats(RankType.DiamondMaster, 0.7, 1.2, "Diamond master", DIAMOND_MASTER_EP);
+	RankStats(RankType.AssaultEliteI, 0.69, 1.21, "Assault elite I", ASSAULT_ELITEI_EP);
+	RankStats(RankType.AssaultEliteII, 0.67, 1.22, "Assault elite II", ASSAULT_ELITEII_EP);
+	RankStats(RankType.AssaultMaster, 0.63, 1.23, "Assault master", ASSAULT_MASTER_EP);
+	RankStats(RankType.VersatileMaster, 0.61, 1.25, "Versatile master", VERSATILE_MASTER_EP);
+	RankStats(RankType.ExperiencedVersatileMaster, 0.59, 1.3, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_EP);
+	RankStats(RankType.SupremeMaster, 0.53, 1.35, "Supreme master", SUPREME_MASTER_EP);
+	RankStats(RankType.GlobalMaster, 0.5, 1.75, "Global master", GLOBAL_MASTER_EP);
 }
 
-function get_rank(Elo){
+function get_rank(Ep){
 	var highest_rank = -1;	
     for(var i = 0; i < RankType.Total; i++){
-        if(convert_back(Elo) >= global.RankIndex[#i, RankStat.Elo]){
+        if(convert_back(Ep) >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }
@@ -324,10 +453,10 @@ function get_rank(Elo){
     return highest_rank;
 }
 
-function get_rank_boost(elo){
+function get_rank_boost(ep){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
-        if(elo >= global.RankIndex[#i, RankStat.Elo]){
+        if(ep >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }
@@ -335,10 +464,10 @@ function get_rank_boost(elo){
     return global.RankIndex[#highest_rank, RankStat.BoostModifier];
 }
 
-function get_rank_less(elo){
+function get_rank_less(ep){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
-        if(elo >= global.RankIndex[#i, RankStat.Elo]){
+        if(ep >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }

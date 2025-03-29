@@ -355,7 +355,7 @@ function console_submit(Console) {
 					
 					case "set_player_eggy_points":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.player_elo_struct.Elo = convert_to_eggy_scale(real(c[1]));	
+							global.player_rating_struct.Ep = real(c[1]);	
 						}
 					break;
 					
@@ -367,13 +367,13 @@ function console_submit(Console) {
 					
 					case "set_enemy_eggy_points":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game] = convert_to_eggy_scale(real(c[1]));
+							global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game] = convert_to_eggy_scale(real(c[1]));
 						}
 					break;
 					
 					case "set_player_played_games":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.player_elo_struct.Played_games = real(c[1]);
+							global.player_rating_struct.Played_games = real(c[1]);
 						}
 					break;
 

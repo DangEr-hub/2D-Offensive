@@ -15,9 +15,9 @@ button_height = 32 * global.GUIMultiplier;
 #region Statistics
 statistics_number = 3;
 text_gap = sprite_get_height(spr_Icons)*1.1 * global.GUIMultiplier;
-average_playing_time = average(global.player_elo_struct.Playing_time_per_round, false);
-total_headshots = sum(global.player_elo_struct.Headshots_per_round);
-total_kills = sum(global.player_elo_struct.Kills_per_round);
+average_playing_time = average(global.player_rating_struct.Playing_time_per_round, false);
+total_headshots = sum(global.player_rating_struct.Headshots_per_round);
+total_kills = sum(global.player_rating_struct.Kills_per_round);
 with (zui_create(statistics_x, statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.kills;

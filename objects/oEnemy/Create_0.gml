@@ -69,21 +69,21 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
-HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
+HelmetID = Item.None;//choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
 #region Movement engine
-Acceleration = min(.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .7);
+Acceleration = min(.5 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), .7);
 Friction = .75;
-MaxSpeed = min(2.5 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 5);
+MaxSpeed = min(2.5 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 5);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(768 * get_rank_boost(global.player_elo_struct.Enemy_elo[global.player_elo_struct.Tracking_game]), 1024);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
+ChasingDistance = min(768 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 1024);
 #endregion
 
 #region Legs
@@ -94,7 +94,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.m4_carbine, Item.famas);
+WeaponID[0] = Item.None;//choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.m4_carbine, Item.famas);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250, Item.tec9);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
