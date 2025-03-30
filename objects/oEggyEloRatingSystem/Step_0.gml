@@ -21,9 +21,6 @@ if(round_ended == true && oDraw.RespawnMenu == false){
 		global.player_rating_struct.Headshots_per_round[global.player_rating_struct.Current_round] = headshots;
 		global.player_rating_struct.Playing_time_per_round[global.player_rating_struct.Current_round] = playing_time / game_get_speed(gamespeed_fps);
 		var game_result = calculate_game_result(global.player_rating_struct.Rounds_win, global.player_rating_struct.Rounds_lost);
-		update_eggy_rating_system(
-			game_result, 
-			global.MapID
-		);
+		update_eggy_rating_system(game_result, global.MapID);
 	}		
 }

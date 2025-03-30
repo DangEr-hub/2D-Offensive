@@ -355,7 +355,7 @@ function console_submit(Console) {
 					
 					case "set_player_eggy_points":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.player_rating_struct.Ep = real(c[1]);	
+							global.player_rating_struct.Player_ep = real(c[1]);	
 						}
 					break;
 					

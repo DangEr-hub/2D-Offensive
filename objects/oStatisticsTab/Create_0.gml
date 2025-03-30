@@ -8,8 +8,8 @@ draw_set_font(set_font("Menu_small"));
 zui_set_size(tab_width, tab_height);
 
 rank_position = 0;
-if(global.player_rating_struct.Played_games >= TRACKING_GAMES/2){
-	rank_position = get_rank(global.player_rating_struct.Ep);
+if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.player_rating_struct.Player_ep);
 }
 
 text_gap = sprite_get_height(spr_Icons)*1.1 * global.GUIMultiplier;

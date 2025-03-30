@@ -482,8 +482,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 			
 			var rank_position = 0;
-			if(global.player_rating_struct.Played_games >= TRACKING_GAMES/2){
-				rank_position = get_rank(global.player_rating_struct.Ep);	
+			if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
+				rank_position = get_rank(global.player_rating_struct.Player_ep);	
 			}
 			if!(instance_exists(oInventory)){
 				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -556,17 +556,17 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		
 			if(global.ranked_game == true){
 				//Ep
-				var player_elo = global.player_rating_struct.Ep;
+				var player_elo = global.player_rating_struct.Player_ep;
 				var elo_string = "EP: " + string_format(convert_back(player_elo), 0, 1);
 				var elo_string_eggy_scale = "EP (eggy scale): " + string_format(player_elo, 0, 1);
 				draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
 				draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
 		
 				//Volatility
-				var player_game_volatility = global.player_rating_struct.Local_volatility;
-				var player_volatility = global.player_rating_struct.Game_volatility;
+				//var player_game_volatility = global.player_rating_struct.Local_volatility;
+				var player_volatility = global.player_rating_struct.Global_volatility;
 				var volatility_string = "Global volatility: " + string_format(player_volatility, 0, 1);
-				var game_volatility_string = "Local volatility: " + string_format(player_game_volatility, 0, 1);
+				//var game_volatility_string = "Local volatility: " + string_format(player_game_volatility, 0, 1);
 				draw_text_outlined(AdminHUDX - string_width(volatility_string), AdminHUDY + TextHeightSmall*6, volatility_string, c_white, c_black, 1);	
 				draw_text_outlined(AdminHUDX - string_width(game_volatility_string), AdminHUDY + TextHeightSmall*7, game_volatility_string, c_white, c_black, 1);
 			

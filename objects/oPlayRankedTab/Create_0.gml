@@ -33,30 +33,18 @@ for(var j=0;j<MapIndex.Total;j++){
 map_callbacks = [
     function() { 
 		set_map_rounds(MapIndex.Desert);
-		if(global.player_rating_struct.Played_games <= 0){
-			update_player_expected_games();
-		}
 		room_goto(rm_Desert);
 	},
     function() { 
 		set_map_rounds(MapIndex.RainForest);
-		if(global.player_rating_struct.Played_games <= 0){
-			update_player_expected_games();
-		} 
 		room_goto(rm_RainForest); 
 	},
     function() { 
 		set_map_rounds(MapIndex.City);
-		if(global.player_rating_struct.Played_games <= 0){
-			update_player_expected_games();
-		} 
 		room_goto(rm_Desert); 
 	},
     function() { 
 		set_map_rounds(MapIndex.Nuclear);
-		if(global.player_rating_struct.Played_games <= 0){
-			update_player_expected_games();
-		} 
 		room_goto(rm_Desert); 
 	}
 ];

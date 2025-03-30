@@ -33,7 +33,7 @@ function console_preset(argument0) {
 	console_add(c, "set_crosshair_color " + string(r) + string(g) + string(b));
 	console_add(c, "draw_other_models {0,1} " + string(global.draw_other_models));
 	console_add(c, "set_window_size " + string(global.window_width) + " " + string(global.window_height));
-	console_add(c, "set_player_eggy_points (ES) " + string(global.player_rating_struct.Ep));
+	console_add(c, "set_player_eggy_points (ES) " + string(global.player_rating_struct.Player_ep));
 	console_add(c, "set_enemy_visibility {0,1} " + string(global.enemy_visibility));
 	console_add(c, "set_enemy_eggy_points " + string(convert_back(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
 	console_add(c, "set_player_played_games " + string(global.player_rating_struct.Played_games));

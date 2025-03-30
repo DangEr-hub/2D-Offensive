@@ -1,3 +1,4 @@
+set_current_enemy();
 get_accuracy = function(AllShots, HitShots){
 	var accuracy = 0;
 	if(AllShots != 0){

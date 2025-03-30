@@ -99,8 +99,8 @@ draw_set_font(set_font("Menu_small"));
 #region Current player rank
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 rank_position = 0;
-if(global.player_rating_struct.Played_games >= TRACKING_GAMES/2){
-	rank_position = get_rank(global.player_rating_struct.Ep);
+if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.player_rating_struct.Player_ep);
 }
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
