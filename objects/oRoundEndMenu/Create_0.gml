@@ -99,8 +99,8 @@ draw_set_font(set_font("Menu_small"));
 #region Current player rank
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 rank_position = 0;
-if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-	rank_position = get_rank(global.player_rating_struct.Player_ep);
+if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.rating_struct.Player_ep);
 }
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
@@ -123,7 +123,7 @@ with (zui_create(current_rank_x - string_width("VS")/2, base_position_y + rank_i
 	caption = "VS";
 }
 
-rank_position = get_rank(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]);
+rank_position = get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks) * global.GUIMultiplier;
 current_rank_x = zui_get_width() * .5;

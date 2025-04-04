@@ -66,7 +66,7 @@ function save_game(){
 	if(file_exists("player_rating_stats.json")){
 		file_delete("player_rating_stats.json");
 	}
-	var json_string = json_stringify(global.player_rating_struct);
+	var json_string = json_stringify(global.rating_struct);
 	var file = file_text_open_write("player_rating_stats.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
@@ -155,7 +155,7 @@ function load_game(){
 	    var file = file_text_open_read("player_rating_stats.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
-	    global.player_rating_struct = json_parse(json_string);
+	    global.rating_struct = json_parse(json_string);
 	}
 	#endregion
 	

@@ -26,7 +26,7 @@ function calculate_probability(player_ep, enemy_ep, rd_player, rd_enemy) {
 function calculate_games_information(rd_enemy){
 	var information_sum = 0;
 	for(var i = 0; i < TRACKING_PERIOD; i ++){
-		prob_win = global.player_rating_struct.Expected_results[i];
+		prob_win = global.rating_struct.Expected_results[i];
 		information_sum += rd_weight(rd_enemy[i]) * prob_win * (1 - prob_win);
 	}
 	
@@ -34,32 +34,35 @@ function calculate_games_information(rd_enemy){
 }
 
 function set_current_enemy(){
-	global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game] = get_enemy_ep(global.player_rating_struct.Player_ep);
-	global.player_rating_struct.Enemy_rd[global.player_rating_struct.Current_game] = get_enemy_rd(global.player_rating_struct.Player_rd);
+	if(global.rating_struct.Enemy_ep[global.rating_struct.Current_game] == -1){
+		global.rating_struct.Enemy_ep[global.rating_struct.Current_game] = get_enemy_ep(global.rating_struct.Player_ep, global.rating_struct.Player_rd);
+		global.rating_struct.Enemy_rd[global.rating_struct.Current_game] = get_enemy_rd(global.rating_struct.Player_rd);
+	}
 }
 
 function ini_player_struct_create(){
 	var player_struct = {
 		"Previous_ep": convert_to_eggy_scale(MIN_EP),
 		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
-		"Game_volatility": PLAYER_STARTING_VOLATILITY,
-		"Local_volatility": array_create(TRACKING_PERIOD, PLAYER_STARTING_VOLATILITY),
+		"Predictive_volatility": PLAYER_STARTING_VOLATILITY,
+		"Game_volatility": array_create(TRACKING_PERIOD, PLAYER_STARTING_VOLATILITY),
 		"Player_ep": convert_to_eggy_scale(MIN_EP), // Eggy scale
 		"Current_game": 0,
 		"Current_round": 0,
 		"Rounds_win": 0,
 		"Rounds_lost": 0,
 		"Played_games": 0,
+		"Winned_rounds": array_create(TRACKING_PERIOD, 0),
 		"Won_games": 0,
 		"Lost_games": 0,
 		"Tied_games": 0,
-		"Player_rd": RD_START/ES_MODIFIER, // Eggy scale
+		"Player_rd": convert_to_eggy_scale(RD_START, true), // Eggy scale
 		"Kills_per_round": array_create(MAX_ROUNDS, 0),
 		"Headshots_per_round": array_create(MAX_ROUNDS, 0),
 		"Recent_results": array_create(TRACKING_PERIOD, -1),
 		"Expected_results": array_create(TRACKING_PERIOD, -1),
 		"Enemy_ep": array_create(TRACKING_PERIOD, -1),
-		"Enemy_rd": array_create(TRACKING_PERIOD, -1)
+		"Enemy_rd": array_create(TRACKING_PERIOD, 0)
 	}
 	
 	return player_struct;
@@ -68,100 +71,116 @@ function ini_player_struct_create(){
 function set_map_rounds(Map){
 	global.MapID = Map;
 	if(global.map_rounds[Map][2] == -1){
-		global.map_rounds[Map][2] = global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game];
+		global.map_rounds[Map][2] = global.rating_struct.Enemy_ep[global.rating_struct.Current_game];
 	}
 	if(global.map_rounds[Map][0] != -1){
-		global.player_rating_struct.Rounds_win = global.map_rounds[Map][0];
-		global.player_rating_struct.Rounds_lost = global.map_rounds[Map][1];
+		global.rating_struct.Rounds_win = global.map_rounds[Map][0];
+		global.rating_struct.Rounds_lost = global.map_rounds[Map][1];
 	}
 }
 
 function clear_player_statistics(total_rounds){
-	global.player_rating_struct.Rounds_win = 0;
-	global.player_rating_struct.Rounds_lost = 0;
-	global.player_rating_struct.Current_round = 0;
+	global.rating_struct.Rounds_win = 0;
+	global.rating_struct.Rounds_lost = 0;
+	global.rating_struct.Current_round = 0;
 	for(var i=0;i<total_rounds;i++){
-		global.player_rating_struct.Headshots_per_round[i] = 0;
-		global.player_rating_struct.Kills_per_round[i] = 0;
-		global.player_rating_struct.Playing_time_per_round[i] = 0;
+		global.rating_struct.Headshots_per_round[i] = 0;
+		global.rating_struct.Kills_per_round[i] = 0;
+		global.rating_struct.Playing_time_per_round[i] = 0;
 	}
 }
 
 function clear_tracking_period(){
 	for(var i=0;i<TRACKING_PERIOD;i++){
-		global.player_rating_struct.Recent_results[i] = -1;
-		global.player_rating_struct.Expected_results[i] = -1;
-		global.player_rating_struct.Enemy_ep[i] = -1;
-		global.player_rating_struct.Enemy_rd[i] = -1;
+		global.rating_struct.Recent_results[i] = -1;
+		global.rating_struct.Expected_results[i] = -1;
+		global.rating_struct.Enemy_ep[i] = -1;
+		global.rating_struct.Enemy_rd[i] = -1;
 	}
 }
 
-function calculate_volatility(local_volatility_array, global_volatility){	
-	return sqrt(power(average(local_volatility_array), 2) + power(global_volatility, 2));
+function calculate_volatility(local_volatility_array, predictive_volatility, local_volatility_weights_array){	
+	local_volatility = average(local_volatility_array, true, true, local_volatility_weights_array);
+	return sqrt(power(local_volatility, 2) + power(predictive_volatility, 2));
 }
 
 function update_eggy_rating_system(game_result, map){
-	var enemy_ep = global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game];
-	var enemy_rd = global.player_rating_struct.Enemy_rd[global.player_rating_struct.Current_game];
-	var expected_result = calculate_probability(global.player_rating_struct.Player_ep, enemy_ep, global.player_rating_struct.Player_rd, enemy_rd);
-	var local_volatility = calculate_local_volatility(global.player_rating_struct.Headshots_per_round, global.player_rating_struct.Kills_per_round);
+	var enemy_ep = global.rating_struct.Enemy_ep[global.rating_struct.Current_game];
+	var enemy_rd = global.rating_struct.Enemy_rd[global.rating_struct.Current_game];
+	var winned_rounds = global.rating_struct.Rounds_win;
+	var expected_result = calculate_probability(global.rating_struct.Player_ep, enemy_ep, global.rating_struct.Player_rd, enemy_rd);
+	var game_volatility = calculate_game_volatility(global.rating_struct.Headshots_per_round, global.rating_struct.Kills_per_round);
 	
-	global.player_rating_struct.Recent_results = array_shift_left(global.player_rating_struct.Recent_results, game_result);
-	global.player_rating_struct.Expected_results = array_shift_left(global.player_rating_struct.Expected_results, expected_result);	
-	global.player_rating_struct.Local_volatility = array_shift_left(global.player_rating_struct.Local_volatility, local_volatility);
+	global.rating_struct.Recent_results = array_shift_left(global.rating_struct.Recent_results, game_result);
+	global.rating_struct.Expected_results = array_shift_left(global.rating_struct.Expected_results, expected_result);	
+	global.rating_struct.Game_volatility = array_shift_left(global.rating_struct.Game_volatility, game_volatility);
+	global.rating_struct.Winned_rounds = array_shift_left(global.rating_struct.Winned_rounds, winned_rounds);
 	
-	if (global.player_rating_struct.Current_game > 0 && global.player_rating_struct.Current_game % TRACKING_PERIOD == 0){
-		global.player_rating_struct.Global_volatility = calculate_global_volatility(global.player_rating_struct.Recent_results, global.player_rating_struct.Expected_results);
-		var volatility = calculate_volatility(global.player_rating_struct.Local_volatility, global.player_rating_struct.Global_volatility);	
-		global.player_rating_struct.Player_rd = calculate_new_rd(global.player_rating_struct.Player_rd, volatility, global.player_rating_struct.Enemy_rd);
-		global.player_rating_struct.Current_game = 0;
+	if (global.rating_struct.Current_game > 0 && global.rating_struct.Current_game % TRACKING_PERIOD == 0){
+		global.rating_struct.Predictive_volatility = calculate_predictive_volatility(global.rating_struct.Recent_results, global.rating_struct.Expected_results);
+		var played_rounds = array_create(TRACKING_PERIOD, global.rating_struct.Winned_rounds + MAX_ROUNDS - global.rating_struct.Winned_rounds);
+		var volatility = calculate_volatility(
+												global.rating_struct.Game_volatility, 
+												global.rating_struct.Predictive_volatility, 
+												played_rounds
+											);	
+		global.rating_struct.Player_rd = calculate_new_rd(global.rating_struct.Player_rd, volatility, global.rating_struct.Enemy_rd);
+		global.rating_struct.Current_game = 0;
 		clear_tracking_period();
 	}else{
-		global.player_rating_struct.Current_game ++;
+		global.rating_struct.Current_game ++;
 	}
 
-	global.player_rating_struct.Played_games ++;
+	global.rating_struct.Played_games ++;
 	
 	if(game_result < 0.5){
-		global.player_rating_struct.Lost_games ++;
+		global.rating_struct.Lost_games ++;
 	}else if(game_result == 0.5){
-		global.player_rating_struct.Tied_games ++;
+		global.rating_struct.Tied_games ++;
 	}else{
-		global.player_rating_struct.Won_games ++;
+		global.rating_struct.Won_games ++;
 	}
 
-	var hs_sum = sum(global.player_rating_struct.Headshots_per_round);
-	var kills_sum = sum(global.player_rating_struct.Kills_per_round);
+	var hs_sum = sum(global.rating_struct.Headshots_per_round);
+	var kills_sum = sum(global.rating_struct.Kills_per_round);
 	var ep_change = calculate_ep_change(
 		expected_result,
 		game_result, 
 		kills_sum, 
 		hs_sum, 
-		global.player_rating_struct.Player_ep, 
-		global.player_rating_struct.Player_rd,
+		global.rating_struct.Player_ep, 
+		global.rating_struct.Player_rd,
 		enemy_ep,
 		enemy_rd,
 		map	
 	);
 	
-	global.player_rating_struct.Previous_ep = global.player_rating_struct.Player_ep;
-	global.player_rating_struct.Player_ep += ep_change;
+	global.rating_struct.Previous_ep = global.rating_struct.Player_ep;
+	global.rating_struct.Player_ep += ep_change;
 }
 
-function get_enemy_ep(player_ep){
-	return max(random_range((player_ep + 1) * .75, (player_ep + 1) * 1.5), 0);	
+function get_enemy_ep(player_ep, player_rd){
+	return max(random_range(max(player_ep - player_rd*2, 0), player_ep + player_rd*2), 0);	
 }
 
 function get_enemy_rd(player_rd){
-	return max(random_range(player_rd * .5, (player_rd * 5.0)), 0);	
+	return max(random_range(player_rd * .5, (player_rd * 2.0)), 0);	
 }
 
-function convert_to_eggy_scale(ep) {
-    return (ep - MIN_EP) / ES_MODIFIER;
+function convert_to_eggy_scale(ep, rd = false) {
+	if(rd == false){
+		return (ep - MIN_EP) / ES_MODIFIER;
+	}
+	
+	return (ep / ES_MODIFIER);
 }
 
-function convert_back(eggy_ep) {
-    return (eggy_ep * ES_MODIFIER + MIN_EP);
+function convert_back(eggy_ep, rd = false) {
+	if(rd == false){
+		return (eggy_ep * ES_MODIFIER + MIN_EP);
+	}
+	
+	return (eggy_ep * ES_MODIFIER);
 }
 
 function std(array){
@@ -197,7 +216,7 @@ function calculate_team_ep(enemy_ep, enemy_rd){
 	return ep_opponent;
 }
 
-function ep_diff_modifier(rd, ep_diff, game_result) {
+function ep_diff_modifier(rd, ep_diff) {
     var uncertainty_factor = 1 / (1 + rd);
     var sigmoid_component = 1 / (1 + exp(-ep_diff * 0.5));
     return sigmoid_component * uncertainty_factor * 0.5;
@@ -250,7 +269,7 @@ function calculate_ep_change(prob_win, game_result, your_kills, your_hs, A_ep, A
 	}
 	
 	var ep_difference = B_eggy_points - A_eggy_points;
-	var ep_modifier_diff = ep_diff_modifier(B_rating_d, ep_difference, game_result);
+	var ep_modifier_diff = ep_diff_modifier(B_rating_d, ep_difference);
 	#endregion
 	
 	#region Game result modifier	
@@ -263,7 +282,7 @@ function calculate_ep_change(prob_win, game_result, your_kills, your_hs, A_ep, A
 	
 	#region RD modifier
 	// Čím větší RD, tím větší odměna/penalizace, protože systém nemá tušení, kde hráč patří
-	var rd_modifier = global.player_rating_struct.Player_rd;
+	var rd_modifier = A_rating_d;
 	#endregion
 	
 	var base_modifier = 1 + ep_modifier_diff + statistics_modifier;
@@ -274,7 +293,7 @@ function calculate_ep_change(prob_win, game_result, your_kills, your_hs, A_ep, A
     return game_result_change * base_modifier * rd_modifier;
 }
 
-function calculate_global_volatility(player_recent_results, player_recent_expected) {
+function calculate_predictive_volatility(player_recent_results, player_recent_expected) {
 	var valid_entries = 0;
     var sum_abs_diff = 0;
     var n = array_length(player_recent_results);
@@ -323,7 +342,7 @@ function get_average_headshots(player_ep, base_headshots, max_headshots, max_ep)
 }
 
 /// @desc Calculate local volatility
-function calculate_local_volatility(headshots_per_round, kills_per_round) {
+function calculate_game_volatility(headshots_per_round, kills_per_round) {
     var sum_headshot_variances = 0;
     var sum_kill_variances = 0;
     var valid_headshots = 0;

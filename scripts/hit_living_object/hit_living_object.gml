@@ -31,7 +31,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		if(hit_object.object_index == oEnemy){
 			with(hit_object){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 				}
 			}
 		}

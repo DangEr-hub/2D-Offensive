@@ -51,7 +51,7 @@ popup_exit_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();	
 	}
-	clear_player_statistics(global.player_rating_struct.Rounds_win + global.player_rating_struct.Rounds_lost);
+	clear_player_statistics(global.rating_struct.Rounds_win + global.rating_struct.Rounds_lost);
 	save_game();
 	game_end();	
 };
@@ -64,7 +64,7 @@ popup_main_menu_callback_positive = function(){
 	with(objZUIMain){
 		zui_destroy();
 	}
-	clear_player_statistics(global.player_rating_struct.Rounds_win + global.player_rating_struct.Rounds_lost);
+	clear_player_statistics(global.rating_struct.Rounds_win + global.rating_struct.Rounds_lost);
 	room_goto(rm_main_menu);
 };
 
@@ -74,8 +74,8 @@ main_menu_callback = function(){
 #endregion
 
 #region Rank up title
-if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-	if(get_rank(global.player_rating_struct.Previous_ep) < get_rank(global.player_rating_struct.Player_ep)){
+if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+	if(get_rank(global.rating_struct.Previous_ep) < get_rank(global.rating_struct.Player_ep)){
 		rank_string_color = MAIN_COLOR;
 		var px = random_range(camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2, camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2);
 		var py = zui_get_height() * .2;
@@ -92,17 +92,17 @@ if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
 
 #region Title
 draw_set_font(set_font("Title"));
-player_score = string(global.player_rating_struct.Rounds_win);
-enemy_score = string(global.player_rating_struct.Rounds_lost);
+player_score = string(global.rating_struct.Rounds_win);
+enemy_score = string(global.rating_struct.Rounds_lost);
 separator = "/";
 score_string_width = string_width(player_score + enemy_score + separator);
 player_score_string_width = string_width(player_score);
 title_color = MAIN_COLOR;
 title_string = "Win";
-if(global.player_rating_struct.Rounds_lost > global.player_rating_struct.Rounds_win){
+if(global.rating_struct.Rounds_lost > global.rating_struct.Rounds_win){
 	title_color = c_red;
 	title_string = "Loss";	
-}else if(global.player_rating_struct.Rounds_lost == global.player_rating_struct.Rounds_win){
+}else if(global.rating_struct.Rounds_lost == global.rating_struct.Rounds_win){
 	title_color = c_ltgray;
 	title_string = "Draw";
 }
@@ -135,10 +135,10 @@ draw_set_font(set_font("Title"));
 prev_rank_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
 current_rank_y = zui_get_height() * .35 + 24/global.GUIMultiplier;
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
-rank_previous = get_rank(global.player_rating_struct.Previous_ep);
+rank_previous = get_rank(global.rating_struct.Previous_ep);
 rank_position = 0;
-if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-	rank_position = get_rank(global.player_rating_struct.Player_ep);
+if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.rating_struct.Player_ep);
 }
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
@@ -177,12 +177,12 @@ with (zui_create(rank_x + rank_image_size_width, prev_rank_y, objUILabel)) {
 
 #region Enemy rank
 
-rank_previous = get_rank(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]);
+rank_previous = get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
 rank_position = 0;
 
-if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-	if(global.player_rating_struct.Current_game < TRACKING_PERIOD/2 - 1){
-		rank_position = get_rank(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game + 1]);
+if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+	if(global.rating_struct.Current_game < TRACKING_PERIOD/2 - 1){
+		rank_position = get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game + 1]);
 	}else{
 		rank_position = 0;
 	}

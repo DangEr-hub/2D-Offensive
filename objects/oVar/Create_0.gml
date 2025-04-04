@@ -75,7 +75,7 @@ global.player_stats_struct = {
 	Armour: 0
 	
 };
-global.player_rating_struct = ini_player_struct_create();
+global.rating_struct = ini_player_struct_create();
 
 enum icons{
 	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, total

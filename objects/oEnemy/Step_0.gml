@@ -21,7 +21,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 	switch(State){
 		case States.MoveAway:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -30,7 +30,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveShoot:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -39,7 +39,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.Move:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -48,7 +48,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveToward:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -57,7 +57,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveAwayFromGrenade:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -66,7 +66,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.Chase:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -75,7 +75,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -84,7 +84,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 100);
+				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
 				if(percent_chance(shooting_chance)){
 					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
@@ -389,7 +389,7 @@ if(instance_exists(oBulletTracer)){
 		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.stats.Object_index == ChasingObject){
 			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 				}
 			}
 		}
@@ -402,7 +402,7 @@ if(instance_exists(oBullet)){
 		if(distance_to_object(ChasingObjectBullet) <= 128 && ChasingObjectBullet.stats.Object_index == ChasingObject){
 			if(percent_chance(100 * global.ItemIndex[#global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 				}
 			}
 		}
@@ -412,9 +412,9 @@ if(instance_exists(oBullet)){
 // Hear the player
 if(ChasingObject.object_index == oPlayer && distance_to_object(ChasingObject) <= ChasingDistance*.75){
 	var PlayerVelocity = sqrt(power(ChasingObject.XSpeed, 2) + power(ChasingObject.YSpeed, 2)) * game_get_speed(gamespeed_fps);
-	if(ChasingObject.Moving == true && PlayerVelocity >= ChasingObject.MoveSpeed/2 && percent_chance(1 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]))){
+	if(ChasingObject.Moving == true && PlayerVelocity >= ChasingObject.MoveSpeed/2 && percent_chance(1 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
 		if(ChasingObjectSpotted == false){
-			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 		}
 	}
 }
@@ -527,7 +527,7 @@ if (distToGrenade <= 256 || distToLandMine <= 256) {
 	if (distToGrenade <= distToLandMine) {
 		if(nearestGrenade.stats.Object_index != oEnemy){
 			if (!ChasingObjectSpotted) {
-				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 			}
 			SpottedDanger = true;
 		    NearestDangerX = nearestGrenade.x;
@@ -537,7 +537,7 @@ if (distToGrenade <= 256 || distToLandMine <= 256) {
 	} else {
 		if(nearestLandMine.stats.Object_index != oEnemy){
 			if (!ChasingObjectSpotted) {
-				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game])));
+				ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 			}
 			SpottedDanger = true;
 			NearestDangerX = nearestLandMine.x;

@@ -19,10 +19,10 @@ map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
 if(global.MapID != -1){
-	global.map_rounds[global.MapID][0] = global.player_rating_struct.Rounds_win;
-	global.map_rounds[global.MapID][1] = global.player_rating_struct.Rounds_lost;
-	global.player_rating_struct.Rounds_win = 0;
-	global.player_rating_struct.Rounds_lost = 0;	
+	global.map_rounds[global.MapID][0] = global.rating_struct.Rounds_win;
+	global.map_rounds[global.MapID][1] = global.rating_struct.Rounds_lost;
+	global.rating_struct.Rounds_win = 0;
+	global.rating_struct.Rounds_lost = 0;	
 }
 
 for(var j=0;j<MapIndex.Total;j++){

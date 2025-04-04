@@ -220,7 +220,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				}
 					
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, get_rank(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_ranks, get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 				}
 			}
 		}
@@ -482,8 +482,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 			
 			var rank_position = 0;
-			if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-				rank_position = get_rank(global.player_rating_struct.Player_ep);	
+			if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+				rank_position = get_rank(global.rating_struct.Player_ep);	
 			}
 			if!(instance_exists(oInventory)){
 				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -516,8 +516,8 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		#region Draw ranked score
 		if(global.ranked_game == true){
 			draw_set_font(set_font("Title"));
-			var player_score = string(global.player_rating_struct.Rounds_win);
-			var enemy_score = string(global.player_rating_struct.Rounds_lost);
+			var player_score = string(global.rating_struct.Rounds_win);
+			var enemy_score = string(global.rating_struct.Rounds_lost);
 			var separator = "/";
 			var score_string_width = string_width(player_score + enemy_score + separator);
 			var player_score_string_width = string_width(player_score);
@@ -556,31 +556,45 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		
 			if(global.ranked_game == true){
 				//Ep
-				var player_elo = global.player_rating_struct.Player_ep;
-				var elo_string = "EP: " + string_format(convert_back(player_elo), 0, 1);
-				var elo_string_eggy_scale = "EP (eggy scale): " + string_format(player_elo, 0, 1);
-				draw_text_outlined(AdminHUDX - string_width(elo_string), AdminHUDY + TextHeightSmall*4, elo_string, c_white, c_black, 1);	
-				draw_text_outlined(AdminHUDX - string_width(elo_string_eggy_scale), AdminHUDY + TextHeightSmall*5, elo_string_eggy_scale, c_white, c_black, 1);	
+				var player_r = global.rating_struct.Player_ep;
+				var player_rd = global.rating_struct.Player_rd;
+				var r_string = "R: " + string(ceil(convert_back(player_r)));
+				var r_string_es = "R (ES): " + string_format(player_r, 0, 1);
+				var rd_string = "RD: " + string_format(convert_back(player_rd, true), 0, 1);
+				var rd_string_es = "RD (ES): " + string_format(player_rd, 0, 1);
+				draw_text_outlined(AdminHUDX - string_width(r_string), AdminHUDY + TextHeightSmall*4, r_string, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(r_string_es), AdminHUDY + TextHeightSmall*5, r_string_es, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(rd_string), AdminHUDY + TextHeightSmall*6, rd_string, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(rd_string_es), AdminHUDY + TextHeightSmall*7, rd_string_es, c_white, c_black, 1);	
 		
 				//Volatility
-				//var player_game_volatility = global.player_rating_struct.Local_volatility;
-				var player_volatility = global.player_rating_struct.Global_volatility;
-				var volatility_string = "Global volatility: " + string_format(player_volatility, 0, 1);
-				//var game_volatility_string = "Local volatility: " + string_format(player_game_volatility, 0, 1);
-				draw_text_outlined(AdminHUDX - string_width(volatility_string), AdminHUDY + TextHeightSmall*6, volatility_string, c_white, c_black, 1);	
-				draw_text_outlined(AdminHUDX - string_width(game_volatility_string), AdminHUDY + TextHeightSmall*7, game_volatility_string, c_white, c_black, 1);
+				var gv = global.rating_struct.Game_volatility;
+				var pv = global.rating_struct.Predictive_volatility;
+				var pv_string = "Predictive volatility: " + string_format(pv, 0, 1);
+				var gv_string = "Game volatility: " + string(global.rating_struct.Game_volatility);
+
+				draw_text_outlined(AdminHUDX - string_width(gv_string), AdminHUDY + TextHeightSmall * 8, gv_string, c_white, c_black, 1);
+				draw_text_outlined(AdminHUDX - string_width(pv_string), AdminHUDY + TextHeightSmall * 9, pv_string, c_white, c_black, 1);
+
 			
 				//Enemy elos
-				var enemy_elos_string = "Enemy EP: [ ";
-				var enemy_elos_string_eggy_scale = "Enemy EP (eggy scale): " + string(global.player_rating_struct.Enemy_ep);
+				var enemy_elos_string = "Enemy R: [ ";
+				var enemy_elos_string_eggy_scale = "Enemy R (ES): " + string(global.rating_struct.Enemy_ep);
+				var enemy_rd_string = "Enemy RD: [ ";
+				var enemy_rd_string_es = "Enemy RD (ES) " + string(global.rating_struct.Enemy_rd);
 			
-				for (var i = 0; i < array_length(global.player_rating_struct.Enemy_ep); i++) {
-				    var converted_elo = convert_back(global.player_rating_struct.Enemy_ep[i]);
-				    enemy_elos_string += string(converted_elo) + (i < array_length(global.player_rating_struct.Enemy_ep) - 1 ? "," : "");
+				for (var i = 0; i < array_length(global.rating_struct.Enemy_ep); i++) {
+				    var converted_elo = convert_back(global.rating_struct.Enemy_ep[i]);
+					var converted_rd = convert_back(global.rating_struct.Enemy_rd[i], true);
+				    enemy_elos_string += string(ceil(converted_elo)) + (i < array_length(global.rating_struct.Enemy_ep) - 1 ? "," : "");
+					enemy_rd_string += string(converted_rd) + (i < array_length(global.rating_struct.Enemy_rd) - 1 ? "," : "");
 				}
 				enemy_elos_string += " ]";
-				draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*8, enemy_elos_string, c_white, c_black, 1);	
-				draw_text_outlined(AdminHUDX - string_width(enemy_elos_string_eggy_scale), AdminHUDY + TextHeightSmall*9, enemy_elos_string_eggy_scale, c_white, c_black, 1);	
+				enemy_rd_string += " ]";
+				draw_text_outlined(AdminHUDX - string_width(enemy_elos_string), AdminHUDY + TextHeightSmall*10, enemy_elos_string, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(enemy_elos_string_eggy_scale), AdminHUDY + TextHeightSmall*11, enemy_elos_string_eggy_scale, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(enemy_rd_string), AdminHUDY + TextHeightSmall*12, enemy_rd_string, c_white, c_black, 1);	
+				draw_text_outlined(AdminHUDX - string_width(enemy_rd_string_es), AdminHUDY + TextHeightSmall*13, enemy_rd_string_es, c_white, c_black, 1);	
 			}
 		
 		}

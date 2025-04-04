@@ -13,5 +13,5 @@ if(CanShoot == false){
 if(XSpeed != 0 || YSpeed != 0){
 	MovingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.MovingSpdMul];
 }
-MaxSpeed = min(2.5 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 5.75) * ShootingSpeedMultiplier * MovingSpeedMultiplier;
+MaxSpeed = min(2.5 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 5.75) * ShootingSpeedMultiplier * MovingSpeedMultiplier;
 

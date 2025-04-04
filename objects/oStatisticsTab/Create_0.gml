@@ -8,8 +8,8 @@ draw_set_font(set_font("Menu_small"));
 zui_set_size(tab_width, tab_height);
 
 rank_position = 0;
-if(global.player_rating_struct.Played_games >= TRACKING_PERIOD/2){
-	rank_position = get_rank(global.player_rating_struct.Player_ep);
+if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.rating_struct.Player_ep);
 }
 
 text_gap = sprite_get_height(spr_Icons)*1.1 * global.GUIMultiplier;
@@ -194,28 +194,28 @@ with (zui_create(statistics_x, rank_title_y + text_gap*6, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.game;
 	color = c_white;
-	caption = "Finished games: " + string(global.player_rating_struct.Played_games);
+	caption = "Finished games: " + string(global.rating_struct.Played_games);
 }
 
 with (zui_create(statistics_x, rank_title_y + text_gap*7, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.won_game;
 	color = c_white;
-	caption = "Won games: " + string(global.player_rating_struct.Won_games);
+	caption = "Won games: " + string(global.rating_struct.Won_games);
 }
 
 with (zui_create(statistics_x, rank_title_y + text_gap*8, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.lost_game;
 	color = c_white;
-	caption = "Lost games: " + string(global.player_rating_struct.Lost_games);
+	caption = "Lost games: " + string(global.rating_struct.Lost_games);
 }
 
 with (zui_create(statistics_x, rank_title_y + text_gap*9, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.tied_game;
 	color = c_white;
-	caption = "Tied games: " + string(global.player_rating_struct.Tied_games);
+	caption = "Tied games: " + string(global.rating_struct.Tied_games);
 }
 
 #endregion

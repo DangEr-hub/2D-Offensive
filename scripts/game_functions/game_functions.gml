@@ -368,23 +368,33 @@ function statistics_hit(Type, Damage, ObjectType){
 	}
 }
 
-function average(array, count_zero = true){
+function average(array, count_zero = true, weighted = false, weights = []) {
     var array_sum = 0;
+    var weight_sum = 0;
     var count = 0;
 
-    for(var i = 0; i < array_length(array); i++){
-        if(count_zero == true || (array[i] != 0 && count_zero == false)){
-            array_sum += array[i];
-            count += 1;
+    for (var i = 0; i < array_length(array); i++) {
+        var val = array[i];
+        if (count_zero == true || val != 0) {
+            if (weighted && array_length(weights) == array_length(array)) {
+                array_sum += val * weights[i];
+                weight_sum += weights[i];
+            } else {
+                array_sum += val;
+                count += 1;
+            }
         }
     }
-    
-    if(count == 0){
+
+    if (weighted && weight_sum > 0) {
+        return array_sum / weight_sum;
+    } else if (!weighted && count > 0) {
+        return array_sum / count;
+    } else {
         return 0;
     }
-
-    return array_sum / count;
 }
+
 
 
 function sum(array){	

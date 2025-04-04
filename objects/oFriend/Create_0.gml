@@ -74,16 +74,16 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Movement engine
-Acceleration = min(.59 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), .75);
+Acceleration = min(.59 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), .75);
 Friction = .75;
-MaxSpeed = min(2.5 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 5.75);
+MaxSpeed = min(2.5 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 5.75);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(768 * get_rank_boost(global.player_rating_struct.Enemy_ep[global.player_rating_struct.Current_game]), 1024);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
+ChasingDistance = min(768 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 1024);
 #endregion
 
 #region Legs
