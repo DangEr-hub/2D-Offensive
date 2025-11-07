@@ -570,7 +570,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 				//Volatility
 				var gv = global.rating_struct.Game_volatility;
 				var pv = global.rating_struct.Predictive_volatility;
-				var pv_string = "Predictive volatility: " + string_format(pv, 0, 1);
+				var pv_string = "Predictive volatility: " + string_format(pv, 0, 2);
 				var gv_string = "Game volatility: " + string(global.rating_struct.Game_volatility);
 
 				draw_text_outlined(AdminHUDX - string_width(gv_string), AdminHUDY + TextHeightSmall * 8, gv_string, c_white, c_black, 1);

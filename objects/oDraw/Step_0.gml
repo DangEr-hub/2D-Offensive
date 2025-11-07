@@ -6,8 +6,8 @@ global.GuiH = display_get_gui_height();
 
 if(instance_exists(oPlayer)){
 	
-	#region Bird spawning
-	if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
+	//#region Bird spawning
+	/*if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
 		var birds = random_range(1, 3);
 		var offset = 8;
 		var areas = {
@@ -33,7 +33,7 @@ if(instance_exists(oPlayer)){
 	    var bird_sound = choose(snd_Bird1, snd_Bird2, snd_Bird3, snd_Bird4, snd_Bird5);
 	    play_sound(oPlayer.x, oPlayer.y, bird_sound, oPlayer.id);
 	    bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
-	}
+	}*/
 	
 	bloom_threshold = .29;
 	if(oPlayer.ToggleInfraVision == true){

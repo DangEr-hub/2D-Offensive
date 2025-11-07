@@ -96,6 +96,12 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 		"Object_y": BOPosition[1]
 	};
 	
+    // Send projectile spawn to network
+    var proj_id = send_projectile_spawn(BX, BY, BulletDirection, BS);
+        
+    bullet_tracer.network_id = proj_id;
+    bullet_tracer.owner_id = network_id;
+	
 	with(bullet_tracer){
 		image_index = BulletImage;
 		image_angle = BulletDirection;
@@ -104,6 +110,7 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 		LightObject.castShadows = false;
 		move_towards_point(BulletShotX, BulletShotY, BS);	
 	}
+	
 }
 
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection){

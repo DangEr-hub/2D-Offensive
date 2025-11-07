@@ -1,4 +1,5 @@
 event_inherited();
+RotationAngle = 0;
 in_water = false;
 hit_timer = -1;
 WeaponDistance = 0;
@@ -12,12 +13,15 @@ KilledByWeapon = "Nothing";
 DestroyTimer = -1;
 MuzzleFlashLight = undefined;
 RotationAngle = 0;
-FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
-FlashLight.alpha = FLASHLIGHT_ALPHA;
-FlashLight.penumbraSize = 30;
-FlashLight.xscale = 2;
-FlashLight.yscale = 2;
-FlashLight.blend = c_white;
+FlashLight = noone;
+if(instance_exists(oLightRenderer)){
+	FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
+	FlashLight.alpha = FLASHLIGHT_ALPHA;
+	FlashLight.penumbraSize = 30;
+	FlashLight.xscale = 2;
+	FlashLight.yscale = 2;
+	FlashLight.blend = c_white;
+}
 InfraVisionIntensity = 2;
 headshot_x = x + 3;
 headshot_y = y - 17;

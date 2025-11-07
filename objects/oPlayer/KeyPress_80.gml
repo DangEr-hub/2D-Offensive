@@ -1,1 +1,4 @@
-instance_create_depth(x, y, -100, oBird);
+if!(global.my_console[? "active"]){
+	round_end("Win");
+	//spawn_enemies(global.MapID);
+}

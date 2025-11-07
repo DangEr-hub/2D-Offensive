@@ -1,4 +1,55 @@
 event_inherited();
+
+#region Networking
+/// Player Object - Step Event (Add this to your existing step code)
+
+if (is_remote && interpolation_enabled) {
+    // Smooth interpolation for remote players
+    x = interpolate_position(x, target_x, interpolation_speed);
+    y = interpolate_position(y, target_y, interpolation_speed);
+    RotationAngle = interpolate_position(RotationAngle, target_direction, interpolation_speed);
+}
+
+/*if (is_local) {
+    // Your existing local player movement code
+    // ...
+    
+    // Example input handling (replace with your code)
+    var move_x = keyboard_check(vk_right) - keyboard_check(vk_left);
+    var move_y = keyboard_check(vk_down) - keyboard_check(vk_up);
+    
+    if (move_x != 0 || move_y != 0) {
+        var move_speed = 4;
+        hspeed = move_x * move_speed;
+        vspeed = move_y * move_speed;
+        
+        if (move_x != 0) {
+            direction = move_x > 0 ? 0 : 180;
+        }
+    } else {
+        hspeed = 0;
+        vspeed = 0;
+    }
+    
+    // Example shooting (replace with your code)
+    if (mouse_check_button_pressed(mb_left)) {
+        var bullet_dir = point_direction(x, y, mouse_x, mouse_y);
+        var bullet_speed = 8;
+        
+        // Send projectile spawn to network
+        var proj_id = send_projectile_spawn(x, y, bullet_dir, bullet_speed);
+        
+        // Create projectile locally
+        var proj = instance_create_layer(x, y, "Instances", obj_projectile);
+        proj.direction = bullet_dir;
+        proj.speed = bullet_speed;
+        proj.network_id = proj_id;
+        proj.owner_id = network_id;
+    }
+}*/
+
+#endregion
+
 if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 	#region Hidden flag boolean variable
@@ -1295,7 +1346,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	#endregion
 
 	#region Movement
-	if(player_can_shoot == true && !global.my_console[? "active"] && can_player_shoot()){
+	if(player_can_shoot == true && !global.my_console[? "active"] && can_player_shoot() && is_local == true){
 		var Up = keyboard_check(global.KeyBinds[| KeyBind.KeyUp]);
 		var Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
 		var Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
@@ -2160,6 +2211,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		camera_get_view_height(CAMERA) + 2 * ACTIVATE_MARGIN,
 		true
 	);
+	instance_activate_object(oNetworkManager);
 	instance_activate_object(obj_hazeC);
 	instance_activate_object(oParentTile);
 	instance_activate_object(objUITextInput);

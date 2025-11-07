@@ -19,7 +19,6 @@ by = 0;
 cx = 0;
 cy = 0;
 Visible = true;
-RotationAngle = 0;
 AccelX = 0;
 AccelY = 0;
 VelocityX = 0;
@@ -150,4 +149,26 @@ ArmHitBox.MainObject = id;
 LegHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
 LegHitBox.image_index = HitBox.LegProne;
 LegHitBox.MainObject = id;
+#endregion
+
+#region Networking
+/// Player Object - Create Event (Network additions)
+
+// Network properties
+network_id = -1;
+is_local = false;
+is_remote = false;
+
+// Interpolation for remote players
+interpolation_enabled = false;
+target_x = x;
+target_y = y;
+target_direction = 0;
+interpolation_speed = 0.3;
+
+// Network state
+network_vx = 0;
+network_vy = 0;
+network_state = 0;
+
 #endregion

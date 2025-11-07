@@ -1,6 +1,6 @@
 event_inherited();
-draw_text(x, y - 70, in_water_timer);
-
+draw_text(x, y - 70, room_get_name(room));
+draw_text(x, y - 140, global.rating_struct.Kills_per_round);
 
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -97,3 +97,26 @@ if(stats.Health_points > 0){
 	#endregion
 	
 }
+
+#region Networking
+if (global.debug_network) {
+    // Draw network ID
+    draw_set_color(c_white);
+    draw_text(x, y - 32, "ID: " + string(network_id));
+    
+    if (is_local) {
+        draw_set_color(c_lime);
+        draw_text(x, y - 48, "LOCAL");
+    }
+    
+    if (is_remote) {
+        draw_set_color(c_yellow);
+        draw_text(x, y - 48, "REMOTE");
+        
+        // Draw interpolation target
+        draw_set_alpha(0.3);
+        draw_circle(target_x, target_y, 8, false);
+        draw_set_alpha(1);
+    }
+}
+#endregion
