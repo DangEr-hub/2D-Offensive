@@ -17,7 +17,7 @@ function parse_euler_coordinates(coord_str) {
 
     // Validate the format
     if (euler_pos <= 0) {
-        return[oPlayer.x, oPlayer.y]; // Invalid input if 'e^j' is not present
+        return[global.local_player.x, global.local_player.y]; // Invalid input if 'e^j' is not present
     }
 
     // Extract the amplitude and angle strings
@@ -26,7 +26,7 @@ function parse_euler_coordinates(coord_str) {
 
     // Validate extracted strings
     if (amplitude_str == "" || angle_str == "" || !is_real(real(amplitude_str)) || !is_real(real(angle_str))) {
-        return[oPlayer.x, oPlayer.y]; // Invalid input if either part is not a real number
+        return[global.local_player.x, global.local_player.y]; // Invalid input if either part is not a real number
     }
 
     // Convert to real numbers
@@ -49,7 +49,7 @@ function parse_coordinates(coord_str) {
 	
     // Check if the string contains 'j'
     if (string_pos("j", coord_str) <= 0) {
-        return[oPlayer.x, oPlayer.y]; // Invalid input if 'j' is not present
+        return[global.local_player.x, global.local_player.y]; // Invalid input if 'j' is not present
     }
 	
     // Remove 'j' from the string
@@ -63,7 +63,7 @@ function parse_coordinates(coord_str) {
         separator_pos = string_pos("-", coord_str);
         separator = "-";
     } else {
-        return[oPlayer.x, oPlayer.y]; // Fallback, should not happen with valid input
+        return[global.local_player.x, global.local_player.y]; // Fallback, should not happen with valid input
     }
     
     var x_str = string_copy(coord_str, 1, separator_pos - 1);
@@ -71,7 +71,7 @@ function parse_coordinates(coord_str) {
 	
     // Validate extracted strings
     if (x_str == "" || y_str == "" || !is_real(real(x_str)) || !is_real(real(y_str))) {
-        return[oPlayer.x, oPlayer.y];
+        return[global.local_player.x, global.local_player.y];
     }
     
     // Add back the separator for y if it's negative
@@ -88,14 +88,14 @@ function parse_coordinates(coord_str) {
 	
 angle_coordinates_callback_positive = function(InputText){
 	var coordinates = parse_euler_coordinates(InputText);
-	oPlayer.mortar_coordinates[0] = coordinates[0];
-	oPlayer.mortar_coordinates[1] = coordinates[1];
+	global.local_player.mortar_coordinates[0] = coordinates[0];
+	global.local_player.mortar_coordinates[1] = coordinates[1];
 }
 
 coordinates_callback_positive = function(InputText){
 	var coordinates = parse_coordinates(InputText);
-	oPlayer.mortar_coordinates[0] = coordinates[0];
-	oPlayer.mortar_coordinates[1] = coordinates[1];
+	global.local_player.mortar_coordinates[0] = coordinates[0];
+	global.local_player.mortar_coordinates[1] = coordinates[1];
 };
 
 position_x = zui_get_width() * .1;
@@ -107,19 +107,19 @@ with(zui_create(zui_get_width() * .5, position_y + string_height("a")*3, objUIBu
 	zui_set_height(32 * global.GUIMultiplier);
 	caption = "Launch!";
 	callback = function(){
-		with(instance_nearest(oPlayer.x, oPlayer.y, oMortar)){
+		with(instance_nearest(global.local_player.x, global.local_player.y, oMortar)){
 			stats = {
 				Item_id: Item.base_explosion,
 				Damage: global.ItemIndex[#Item.base_explosion, ItemStat.Damage],
-				Object_index: oPlayer,
-				Object_name: instance_nearest(x, y, oPlayer).Name,
-				Object: instance_nearest(x, y, oPlayer),
+				Object_index: global.local_player,
+				Object_name: instance_nearest(x, y, global.local_player).Name,
+				Object: instance_nearest(x, y, global.local_player),
 				Health_points: 100
 			};
 
-			explosion_create(30, oPlayer.mortar_coordinates[0], oPlayer.mortar_coordinates[1], stats.Damage, false, stats.Object, stats.Item_id);
+			explosion_create(30, global.local_player.mortar_coordinates[0], global.local_player.mortar_coordinates[1], stats.Damage, false, stats.Object, stats.Item_id);
 		}
-		//instance_create_layer(oPlayer.mortar_coordinates[0], oPlayer.mortar_coordinates[1], "OtherO", oMortarMissile);
+		//instance_create_layer(global.local_player.mortar_coordinates[0], global.local_player.mortar_coordinates[1], "OtherO", oMortarMissile);
 	}
 }
 

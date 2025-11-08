@@ -7,7 +7,7 @@ zui_set_size(texture_width, texture_height);
 
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-	caption = global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.Name];//global.ItemIndex[#global.weapon_id[oPlayer.WeaponID], ItemStat.Name];
+	caption = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.Name];//global.ItemIndex[#global.weapon_id[global.local_player.WeaponID], ItemStat.Name];
 	draggable = 1;
 }
 
@@ -19,7 +19,7 @@ with(zui_create(weapon_x, weapon_y, objUIImage)){
 	zui_set_size(other.weapon_width, other.weapon_height);
 	zui_set_anchor(0.5, 0);
 	clickable = false;
-	sprite_image_index = global.Inventory[# oPlayer.WeaponID, Index.slot_id]//global.weapon_id[oPlayer.WeaponID];
+	sprite_image_index = global.Inventory[# global.local_player.WeaponID, Index.slot_id]//global.weapon_id[global.local_player.WeaponID];
 	sprite = spr_Items;
 	sprite_width_size = other.weapon_width;
 	sprite_height_size = other.weapon_height;
@@ -36,13 +36,13 @@ if(global.GUIMultiplier <= 1){
 	scope_drop_y = zui_get_height() * .39;
 }
 
-if(global.Inventory[# oPlayer.WeaponID, Index.slot_scope] != Item.None){
+if(global.Inventory[# global.local_player.WeaponID, Index.slot_scope] != Item.None){
 	scope_caption = "Unequip";
 	with(zui_create(scope_drop_x, scope_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
 		clickable = false;
-		sprite_image_index = global.Inventory[# oPlayer.WeaponID, Index.slot_scope];
+		sprite_image_index = global.Inventory[# global.local_player.WeaponID, Index.slot_scope];
 		sprite = spr_Items;
 		sprite_width_size = other.weapon_width*.5;
 		sprite_height_size = other.weapon_height*.5;
@@ -54,9 +54,9 @@ with(zui_create(scope_drop_x, scope_drop_y, objUIButton)){
 	caption_color = MAIN_COLOR;
 	caption = other.scope_caption;
 	callback = function(){
-		if(global.Inventory[# oPlayer.WeaponID, Index.slot_scope] != Item.None){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_scope] != Item.None){
 			GainItem(
-				global.Inventory[# oPlayer.WeaponID, Index.slot_scope],
+				global.Inventory[# global.local_player.WeaponID, Index.slot_scope],
 				1,
 				0,
 				0,
@@ -67,7 +67,7 @@ with(zui_create(scope_drop_x, scope_drop_y, objUIButton)){
 				0,
 				false
 			);
-			global.Inventory[# oPlayer.WeaponID, Index.slot_scope] = Item.None;	
+			global.Inventory[# global.local_player.WeaponID, Index.slot_scope] = Item.None;	
 			if(instance_exists(oWeaponAttachments)){
 				with(oWeaponAttachments){
 					zui_destroy();
@@ -92,13 +92,13 @@ if(global.GUIMultiplier <= 1){
 	barrel_drop_y = zui_get_height() * .39;
 }
 
-if(global.Inventory[# oPlayer.WeaponID, Index.slot_barrel] != Item.None){
+if(global.Inventory[# global.local_player.WeaponID, Index.slot_barrel] != Item.None){
 	barrel_caption = "Unequip";
 	with(zui_create(barrel_drop_x, barrel_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
 		clickable = false;
-		sprite_image_index = global.Inventory[# oPlayer.WeaponID, Index.slot_barrel];
+		sprite_image_index = global.Inventory[# global.local_player.WeaponID, Index.slot_barrel];
 		sprite = spr_Items;
 		sprite_width_size = other.weapon_width*.5;
 		sprite_height_size = other.weapon_height*.5;
@@ -110,9 +110,9 @@ with(zui_create(barrel_drop_x, barrel_drop_y, objUIButton)){
 	caption_color = MAIN_COLOR;
 	caption = other.barrel_caption;
 	callback = function(){
-		if(global.Inventory[# oPlayer.WeaponID, Index.slot_barrel] != Item.None){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_barrel] != Item.None){
 			GainItem(
-				global.Inventory[# oPlayer.WeaponID, Index.slot_barrel],
+				global.Inventory[# global.local_player.WeaponID, Index.slot_barrel],
 				1,
 				0,
 				0,
@@ -123,7 +123,7 @@ with(zui_create(barrel_drop_x, barrel_drop_y, objUIButton)){
 				0,
 				false
 			);
-			global.Inventory[# oPlayer.WeaponID, Index.slot_barrel] = Item.None;	
+			global.Inventory[# global.local_player.WeaponID, Index.slot_barrel] = Item.None;	
 			if(instance_exists(oWeaponAttachments)){
 				with(oWeaponAttachments){
 					zui_destroy();
@@ -148,13 +148,13 @@ if(global.GUIMultiplier <= 1){
 	grip_drop_y = zui_get_height() * .39;
 }
 
-if(global.Inventory[# oPlayer.WeaponID, Index.slot_grip] != Item.None){
+if(global.Inventory[# global.local_player.WeaponID, Index.slot_grip] != Item.None){
 	grip_caption = "Unequip";
 	with(zui_create(grip_drop_x, grip_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
 		clickable = false;
-		sprite_image_index = global.Inventory[# oPlayer.WeaponID, Index.slot_grip];
+		sprite_image_index = global.Inventory[# global.local_player.WeaponID, Index.slot_grip];
 		sprite = spr_Items;
 		sprite_width_size = other.weapon_width*.5;
 		sprite_height_size = other.weapon_height*.5;
@@ -166,9 +166,9 @@ with(zui_create(grip_drop_x, grip_drop_y, objUIButton)){
 	caption_color = MAIN_COLOR;
 	caption = other.grip_caption;
 	callback = function(){
-		if(global.Inventory[# oPlayer.WeaponID, Index.slot_grip] != Item.None){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_grip] != Item.None){
 			GainItem(
-				global.Inventory[# oPlayer.WeaponID, Index.slot_grip],
+				global.Inventory[# global.local_player.WeaponID, Index.slot_grip],
 				1,
 				0,
 				0,
@@ -179,7 +179,7 @@ with(zui_create(grip_drop_x, grip_drop_y, objUIButton)){
 				0,
 				false
 			);
-			global.Inventory[# oPlayer.WeaponID, Index.slot_grip] = Item.None;	
+			global.Inventory[# global.local_player.WeaponID, Index.slot_grip] = Item.None;	
 			if(instance_exists(oWeaponAttachments)){
 				with(oWeaponAttachments){
 					zui_destroy();
@@ -204,13 +204,13 @@ if(global.GUIMultiplier <= 1){
 	suppressor_drop_y = zui_get_height() * .39;
 }
 
-if(global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor] != Item.None){
+if(global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor] != Item.None){
 	suppressor_caption = "Unequip";
 	with(zui_create(suppressor_drop_x, suppressor_drop_y + gap, objUIImage)){
 		zui_set_size(other.weapon_width*.5, other.weapon_height*.5);
 		zui_set_anchor(0.5, 0);
 		clickable = false;
-		sprite_image_index = global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor];
+		sprite_image_index = global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor];
 		sprite = spr_Items;
 		sprite_width_size = other.weapon_width*.5;
 		sprite_height_size = other.weapon_height*.5;
@@ -222,9 +222,9 @@ with(zui_create(suppressor_drop_x, suppressor_drop_y, objUIButton)){
 	caption_color = MAIN_COLOR;
 	caption = other.suppressor_caption;
 	callback = function(){
-		if(global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor] != Item.None){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor] != Item.None){
 			GainItem(
-				global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor],
+				global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor],
 				1,
 				0,
 				0,
@@ -235,7 +235,7 @@ with(zui_create(suppressor_drop_x, suppressor_drop_y, objUIButton)){
 				0,
 				false
 			);
-			global.Inventory[# oPlayer.WeaponID, Index.slot_suppressor] = Item.None;	
+			global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor] = Item.None;	
 			if(instance_exists(oWeaponAttachments)){
 				with(oWeaponAttachments){
 					zui_destroy();

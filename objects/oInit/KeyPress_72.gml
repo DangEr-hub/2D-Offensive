@@ -1,4 +1,4 @@
-// Creating server - Press H event in oInit
+/* Creating server - Press H event in oInit */
 // Make sure NetworkManager exists
 if (!instance_exists(oNetworkManager)) {
     instance_create_layer(100, 100, "Instances", oNetworkManager);

@@ -1,9 +1,8 @@
-/// NetworkManager - Create Event
+/* NetworkManager - Create Event */
 
 // Network configuration
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
-global.debug_network = true;
 global.debug_text = "kokot";
 network_type = network_socket_udp; // UDP for real-time gameplay
 server_port = 50000;
@@ -29,7 +28,7 @@ receive_buffer = buffer_create(1024, buffer_grow, 1);
 // Player data tracking
 player_positions = ds_map_create();
 states_player = ds_map_create();
-projectiles = ds_list_create();
+projectiles_seen = ds_map_create(); // key = proj_id, val = true
 
 // Packet types
 enum PACKET {
@@ -48,6 +47,8 @@ enum PACKET {
 interpolation_enabled = true;
 send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
+accum_server = 0;   // časování GAME_STATE na serveru
+hb_client    = 0;   // heartbeat na klientovi
 
 // Sequence numbers for packet ordering
 send_sequence = 0;

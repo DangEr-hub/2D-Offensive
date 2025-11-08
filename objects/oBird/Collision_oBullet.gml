@@ -11,7 +11,8 @@ if(instance_exists(oParticleSystem)){
 	part_particles_create(global.ParticleSystem, other.x, other.y, oParticleSystem.BloodParticle, BloodParticleNumber);
 }
 
-play_sound(other.x, other.y, snd_BirdDeath, instance_nearest(x, y, oPlayer));
+//play_sound(other.x, other.y, snd_BirdDeath, Player);
+play_sound(other.x, other.y, snd_BirdDeath, global.local_player);
 instance_destroy(id);
 
 

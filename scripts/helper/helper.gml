@@ -1,4 +1,13 @@
-/// Helper functions for networking
+function get_local_player(){
+    with (oPlayer) {
+        if (is_local == true) {
+            return id;
+        }
+    }
+    return noone;
+}
+
+/* Helper functions for networking */
 function sent_server_udp(server_socket, socket_key, send_buffer){
 	var parts = string_split(socket_key, ":");
 	var ip = parts[0];
@@ -53,22 +62,27 @@ function find_player_by_network_id(pid) {
     return noone;
 }
 
-/// @function send_projectile_spawn(x_pos, y_pos, dir, spd)
-function send_projectile_spawn(x_pos, y_pos, dir, spd) {
+function send_projectile_spawn(x_pos, y_pos, angle, spd, index, shot_x, shot_y, damage, pen_damage, item_id) {
     with (oNetworkManager) {
         if ((!is_server && !is_connected) || (is_server && server_socket < 0)) return;
         
         var proj_id = irandom(65535); // Random unique ID
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
-        buffer_write(send_buffer, buffer_u8, PACKET.PROJECTILE_SPAWN);
-        buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u16, proj_id);
-        buffer_write(send_buffer, buffer_u16, my_pid);
-        buffer_write(send_buffer, buffer_f32, x_pos);
-        buffer_write(send_buffer, buffer_f32, y_pos);
-        buffer_write(send_buffer, buffer_f32, dir);
-        buffer_write(send_buffer, buffer_f32, spd);
+		buffer_write(send_buffer, buffer_u8,  PACKET.PROJECTILE_SPAWN);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u16, proj_id);
+		buffer_write(send_buffer, buffer_u16, my_pid);
+		buffer_write(send_buffer, buffer_f32, x_pos);
+		buffer_write(send_buffer, buffer_f32, y_pos);
+		buffer_write(send_buffer, buffer_f32, angle);
+		buffer_write(send_buffer, buffer_f32, spd);
+		buffer_write(send_buffer, buffer_u8,  index);
+		buffer_write(send_buffer, buffer_f32, shot_x);
+		buffer_write(send_buffer, buffer_f32, shot_y);
+		buffer_write(send_buffer, buffer_u16, damage);
+		buffer_write(send_buffer, buffer_u8,  pen_damage);
+		buffer_write(send_buffer, buffer_u16, item_id);
         
         if (is_server) {
             // Broadcast to all clients
@@ -82,44 +96,71 @@ function send_projectile_spawn(x_pos, y_pos, dir, spd) {
             network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }
         
+		ds_map_set(projectiles_seen, proj_id, true);
         return proj_id;
     }
 }
 
 /// @function handle_projectile_spawn(socket_id)
-function handle_projectile_spawn(socket_id) {
+function handle_projectile_spawn(key) {
     with (oNetworkManager) {
+        if (!ds_map_exists(clients, key)) return; // neznámý klient
+
         var proj_id = buffer_read(receive_buffer, buffer_u16);
-        var owner_id = buffer_read(receive_buffer, buffer_u16);
+        var owner_pid = ds_map_find_value(clients, key); // pid podle key
         var x_pos = buffer_read(receive_buffer, buffer_f32);
         var y_pos = buffer_read(receive_buffer, buffer_f32);
-        var dir = buffer_read(receive_buffer, buffer_f32);
-        var spd = buffer_read(receive_buffer, buffer_f32);
-        
-        // Create projectile on server
-        var proj = instance_create_layer(x_pos, y_pos, "Instances", obj_projectile);
-        proj.network_id = proj_id;
-        proj.owner_id = owner_id;
-        proj.direction = dir;
-        proj.speed = spd;
-        
-        // Relay to other clients
+        var angle = buffer_read(receive_buffer, buffer_f32);
+        var spd   = buffer_read(receive_buffer, buffer_f32);
+        var index = buffer_read(receive_buffer, buffer_u8);
+        var bx    = buffer_read(receive_buffer, buffer_f32);
+        var by    = buffer_read(receive_buffer, buffer_f32);
+		var dmg   = buffer_read(receive_buffer, buffer_u16);
+		var pen_dmg   = buffer_read(receive_buffer, buffer_u8);
+		var item_id = buffer_read(receive_buffer, buffer_u16);
+
+        // tracer pro hosta
+        if (owner_pid != my_pid) {
+			var bt = instance_create_layer(x_pos, y_pos, "ItemsO", oBulletTracer);
+			bt.is_remote  = true;
+			bt.is_local   = false;
+			bt.network_id = proj_id;
+			bt.owner_id   = owner_pid;
+			bt.image_index = index;
+			bt.image_angle = angle;
+			bt.stats = {
+			    "Speed": spd,
+			    "Shot_x": bx,
+			    "Shot_y": by,
+			    "Damage": dmg,
+			    "Penetration_damage": pen_dmg,
+			    "Item_id": item_id
+			};
+			with (bt) move_towards_point(bx, by, spd);
+        }
+
+        // rebroadcast
         buffer_seek(send_buffer, buffer_seek_start, 0);
-        buffer_write(send_buffer, buffer_u8, PACKET.PROJECTILE_SPAWN);
+        buffer_write(send_buffer, buffer_u8,  PACKET.PROJECTILE_SPAWN);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         buffer_write(send_buffer, buffer_u16, proj_id);
-        buffer_write(send_buffer, buffer_u16, owner_id);
+        buffer_write(send_buffer, buffer_u16, owner_pid);
         buffer_write(send_buffer, buffer_f32, x_pos);
         buffer_write(send_buffer, buffer_f32, y_pos);
-        buffer_write(send_buffer, buffer_f32, dir);
+        buffer_write(send_buffer, buffer_f32, angle);
         buffer_write(send_buffer, buffer_f32, spd);
-        
-        var socket_key = ds_map_find_first(clients);
-        for (var i = 0; i < ds_map_size(clients); i++) {
-            if (socket_key != socket_id) { // Don't send back to sender
-                sent_server_udp(server_socket, socket_key, send_buffer);
-            }
-            socket_key = ds_map_find_next(clients, socket_key);
+        buffer_write(send_buffer, buffer_u8,  index);
+        buffer_write(send_buffer, buffer_f32, bx);
+        buffer_write(send_buffer, buffer_f32, by);
+		buffer_write(send_buffer, buffer_f16, dmg);
+		buffer_write(send_buffer, buffer_f16,  pen_dmg);
+		buffer_write(send_buffer, buffer_u16, item_id);
+
+        var k = ds_map_find_first(clients);
+        var n = ds_map_size(clients);
+        for (var i = 0; i < n; i++) {
+            if (k != key) sent_server_udp(server_socket, k, send_buffer);
+            k = ds_map_find_next(clients, k);
         }
     }
 }

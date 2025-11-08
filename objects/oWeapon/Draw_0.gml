@@ -15,7 +15,7 @@ with(oEnemy){
 	}
 }
 
-with(oPlayer){
+with(get_local_player()){
 	if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/1.5 && Healing == false && stats.Health_points > 0){
 		draw_sprite_ext(spr_MuzzleFlash, 0, FlashLightX, 
 		FlashLightY, 1, 1, RotationAngle, c_white, 1);

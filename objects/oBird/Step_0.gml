@@ -3,7 +3,7 @@ if(x >= room_width || x <= 0 || y >= room_height || y <= 0){
 }
 
 #region Knife hit
-if(instance_exists(oPlayer) && instance_exists(oKnife)){
+if(instance_exists(global.local_player) && instance_exists(oKnife)){
 	var knife_object = instance_nearest(x, y, oKnife);
 	if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer && state == "Walking") {
 		if (knife_object.stats.Object.knife_attack_timer >= 5) {
@@ -29,7 +29,7 @@ if(instance_exists(oPlayer) && instance_exists(oKnife)){
 					part_particles_create(global.ParticleSystem, x, y, oParticleSystem.BloodParticle, BloodParticleNumber);
 				}
 
-				play_sound(x, y, snd_BirdDeath, instance_nearest(x, y, oPlayer));
+				play_sound(x, y, snd_BirdDeath, global.local_player);
 				instance_destroy(id);
 			}
 		}

@@ -1,4 +1,4 @@
-/// oNetworkManager - Async Networking Event
+/* oNetworkManager - Async Networking Event */
 var type = async_load[? "type"];
 switch (type) {
 		case network_type_data:

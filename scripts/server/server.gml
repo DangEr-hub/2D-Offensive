@@ -1,4 +1,4 @@
-/// Server-side networking functions
+/* Server-side networking functions */
 /// @function start_server()
 function start_server() {
     with (oNetworkManager) {
@@ -100,7 +100,28 @@ function handle_player_update_server(socket_id) {
         ds_map_set(player_data, "vy", velocity_y);
         //ds_map_set(player_data, "state", state);
         ds_map_set(player_data, "timestamp", current_time);
+
+        var p = find_player_by_network_id(pid);
+        if (p == noone) {
+            p = create_remote_player(pid, x_pos, y_pos);     // :contentReference[oaicite:3]{index=3}
+        }
+        if (instance_exists(p)) {
+            with (p) {
+                if (interpolation_enabled) {
+                    target_x = x_pos;
+                    target_y = y_pos;
+                    target_direction = direction_facing;
+                } else {
+                    x = x_pos;
+                    y = y_pos;
+                    RotationAngle = direction_facing;
+                }
+                network_vx = velocity_x;
+                network_vy = velocity_y;
+            }
+        }
     }
+	
 }
 
 /// @function send_game_state_to_all()

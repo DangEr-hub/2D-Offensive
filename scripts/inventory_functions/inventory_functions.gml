@@ -246,8 +246,8 @@ function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAm
 
 function WeaponDrop(ID, ObjectType){
 	if(ObjectType.object_index == oPlayer){
-		ObjectType.Reloading = false;
-		ObjectType.ReloadTime = 0;
+		global.local_player.Reloading = false;
+		global.local_player.ReloadTime = 0;
 		for(var i = 0;i<Index.Total;i++){
 			global.Inventory[# ID, i] = 0;
 		}
@@ -258,8 +258,8 @@ function WeaponDrop(ID, ObjectType){
 
 function ArmourDrop(ID, ObjectType){
 	if(ObjectType == oPlayer){
-		if(oPlayer.ToggleNightVision == true){
-			oPlayer.ToggleNightVision = false;
+		if(global.local_player.ToggleNightVision == true){
+			global.local_player.ToggleNightVision = false;
 		}
 		global.player_stats_struct.Weight -= global.ItemIndex[# global.Inventory[# ID, Index.slot_id], ItemStat.Weight];
 		for(var i = 0;i<Index.Total;i++){
@@ -318,7 +318,7 @@ function switch_weapon_number(){
 	
 function item_swap(type, slot_type){
 	if!(instance_exists(oInventory)){
-		oPlayer.item_equip_timer = oPlayer.item_equip_time;
+		global.local_player.item_equip_timer = global.local_player.item_equip_time;
 	}
 	TempArray = array_create(Index.Total - 1, 0);
 	TempArray[Index.slot_id] = global.Inventory[# slot_type, Index.slot_id];
@@ -358,27 +358,27 @@ function item_swap(type, slot_type){
 		
 	}else if(type == "item_use_position"){
 		
-		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# oPlayer.item_use_position, Index.slot_id];
-		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# oPlayer.item_use_position, Index.SlotAmount];
-		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# oPlayer.item_use_position, Index.slot_ammo];
-		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# oPlayer.item_use_position, Index.slot_clip_ammo];
-		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# oPlayer.item_use_position, Index.slot_durability];
-		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# oPlayer.item_use_position, Index.SlotShootingType];
-		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# oPlayer.item_use_position, Index.slot_barrel];
-		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# oPlayer.item_use_position, Index.slot_grip];
-		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# oPlayer.item_use_position, Index.slot_suppressor];
-		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# oPlayer.item_use_position, Index.slot_scope];	
+		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# global.local_player.item_use_position, Index.slot_id];
+		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# global.local_player.item_use_position, Index.SlotAmount];
+		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# global.local_player.item_use_position, Index.slot_ammo];
+		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# global.local_player.item_use_position, Index.slot_clip_ammo];
+		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# global.local_player.item_use_position, Index.slot_durability];
+		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# global.local_player.item_use_position, Index.SlotShootingType];
+		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# global.local_player.item_use_position, Index.slot_barrel];
+		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# global.local_player.item_use_position, Index.slot_grip];
+		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# global.local_player.item_use_position, Index.slot_suppressor];
+		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# global.local_player.item_use_position, Index.slot_scope];	
 	
-		global.Inventory[# oPlayer.item_use_position, Index.slot_id] = TempArray[Index.slot_id];
-		global.Inventory[# oPlayer.item_use_position, Index.SlotAmount] = TempArray[Index.SlotAmount];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_ammo] = TempArray[Index.slot_ammo];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_durability] = TempArray[Index.slot_durability];
-		global.Inventory[# oPlayer.item_use_position, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_barrel] = TempArray[Index.slot_barrel];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_grip] = TempArray[Index.slot_grip];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
-		global.Inventory[# oPlayer.item_use_position, Index.slot_scope] = TempArray[Index.slot_scope];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_id] = TempArray[Index.slot_id];
+		global.Inventory[# global.local_player.item_use_position, Index.SlotAmount] = TempArray[Index.SlotAmount];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_ammo] = TempArray[Index.slot_ammo];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_durability] = TempArray[Index.slot_durability];
+		global.Inventory[# global.local_player.item_use_position, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_barrel] = TempArray[Index.slot_barrel];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_grip] = TempArray[Index.slot_grip];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
+		global.Inventory[# global.local_player.item_use_position, Index.slot_scope] = TempArray[Index.slot_scope];
 	}else if(type == "description_button"){
 		
 		for(var i=0;i<Index.Total;i++){

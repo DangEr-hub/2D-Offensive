@@ -437,7 +437,6 @@ function rank_database(){
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 	
-	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", MIN_EP);
 	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_EP);	
 	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_EP);
 	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_EP);
@@ -462,10 +461,10 @@ function rank_database(){
 	RankStats(RankType.GlobalMaster, 0.5, 1.75, "Global master", GLOBAL_MASTER_EP);
 }
 
-function get_rank(Ep){
+function get_rank(ep){
 	var highest_rank = -1;	
     for(var i = 0; i < RankType.Total; i++){
-        if(convert_back(Ep) >= global.RankIndex[#i, RankStat.Ep]){
+        if(convert_back(ep) >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }
@@ -476,7 +475,7 @@ function get_rank(Ep){
 function get_rank_boost(ep){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
-        if(ep >= global.RankIndex[#i, RankStat.Ep]){
+        if(convert_back(ep) >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }
@@ -487,7 +486,7 @@ function get_rank_boost(ep){
 function get_rank_less(ep){
 	var highest_rank = -1;
 	for(var i = 0; i < RankType.Total; i++){
-        if(ep >= global.RankIndex[#i, RankStat.Ep]){
+        if(convert_back(ep) >= global.RankIndex[#i, RankStat.Ep]){
             highest_rank = i;
         }
     }

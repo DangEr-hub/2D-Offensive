@@ -1,7 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-//draw_text(x, y - 150, ChasingObjectSpotted);
+//draw_text(x, y - 150, get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]));
+//draw_text(x, y - 50, global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+//draw_text(x, y + 50, convert_back(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]));
 if(Visible == true){
 	var armour_sprite_index = 0;
 	if(image_index == player_textures.no_weapon){

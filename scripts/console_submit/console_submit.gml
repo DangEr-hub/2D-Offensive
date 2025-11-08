@@ -184,7 +184,7 @@ function console_submit(Console) {
 					break;
 					case "give_id":
 						if(no == 1){
-							GiveItem = instance_create_layer(oPlayer.x, oPlayer.y, "ItemsO", oItems);
+							GiveItem = instance_create_layer(global.local_player.x, global.local_player.y, "ItemsO", oItems);
 							GiveItem.image_index = real(c[1]);
 						}
 					break;

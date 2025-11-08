@@ -1,4 +1,4 @@
-/// Client-side networking functions
+/* Client-side networking functions */
 /// @function connect_to_server(ip, port)
 function connect_to_server(ip, port) {
     with (oNetworkManager) {
@@ -213,18 +213,34 @@ function handle_player_disconnect_client() {
 /// @function handle_projectile_spawn_client()
 function handle_projectile_spawn_client() {
     with (oNetworkManager) {
-        var proj_id = buffer_read(receive_buffer, buffer_u16);
-        var owner_id = buffer_read(receive_buffer, buffer_u16);
-        var x_pos = buffer_read(receive_buffer, buffer_f32);
-        var y_pos = buffer_read(receive_buffer, buffer_f32);
-        var dir = buffer_read(receive_buffer, buffer_f32);
-        var speed_val = buffer_read(receive_buffer, buffer_f32);
-        
-        // Create projectile
-        var proj = instance_create_layer(x_pos, y_pos, "Instances", obj_projectile);
-        proj.network_id = proj_id;
-        proj.owner_id = owner_id;
-        proj.direction = dir;
-        proj.speed = speed_val;
+        var proj_id   = buffer_read(receive_buffer, buffer_u16);
+        var owner_pid = buffer_read(receive_buffer, buffer_u16);
+        var x_pos     = buffer_read(receive_buffer, buffer_f32);
+        var y_pos     = buffer_read(receive_buffer, buffer_f32);
+        var angle       = buffer_read(receive_buffer, buffer_f32);
+        var spd       = buffer_read(receive_buffer, buffer_f32);
+		var index	  = buffer_read(receive_buffer, buffer_u8);
+        var bx     = buffer_read(receive_buffer, buffer_f32);
+        var by     = buffer_read(receive_buffer, buffer_f32);
+		var dmg       = buffer_read(receive_buffer, buffer_f16);
+		var pen       = buffer_read(receive_buffer, buffer_f16);
+		var item_id   = buffer_read(receive_buffer, buffer_u16);
+
+        if (ds_map_exists(projectiles_seen, proj_id)) return;
+        if (owner_pid == my_pid) return;
+
+        ds_map_set(projectiles_seen, proj_id, true);
+
+        // Spawn traceru
+        var bullet_tracer = instance_create_layer(x_pos, y_pos, "ItemsO", oBulletTracer);
+        bullet_tracer.network_id = proj_id;
+        bullet_tracer.owner_id   = owner_pid;
+        bullet_tracer.image_angle = angle;
+        bullet_tracer.image_index = index;
+		bullet_tracer.stats = { "Speed": spd, "Shot_x": bx, "Shot_y": by, "Damage": dmg, "Penetration_damage": pen, "Item_id": item_id };
+with (bt) move_towards_point(bx, by, spd);
+        with (bullet_tracer) {
+            move_towards_point(bx, by, spd);
+        }
     }
 }

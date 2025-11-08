@@ -87,21 +87,21 @@ if(ExplosionTimer == -1){
 				stats.Object, 
 				stats.Item_id
 			);
-			if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
-				if (point_distance(x, y, oPlayer.x, oPlayer.y) < global.FlashBangMaxDistance) {
+			if!(collision_line(x, y, global.local_player.x, global.local_player.y, oParentTile, true, false)){
+				if (point_distance(x, y, global.local_player.x, global.local_player.y) < global.FlashBangMaxDistance) {
 					
 					#region Flash player
 					if(global.GodMode == false){
-						var angular_diff = abs(point_direction(oPlayer.x, oPlayer.y, x, y) - oPlayer.RotationAngle);
+						var angular_diff = abs(point_direction(global.local_player.x, global.local_player.y, x, y) - global.local_player.RotationAngle);
 						if (angular_diff > 180){
 							angular_diff = 360 - angular_diff;
 						}
-						oPlayer.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
-						oPlayer.Flashed = true;
-						oPlayer.Reloading = false;
-						oPlayer.ReloadTimer = -1;
-						oPlayer.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oPlayer.x, oPlayer.y) / global.FlashBangMaxDistance)*.1);
-						oPlayer.FlashedAlpha = clamp(oPlayer.FlashedAlpha, 0, 1);
+						global.local_player.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
+						global.local_player.Flashed = true;
+						global.local_player.Reloading = false;
+						global.local_player.ReloadTimer = -1;
+						global.local_player.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, global.local_player.x, global.local_player.y) / global.FlashBangMaxDistance)*.1);
+						global.local_player.FlashedAlpha = clamp(global.local_player.FlashedAlpha, 0, 1);
 					}
 					#endregion					
 				}
@@ -183,21 +183,21 @@ if(ExplodeTimer == -1){
 			stats.Object, 
 			stats.Item_id
 		);
-		if!(collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false)){
-			if (point_distance(x, y, oPlayer.x, oPlayer.y) < global.FlashBangMaxDistance) {
+		if!(collision_line(x, y, global.local_player.x, global.local_player.y, oParentTile, true, false)){
+			if (point_distance(x, y, global.local_player.x, global.local_player.y) < global.FlashBangMaxDistance) {
 				
 				#region Flash player
 				if(global.GodMode == false){
-					var angular_diff = abs(point_direction(oPlayer.x, oPlayer.y, x, y) - oPlayer.RotationAngle);
+					var angular_diff = abs(point_direction(global.local_player.x, global.local_player.y, x, y) - global.local_player.RotationAngle);
 					if (angular_diff > 180){
 						angular_diff = 360 - angular_diff;
 					}
-					oPlayer.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
-					oPlayer.Flashed = true;
-					oPlayer.Reloading = false;
-					oPlayer.ReloadTimer = -1;
-					oPlayer.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oPlayer.x, oPlayer.y) / global.FlashBangMaxDistance)*.1);
-					oPlayer.FlashedAlpha = clamp(oPlayer.FlashedAlpha, 0, 1);
+					global.local_player.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
+					global.local_player.Flashed = true;
+					global.local_player.Reloading = false;
+					global.local_player.ReloadTimer = -1;
+					global.local_player.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, global.local_player.x, global.local_player.y) / global.FlashBangMaxDistance)*.1);
+					global.local_player.FlashedAlpha = clamp(global.local_player.FlashedAlpha, 0, 1);
 				}
 				#endregion
 				

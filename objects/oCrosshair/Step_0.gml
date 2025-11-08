@@ -3,7 +3,7 @@ crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
-if(global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol"){
+if(global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol"){
 	recoil_speed = 10;
 	StabilizationSpeed = 75;
 }
@@ -15,33 +15,33 @@ if(HitMarker > -1){
 	}
 }
 
-if(instance_exists(oPlayer) ){
+if(instance_exists(global.local_player)){
 	
 	#region Wobble
-	if(oPlayer.CrosshairShake > 0){
-		WobbleX += oPlayer.CrosshairShake;
-		WobbleY += oPlayer.CrosshairShake * 1.5;
-		WobbleCrosshairMultiplier = oPlayer.CrosshairShake;
+	if(global.local_player.CrosshairShake > 0){
+		WobbleX += global.local_player.CrosshairShake;
+		WobbleY += global.local_player.CrosshairShake * 1.5;
+		WobbleCrosshairMultiplier = global.local_player.CrosshairShake;
 	}else{
 		WobbleCrosshairMultiplier = lerp(WobbleCrosshairMultiplier, 0, WobbleResetSpeed);
 	}
 	
-	if (oPlayer.stats.Stamina_points <= global.player_stats_struct.Max_stamina * 0.75) {
-	    if (oPlayer.ScopeIn == true) {
-	        WobbleX += 5*max(100/(oPlayer.stats.Stamina_points + 1), 3);
-	        WobbleY += 5*max(100/(oPlayer.stats.Stamina_points + 1), 3) * 1.5;
-	        WobbleScopeInMultiplier = clamp(100/(oPlayer.stats.Stamina_points + 1), 3, 10);
+	if (global.local_player.stats.Stamina_points <= global.player_stats_struct.Max_stamina * 0.75) {
+	    if (global.local_player.ScopeIn == true) {
+	        WobbleX += 5*max(100/(global.local_player.stats.Stamina_points + 1), 3);
+	        WobbleY += 5*max(100/(global.local_player.stats.Stamina_points + 1), 3) * 1.5;
+	        WobbleScopeInMultiplier = clamp(100/(global.local_player.stats.Stamina_points + 1), 3, 10);
 	    } else {
-	        WobbleX += 5*max(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*2, 0);
-	        WobbleY += 5*max(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
-	        WobbleScopeInMultiplier = clamp(ceil((100/(oPlayer.stats.Stamina_points + 1)) - 1)*5, 0, 10);
+	        WobbleX += 5*max(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0);
+	        WobbleY += 5*max(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
+	        WobbleScopeInMultiplier = clamp(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*5, 0, 10);
 	    }
 	}
 
-	if(oPlayer.AimPunchTimer > -1){
-		WobbleX += oPlayer.AimPunchTimer * .25;
-		WobbleY += oPlayer.AimPunchTimer * 1.5;
-		WobbleAimPunchMultiplier = oPlayer.AimPunchTimer;	
+	if(global.local_player.AimPunchTimer > -1){
+		WobbleX += global.local_player.AimPunchTimer * .25;
+		WobbleY += global.local_player.AimPunchTimer * 1.5;
+		WobbleAimPunchMultiplier = global.local_player.AimPunchTimer;	
 	}else{
 		WobbleAimPunchMultiplier = lerp(WobbleAimPunchMultiplier, 0, WobbleResetSpeed);	
 	}
@@ -52,43 +52,43 @@ if(instance_exists(oPlayer) ){
 	#endregion
 
 	#region Recoil
-	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
-	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_grip], ItemStat.KickBackPower];	
-	var recoilY = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilY] * horizontal_recoil_multiplier;
-	var recoilX = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilX] * vertical_recoil_multiplier;
+	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
+	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackPower];	
+	var recoilY = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilY] * horizontal_recoil_multiplier;
+	var recoilX = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilX] * vertical_recoil_multiplier;
 	
-	if(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.HardRecoil] == true){
+	if(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.HardRecoil] == true){
 		
 		#region Hard recoil
-		if(oPlayer.KickBack > 0){
+		if(global.local_player.KickBack > 0){
 			
 			#region Variables
-			var KBPhase1 = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.KBPhase1];
-			var KBPhase2 = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.KBPhase2];
-			var MaxKickBack = global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.MaxKickBack];
+			var KBPhase1 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase1];
+			var KBPhase2 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase2];
+			var MaxKickBack = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxKickBack];
 			#endregion
 
-			if ((!oPlayer.CanShoot && oPlayer.ShootTimer >= global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootTimer] / 2 && global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol") || (oPlayer.shooting && global.ItemIndex[# global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != "Pistol")) {
+			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootTimer] / 2 && global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Pistol") || (global.local_player.shooting && global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != "Pistol")) {
 				
 				#region Recoil mechanic
-			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.RecoilY]);
+			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilY]);
 			    var targetX = mouse_x;
 			    var targetY = mouse_y;
 				
-			    if (oPlayer.KickBack == KBPhase1 || oPlayer.KickBack == KBPhase2 || oPlayer.KickBack >= MaxKickBack) {
-			        oPlayer.DeltaKickBack = oPlayer.KickBack;
+			    if (global.local_player.KickBack == KBPhase1 || global.local_player.KickBack == KBPhase2 || global.local_player.KickBack >= MaxKickBack) {
+			        global.local_player.DeltaKickBack = global.local_player.KickBack;
 			    }					
 
-			    if (oPlayer.KickBack <= KBPhase1) {
-					targetY = mouse_y - oPlayer.KickBack * recoilY;
-			    } else if (oPlayer.KickBack < KBPhase2) {
-			        targetX -= ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX);
+			    if (global.local_player.KickBack <= KBPhase1) {
+					targetY = mouse_y - global.local_player.KickBack * recoilY;
+			    } else if (global.local_player.KickBack < KBPhase2) {
+			        targetX -= ((global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX);
 					targetY = mouse_y - DeltaY;
 			    } else {
 					if(sign(recoilX) == -1){
-						targetX += (oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX;
+						targetX += (global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX;
 					}else{
-						targetX += ((oPlayer.KickBack - oPlayer.DeltaKickBack) * recoilX) - (KBPhase1 * recoilX);
+						targetX += ((global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX) - (KBPhase1 * recoilX);
 					}
 					targetY = mouse_y - DeltaY;
 			    }
@@ -99,7 +99,7 @@ if(instance_exists(oPlayer) ){
 			    var newDeltaX = mouse_x - x;
 			    var newDeltaY = mouse_y - y;
 			    DeltaX = newDeltaX;
-				if(oPlayer.KickBack <= KBPhase1){
+				if(global.local_player.KickBack <= KBPhase1){
 				 DeltaY = newDeltaY;
 				}
 				#endregion
@@ -107,19 +107,19 @@ if(instance_exists(oPlayer) ){
 			}else {
 				
 				#region Recoil reset
-				axis_multiplier[0] = sign(oPlayer.crosshair_position[0] - mouse_x);
-				distance[0] = abs(oPlayer.crosshair_position[0] - mouse_x);
-				distance[1] = abs(oPlayer.crosshair_position[1] - mouse_y);
+				axis_multiplier[0] = sign(global.local_player.crosshair_position[0] - mouse_x);
+				distance[0] = abs(global.local_player.crosshair_position[0] - mouse_x);
+				distance[1] = abs(global.local_player.crosshair_position[1] - mouse_y);
 				
 				if(axis_multiplier[0] == -1){ //If recoil goes to the left
 					if(x < mouse_x){
-						x = oPlayer.crosshair_position[0] - (distance[0]/oPlayer.KickBack * axis_multiplier[0]);
+						x = global.local_player.crosshair_position[0] - (distance[0]/global.local_player.KickBack * axis_multiplier[0]);
 					}else{
 						x = mouse_x;
 					}
 				}else if(axis_multiplier[0] == 1){ //If recoil goes to the right
 					if(x > mouse_x){
-						x = oPlayer.crosshair_position[0] - (distance[0]/oPlayer.KickBack * axis_multiplier[0]);
+						x = global.local_player.crosshair_position[0] - (distance[0]/global.local_player.KickBack * axis_multiplier[0]);
 					}else{
 						x = mouse_x;
 					}
@@ -127,13 +127,13 @@ if(instance_exists(oPlayer) ){
 				
 				if(axis_multiplier[1] == -1){ //If recoil goes up
 					if(y < mouse_y){
-						y = oPlayer.crosshair_position[1] - (distance[1]/oPlayer.KickBack * axis_multiplier[1]);
+						y = global.local_player.crosshair_position[1] - (distance[1]/global.local_player.KickBack * axis_multiplier[1]);
 					}else{
 						y = mouse_y;
 					}
 				}else if(axis_multiplier[1] == 1){ //If recoil goes down
 					if(y > mouse_y){
-						y = oPlayer.crosshair_position[1] - (distance[1]/oPlayer.KickBack * axis_multiplier[1]);
+						y = global.local_player.crosshair_position[1] - (distance[1]/global.local_player.KickBack * axis_multiplier[1]);
 					}else{
 						y = mouse_y;
 					}
@@ -150,7 +150,7 @@ if(instance_exists(oPlayer) ){
 	}else{
 
 		#region Basic recoil
-		if(oPlayer.CanShoot == false && oPlayer.ShootTimer >= global.ItemIndex[#global.Inventory[# oPlayer.WeaponID, Index.slot_id], ItemStat.ShootTimer]/2){
+		if(global.local_player.CanShoot == false && global.local_player.ShootTimer >= global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootTimer]/2){
 			if(RecoilTimer[0] == -1){
 				RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
 			}
@@ -163,7 +163,7 @@ if(instance_exists(oPlayer) ){
 		#region Recoil Y
 		if(RecoilTimer[0] > -1){
 			Recoil[0] += StabilizationSpeed * sign(recoilY);
-			Recoil[0] = min(Recoil[0], recoilY * oPlayer.KickBack);
+			Recoil[0] = min(Recoil[0], recoilY * global.local_player.KickBack);
 			RecoilTimer[0] --;
 		}else{
 			Recoil[0] -= StabilizationSpeed * sign(recoilY);
@@ -173,12 +173,12 @@ if(instance_exists(oPlayer) ){
 		
 		#region Recoil X
 		if(RecoilTimer[1] > -1){
-			if(global.Inventory[# oPlayer.WeaponID, Index.slot_ammo] % 2 == 0){ 
+			if(global.Inventory[# global.local_player.WeaponID, Index.slot_ammo] % 2 == 0){ 
 				Recoil[1] += StabilizationSpeed * sign(recoilX);
-				Recoil[1] = min(Recoil[1], recoilX * oPlayer.KickBack);
+				Recoil[1] = min(Recoil[1], recoilX * global.local_player.KickBack);
 			}else{
 				Recoil[1] -= StabilizationSpeed * sign(recoilX);
-				Recoil[1] = min(abs(Recoil[1]), recoilX * oPlayer.KickBack);
+				Recoil[1] = min(abs(Recoil[1]), recoilX * global.local_player.KickBack);
 			}
 			RecoilTimer[1] --;
 		}else{

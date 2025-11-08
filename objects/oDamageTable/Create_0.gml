@@ -1,6 +1,6 @@
 event_inherited();
 damage_table_width_tab = min(768 * global.GUIMultiplier, 1080);
-damage_table_height_tab = max(128 * global.GUIMultiplier + ((ds_map_size(oPlayer.HitMap) + 2)*32*global.GUIMultiplier), 352);
+damage_table_height_tab = max(128 * global.GUIMultiplier + ((ds_map_size(global.local_player.HitMap) + 2)*32*global.GUIMultiplier), 352);
 alpha = 1;
 black = -1;
 
@@ -10,7 +10,7 @@ zui_set_size(damage_table_width_tab, damage_table_height_tab);
 killed_by_y = max(zui_get_height() * .1, 64);
 offset_position_y = 32;
 offset_position_x = 32;
-grid_height = min((ds_map_size(oPlayer.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
+grid_height = min((ds_map_size(global.local_player.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
 if(oEggyEloRatingSystem.player_win == false){

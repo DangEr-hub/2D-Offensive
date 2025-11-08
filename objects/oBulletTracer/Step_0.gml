@@ -5,10 +5,10 @@ LightObject.y = y;
 LightObject.angle = image_angle;
 
 #region Infra vision
-if(oPlayer.ToggleInfraVision == true || oPlayer.ToggleNightVision == true){
+if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNightVision == true){
 	if(infra_vision_light == undefined){
 		infra_vision_light = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
-		if(oPlayer.ToggleNightVision == true){
+		if(global.local_player.ToggleNightVision == true){
 			infra_vision_light.blend = c_green;
 		}else{
 			infra_vision_light.blend = c_red;	

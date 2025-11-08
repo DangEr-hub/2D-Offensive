@@ -1,6 +1,7 @@
 randomize();
 global.my_console = console_create();
 global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
+global.local_player = -1;
 global.aberration_level = 0;
 global.saturation_level = 1.8;
 global.InventoryEquipLeftTopCorner = [-1, -1];
@@ -36,8 +37,8 @@ global.anti_aliasing = 0;
 global.sound_gain = 100;
 global.ranked_game = false;
 global.hard_mode = false;
-global.window_width = 1920;
-global.window_height = 1080;
+global.window_width = 960;
+global.window_height = 540;
 global.draw_other_models = false;
 global.Weather = "sun";
 global.crosshair_color = c_white;
@@ -108,7 +109,7 @@ for (var i = 0; i < MapIndex.Total; i++) {
 }
 
 
-global.MapID = -1;
+global.MapID = MapIndex.Desert;//-1;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
 global.MapProperties[#MapIndex.Desert, MapProperty.Name] = "Desert";
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(178, 141, 35);

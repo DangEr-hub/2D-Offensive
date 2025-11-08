@@ -2,12 +2,13 @@ ViewX = camera_get_view_x(CAMERA);
 ViewY = camera_get_view_y(CAMERA);
 global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
+global.local_player = get_local_player();
 
 
 if(instance_exists(oPlayer)){
 	
-	//#region Bird spawning
-	/*if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
+	#region Bird spawning
+	if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
 		var birds = random_range(1, 3);
 		var offset = 8;
 		var areas = {
@@ -31,12 +32,12 @@ if(instance_exists(oPlayer)){
 	    bird_snd_timer--;
 	} else {
 	    var bird_sound = choose(snd_Bird1, snd_Bird2, snd_Bird3, snd_Bird4, snd_Bird5);
-	    play_sound(oPlayer.x, oPlayer.y, bird_sound, oPlayer.id);
+	    play_sound(global.local_player.x, global.local_player.y, bird_sound, global.local_player.id);
 	    bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
-	}*/
+	}
 	
 	bloom_threshold = .29;
-	if(oPlayer.ToggleInfraVision == true){
+	if(global.local_player.ToggleInfraVision == true){
 		bloom_threshold = .35;
 	}
 	
@@ -52,15 +53,15 @@ if(instance_exists(oPlayer)){
 	}
 	
 	if(keyboard_check_pressed(vk_escape)){
-		if(oPlayer.player_can_shoot == false){
-			oPlayer.player_can_shoot = true;
+		if(global.local_player.player_can_shoot == false){
+			global.local_player.player_can_shoot = true;
 		}
 		
 		if(instance_exists(oMortarMenu)){
 			with(oMortarMenu){
 				zui_destroy();
 			}
-			oPlayer.moving_state = player_states.none_state;
+			global.local_player.moving_state = player_states.none_state;
 		}
 		
 		if(instance_exists(oBuyMenu)){
@@ -86,25 +87,25 @@ if(instance_exists(oPlayer)){
 		item_description_destroy();
 	}
 
-	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || oPlayer.player_can_shoot == false){
+	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || global.local_player.player_can_shoot == false){
 		window_set_cursor(cr_default);
 	}else{
 		window_set_cursor(cr_none);	
 	}
 
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
-		if(global.Inventory[# oPlayer.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false){
 			if(show_weapon_attachments == false){
 				with(zui_main()){
 					with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
 						
 					}
 				}
-				oPlayer.Moving = false;
-				oPlayer.Legs.image_speed = 0;
-				oPlayer.RelativeSpeedX = 0;
-				oPlayer.RelativeSpeedY = 0;
-				oPlayer.player_can_shoot = false;
+				global.local_player.Moving = false;
+				global.local_player.Legs.image_speed = 0;
+				global.local_player.RelativeSpeedX = 0;
+				global.local_player.RelativeSpeedY = 0;
+				global.local_player.player_can_shoot = false;
 				show_weapon_attachments = true;
 			}else{
 				if(instance_exists(oWeaponAttachments)){
@@ -114,7 +115,7 @@ if(instance_exists(oPlayer)){
 				}
 				show_weapon_attachments = false;
 				if!(instance_exists(oInventory)){
-					oPlayer.player_can_shoot = true;	
+					global.local_player.player_can_shoot = true;	
 				}
 			}
 		}

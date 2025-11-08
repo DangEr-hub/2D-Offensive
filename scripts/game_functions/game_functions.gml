@@ -77,6 +77,8 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
 		}
 	}
+    // Send projectile spawn to network
+    var proj_id = send_projectile_spawn(BX, BY, BulletDirection, BS, BulletImage, BulletShotX, BulletShotY, BulletDamage, BPD, BulletItemID);
 	var bullet_tracer = instance_create_layer(BX, BY, "ItemsO", oBulletTracer);
 	bullet_tracer.stats = {
 		"Speed": BS,
@@ -95,9 +97,6 @@ function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, Bul
 		"Object_x": BOPosition[0],
 		"Object_y": BOPosition[1]
 	};
-	
-    // Send projectile spawn to network
-    var proj_id = send_projectile_spawn(BX, BY, BulletDirection, BS);
         
     bullet_tracer.network_id = proj_id;
     bullet_tracer.owner_id = network_id;
@@ -429,13 +428,13 @@ function player_shooting(){
 		with(Fog){
 			smoke_effect_create(
 				20,
-				oPlayer.RotationAngle - 180,
+				global.local_player.RotationAngle - 180,
 				5,
 				5,
 				10,
 				.1,
 				.75,
-				clamp(oPlayer.ShootTimer, 10, 30)
+				clamp(global.local_player.ShootTimer, 10, 30)
 			);	
 		}
 	}
@@ -444,7 +443,7 @@ function player_shooting(){
 	#region Create bullet casing
 	if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.BulletCasingID] != -1){
 		particle_create(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-		0, point_direction(oPlayer.x, oPlayer.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.BulletCasingID], x, y, 1, 60);
+		0, point_direction(global.local_player.x, global.local_player.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.BulletCasingID], x, y, 1, 60);
 	}
 	#endregion
 				
@@ -632,7 +631,7 @@ function inaccuracy_formula(WID, ObjectType){
 
 function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
 	if(instance_exists(instance_id)){
-	    var playerInstance = instance_find(oPlayer, 0);
+	    var playerInstance = global.local_player;//instance_find(Player, 0);
 		audio_emitter_gain(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
 		audio_emitter_pitch(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
 	    audio_emitter_position(instance_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
@@ -730,13 +729,13 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
 function pause(ObjectType){
 	//part_particles_clear(global.ParticleSystem);
 	if(instance_exists(oWeaponAttachments)){
-		oPlayer.player_can_shoot = true;
+		global.local_player.player_can_shoot = true;
 		with(oWeaponAttachments){
 			zui_destroy();
 		}
 	}
 	if(instance_exists(oBuyMenu)){
-		oPlayer.player_can_shoot = true;
+		global.local_player.player_can_shoot = true;
 		with(oBuyMenuDescription){
 			zui_destroy();
 		}
@@ -802,7 +801,7 @@ function reset_gui(){
 	if(instance_exists(oInventory)){
 		instance_destroy(oInventory);
 		instance_destroy(oSlot);
-		instance_create_layer(oPlayer.x, oPlayer.y, "OtherO", oInventory);
+		instance_create_layer(global.local_player.x, global.local_player.y, "OtherO", oInventory);
 	}
 	if(instance_exists(oController)){
 		instance_destroy(oController);	

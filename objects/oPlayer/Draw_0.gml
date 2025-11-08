@@ -1,6 +1,6 @@
 event_inherited();
-draw_text(x, y - 70, room_get_name(room));
-draw_text(x, y - 140, global.rating_struct.Kills_per_round);
+//draw_text(x, y - 70, string(instance_number(oParticleSystem)) + ", " + string(instance_number(oDraw)));
+//draw_text(x, y - 140, global.rating_struct.Kills_per_round);
 
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -99,6 +99,7 @@ if(stats.Health_points > 0){
 }
 
 #region Networking
+/*
 if (global.debug_network) {
     // Draw network ID
     draw_set_color(c_white);
@@ -118,5 +119,5 @@ if (global.debug_network) {
         draw_circle(target_x, target_y, 8, false);
         draw_set_alpha(1);
     }
-}
+}*/
 #endregion

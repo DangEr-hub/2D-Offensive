@@ -9,13 +9,13 @@ if(type == "Respawn menu"){
 	var CellHeight = 32 * global.GUIMultiplier;
 	var cell_x = x;
 	var cell_y = y;
-	var Keys = ds_map_keys_to_array(oPlayer.HitMap);
-	var Damages = array_create(ds_map_size(oPlayer.HitMap), -1);
-	var NumRows = ds_map_size(oPlayer.HitMap) + 1; // +1 for header row
+	var Keys = ds_map_keys_to_array(global.local_player.HitMap);
+	var Damages = array_create(ds_map_size(global.local_player.HitMap), -1);
+	var NumRows = ds_map_size(global.local_player.HitMap) + 1; // +1 for header row
 	
-	for (var i = 0; i < ds_map_size(oPlayer.HitMap); i++) {
+	for (var i = 0; i < ds_map_size(global.local_player.HitMap); i++) {
 		var entity_id = Keys[i];
-		var Data = oPlayer.HitMap[? entity_id];
+		var Data = global.local_player.HitMap[? entity_id];
 		Damages[i] = Data[? "DamageReceived"];
 	}
 
@@ -43,7 +43,7 @@ if(type == "Respawn menu"){
 	    for (var i = 0; i < max_rows; i++) {
 	        var maxIndex = i;
 	        for (var j = i + 1; j < array_length(Keys); j++) {
-	            if (oPlayer.HitMap[? Keys[j]][? "DamageReceived"] > oPlayer.HitMap[? Keys[maxIndex]][? "DamageReceived"]) {
+	            if (global.local_player.HitMap[? Keys[j]][? "DamageReceived"] > global.local_player.HitMap[? Keys[maxIndex]][? "DamageReceived"]) {
 	                maxIndex = j;
 	            }
 	        }
@@ -77,7 +77,7 @@ if(type == "Respawn menu"){
 	#region Draw data
 	for (var row = 1; row < NumRows; row++) {
 		var EntityId = Keys[row - 1];
-		var Data = oPlayer.HitMap[? EntityId];   
+		var Data = global.local_player.HitMap[? EntityId];   
 		var RowData = [string(Data[? "Name"]), 
 			            string(Data[? "HitsReceived"]), 
 			            string(Data[? "DamageReceived"]), 

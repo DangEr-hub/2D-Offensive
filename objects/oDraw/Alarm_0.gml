@@ -19,6 +19,6 @@ instance_activate_object(objUIWindowCaption);
 instance_activate_object(objZUIMain);
 instance_activate_object(objUIBlack);
 instance_activate_object(oPause);
-instance_activate_object(oPlayer);
+instance_activate_object(global.local_player);
 instance_activate_object(oConsole);
 part_particles_clear(global.ParticleSystem);

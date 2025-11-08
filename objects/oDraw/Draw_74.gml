@@ -2,37 +2,37 @@
 var blur_intensity = 0;
 var vignette_level = 0.75;
 if(instance_exists(oPlayer)){
-	if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
+	if(global.local_player.ToggleNightVision == true || global.local_player.ToggleInfraVision == true) {
 	    if(!surface_exists(nightvision_surface)){
 	        nightvision_surface = surface_create(global.GuiW, global.GuiH);
 	    }
 	}
 	aberration_level = global.aberration_level;
 	saturation_level = global.saturation_level;
-	if(oPlayer.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2) && oPlayer.stats.Health_points > 0){
-		aberration_level = clamp(oPlayer.stats.Health_points/500, 0.01, 0.05);
-		saturation_level = min(0 + oPlayer.stats.Health_points/100, global.saturation_level);
+	if(global.local_player.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2) && global.local_player.stats.Health_points > 0){
+		aberration_level = clamp(global.local_player.stats.Health_points/500, 0.01, 0.05);
+		saturation_level = min(0 + global.local_player.stats.Health_points/100, global.saturation_level);
 	}
 	
 	var vignette_aimpunch = 0;
 	var vignette_explosion = 0;
-	if(oPlayer.near_explosion == true){
+	if(global.local_player.near_explosion == true){
 		aberration_level = 0.02;
 		vignette_explosion = 0.5;
 	}
 	
-	if(oPlayer.AimPunchTimer > -1 || oPlayer.near_explosion == true || oPlayer.in_water == true){
+	if(global.local_player.AimPunchTimer > -1 || global.local_player.near_explosion == true || global.local_player.in_water == true){
 		vignette_aimpunch = 0.25;
 		blur_intensity = 0.05;
 	}
-	var hp_ratio = clamp(oPlayer.stats.Health_points / global.player_stats_struct.Max_health, 0, 1);
+	var hp_ratio = clamp(global.local_player.stats.Health_points / global.player_stats_struct.Max_health, 0, 1);
 	var vignette_hp = lerp(1.05, 0, hp_ratio);
 	vignette_level = 0.75 + vignette_explosion + vignette_aimpunch + vignette_hp;
 }
 #endregion
 
 if(instance_exists(oPlayer)){	
-	if(oPlayer.player_has_scope != 0 ||(oPlayer.player_has_scope == 0 && oPlayer.ScopeIn == false)){
+	if(global.local_player.player_has_scope != 0 ||(global.local_player.player_has_scope == 0 && global.local_player.ScopeIn == false)){
 
 		if(global.BloomShader == true){
 			if(!surface_exists(bloom_surface1)){
@@ -85,9 +85,9 @@ if(instance_exists(oPlayer)){
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
 
-			if (oPlayer.in_water == true) {
+			if (global.local_player.in_water == true) {
 			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000.0);
-			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (oPlayer.in_water_timer + 1) / game_get_speed(gamespeed_fps)));
+			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)));
 			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 2.5);
 			} else {
 			    shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0.0);
@@ -101,7 +101,7 @@ if(instance_exists(oPlayer)){
 
 
 		// Vykreslení night vision surface
-		if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
+		if(global.local_player.ToggleNightVision == true || global.local_player.ToggleInfraVision == true) {
 		    surface_set_target(nightvision_surface);
 		}
 		    
@@ -120,11 +120,11 @@ if(instance_exists(oPlayer)){
 			
 		}
 		
-		if(oPlayer.ToggleNightVision == true || oPlayer.ToggleInfraVision == true) {
+		if(global.local_player.ToggleNightVision == true || global.local_player.ToggleInfraVision == true) {
 		    surface_reset_target();
 		}
 
-		if(oPlayer.ToggleNightVision) {
+		if(global.local_player.ToggleNightVision) {
 			
 			#region Night vision effect
 		    shader_set(shd_NightVision);
@@ -144,7 +144,7 @@ if(instance_exists(oPlayer)){
 		    shader_reset();
 			#endregion
 			
-		}else if(oPlayer.ToggleInfraVision){
+		}else if(global.local_player.ToggleInfraVision){
 			
 			#region Infra vision effect
 		    shader_set(shd_InfraVisionSurface);
@@ -162,8 +162,8 @@ if(instance_exists(oPlayer)){
 }
 
 
-if (oPlayer.in_water == true) {
-    var alpha = 0.25 * (oPlayer.in_water_timer + 1) / game_get_speed(gamespeed_fps);
+if (global.local_player.in_water == true) {
+    var alpha = 0.25 * (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps);
     
     draw_set_alpha(alpha);
     draw_set_color(c_aqua);

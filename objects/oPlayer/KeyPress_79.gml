@@ -1,6 +1,6 @@
 //show_debug_message(global.window_height);
 if!(global.my_console[? "active"]){
-	round_end("Loss");
-	//spawn_enemies(global.MapID);
+	//round_end("Loss");
+	spawn_enemies(global.MapID);
 }
 

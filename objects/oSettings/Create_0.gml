@@ -320,6 +320,7 @@ with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, 
 	callback = function(){
 		value = !value;
 		window_set_fullscreen(value);
+		window_resize();
 	};
 }
 #endregion

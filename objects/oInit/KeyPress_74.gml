@@ -1,10 +1,9 @@
-/// Joining the game - Press J event in oInit
+/* Joining the game - Press J event in oInit */
 // Make sure NetworkManager exists
 if (!instance_exists(oNetworkManager)) {
     instance_create_layer(100, 100, "Instances", oNetworkManager);
 }
     
-// Get IP from input (replace with your UI)
 var ip_address = "127.0.0.1"; // For local testing
 var port = 50000;  
     

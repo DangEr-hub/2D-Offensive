@@ -62,7 +62,7 @@ function weapon_attachment_equip(ID, AttachmentPosition, ObjectType = oPlayer) {
 
     if (canEquip) {
         global.Inventory[# ObjectType.WeaponID, AttachmentPosition] = ID;
-		with(oPlayer){
+		with(get_local_player()){
 			ItemAmountSubstract(item_use_position, 1);
 		}
     }

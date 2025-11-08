@@ -50,12 +50,12 @@ if(MuzzleFlashLight != undefined){
 #endregion
 
 #region Infra vision
-if(oPlayer.stats.Health_points > 0){
-	if(oPlayer.ToggleInfraVision == true || oPlayer.ToggleNightVision == true){
+if(global.local_player.stats.Health_points > 0){
+	if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNightVision == true){
 		if(infra_vision_light == undefined){
 			infra_vision_light = new BulbLight(oLightRenderer.lighting, sLight128, 0, x, y);
 			infra_vision_light.alpha = 1;
-			if(oPlayer.ToggleNightVision == true){
+			if(global.local_player.ToggleNightVision == true){
 				infra_vision_light.blend = c_green;
 			}else{
 				infra_vision_light.blend = c_red;	
