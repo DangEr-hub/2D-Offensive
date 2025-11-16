@@ -1,4 +1,17 @@
 /* Helper functions for networking */
+function bit_state_has(st, flag){ 
+	return (st & flag) != 0; 
+}
+
+
+function write_debug(text, file_name = "debug_log.txt"){
+	var f = file_text_open_append(file_name);
+	file_text_write_string(f, string(text));
+	file_text_write_string(f, "\n");
+	file_text_close(f);	
+}
+
+
 function equip_network_propagate(){
 	/* oPlayer local function */
 	if (is_local && instance_exists(oNetworkManager)) {

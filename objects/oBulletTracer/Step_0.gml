@@ -22,7 +22,6 @@ if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNi
 }
 #endregion
 
-
 if (is_remote) {
     if (distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance) {
         instance_destroy();
@@ -128,59 +127,23 @@ if(is_local){
 
 	#region Normal bullet tracer
 	if(image_index == 0){
-		if(PointDistance <= stats.Distance){
-			if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
-				create_bullet(
-					stats.Shot_x,
-					stats.Shot_y,
-					stats.Damage,
-					stats.Starting_x,
-					stats.Starting_y,
-					stats.Object,
-					stats.Item_id,
-					stats.Penetration_damage*10,
-					image_index,
-					stats.Object_index,
-					stats.Owner_name,
-					direction,
-					stats.Owner_id
-				);
-				instance_destroy(id);
-			}
-		}else{
-			var RandomX = 0;
-			var RandomY = 0;
-			if(distance_to_point(stats.Starting_x, stats.Starting_y) >= stats.Distance){
-				RandomX = random_range(
-					stats.Shot_x - inaccuracy_formula(stats.Item_id, stats.Object), 
-					stats.Shot_x + inaccuracy_formula(stats.Item_id, stats.Object)
-				);
-			
-				RandomY = random_range(
-					stats.Shot_y - inaccuracy_formula(stats.Item_id, stats.Object), 
-					stats.Shot_y + inaccuracy_formula(stats.Item_id, stats.Object)
-				);
-				var BX = stats.Starting_x +
-				lengthdir_x(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
-				var BY = stats.Starting_y + 
-				lengthdir_y(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
-				create_bullet(
-					BX,
-					BY,
-					stats.Damage,
-					stats.Starting_x,
-					stats.Starting_y,
-					stats.Object,
-					stats.Item_id,
-					stats.Penetration_damage*10,
-					image_index,
-					stats.Object_index,
-					stats.Owner_name,
-					direction,
-					stats.Owner_id
-				);
-				instance_destroy(id);
-			}	
+		if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
+			create_bullet(
+				stats.Shot_x,
+				stats.Shot_y,
+				stats.Damage,
+				stats.Starting_x,
+				stats.Starting_y,
+				stats.Object,
+				stats.Item_id,
+				stats.Penetration_damage*10,
+				image_index,
+				stats.Object_index,
+				stats.Owner_name,
+				direction,
+				stats.Owner_id
+			);
+			instance_destroy(id);
 		}
 	}
 	#endregion

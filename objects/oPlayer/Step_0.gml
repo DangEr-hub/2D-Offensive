@@ -8,6 +8,7 @@ if (is_remote) {
     x = lerp(x, target_x, interpolation_speed);
     y = lerp(y, target_y, interpolation_speed);
     RotationAngle = lerp(RotationAngle, target_direction, interpolation_speed);
+	instance_destroy(LegHitBox);
 }
 
 #endregion
@@ -171,7 +172,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Timers and other
-		stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
+		stats.Health_points = clamp(stats.Health_points, 0, global.player_stats_struct.Max_health);
 		stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
 		stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
 		stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);

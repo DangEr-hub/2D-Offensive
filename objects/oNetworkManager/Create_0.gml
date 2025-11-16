@@ -5,10 +5,6 @@ enum PLAYER_FLAGS {
    // CROUCH  = 4   // 0b00000100 1 << 2
 }
 
-function bit_state_has(st, flag){ 
-	return (st & flag) != 0; 
-}
-
 
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
@@ -49,7 +45,8 @@ enum PACKET {
     OBJECT_SYNC,
     HEARTBEAT,
     PLAYER_STATE,
-	EQUIP_SYNC
+	EQUIP_SYNC,
+	HIT
 	
 }
 

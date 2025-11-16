@@ -99,7 +99,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		   [pos[0], pos[1]], 
 		   [item_dir_spd_dist[1], item_dir_spd_dist[2], BulletImage, item_dir_spd_dist[3]], 
 		   [bullet_x, bullet_y], 
-		   BulletDamage, BulletItemID, name_vis[1], name_vis[0]
+		   BulletDamage, item_dir_spd_dist[0], name_vis[1], name_vis[0]
 	   );
 	    bullet_tracer.network_id = proj_id;
 		bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
@@ -139,7 +139,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y); 
 		LightObject.angle = item_dir_spd_dist[1];
 		LightObject.castShadows = false;
-		move_towards_point(shot_pos[0], shot_pos[1], BS);	
+		move_towards_point(shot_pos[0], shot_pos[1], item_dir_spd_dist[2]);	
 	}
 	
 	return bullet_tracer;
@@ -547,10 +547,12 @@ function player_shooting(){
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
 				1,
-				global.Inventory[# WeaponID, Index.slot_id],
-				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
-				25,
-				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range],
+				[
+					global.Inventory[# WeaponID, Index.slot_id], 
+					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
+					25,
+					global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range]
+				],
 				id,
 				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
@@ -564,10 +566,12 @@ function player_shooting(){
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
 				0,
-				global.Inventory[# WeaponID, Index.slot_id],
-				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
-				global.BulletSpeed,
-				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range],
+				[
+					global.Inventory[# WeaponID, Index.slot_id], 
+					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
+					global.BulletSpeed,
+					global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range]
+				],
 				id,
 				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
@@ -912,36 +916,4 @@ function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageInd
 		Indicator.Sprite = DamageIndicatorSprite;
 		Indicator.SpriteID = DamageIndicatorSpriteID;
 	}
-}
-
-function player_add_kill_and_money(pid, reward, is_headshot) {
-    if (!ds_map_exists(player_stats_by_pid, pid)) {
-        var m = ds_map_create();
-        ds_map_add(m, "Money", 0);
-        ds_map_add(m, "Kills", 0);
-        ds_map_add(m, "Headshots", 0);
-        ds_map_add(player_stats_by_pid, pid, m);
-    }
-    var s = ds_map_find_value(player_stats_by_pid, pid);
-
-    ds_map_set(s, "Money", ds_map_find_value(s, "Money") + reward);
-    ds_map_set(s, "Kills", ds_map_find_value(s, "Kills") + 1);
-    if (is_headshot) {
-        ds_map_set(s, "Headshots", ds_map_find_value(s, "Headshots") + 1);
-    }
-
-    // update ranked
-    if (global.ranked_game) {
-        if (pid == my_pid) {
-            // tohle je host – jeho vlastní kill
-            global.player_stats_struct.Kills++;
-            oRatingController.kills++;
-            if (is_headshot) {
-                oRatingController.headshots++;
-            }
-        }
-    }
-
-    // pošli hráči update jeho stats (money atd.)
-    send_player_stats_update(pid, s);
 }

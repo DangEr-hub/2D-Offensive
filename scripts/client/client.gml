@@ -52,8 +52,29 @@ function handle_client_receive() {
             case PACKET.EQUIP_SYNC:
                 handle_equipment_update_client();
             break;
+			
+			case PACKET.HIT:
+				handle_hit_client();
+			break;
         }
     }
+}
+
+function handle_hit_client() {
+	with (oNetworkManager) {
+		var attacker_pid = buffer_read(receive_buffer, buffer_u16);
+		var victim_pid   = buffer_read(receive_buffer, buffer_u16);
+		var damage       = buffer_read(receive_buffer, buffer_f16);
+		var body_part    = buffer_read(receive_buffer, buffer_u8);
+		var impact_x     = buffer_read(receive_buffer, buffer_f32);
+		var impact_y     = buffer_read(receive_buffer, buffer_f32);
+		var hit_spd_mod  = buffer_read(receive_buffer, buffer_f16);
+
+		var victim = find_player_by_network_id(victim_pid);
+		if (instance_exists(victim)) {
+			statistics_hit("Health", damage, victim);
+		}
+	}
 }
 
 function handle_connect_accept() {
@@ -73,8 +94,9 @@ function handle_player_state_update_client() {
             var pid = buffer_read(receive_buffer, buffer_u16);
             var x_pos = buffer_read(receive_buffer, buffer_f32);
             var y_pos = buffer_read(receive_buffer, buffer_f32);
-            var direction_facing = buffer_read(receive_buffer, buffer_f32);
+            var direction_facing = buffer_read(receive_buffer, buffer_f16);
 			var bit_states = buffer_read(receive_buffer, buffer_u8);
+			var hp = buffer_read(receive_buffer, buffer_f16);
 			
             
             // Přeskoč lokálního hráče
@@ -95,6 +117,7 @@ function handle_player_state_update_client() {
                     target_y = y_pos;
                     target_direction = direction_facing;    
                     network_bit_state = bit_states;
+					stats.Health_points = hp;
                 }
             }
         }
@@ -179,14 +202,14 @@ function send_player_state_update_client() {
         with (player) {
             buffer_write(other.send_buffer, buffer_f32, x);
             buffer_write(other.send_buffer, buffer_f32, y);
-            buffer_write(other.send_buffer, buffer_f32, RotationAngle);
-            buffer_write(other.send_buffer, buffer_f32, XSpeed);
-            buffer_write(other.send_buffer, buffer_f32, YSpeed);
+            buffer_write(other.send_buffer, buffer_f16, RotationAngle);
 			
 			var bit_states = 0;
 			if(global.GodMode == true){
 				bit_states |= PLAYER_FLAGS.GODMODE;
 			}
+			buffer_write(other.send_buffer, buffer_u8, bit_states);
+			buffer_write(other.send_buffer, buffer_f16, stats.Health_points);
         }
         
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
@@ -251,6 +274,26 @@ function handle_player_disconnect_client() {
             if (network_id == pid) {
                 instance_destroy();
             }
+        }
+    }
+}
+
+function handle_hit_packet_client() {
+    with (oNetworkManager) {
+        var attacker_pid = buffer_read(receive_buffer, buffer_u16);
+        var victim_pid   = buffer_read(receive_buffer, buffer_u16);
+        var damage       = buffer_read(receive_buffer, buffer_f16);
+        var body_part    = buffer_read(receive_buffer, buffer_u8);
+        var impact_x     = buffer_read(receive_buffer, buffer_f32);
+        var impact_y     = buffer_read(receive_buffer, buffer_f32);
+
+        if (victim_pid != my_pid) {
+            return;
+        }
+
+        var player = find_player_by_network_id(my_pid);
+        if (instance_exists(player)) {
+            statistics_hit("Health", damage, player);
         }
     }
 }

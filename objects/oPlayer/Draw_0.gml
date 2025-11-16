@@ -1,5 +1,6 @@
 event_inherited();
-draw_text(x, y - 70, is_local);
+//draw_text(x, y - 70, network_id);
+draw_text(x, y - 70, stats.Health_points);
 //draw_text(x, y - 140, is_local);
 
 if(stats.Health_points > 0){

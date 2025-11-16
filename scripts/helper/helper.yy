@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "Server",
-    "path": "folders/Objects/Server.yy",
+    "path": "folders/Server.yy",
   },
 }

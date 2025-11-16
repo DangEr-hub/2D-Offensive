@@ -16,6 +16,36 @@ function enemy_initialized(hitObj, enemy_key, enemy_name) {
     return enemyStatsMap;
 }
 
+function send_hit(attacking_item, hit_object, BodyPart, BloodSplashX, BloodSplashY, hit_spd_mod) {
+    if (!instance_exists(oNetworkManager)) { return;}
+    if (hit_object.object_index != oPlayer) {return;} ///zatím jen hráče
+
+    var attacker_pid = attacking_item.stats.Owner_id;
+    var victim_pid = hit_object.network_id;
+    if (attacker_pid < 0 || victim_pid < 0) {return;}
+
+    var damage = hit_object.attack_damage;
+
+    with (oNetworkManager) {
+        if (is_server) {
+                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, BloodSplashX, BloodSplashY, true, hit_spd_mod);
+        } else if (is_connected) {
+                buffer_seek(send_buffer, buffer_seek_start, 0);
+                buffer_write(send_buffer, buffer_u8, PACKET.HIT);
+                buffer_write(send_buffer, buffer_u32, send_sequence++);
+                buffer_write(send_buffer, buffer_u16, attacker_pid);
+                buffer_write(send_buffer, buffer_u16, victim_pid);
+                buffer_write(send_buffer, buffer_f16, damage);
+                buffer_write(send_buffer, buffer_u8, BodyPart);
+                buffer_write(send_buffer, buffer_f32, BloodSplashX);
+                buffer_write(send_buffer, buffer_f32, BloodSplashY);
+				buffer_write(send_buffer, buffer_f16, hit_spd_mod);
+
+                network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+        }
+    }
+}
+
 function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, HelmetID, BloodSplashX = other.x, BloodSplashY = other.y){
 	if!(instance_exists(hit_object)){
 		return;
@@ -30,6 +60,8 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var armour_durability = 0;
 	var blood_color = c_red;
 	var is_net  = instance_exists(oNetworkManager);
+	var data = -1;
+	var hp = hit_object.stats.Health_points;
 	
 	/* Networking */
 	if(is_player){
@@ -57,10 +89,14 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	}
 	/********************/
 	
-	
-	
-	
-	if(hit_object.stats.Health_points > 0 && has_godmode == false){
+	/* Hit marker */
+	oCrosshair.HitMarker = 0;
+	if(BodyPart <= HitBox.HeadProne){
+		oCrosshair.HitMarker = 4;
+	}
+	/**************/
+
+	if(hp > 0 && has_godmode == false){
 		var Damage = attacking_item.stats.Damage * power(1 - global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, attacking_item.stats.Starting_x, attacking_item.stats.Starting_y));
 		hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / global.ItemIndex[#armour_id, ItemStat.Defense]);
 		hit_object.attack_damage = Damage;
@@ -69,7 +105,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		
 		/* Stealth damage with knife */
 		if(global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.WeaponTypeClass] == "Knife"){
-			if(hit_object.ChasingObjectSpotted == false){
+			if(apply_stealth_damage(hit_object)){
 				Damage *= STEALTH_DMG_MOD;
 			}
 		}
@@ -109,22 +145,15 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			}
 		}
 		
-		/* Hit marker */
-		oCrosshair.HitMarker = 0;
-		if(BodyPart >= HitBox.Head){
-			oCrosshair.HitMarker = 4;
-		}
-		/**************/
-		
 		hit_object.attack_damage *= DamageMultiplier / (attacking_item.stats.Penetration_damage + 1);
 		hit_object.attack_damage = ceil(hit_object.attack_damage);
 		
 		if(hit_object.object_index == oEnemy){
-			helmet_durability = hit_object.ArmourDurability[1];
-			armour_durability = hit_object.ArmourDurability[0];
 			hit_object.enemy_aimpunch = hit_object.attack_damage;
 		}
-		
+
+		var BloodSplashNumber = ceil(hit_object.attack_damage / 5);
+		var BloodParticleNumber = ceil(hit_object.attack_damage / 2);
 		var attacker_key = -1;
 		var attacker_name = "";
 		var victim_key = -1;
@@ -182,8 +211,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.reward];
 		var is_host = is_net && oNetworkManager.is_server;
 
-		if (hit_object.stats.Health_points <= hit_object.attack_damage) {
-
+		if (hp <= hit_object.attack_damage) {
 		    if (!is_net) {
 		        // SINGLEPLAYER REWARD
 		        global.player_stats_struct.Money += reward;
@@ -231,28 +259,45 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    }
 		    hit_object.KilledByName = attacking_item.stats.Owner_name;
 		    hit_object.KilledByWeapon = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.Name];
-		    hit_object.stats.Health_points = -1;
 		} else {
-		    statistics_hit("Health", hit_object.attack_damage, hit_object);
+			statistics_hit("Health", hit_object.attack_damage, hit_object);
 		}
 		
-		
-		
-		var BloodSplashNumber = ceil(hit_object.attack_damage / 5);
-		var BloodParticleNumber = ceil(hit_object.attack_damage / 2);
 
 	
-		if(is_player){
-			hit_object.AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
-		}else{
-			if(global.ranked_game == true){
-				global.player_stats_struct.Hit_shots ++;
-				oRatingController.hit_shots ++;
-				if(BodyPart <= HitBox.HeadProne){
-					global.player_stats_struct.Headshots ++;
-					oRatingController.headshots ++;
-				}
-			}
+		if (is_player) {
+		    hit_object.AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
+		} else {
+		    if (global.ranked_game) {
+		        if (!is_net) {
+		            // SINGLEPLAYER
+		            global.player_stats_struct.Hit_shots++;
+		            oRatingController.hit_shots++;
+		            if (BodyPart <= HitBox.HeadProne) {
+		                global.player_stats_struct.Headshots++;
+		                oRatingController.headshots++;
+		            }
+		        } else if (is_host && attacker_pid >= 0) {
+		            // MULTIPLAYER HOST
+		            with (oNetworkManager) {
+		                var stats = ds_map_find_value(player_stats, attacker_pid);
+		                if (is_undefined(stats)) {
+		                    stats = ds_map_create();
+		                    ds_map_set(stats, "Kills", 0);
+		                    ds_map_set(stats, "Deaths", 0);
+		                    ds_map_set(stats, "Money", 0);
+		                    ds_map_set(stats, "Hit_shots", 0);
+		                    ds_map_set(stats, "Headshots", 0);
+		                    ds_map_add(player_stats, attacker_pid, stats);
+		                }
+
+		                ds_map_set(stats, "Hit_shots", ds_map_find_value(stats, "Hit_shots") + 1);
+		                if (BodyPart <= HitBox.HeadProne) {
+		                    ds_map_set(stats, "Headshots", ds_map_find_value(stats, "Headshots") + 1);
+		                }
+		            }
+		        }
+		    }
 		}
 
 		repeat(BloodSplashNumber){
@@ -263,14 +308,15 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			part_type_color1(oParticleSystem.BloodParticle, blood_color);
 			part_particles_create(global.ParticleSystem, BloodSplashX, BloodSplashY, oParticleSystem.BloodParticle, BloodParticleNumber);
 		}
-		if(BodyPart != HitBox.Head){
-			if(global.ItemIndex[#ArmourID, ItemStat.Defense] > .95 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
+		
+		/*if(BodyPart != HitBox.Head){
+			if(global.ItemIndex[# ArmourID, ItemStat.Defense] > .95 || armour_durability <= 0 || BodyPart == HitBox.ArmWithAssaultRifle || BodyPart == HitBox.ArmWithoutWeapon || BodyPart == HitBox.ArmWithPistol || BodyPart == HitBox.LegProne){
 				var sound_effect = snd_BulletHit;
 				if!(audio_is_playing(sound_effect)){
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}else{
-				if(hit_object.object_index == global.local_player){
+				if(is_player){
 					global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= hit_object.attack_damage/50/global.ItemIndex[#ArmourID, ItemStat.Defense];	
 					global.Inventory[# OtherSlot.Armour, Index.slot_durability] = max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], 0);
 				}else{
@@ -331,8 +377,21 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 					play_sound(BloodSplashX, BloodSplashY, sound_effect, attacking_item.stats.Object);
 				}
 			}
-		}
+		}*/
+		
+        if (is_net) {
+            send_hit(attacking_item, hit_object, BodyPart, BloodSplashX, BloodSplashY, hit_object.aimpunch_speed_multiplier);
+        }
+		
 		damage_indicator("-" + string(ceil(hit_object.attack_damage)), BloodSplashX, BloodSplashY, c_white, spr_Icons, icons.health);
 		hit_object.attack_damage = 0; ///Nezapomenout vynulovat!!!!!
+	}
+}
+
+function apply_stealth_damage(hit_object){
+	if(hit_object.object_index != oPlayer){
+		return hit_object.ChasingObjectSpotted == false;
+	}else{
+		return false;	
 	}
 }

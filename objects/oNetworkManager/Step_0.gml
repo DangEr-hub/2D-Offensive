@@ -14,6 +14,7 @@ if (is_server) {
                 ds_map_set(data, "x", x);
                 ds_map_set(data, "y", y);
                 ds_map_set(data, "dir", RotationAngle);
+				ds_map_set(data, "health", stats.Health_points);
 				
 				var bit_states = 0;
 				if (global.GodMode) { bit_states |= PLAYER_FLAGS.GODMODE; }

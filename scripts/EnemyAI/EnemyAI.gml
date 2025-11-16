@@ -33,10 +33,12 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 		[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 		[EnemyShotX, EnemyShotY],
 		0,
-		EnemyWeaponID,
-		point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
-		global.BulletSpeed,
-		-1,
+		[
+			EnemyWeaponID,
+			point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
+			global.BulletSpeed,
+			global.ItemIndex[#global.Inventory[# EnemyWeaponID, Index.slot_id], ItemStat.Range]
+		],
 		id,
 		global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
 		object_index,

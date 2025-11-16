@@ -23,7 +23,7 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Menu","folderPath":"folders/Objects/Menu.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Other","folderPath":"folders/Objects/Other.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Parents","folderPath":"folders/Objects/Parents.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Server","folderPath":"folders/Objects/Server.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Server","folderPath":"folders/Server.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Tiles","folderPath":"folders/Objects/Tiles.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Other","folderPath":"folders/Other.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Animation Curves","folderPath":"folders/Other/Animation Curves.yy",},

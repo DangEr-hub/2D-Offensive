@@ -14,7 +14,7 @@
   "overriddenProperties": [],
   "parent": {
     "name": "Server",
-    "path": "folders/Objects/Server.yy",
+    "path": "folders/Server.yy",
   },
   "parentObjectId": null,
   "persistent": true,

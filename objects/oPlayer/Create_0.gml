@@ -75,6 +75,7 @@ triangle_point_distance = 1024;
 Name = "DangEr";
 WX = 8;
 WY = 8;
+stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina, global.player_stats_struct.Name);
 
 global.Hostage = false;
 
@@ -86,7 +87,6 @@ burst_fire_timer = 0;
 #endregion
 
 #region Statistics
-stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina, global.player_stats_struct.Name);
 HealingTimer = game_get_speed(gamespeed_fps);
 HPHealingTimer = -1;
 HPTimer = -1;

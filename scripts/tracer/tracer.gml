@@ -26,11 +26,13 @@ function handle_projectile_spawn_client() {
 			[x_pos, y_pos],
 			[bx, by],
 			index,
-			item_id,
-			angle,
-			spd,
-			0,
-			noone,
+			[
+				item_id,
+				angle,
+				spd,
+				max_dist
+			],
+			-1,
 			dmg,
 			-1,
 			[owner_name, owner_visible],
@@ -49,7 +51,7 @@ function handle_projectile_spawn_server(key) {
         if (!ds_map_exists(clients, key)) return; // neznámý klient
 
         var proj_id = buffer_read(receive_buffer, buffer_u16);
-        var owner_pid = ds_map_find_value(clients, key); // pid podle key
+        var owner_pid = buffer_read(receive_buffer, buffer_u16);
         var x_pos = buffer_read(receive_buffer, buffer_f32);
         var y_pos = buffer_read(receive_buffer, buffer_f32);
         var angle = buffer_read(receive_buffer, buffer_f32);
@@ -62,18 +64,20 @@ function handle_projectile_spawn_server(key) {
 		var owner_visible = buffer_read(receive_buffer, buffer_u8);
 		var owner_name    = buffer_read(receive_buffer, buffer_string);
 		var max_dist = buffer_read(receive_buffer, buffer_f16);
-
+		
         // tracer pro hosta
         if (owner_pid != my_pid) {
 			create_bullet_tracer(
 				[x_pos, y_pos],
 				[bx, by],
 				index,
-				item_id,
-				angle,
-				spd,
-				max_dist,
-				noone,
+				[
+					item_id,
+					angle,
+					spd,
+					global.ItemIndex[#global.Inventory[# item_id, Index.slot_id], ItemStat.Range]
+				],
+				-1,
 				dmg,
 				-1,
 				[owner_name, owner_visible],
@@ -103,6 +107,7 @@ function handle_projectile_spawn_server(key) {
 		buffer_write(send_buffer, buffer_u16, item_id);
 		buffer_write(send_buffer, buffer_u8,  owner_visible);
 		buffer_write(send_buffer, buffer_string, owner_name);
+		buffer_write(send_buffer, buffer_f16, max_dist);
 
         var k = ds_map_find_first(clients);
         var n = ds_map_size(clients);
@@ -136,6 +141,9 @@ function send_projectile_spawn(start_pos, angle_spd_id_dist, shot_pos, damage, i
         buffer_write(send_buffer, buffer_u8,  owner_visible);
         buffer_write(send_buffer, buffer_string, owner_name);
 		buffer_write(send_buffer, buffer_f16,  angle_spd_id_dist[3]);
+		
+
+		
         
         if (is_server) {
             // Broadcast to all clients
