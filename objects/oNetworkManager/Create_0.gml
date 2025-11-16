@@ -1,6 +1,15 @@
 /* NetworkManager - Create Event */
+enum PLAYER_FLAGS {
+    GODMODE = 1  // 0b00000001 1 << 0
+   //VISIBLE = 2,  // 0b00000010 1 << 1
+   // CROUCH  = 4   // 0b00000100 1 << 2
+}
 
-// Network configuration
+function bit_state_has(st, flag){ 
+	return (st & flag) != 0; 
+}
+
+
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
 global.debug_text = "kokot";
@@ -26,9 +35,9 @@ send_buffer = buffer_create(1024, buffer_grow, 1);
 receive_buffer = buffer_create(1024, buffer_grow, 1);
 
 // Player data tracking
-player_positions = ds_map_create();
-states_player = ds_map_create();
+player_states = ds_map_create();
 projectiles_seen = ds_map_create(); // key = proj_id, val = true
+player_stats = ds_map_create();
 
 // Packet types
 enum PACKET {
@@ -37,17 +46,17 @@ enum PACKET {
     DISCONNECT,
     PLAYER_UPDATE,
     PROJECTILE_SPAWN,
-    PROJECTILE_UPDATE,
     OBJECT_SYNC,
     HEARTBEAT,
-    GAME_STATE
+    PLAYER_STATE,
+	EQUIP_SYNC
+	
 }
 
-// Interpolation settings
-interpolation_enabled = true;
+equipment_changed = false;
 send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
-accum_server = 0;   // časování GAME_STATE na serveru
+accum_server = 0;   // časování PLAYER_STATE na serveru
 hb_client    = 0;   // heartbeat na klientovi
 
 // Sequence numbers for packet ordering
@@ -57,5 +66,3 @@ receive_sequences = ds_map_create();
 // Prediction and reconciliation
 client_input_buffer = ds_list_create();
 last_processed_input = 0;
-
-show_debug_message("NetworkManager initialized");

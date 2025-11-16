@@ -1,3 +1,4 @@
+/* Game end event - oNetworkManager */
 if (is_server) {
     // Server shutdown
     if (server_socket >= 0) {

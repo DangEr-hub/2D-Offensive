@@ -17,7 +17,7 @@ title_position_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
 base_position_y = zui_get_height() * .2 + 24/global.GUIMultiplier;
 gap = 128;
 
-if(oEggyEloRatingSystem.player_win == false){
+if(oRatingController.player_win == false){
 	title_color = c_red;
 	title_string = "Round lost";	
 }

@@ -11,12 +11,13 @@ function array_min(arr) {
 function window_resize(){
 	var window_h_before = window_get_height();
 	var display_h_before = display_get_height();
-	var extra_h = display_h_before - window_h_before; // Výška titulku a okrajů
+	
+	//var extra_h = display_h_before - window_h_before; // Výška titulku a okrajů
 	var window_scale = 2;
 	
-	if(window_get_fullscreen() == true){
+	//if(window_get_fullscreen() == true || window_h_before ){
 		extra_h = 0;
-	}
+	//}
 
 	// Nastavit velikost okna tak, aby vnitřní část byla přesně velikost displeje
 	window_set_size(global.window_width, global.window_height + extra_h);
@@ -69,50 +70,83 @@ function buy_item(ItemID){
 	}
 }
 
-function create_bullet_tracer(BX, BY, BulletShotX, BulletShotY, BulletImage, BulletItemID, BulletDirection, BS, BulletDistance, BulletObject, BulletDamage, ObjectIndex, ObjectName, BNE, BPD, BOPosition){
-	if(instance_exists(BulletObject)){
+function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1]){
+	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
+	
+	if(remote == false){
+		var random_x = 0;
+		var random_y = 0;
+		var bullet_x = shot_pos[0];
+		var bullet_y = shot_pos[1];
+		if(point_distance(shot_pos[0], shot_pos[1], pos[0], pos[1]) <= item_dir_spd_dist[3]){
+			if(distance_to_point(pos[0], pos[1]) >= item_dir_spd_dist[3]){
+				random_x = random_range(
+					shot_pos[0] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
+					shot_pos[0] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+				);
+			
+				random_y = random_range(
+					shot_pos[1] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
+					shot_pos[1] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+				);
+				bullet_x = pos[0] +
+				lengthdir_x(global.ItemIndex[# item_dir_spd_dist[0], ItemStat.Range], point_direction(pos[0], pos[1], random_x, random_y));
+				bullet_y = pos[1] + 
+				lengthdir_y(global.ItemIndex[# item_dir_spd_dist[0], ItemStat.Range], point_direction(pos[0], pos[1], random_x, random_y));	
+			}
+		}
+	   var proj_id = send_projectile_spawn(
+		   [pos[0], pos[1]], 
+		   [item_dir_spd_dist[1], item_dir_spd_dist[2], BulletImage, item_dir_spd_dist[3]], 
+		   [bullet_x, bullet_y], 
+		   BulletDamage, BulletItemID, name_vis[1], name_vis[0]
+	   );
+	    bullet_tracer.network_id = proj_id;
+		bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
+	}else{
+	    bullet_tracer.network_id = proj_own[0];
+	    bullet_tracer.stats.Owner_id = proj_own[1];
+	}
+	bullet_tracer.stats.Speed = item_dir_spd_dist[2];
+	bullet_tracer.stats.Shot_x = shot_pos[0];
+	bullet_tracer.stats.Shot_y = shot_pos[1];
+	bullet_tracer.stats.Damage = BulletDamage;
+	bullet_tracer.stats.Starting_x = pos[0];
+	bullet_tracer.stats.Starting_y = pos[1];
+	bullet_tracer.stats.Object = BulletObject;
+	bullet_tracer.stats.Item_id = item_dir_spd_dist[0];
+	bullet_tracer.stats.Object_index = ObjectIndex;
+	bullet_tracer.stats.Distance = item_dir_spd_dist[3];
+	bullet_tracer.stats.Nearest_enemy = BNE;
+	bullet_tracer.stats.Object_x = BOPosition[0];
+	bullet_tracer.stats.Object_y = BOPosition[1]; 
+	bullet_tracer.is_local  = local_remote[0];
+	bullet_tracer.is_remote = local_remote[1];		   
+	bullet_tracer.stats.Owner_name = name_vis[0];
+	bullet_tracer.stats.Owner_visible = name_vis[1];
+	
+	if(instance_exists(BulletObject) && BulletObject != -1){
 		if(instance_exists(oParticleSystem) && BulletObject.Visible == true){
 			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
-			part_particles_create(global.ParticleSystem, BX, BY, oParticleSystem.Spark, BulletDamage/5);
+			part_particles_create(global.ParticleSystem, pos[0], pos[1], oParticleSystem.Spark, BulletDamage/5);
 			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
 		}
 	}
-    // Send projectile spawn to network
-    var proj_id = send_projectile_spawn(BX, BY, BulletDirection, BS, BulletImage, BulletShotX, BulletShotY, BulletDamage, BPD, BulletItemID);
-	var bullet_tracer = instance_create_layer(BX, BY, "ItemsO", oBulletTracer);
-	bullet_tracer.stats = {
-		"Speed": BS,
-		"Shot_x": BulletShotX,
-		"Shot_y": BulletShotY,
-		"Damage": BulletDamage,
-		"Starting_x": BX,
-		"Starting_y": BY,
-		"Object": BulletObject,
-		"Item_id": BulletItemID,
-		"Penetration_damage": BPD,
-		"Object_index": ObjectIndex,
-		"Object_name": ObjectName,
-		"Distance": BulletDistance,
-		"Nearest_enemy": BNE,
-		"Object_x": BOPosition[0],
-		"Object_y": BOPosition[1]
-	};
-        
-    bullet_tracer.network_id = proj_id;
-    bullet_tracer.owner_id = network_id;
 	
 	with(bullet_tracer){
 		image_index = BulletImage;
-		image_angle = BulletDirection;
+		image_angle = item_dir_spd_dist[1];
 		LightObject = new BulbLight(oLightRenderer.lighting, sLightTracer, 0, x, y); 
-		LightObject.angle = BulletDirection;
+		LightObject.angle = item_dir_spd_dist[1];
 		LightObject.castShadows = false;
-		move_towards_point(BulletShotX, BulletShotY, BS);	
+		move_towards_point(shot_pos[0], shot_pos[1], BS);	
 	}
+	
+	return bullet_tracer;
 	
 }
 
-function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection){
+function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
 	var particles_number = global.ItemIndex[#BulletItemID, ItemStat.Damage]/5;
 	if(BulletItemID == Item.base_explosion || BulletItemID == Item.HEGrenade || BulletItemID == Item.StickyGrenade
@@ -152,17 +186,16 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		}
 	}
 	Bullet.direction = BulletDirection;
-	Bullet.stats = {
-		"Damage": BulletDamage,
-		"Starting_x": BulletStartingX,
-		"Starting_y": BulletStartingY,
-		"Object": BulletObject,
-		"Item_id": BulletItemID,
-		"Penetration_damage": BulletPenetrationDamage,
-		"Tracer_image": TracerImage,
-		"Object_index": ObjectIndex,
-		"Object_name": ObjectName
-	};
+	Bullet.stats.Damage = BulletDamage;
+	Bullet.stats.Starting_x = BulletStartingX;
+	Bullet.stats.Starting_y = BulletStartingY;
+	Bullet.stats.Object = BulletObject;
+	Bullet.stats.Item_id = BulletItemID;
+	Bullet.stats.Penetration_damage = BulletPenetrationDamage;
+	Bullet.stats.Tracer_image = TracerImage;
+	Bullet.stats.Object_index = ObjectIndex;
+	Bullet.stats.Owner_name = ObjectName;
+	Bullet.stats.Owner_id = owner_id;
 	if(instance_number(oFog) < 10){
 		Fog = instance_create_layer(BulletX, BulletY, "OtherO", oFog);
 		with(Fog){
@@ -416,7 +449,7 @@ function player_shooting(){
 	
 	if(global.ranked_game == true){
 		global.player_stats_struct.All_shots ++;
-		oEggyEloRatingSystem.all_shots ++;
+		oRatingController.all_shots ++;
 	}
 	
 	#region Create smoke effect
@@ -464,7 +497,7 @@ function player_shooting(){
 		#region Determine shot position
 							
 		var prone_kickback = 1;
-		if(moving_state == player_states.prone_state){
+		if(moving_state == states_player.prone_state){
 			prone_kickback = .5;
 		}
 		var suppressor_multiplier = 1;
@@ -511,41 +544,37 @@ function player_shooting(){
 			
 		if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			create_bullet_tracer(
-				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
-				ShotX,
-				ShotY,
+				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
+				[ShotX,ShotY],
 				1,
 				global.Inventory[# WeaponID, Index.slot_id],
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				25,
-				-1,
+				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range],
 				id,
 				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
-				stats.Name,
+				[stats.Name, Visible],
 				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
-				0,
-				[id.x, id.y]
+				[id.x, id.y],
+				false
 			);
 		}else{
 			create_bullet_tracer(
-				Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-				Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
-				ShotX,
-				ShotY,
+				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
+				[ShotX,ShotY],
 				0,
 				global.Inventory[# WeaponID, Index.slot_id],
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 				global.BulletSpeed,
-				-1,
+				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range],
 				id,
 				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
 				object_index,
-				stats.Name,
+				[stats.Name, Visible],
 				noone,
-				0,
-				[id.x, id.y]
+				[id.x, id.y],
+				false
 			);
 		}
 					
@@ -562,7 +591,7 @@ function inaccuracy_formula(WID, ObjectType){
 				var range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
 				var moving_state_inaccuracy = 1;
 	
-				if(ObjectType.moving_state == player_states.prone_state){
+				if(ObjectType.moving_state == states_player.prone_state){
 					moving_state_inaccuracy = .5;	
 				}
 	
@@ -615,17 +644,12 @@ function inaccuracy_formula(WID, ObjectType){
 				
 				var inaccuracy_value = min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
 				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
-				//show_debug_message(inaccuracy_value);
 				return inaccuracy_value;
 
 			}
-		}else if(ObjectType.object_index == oFriend){
-			if(instance_exists(oFriend)){
-				
-			}
+		}else{
+			return 0;	
 		}
-	}else{
-		return 0;	
 	}
 }
 
@@ -888,4 +912,36 @@ function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageInd
 		Indicator.Sprite = DamageIndicatorSprite;
 		Indicator.SpriteID = DamageIndicatorSpriteID;
 	}
+}
+
+function player_add_kill_and_money(pid, reward, is_headshot) {
+    if (!ds_map_exists(player_stats_by_pid, pid)) {
+        var m = ds_map_create();
+        ds_map_add(m, "Money", 0);
+        ds_map_add(m, "Kills", 0);
+        ds_map_add(m, "Headshots", 0);
+        ds_map_add(player_stats_by_pid, pid, m);
+    }
+    var s = ds_map_find_value(player_stats_by_pid, pid);
+
+    ds_map_set(s, "Money", ds_map_find_value(s, "Money") + reward);
+    ds_map_set(s, "Kills", ds_map_find_value(s, "Kills") + 1);
+    if (is_headshot) {
+        ds_map_set(s, "Headshots", ds_map_find_value(s, "Headshots") + 1);
+    }
+
+    // update ranked
+    if (global.ranked_game) {
+        if (pid == my_pid) {
+            // tohle je host – jeho vlastní kill
+            global.player_stats_struct.Kills++;
+            oRatingController.kills++;
+            if (is_headshot) {
+                oRatingController.headshots++;
+            }
+        }
+    }
+
+    // pošli hráči update jeho stats (money atd.)
+    send_player_stats_update(pid, s);
 }

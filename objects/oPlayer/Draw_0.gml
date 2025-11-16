@@ -1,6 +1,6 @@
 event_inherited();
-//draw_text(x, y - 70, string(instance_number(oParticleSystem)) + ", " + string(instance_number(oDraw)));
-//draw_text(x, y - 140, global.rating_struct.Kills_per_round);
+draw_text(x, y - 70, is_local);
+//draw_text(x, y - 140, is_local);
 
 if(stats.Health_points > 0){
 	var armour_sprite_index = 0;
@@ -49,18 +49,23 @@ if(stats.Health_points > 0){
 	if(image_index >= player_textures.prone && image_index < player_textures.knife){
 		helmet_sprite_index = 6;	
 	}
+	
+	var helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+	if(instance_exists(oNetworkManager) && is_local == false){
+		helmet_id = network_helmet_id;
+	}
 
-	if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.KevlarHelm){
+	if(helmet_id == Item.KevlarHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);	
-	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.MilitaryHelm){
+	}else if(helmet_id == Item.MilitaryHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 1, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.SpecOpsHelm){
+	}else if(helmet_id == Item.SpecOpsHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 2, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.MilitaryNightVision){
+	}else if(helmet_id == Item.MilitaryNightVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 3, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.BasicNightVision){
+	}else if(helmet_id == Item.BasicNightVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] == Item.InfraredVision){
+	}else if(helmet_id == Item.InfraredVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 		  
@@ -68,7 +73,7 @@ if(stats.Health_points > 0){
 	if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
 		var item_offset_x = 40;
 		var item_offset_y = -10;
-		if(moving_state == player_states.prone_state){
+		if(moving_state == states_player.prone_state){
 			item_offset_x = 100;
 			item_offset_y = -3;
 		}

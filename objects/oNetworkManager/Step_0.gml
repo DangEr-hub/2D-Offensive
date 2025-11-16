@@ -5,21 +5,29 @@ if (is_server) {
     if (accum_server >= 1/20) {
         var srv = find_player_by_network_id(0);
         if (instance_exists(srv)) {
-            var data = ds_map_find_value(player_positions, 0);
+            var data = ds_map_find_value(player_states, 0);
             if (is_undefined(data)) {
                 data = ds_map_create();
-                ds_map_add(player_positions, 0, data);
+                ds_map_add(player_states, 0, data);
             }
             with (srv) {
                 ds_map_set(data, "x", x);
                 ds_map_set(data, "y", y);
                 ds_map_set(data, "dir", RotationAngle);
-                ds_map_set(data, "vx", XSpeed);
-                ds_map_set(data, "vy", YSpeed);
+				
+				var bit_states = 0;
+				if (global.GodMode) { bit_states |= PLAYER_FLAGS.GODMODE; }
+				ds_map_set(data, "state",  bit_states);
             }
             ds_map_set(data, "timestamp", current_time);
         }
-        send_game_state_to_all();
+        send_player_state_to_all();
+		
+		if(equipment_changed){
+			send_equipment_to_all();	
+			equipment_changed = false;
+		}
+		
         accum_server = 0;
     }
 
@@ -30,7 +38,7 @@ if (!is_server && is_connected) {
     // player update ~30 Hz
     send_timer += delta_time / 1000000;
     if (send_timer >= send_rate) {
-        send_player_update();
+        send_player_state_update_client();
         send_timer = 0;
     }
 
@@ -40,4 +48,10 @@ if (!is_server && is_connected) {
         send_heartbeat();
         hb_client = 0;
     }
+	
+	if(equipment_changed){
+	    send_equipment_update_client();
+	    equipment_changed = false; // Reset flag after sending
+	}
 }
+

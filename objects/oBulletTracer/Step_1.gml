@@ -35,7 +35,7 @@ if(wall_collision != noone){
 				#region Barrel
 				if(wall_collision.instance_id.object_index == oBarrel){
 					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.instance_id.x, wall_collision.instance_id.y));
-					wall_collision.instance_id.stats.Object_name = stats.Object_name;
+					wall_collision.instance_id.stats.Object_name = stats.Owner_name;
 					wall_collision.instance_id.stats.Object_index = stats.Object_index;
 					wall_collision.instance_id.stats.Object = stats.Object;
 					wall_collision.instance_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);

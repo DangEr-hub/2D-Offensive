@@ -286,7 +286,7 @@ if(global.enemy_visibility == false){
 		){
 			var collision_object = collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false);
 			if(collision_object || collision_line(x, y, oPlayer.x, oPlayer.y, oSmokeTile, true, false)){
-				if!(oPlayer.moving_state == player_states.machine_gun_state && collision_object.object_index == oMachineGunFloor){
+				if!(oPlayer.moving_state == states_player.machine_gun_state && collision_object.object_index == oMachineGunFloor){
 					if(Visible == true){
 						if(VisibilityTimer == -1){
 							VisibilityTimer = VisibilityTime;

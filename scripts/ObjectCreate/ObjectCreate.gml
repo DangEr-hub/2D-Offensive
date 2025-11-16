@@ -52,10 +52,10 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 	}
 	for(i=0;i<ShrapnelNumber;i++){
 		create_bullet_tracer(
-			random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower),
-			random_range(PositionY - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, PositionY + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower),
-			x + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
-			y + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber)),
+			[random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower), 
+			random_range(PositionY - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, PositionY + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower)],
+			[x + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
+			y + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber))],
 			2,
 			Id,
 			i * (360/ShrapnelNumber),
@@ -64,10 +64,10 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 			ObjectType,
 			ExplosionDamage,
 			stats.Object_index,
-			stats.Object_name,
+			[stats.Object_name, false],
 			noone,
-			0,
-			[id.x, id.y]
+			[id.x, id.y],
+			false
 		);	
 	}
 	Fog = instance_create_layer(x, y, "OtherO", oFog);

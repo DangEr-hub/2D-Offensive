@@ -22,21 +22,21 @@ with (zui_create(statistics_x, statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.kills;
 	color = c_white;
-	caption = "Kills: " + string(oEggyEloRatingSystem.kills);
+	caption = "Kills: " + string(oRatingController.kills);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.headshot_percentage;
 	color = c_white;
-	caption = "Headshots: " + string(oEggyEloRatingSystem.headshots);
+	caption = "Headshots: " + string(oRatingController.headshots);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = icons.time;
 	color = c_white;
-	caption = "Time alive: " + string(oEggyEloRatingSystem.playing_time/game_get_speed(gamespeed_fps)) + " s";
+	caption = "Time alive: " + string(oRatingController.playing_time/game_get_speed(gamespeed_fps)) + " s";
 }
 with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;

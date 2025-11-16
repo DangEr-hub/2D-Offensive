@@ -1,5 +1,5 @@
 function can_player_shoot(){
-	return (moving_state != player_states.machine_gun_state && moving_state != player_states.mortar_state);
+	return (moving_state != states_player.machine_gun_state && moving_state != states_player.mortar_state);
 }
 
 function is_inventory_full(Item = Item.None){

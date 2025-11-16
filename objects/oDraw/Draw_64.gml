@@ -136,7 +136,7 @@ if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == 
 		#endregion
 		
 		#region Draw mortar GUI
-		if (global.local_player.moving_state == player_states.mortar_state) {
+		if (global.local_player.moving_state == states_player.mortar_state) {
 		    var mortar_object = instance_nearest(global.local_player.x, global.local_player.y, oMortar);
 		    var camera_width = camera_get_view_width(view_camera[0]) * 3;
 		    var camera_height = camera_get_view_height(view_camera[0]) * 3;
@@ -249,7 +249,7 @@ if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == 
 				}
 			}
 			
-			if(global.local_player.moving_state == player_states.none_state){
+			if(global.local_player.moving_state == states_player.none_state){
 				if(instance_exists(oMachineGun)){
 					with(oMachineGun){
 						var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);

@@ -13,7 +13,7 @@ offset_position_x = 32;
 grid_height = min((ds_map_size(global.local_player.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-if(oEggyEloRatingSystem.player_win == false){
+if(oRatingController.player_win == false){
 	offset_position_y = 128;
 	killed_by_weapon = oDraw.KilledByWeapon;
 	killed_by_name = oDraw.KilledByName;

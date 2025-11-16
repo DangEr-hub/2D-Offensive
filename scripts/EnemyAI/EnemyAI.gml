@@ -30,10 +30,8 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	}
 	
 	create_bullet_tracer(
-		Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),
-		Weapon.y + lengthdir_y(WeaponDistance, RotationAngle),
-		EnemyShotX,
-		EnemyShotY,
+		[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
+		[EnemyShotX, EnemyShotY],
 		0,
 		EnemyWeaponID,
 		point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
@@ -42,10 +40,10 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 		id,
 		global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
 		object_index,
-		stats.Name,
+		[stats.Name, Visible],
 		noone,
-		0,
-		[id.x, id.y]
+		[id.x, id.y],
+		false
 	);
 }
 

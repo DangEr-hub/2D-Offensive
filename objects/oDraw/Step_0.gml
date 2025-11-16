@@ -61,7 +61,7 @@ if(instance_exists(oPlayer)){
 			with(oMortarMenu){
 				zui_destroy();
 			}
-			global.local_player.moving_state = player_states.none_state;
+			global.local_player.moving_state = states_player.none_state;
 		}
 		
 		if(instance_exists(oBuyMenu)){

@@ -1,3 +1,6 @@
+if (is_local == true){
+	sync_object_destroy(id);
+}
 if(infra_vision_light != undefined){
 	infra_vision_light.Destroy();
 	infra_vision_light = undefined;

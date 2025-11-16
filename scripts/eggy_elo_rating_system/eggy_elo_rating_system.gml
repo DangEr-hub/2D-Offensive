@@ -400,13 +400,13 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 
 function round_end(round_result){
 	save_game();
-	oEggyEloRatingSystem.round_ended = true;
+	oRatingController.round_ended = true;
 	if(global.ranked_game == true){
 		if(round_result == "Win"){
-			oEggyEloRatingSystem.player_win = true;
+			oRatingController.player_win = true;
 		}else{
 			global.player_stats_struct.Deaths ++;
-			oEggyEloRatingSystem.player_win = false;
+			oRatingController.player_win = false;
 		}
 	}else{
 		oDraw.RespawnMenu = true;

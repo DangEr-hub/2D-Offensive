@@ -62,7 +62,7 @@ Reloading = false;
 ReloadTime = 0;
 image_speed = 0;
 moving_timer = -1;
-moving_state = player_states.none_state;
+moving_state = states_player.none_state;
 equip_time = 0;
 equip_timer = -1;
 player_has_scope = -1;
@@ -145,17 +145,17 @@ LegHitBox.MainObject = id;
 network_id = -1;
 is_local = false;//false;
 is_remote = false;
-
 // Interpolation for remote players
-interpolation_enabled = false;
 target_x = x;
 target_y = y;
 target_direction = 0;
 interpolation_speed = 0.3;
 
 // Network state
-network_vx = 0;
-network_vy = 0;
-network_state = 0;
+network_bit_state = 0;
+network_armour_id = Item.None;
+network_helmet_id = Item.None;
+network_armour_dur = 0;
+network_helmet_dur = 0;
 
 #endregion

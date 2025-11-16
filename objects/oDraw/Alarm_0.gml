@@ -5,7 +5,7 @@ instance_deactivate_all(true);
 instance_activate_object(oParticleSystem);
 instance_activate_object(oCamera);
 instance_activate_object(oGameEndMenu);
-instance_activate_object(oEggyEloRatingSystem);
+instance_activate_object(oRatingController);
 instance_activate_object(objUIImage);
 instance_activate_object(oRoundEndMenu);
 instance_activate_object(oWeapon);

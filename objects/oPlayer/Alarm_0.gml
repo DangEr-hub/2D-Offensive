@@ -5,7 +5,7 @@ if(is_local == true){
 		instance_create_layer(x, y, "OtherO", oParticleSystem);
 	}
 	if(global.ranked_game == true){
-		instance_create_layer(x, y, "OtherO", oEggyEloRatingSystem);
+		instance_create_layer(x, y, "OtherO", oRatingController);
 	}
 	instance_create_layer(x, y, "OtherO", oDraw);
 	instance_create_layer(x, y, "OtherO", oConsole);

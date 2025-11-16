@@ -1,4 +1,4 @@
-event_inherited();
+/*event_inherited();
 
 #region Enemy triggered
 if(instance_exists(oEnemy)){

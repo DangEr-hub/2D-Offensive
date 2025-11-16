@@ -22,7 +22,6 @@ rank_image_gap = rank_image_size_height * 1.1;
 rank_callbacks = [];
 rank_title_x = rank_image_position_x - rank_image_size_width/2;
 rank_title_y = rank_image_position_y - rank_image_gap;
-armour_string = "Armour: " + string(global.player_stats_struct.Armour*100) + "%";
 xp_string = "Experience: " + string(global.player_stats_struct.Xp) + "/" + string(global.player_stats_struct.Max_xp);
 stamina_string = "Stamina: " + string(global.player_stats_struct.Max_stamina);
 health_string = "Health: " + string(global.player_stats_struct.Max_health);
@@ -130,18 +129,6 @@ with (zui_create(level_x + string_width(" ") + string_width(stamina_string), ran
 	caption = "(+" + string(bonus_stamina) + ")";
 }
 
-with (zui_create(level_x, rank_title_y + text_gap*5, objUILabel)) {
-	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.armour;
-	color = c_white;
-	caption = other.armour_string;
-}
-
-with (zui_create(level_x + string_width(" ") + string_width(armour_string), rank_title_y + text_gap*5, objUILabel)) {
-	var bonus_armour = ARMOUR_LVL_UP;
-	color = c_green;
-	caption = "(+" + string(bonus_armour*100) + " %)";
-}
 #endregion
 
 #region Statistics

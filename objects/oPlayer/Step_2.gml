@@ -7,7 +7,7 @@ if(is_local == true){
 		knife_offset_y = 35;
 	}
 	
-	if(moving_state == player_states.prone_state){
+	if(moving_state == states_player.prone_state){
 		knife_offset_x = 100;
 		knife_offset_y = -3;
 		

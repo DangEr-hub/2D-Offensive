@@ -3,11 +3,11 @@ event_inherited();
 #region Networking
 /* Player Object - Step Event */
 
-if (is_remote && interpolation_enabled) {
+if (is_remote) {
     // Smooth interpolation for remote players
-    x = interpolate_position(x, target_x, interpolation_speed);
-    y = interpolate_position(y, target_y, interpolation_speed);
-    RotationAngle = interpolate_position(RotationAngle, target_direction, interpolation_speed);
+    x = lerp(x, target_x, interpolation_speed);
+    y = lerp(y, target_y, interpolation_speed);
+    RotationAngle = lerp(RotationAngle, target_direction, interpolation_speed);
 }
 
 #endregion
@@ -55,7 +55,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Drop weapon
-		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != player_states.machine_gun_state){
+		if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != states_player.machine_gun_state){
 			player_has_scope = -1;
 			ScopeIn = false;	
 			GainItem(
@@ -85,7 +85,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Legs animation
-		if (global.my_console[? "active"] || moving_state == player_states.prone_state || moving_state == player_states.machine_gun_state || moving_state == player_states.mortar_state
+		if (global.my_console[? "active"] || moving_state == states_player.prone_state || moving_state == states_player.machine_gun_state || moving_state == states_player.mortar_state
 		|| instance_exists(oInventory) || Moving == false) {
 		    Legs.image_speed = 0;
 		} else {
@@ -94,7 +94,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Buy menu
-		if(!global.my_console[? "active"] && !instance_exists(oInventory) && moving_state != player_states.mortar_state){
+		if(!global.my_console[? "active"] && !instance_exists(oInventory) && moving_state != states_player.mortar_state){
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyBuyMenu])){
 				if(instance_exists(oBuyMenu)){
 					player_can_shoot = true;
@@ -117,7 +117,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Friend command and go
-		if!(global.my_console[? "active"]){
+		/*if!(global.my_console[? "active"]){
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommand]) && instance_exists(oFriend)){
 			    var botList = ds_list_create();
 			    with (oFriend) {
@@ -167,7 +167,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 					PointY = oCrosshair.y;
 				}
 			}
-		}
+		}*/
 		#endregion
 	
 		#region Timers and other
@@ -230,7 +230,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		if(StaminaHealingTimer == -1){
 			if(stats.Stamina_points >= 0 && stats.Stamina_points < global.player_stats_struct.Max_stamina){
 				var stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/50);
-				if(moving_state == player_states.prone_state){
+				if(moving_state == states_player.prone_state){
 					stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/10);
 				}
 				if(stats.Stamina_points <= global.player_stats_struct.Max_stamina - stamina_healing_power){
@@ -261,7 +261,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			YSpeed = 0;
 		}
 	
-		if(moving_state == player_states.prone_state){
+		if(moving_state == states_player.prone_state){
 			headshot_x = x + 67;
 			headshot_y = y - 12;
 		}
@@ -292,8 +292,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 		if(instance_exists(oBulletTracer)){
 			var BulletTracerNearby = instance_nearest(x, y, oBulletTracer);
-			if(BulletTracerNearby.stats.Object != id && distance_to_object(BulletTracerNearby) <= 64){
-				play_sound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3));	
+			if(BulletTracerNearby.stats.Object != noone){
+				if(BulletTracerNearby.stats.Object != id && distance_to_object(BulletTracerNearby) <= 64){
+					play_sound(BulletTracerNearby.x, BulletTracerNearby.y, choose(snd_BulletTor1, snd_BulletTor2, snd_BulletTor3));	
+				}
 			}
 		}
 		#endregion
@@ -451,7 +453,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			if (player_can_shoot == true && !global.my_console[? "active"]) {
 				rotation_increment = PlayerVelocity/5000;
 				max_rotation = PlayerVelocity/750;
-				if(moving_state == player_states.none_state || moving_state == player_states.prone_state){
+				if(moving_state == states_player.none_state || moving_state == states_player.prone_state){
 					if (keyboard_check(ord("A"))) {
 						if (rotation_target > -max_rotation && rotation_direction == 1) {
 							rotation_target -= rotation_increment;
@@ -644,7 +646,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 					#region Assault rifle texture
 					case "Assault rifle":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							if(Flashed == false){
 								if!(ReloadTime >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]*.95){
@@ -703,7 +705,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 					#region Pistol texture
 					case "Pistol":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							if(Flashed == false){
 								if!(ReloadTime >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]*.95){
@@ -763,7 +765,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 					#region Submachine gun texture
 					case "Submachine gun":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							if(Flashed == false){
 								if!(ReloadTime >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]*.95){
@@ -822,7 +824,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
 					#region Sniper rifle texture
 					case "Sniper rifle":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							if(Flashed == false){
 								if!(ReloadTime >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]*.95){
@@ -881,7 +883,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 					#region Shotgun texture
 					case "Shotgun":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 							if(Flashed == false){
@@ -940,7 +942,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			
 					#region Anti-tank missile texture
 					case "Anti-tank missile":
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 							if(Flashed == false){
@@ -1041,7 +1043,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 					#region Default texture
 					default:
-						if(moving_state != player_states.prone_state){
+						if(moving_state != states_player.prone_state){
 							HeadHitBox.image_index = HitBox.Head;
 							BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 							if(Flashed == false){
@@ -1092,7 +1094,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			}else{
 			
 				#region No weapon texture
-				if(moving_state != player_states.prone_state){
+				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 					if(Flashed == false){
@@ -1222,7 +1224,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 
 		#region Shooting
 		if!(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.MaxAmmo] == -1){
-			if(global.Inventory[# WeaponID, Index.slot_id] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != player_states.mortar_state && item_equip_timer == -1){
+			if(global.Inventory[# WeaponID, Index.slot_id] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != states_player.mortar_state && item_equip_timer == -1){
 				if (player_can_shoot == true && !global.my_console[? "active"]) {
 					if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
 						play_sound(x, y, snd_empty_magazine);
@@ -1335,7 +1337,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				ReloadingSpeedMultiplier = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpdMul];
 			}
 			var moving_speed_multiplier = 1;	
-			if(moving_state == player_states.prone_state){
+			if(moving_state == states_player.prone_state){
 				moving_speed_multiplier	= .135;
 			}
 	
@@ -1375,7 +1377,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			}
 
 			if(Moving == true){
-				if(moving_state != player_states.prone_state){
+				if(moving_state != states_player.prone_state){
 					if(FootStepTimer == -1){
 						FootStepTimer = 5;
 						FootSteps ++;
@@ -1396,7 +1398,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						}
 						x += min(XSpeed, MoveSpeed);
 					}
-					if(moving_state != player_states.prone_state && Visible == true){
+					if(moving_state != states_player.prone_state && Visible == true){
 						particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
 					}
 				
@@ -1413,7 +1415,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						}
 						y += min(YSpeed, MoveSpeed);
 					}
-					if(moving_state != player_states.prone_state && Visible == true){
+					if(moving_state != states_player.prone_state && Visible == true){
 						particle_create(round(abs(YSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(YSpeed) * -1, abs(YSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
 					}
 				}
@@ -1551,10 +1553,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		if(!global.my_console[? "active"]){
 	
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyProne]) && Moving == false){
-				if(moving_state == player_states.none_state){
-					moving_state = player_states.prone_state;
-				}else if(moving_state == player_states.prone_state){
-					moving_state = player_states.none_state;
+				if(moving_state == states_player.none_state){
+					moving_state = states_player.prone_state;
+				}else if(moving_state == states_player.prone_state){
+					moving_state = states_player.none_state;
 				}
 			}
 		
@@ -1562,19 +1564,19 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				var mortar = instance_nearest(x, y, oMortar);		
 				if(distance_to_object(mortar) <= PickUpDistance){
 					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
-						if(moving_state == player_states.none_state){ /// Pokud neběži ani se neplazí
+						if(moving_state == states_player.none_state){ /// Pokud neběži ani se neplazí
 							player_can_shoot = false;
 							with(zui_main()){
 								with(zui_create(zui_get_width() * .75, zui_get_height() * .75, oMortarMenu)){
 								}
 							}
-							moving_state = player_states.mortar_state;
-						}else if(moving_state == player_states.mortar_state){
+							moving_state = states_player.mortar_state;
+						}else if(moving_state == states_player.mortar_state){
 							player_can_shoot = true;
 							with(oMortarMenu){
 								zui_destroy();
 							}
-							moving_state = player_states.none_state;
+							moving_state = states_player.none_state;
 						}
 					}
 				}
@@ -1584,7 +1586,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 				var machine_gun = instance_nearest(x, y, oMachineGun);		
 				if(distance_to_object(machine_gun) <= PickUpDistance){
 					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
-						if(moving_state == player_states.none_state && global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None){ /// Pokud neběži ani se neplazí
+						if(moving_state == states_player.none_state && global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None){ /// Pokud neběži ani se neplazí
 						
 							#region Equip machine gun
 							global.Inventory[# OtherSlot.Primary, Index.slot_id] = machine_gun.stats.Id;
@@ -1600,10 +1602,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 							x = machine_gun.x;
 							y = machine_gun.y;
 							machine_gun.stats.Object = id;
-							moving_state = player_states.machine_gun_state;	
-						}else if(moving_state == player_states.machine_gun_state){
+							moving_state = states_player.machine_gun_state;	
+						}else if(moving_state == states_player.machine_gun_state){
 							ReloadTime = 0;
-							moving_state = player_states.none_state;
+							moving_state = states_player.none_state;
 							Reloading = false;
 						
 							#region Dequip machine gun
@@ -1630,7 +1632,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		}
 	
 		var RotationSpeed = 9;
-		if(moving_state == player_states.prone_state){
+		if(moving_state == states_player.prone_state){
 			LegHitBox.visible = true;
 			RotationSpeed = 4.5;
 			WX = 64;
@@ -1740,15 +1742,13 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 			}
 			global.player_stats_struct.Xp = 0;
 			global.player_stats_struct.Lvl ++;
-			global.player_stats_struct.Armour += ARMOUR_LVL_UP;
-			global.player_stats_struct.Armour = min(global.player_stats_struct.Armour, ARMOUR_LVL_CAP);
 			global.player_stats_struct.Max_stamina *= power(STATS_LVL_UP, ln(global.player_stats_struct.Lvl));
 			global.player_stats_struct.Max_health *= power(STATS_LVL_UP, ln(global.player_stats_struct.Lvl));
 			global.player_stats_struct.Max_xp *= XP_LVL_UP_MUL;
 		}
 		#endregion
 
-		if(!global.my_console[? "active"] && !instance_exists(oBuyMenu) && moving_state != player_states.mortar_state){
+		if(!global.my_console[? "active"] && !instance_exists(oBuyMenu) && moving_state != states_player.mortar_state){
 		
 			#region Inventory
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyInventory])){
@@ -1979,11 +1979,17 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						item_equip_timer = item_equip_time;
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
 						item_swap("item_use_position", OtherSlot.Armour);
+						with(id){
+							equip_network_propagate();
+						}
 						armour_slot_id = Item.None;
 					} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
 						item_equip_timer = item_equip_time;
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
 						item_swap("item_use_position", OtherSlot.Armour);
+						with(id){
+							equip_network_propagate();
+						}
 					}
 					#endregion
 				
@@ -1996,10 +2002,16 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], helmet_slot_id);
 						item_swap("item_use_position", OtherSlot.Helmet);
 						helmet_slot_id = Item.None;
+						with(id){
+							equip_network_propagate();
+						}
 					} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
 						item_equip_timer = item_equip_time;
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], helmet_slot_id);
 						item_swap("item_use_position", OtherSlot.Helmet);
+						with(id){
+							equip_network_propagate();
+						}
 					}
 					#endregion
 				
@@ -2194,7 +2206,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		instance_activate_object(objUILabel);
 		instance_activate_object(objUIGrid);
 		instance_activate_object(oArmourDescription);
-		instance_activate_object(oEggyEloRatingSystem);
+		instance_activate_object(oRatingController);
 		instance_activate_object(oCrosshair);
 		instance_activate_object(oDamageIndicator);
 		instance_activate_object(oDraw);
@@ -2204,6 +2216,7 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		instance_activate_object(oParticleSurface);
 		instance_activate_object(oConsole);
 		instance_activate_object(oCamera);
+		instance_activate_object(oPlayer);
 		instance_activate_object(oInventory);
 		instance_activate_object(oGrenade);
 		instance_activate_object(oExplosion);
