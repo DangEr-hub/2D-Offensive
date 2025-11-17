@@ -1,4 +1,3 @@
-display_set_gui_size(1920, 1080);
 with (objZUIMain) {
 	if (id != other.id) {
 		show_error("Do not create ZUIMain twice", true);

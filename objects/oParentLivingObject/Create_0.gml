@@ -1,4 +1,5 @@
 event_inherited();
+stats = {};
 RotationAngle = 0;
 in_water = false;
 hit_timer = -1;

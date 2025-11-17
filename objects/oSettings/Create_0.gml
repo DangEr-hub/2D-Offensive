@@ -352,7 +352,6 @@ with(window_width_checkbox){
 	    if (window_get_fullscreen() == false) {
 			value = 0;
 	        display_set_gui_size(global.window_width, global.window_height);
-	        surface_resize(application_surface, global.window_width, global.window_height);
 	        window_set_size(global.window_width, global.window_height);
 	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
 			room_restart();
@@ -385,7 +384,6 @@ with(window_height_checkbox){
 	    if (window_get_fullscreen() == false) {
 			value = 0;
 	        display_set_gui_size(global.window_width, global.window_height);
-	        surface_resize(application_surface, global.window_width, global.window_height);
 	        window_set_size(global.window_width, global.window_height);
 	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
 			room_restart();

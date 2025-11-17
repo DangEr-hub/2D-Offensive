@@ -20,7 +20,7 @@ function start_server() {
 
 function handle_server_receive(sender_ip, sender_port) {
     with (oNetworkManager) {
-		write_debug("Packet received from " + sender_ip + ":" + string(sender_port), "server_debug.txt");
+		//write_debug("Packet received from " + sender_ip + ":" + string(sender_port), "server_debug.txt");
         buffer_seek(receive_buffer, buffer_seek_start, 0);
         var packet_type = buffer_read(receive_buffer, buffer_u8);
         var sequence = buffer_read(receive_buffer, buffer_u32);
@@ -307,15 +307,13 @@ function send_equipment_to_all() {
 }
 
 
-function server_process_hit(attacker_pid, victim_pid, damage, body_part, impact_x, impact_y, apply_locally, hit_spd_mod) {
+function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur) {
     with (oNetworkManager) {
         if (!is_server) return;
 
-        if (apply_locally) {
-            var victim_obj = find_player_by_network_id(victim_pid);
-            if (instance_exists(victim_obj)) {
-                statistics_hit("Health", damage, victim_obj);
-            }
+        var victim_obj = find_player_by_network_id(victim_pid);
+        if (instance_exists(victim_obj)) {	
+			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur);
         }
 
         if (victim_pid == my_pid) {
@@ -329,10 +327,13 @@ function server_process_hit(attacker_pid, victim_pid, damage, body_part, impact_
         buffer_write(send_buffer, buffer_u16, attacker_pid);
         buffer_write(send_buffer, buffer_u16, victim_pid);
         buffer_write(send_buffer, buffer_f16, damage);
-        buffer_write(send_buffer, buffer_u8,  body_part);
-        buffer_write(send_buffer, buffer_f32, impact_x);
-        buffer_write(send_buffer, buffer_f32, impact_y);
+        buffer_write(send_buffer, buffer_u8,  hitbox_type);
+        buffer_write(send_buffer, buffer_f16, impact_pos[0]);
+        buffer_write(send_buffer, buffer_f16, impact_pos[1]);
 		buffer_write(send_buffer, buffer_f16, hit_spd_mod);
+		buffer_write(send_buffer, buffer_f16, aimpunch_modifier);
+		buffer_write(send_buffer, buffer_f16, equip_dur[0]);
+		buffer_write(send_buffer, buffer_f16, equip_dur[1]);
 
         var k = ds_map_find_first(clients);
         var n = ds_map_size(clients);
@@ -350,16 +351,19 @@ function handle_hit_server(socket_key) {
         var attacker_pid_claim = buffer_read(receive_buffer, buffer_u16);
         var victim_pid   = buffer_read(receive_buffer, buffer_u16);
         var damage       = buffer_read(receive_buffer, buffer_f16);
-        var body_part    = buffer_read(receive_buffer, buffer_u8);
-        var impact_x     = buffer_read(receive_buffer, buffer_f32);
-        var impact_y     = buffer_read(receive_buffer, buffer_f32);
+        var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
+        var impact_x     = buffer_read(receive_buffer, buffer_f16);
+        var impact_y     = buffer_read(receive_buffer, buffer_f16);
 		var hit_spd_mod = buffer_read(receive_buffer, buffer_f16);
+		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
+		var armour_dur = buffer_read(receive_buffer, buffer_f16);
+		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
 
         var attacker_pid = ds_map_find_value(clients, socket_key);
         if (attacker_pid < 0) {
             attacker_pid = attacker_pid_claim;
         }
 
-        server_process_hit(attacker_pid, victim_pid, damage, body_part, impact_x, impact_y, true, hit_spd_mod);
+        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
     }
 }

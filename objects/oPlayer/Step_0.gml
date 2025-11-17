@@ -172,8 +172,8 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 		#endregion
 	
 		#region Timers and other
-		stats.Health_points = clamp(stats.Health_points, 0, global.player_stats_struct.Max_health);
-		stats.Damage_health_points = clamp(stats.Damage_health_points, 0, global.player_stats_struct.Max_health);
+		stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
+		stats.Damage_health_points = clamp(stats.Damage_health_points, 1, global.player_stats_struct.Max_health);
 		stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
 		stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);
 		headshot_x = x + 3;
@@ -1980,10 +1980,10 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 						item_equip_timer = item_equip_time;
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
 						item_swap("item_use_position", OtherSlot.Armour);
+						armour_slot_id = Item.None;
 						with(id){
 							equip_network_propagate();
 						}
-						armour_slot_id = Item.None;
 					} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
 						item_equip_timer = item_equip_time;
 						ItemAddWeight(global.Inventory[# item_use_position, Index.slot_id], armour_slot_id);
@@ -2228,13 +2228,19 @@ if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 }
 
 #region Death
-if(stats.Health_points <= 0 && oDraw.RespawnMenu == false && is_local == true){
-	flashed_muffled_sounds = 1;
-	oDraw.KilledByWeapon = KilledByWeapon;
-	oDraw.KilledByName = KilledByName;
-	Weapon.image_index = 0;
-	image_index = 3;
-	round_end("Loss");
-	camera_set_view_angle(CAMERA, 0);
+if!(instance_exists(oNetworkManager)){
+	if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
+		flashed_muffled_sounds = 1;
+		oDraw.KilledByWeapon = KilledByWeapon;
+		oDraw.KilledByName = KilledByName;
+		Weapon.image_index = 0;
+		image_index = 3;
+		round_end("Loss");
+		camera_set_view_angle(CAMERA, 0);
+	}
+}else{
+	if(stats.Health_points <= 0){
+		stats.Health_points = 100;
+	}
 }
 #endregion

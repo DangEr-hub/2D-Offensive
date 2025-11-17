@@ -1,49 +1,67 @@
 event_inherited();
 //draw_text(x, y - 70, network_id);
-draw_text(x, y - 70, stats.Health_points);
+draw_text(x, y + 50, "network_armour_dur " + string(network_armour_dur));
 //draw_text(x, y - 140, is_local);
 
+if(is_local){
+	draw_text(x, y - 50, "local armour dur " + string(global.Inventory[# OtherSlot.Armour, Index.slot_durability]));
+}
+
 if(stats.Health_points > 0){
+	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+	if (instance_exists(oNetworkManager) && !is_local) {
+	    armour_id = network_armour_id;
+	}
+
 	var armour_sprite_index = 0;
-	if(image_index == player_textures.no_weapon){
-		armour_sprite_index = 0;	
-	}else if(image_index == player_textures.pistol){
-		armour_sprite_index = 1;
-	}else if(image_index == player_textures.assault_rifle){
-		armour_sprite_index = 2;
-	}else if(image_index == player_textures.flashed_weapon){
-		armour_sprite_index = 3;
-	}else if(image_index == player_textures.flashed_no_weapon){
-		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload){
-		armour_sprite_index = 7;
-	}else if(image_index >= player_textures.prone && image_index < player_textures.knife){
-		armour_sprite_index = 5;
-	}else if(image_index == player_textures.knife){
-		armour_sprite_index = 9;
-	}
-	
-	if(image_index == player_textures.flashed_prone || image_index == player_textures.flashed_prone_second || image_index == player_textures.flashed_prone_third){
-		armour_sprite_index = 6;
-	}
-	
-	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
-		armour_sprite_index = 8;
+	if (image_index == player_textures.no_weapon) {
+	    armour_sprite_index = 0;
+	} else if (image_index == player_textures.pistol) {
+	    armour_sprite_index = 1;
+	} else if (image_index == player_textures.assault_rifle) {
+	    armour_sprite_index = 2;
+	} else if (image_index == player_textures.flashed_weapon) {
+	    armour_sprite_index = 3;
+	} else if (image_index == player_textures.flashed_no_weapon) {
+	    armour_sprite_index = 4;
+	} else if (image_index == player_textures.reload) {
+	    armour_sprite_index = 7;
+	} else if (image_index >= player_textures.prone && image_index < player_textures.knife) {
+	    armour_sprite_index = 5;
+	} else if (image_index == player_textures.knife) {
+	    armour_sprite_index = 9;
 	}
 
-	if(image_index == player_textures.knife_prone || image_index == player_textures.knife_prone_second || image_index == player_textures.knife_prone_third){
-		armour_sprite_index = 8;
+	if (image_index == player_textures.flashed_prone 
+	    || image_index == player_textures.flashed_prone_second 
+	    || image_index == player_textures.flashed_prone_third)
+	{
+	    armour_sprite_index = 6;
 	}
 
-	if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.KevlarVest){
-		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.MilitaryVest){
-		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(global.Inventory[# OtherSlot.Armour, Index.slot_id] == Item.SpecOpsVest){
-		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	if (image_index == player_textures.reload_prone 
+	    || image_index == player_textures.reload_prone_second 
+	    || image_index == player_textures.reload_prone_third)
+	{
+	    armour_sprite_index = 8;
 	}
 
-	
+	if (image_index == player_textures.knife_prone 
+	    || image_index == player_textures.knife_prone_second 
+	    || image_index == player_textures.knife_prone_third)
+	{
+	    armour_sprite_index = 8;
+	}
+
+	if (armour_id == Item.KevlarVest) {
+	    draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}
+	else if (armour_id == Item.MilitaryVest) {
+	    draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}
+	else if (armour_id == Item.SpecOpsVest) {
+	    draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
+	}
 	
 	
 	var helmet_sprite_index = 0;

@@ -207,6 +207,7 @@ function console_submit(Console) {
 	                case "set_window_fullscreen": 
 	                    if(no == 1 && string_digits(c[1]) != ""){
 							window_set_fullscreen(real(c[1])); 
+							//window_resize();
 							oConsole.alarm[0] = 10; //Proč to musí byt tolik? Nikdo neví
 						}
 					break;

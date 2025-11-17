@@ -37,16 +37,17 @@ global.anti_aliasing = 0;
 global.sound_gain = 100;
 global.ranked_game = false;
 global.hard_mode = false;
-global.window_width = 960;
-global.window_height = 540;
+global.window_width = 1920;
+global.window_height = 1080;
 global.draw_other_models = false;
 global.Weather = "sun";
 global.crosshair_color = c_white;
 global.sound_emitters = ds_map_create();
-//display_set_gui_size(1920, 1080);
+window_set_fullscreen(true);
+display_set_gui_size(1920, 1080);
 global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
-window_resize();
+//window_resize();
 
 global.player_stats_struct = {
 	Name: "DangEr",

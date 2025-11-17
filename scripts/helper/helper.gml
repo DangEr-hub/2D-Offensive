@@ -3,6 +3,25 @@ function bit_state_has(st, flag){
 	return (st & flag) != 0; 
 }
 
+function hit_remote_object(damage, object, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur){
+	
+	var blood_color = c_red;
+	if(hitbox_type <= HitBox.HeadProne){
+		blood_color = c_maroon;
+	}
+	
+	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, icons.health);
+	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));		
+	statistics_hit("Health", damage, object);
+	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
+	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
+	with(object){
+	    AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
+		AimPunchTimer = AimPunchTime;
+		AimPunchMultiplier = aimpunch_modifier;
+		aimpunch_speed_multiplier = hit_spd_mod;
+	}
+}
 
 function write_debug(text, file_name = "debug_log.txt"){
 	var f = file_text_open_append(file_name);
@@ -52,7 +71,7 @@ function sent_server_udp(server_socket, socket_key, send_buffer){
 }
 
 function create_local_player(pid) {
-    var player = instance_create_layer(200, 200, "Instances", oPlayer);
+    var player = instance_create_layer(200, 200, "LivingO", oPlayer);
     player.network_id = pid;
     player.is_local = true;
     player.is_remote = false;
@@ -73,20 +92,20 @@ function create_local_player(pid) {
         ds_map_add(player_states, pid, player_data);
     }
     
-    show_debug_message("Created local player with ID: " + string(pid));
+    //write_debug("Created local player with ID: " + string(pid), "server_debug.txt");
     return player;
 }
 
 /// @function create_remote_player(pid, x_pos, y_pos)
 function create_remote_player(pid, x_pos, y_pos) {
-    var player = instance_create_layer(x_pos, y_pos, "Instances", oPlayer);
+    var player = instance_create_layer(x_pos, y_pos, "LivingO", oPlayer);
     player.network_id = pid;
     player.is_local = false;
     player.is_remote = true;
     player.target_x = x_pos;
     player.target_y = y_pos;
     
-    show_debug_message("Created remote player with ID: " + string(pid));
+    //write_debug("Created remote player with ID: " + string(pid), "server_debug.txt");
     return player;
 }
 

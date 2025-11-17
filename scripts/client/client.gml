@@ -65,14 +65,17 @@ function handle_hit_client() {
 		var attacker_pid = buffer_read(receive_buffer, buffer_u16);
 		var victim_pid   = buffer_read(receive_buffer, buffer_u16);
 		var damage       = buffer_read(receive_buffer, buffer_f16);
-		var body_part    = buffer_read(receive_buffer, buffer_u8);
-		var impact_x     = buffer_read(receive_buffer, buffer_f32);
-		var impact_y     = buffer_read(receive_buffer, buffer_f32);
+		var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
+		var impact_x     = buffer_read(receive_buffer, buffer_f16);
+		var impact_y     = buffer_read(receive_buffer, buffer_f16);
 		var hit_spd_mod  = buffer_read(receive_buffer, buffer_f16);
+		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
+		var armour_dur = buffer_read(receive_buffer, buffer_f16);
+		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
 
 		var victim = find_player_by_network_id(victim_pid);
 		if (instance_exists(victim)) {
-			statistics_hit("Health", damage, victim);
+			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
 		}
 	}
 }
@@ -117,7 +120,9 @@ function handle_player_state_update_client() {
                     target_y = y_pos;
                     target_direction = direction_facing;    
                     network_bit_state = bit_states;
-					stats.Health_points = hp;
+					if(!is_undefined(stats)){
+						stats.Health_points = hp;
+					}
                 }
             }
         }
@@ -283,9 +288,10 @@ function handle_hit_packet_client() {
         var attacker_pid = buffer_read(receive_buffer, buffer_u16);
         var victim_pid   = buffer_read(receive_buffer, buffer_u16);
         var damage       = buffer_read(receive_buffer, buffer_f16);
-        var body_part    = buffer_read(receive_buffer, buffer_u8);
-        var impact_x     = buffer_read(receive_buffer, buffer_f32);
-        var impact_y     = buffer_read(receive_buffer, buffer_f32);
+        var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
+        var impact_x     = buffer_read(receive_buffer, buffer_f16);
+        var impact_y     = buffer_read(receive_buffer, buffer_f16);
+		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 
         if (victim_pid != my_pid) {
             return;
@@ -293,7 +299,7 @@ function handle_hit_packet_client() {
 
         var player = find_player_by_network_id(my_pid);
         if (instance_exists(player)) {
-            statistics_hit("Health", damage, player);
+			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier);
         }
     }
 }

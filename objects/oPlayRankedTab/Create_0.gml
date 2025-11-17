@@ -98,3 +98,46 @@ with (zui_create(play_unranked_tab_width * .5, zui_get_height() - 16 - string_co
 	caption = other.unranked_description_string;
 }
 
+with (zui_create(zui_get_width() * .1, zui_get_height() * .7, objUIButton)) {
+	zui_set_anchor(0, 0);
+	zui_set_size(other.map_play_button_width * 1.5, other.map_play_button_height);
+
+	caption = "Host server";
+	callback = function(){
+		/* Creating server - Menu button */
+		if (!instance_exists(oNetworkManager)) {
+		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
+		}
+    
+		// Start server
+		if (start_server()) {
+		    show_debug_message("Server started successfully!");
+		    room_goto(rm_ServerTest);
+		} else {
+		    show_debug_message("Failed to start server!");
+		}
+	};
+}
+
+with (zui_create(zui_get_width() * .1, zui_get_height() * .8, objUIButton)) {
+	zui_set_anchor(0, 0);
+	zui_set_size(other.map_play_button_width * 1.5, other.map_play_button_height);
+
+	caption = "Join server";
+	callback = function(){
+		/* Joining the game - Menu button */
+		if (!instance_exists(oNetworkManager)) {
+		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
+		}
+    
+		var ip_address = "127.0.0.1"; // For local testing
+		var port = 50000;  
+    
+		// Connect to server
+		if (connect_to_server(ip_address, port)) {
+		    show_debug_message("Connecting to server...");
+		} else {
+		    show_debug_message("Failed to connect to server!");
+		} 
+	};
+}

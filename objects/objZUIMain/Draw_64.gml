@@ -1,3 +1,6 @@
+
+
+
 matrix_stack_push();
 matrix_set(matrix_world, matrix_build_identity());
 
