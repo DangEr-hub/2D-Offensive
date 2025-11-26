@@ -8,6 +8,7 @@ LightObject.yscale = .5;
 mask_index = spr_Bullet;
 image_angle = random(360);
 alarm[0] = 1;
+is_remote = false;
 
 stats = {
     "Damage": 0,

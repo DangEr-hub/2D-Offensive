@@ -20,7 +20,6 @@ function start_server() {
 
 function handle_server_receive(sender_ip, sender_port) {
     with (oNetworkManager) {
-		//write_debug("Packet received from " + sender_ip + ":" + string(sender_port), "server_debug.txt");
         buffer_seek(receive_buffer, buffer_seek_start, 0);
         var packet_type = buffer_read(receive_buffer, buffer_u8);
         var sequence = buffer_read(receive_buffer, buffer_u32);
@@ -55,6 +54,11 @@ function handle_server_receive(sender_ip, sender_port) {
             case PACKET.HIT:
                 handle_hit_server(key);
             break;
+			
+			case PACKET.WEAPON_SYNC:
+				handle_weapon_update_server(key);
+			break;
+		
 
         }
     }
@@ -70,8 +74,9 @@ function handle_connect_request(sender_ip, sender_port) {
         ds_map_add(client_timeout, client_key, current_time);
         global.debug_text = "Player " + string(pid) + " connected from " + client_key;
 		
-		///Broadcast v step eventu oNetworkManagera pro rozeslání všech equipmentů
+		///Broadcast v step eventu oNetworkManagera pro rozeslání všech equipmentů a zbraní
 		equipment_changed = true;
+		weapon_changed = true;
 
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.CONNECT_ACCEPT);
@@ -124,8 +129,8 @@ function handle_player_state_update_server(socket_id) {
 	
 }
 
-/// @function send_player_state_to_all()
-function send_player_state_to_all() {
+/// @function send_player_state_broadcast()
+function send_player_state_broadcast() {
     with (oNetworkManager) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_STATE);
@@ -259,7 +264,73 @@ function handle_equipment_update_server(socket_id) {
     }
 }
 
-function send_equipment_to_all() {
+function handle_weapon_update_server(socket_id) {
+    with (oNetworkManager) {
+        if (!ds_map_exists(clients, socket_id)) return;
+        
+        var pid = ds_map_find_value(clients, socket_id);
+        
+        // Read equipment data
+        var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+        
+        // Store in player_states
+        var player_data = ds_map_find_value(player_states, pid);
+        if (is_undefined(player_data)) {
+            player_data = ds_map_create();
+            ds_map_add(player_states, pid, player_data);
+        }
+        
+        ds_map_set(player_data, "weapon_id", weapon_id);
+        
+        // Update the player object
+        var p = find_player_by_network_id(pid);
+        if (instance_exists(p)) {
+            with (p) {
+                network_weapon_id = weapon_id;
+            }
+        }
+     
+	 weapon_changed = true;
+    }
+}
+
+function send_weapon_broadcast() {
+    with (oNetworkManager) {
+        if (!is_server) return;
+        
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.WEAPON_SYNC);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        
+        // Count players
+        var player_count = ds_map_size(player_states);
+        buffer_write(send_buffer, buffer_u8, player_count);
+        
+        var key = ds_map_find_first(player_states);
+        for (var i = 0; i < player_count; i++) {
+            var pid = key;
+            var player_data = ds_map_find_value(player_states, pid);
+
+            // Read values with safe defaults (fix undefined crash)
+            var weapon_id  = ds_map_find_value(player_data, "weapon_id");
+
+            if (is_undefined(weapon_id))  weapon_id  = 0;
+
+            buffer_write(send_buffer, buffer_u16, pid);
+            buffer_write(send_buffer, buffer_u16, weapon_id);
+            key = ds_map_find_next(player_states, key);
+        }
+        
+        // Send to all clients
+        var socket_key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, socket_key, send_buffer);
+            socket_key = ds_map_find_next(clients, socket_key);
+        }
+    }
+}
+
+function send_equipment_broadcast() {
     with (oNetworkManager) {
         if (!is_server) return;
         
@@ -305,7 +376,6 @@ function send_equipment_to_all() {
         }
     }
 }
-
 
 function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur) {
     with (oNetworkManager) {

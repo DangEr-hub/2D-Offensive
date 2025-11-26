@@ -82,6 +82,7 @@ function zui_update() {
 
 	__mx = global.__zui_mx - rx;
 	__my = global.__zui_my - ry;
+	
 
 	if (__visible && __enabled && global.__zui_mx >= rx && global.__zui_my >= ry && global.__zui_mx < (rx + __width * __sx) && global.__zui_my < (ry + __height * __sy)) {
 		var child_count = array_length(__children);

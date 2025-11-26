@@ -1,12 +1,8 @@
 event_inherited();
 //draw_text(x, y - 70, network_id);
-draw_text(x, y + 50, "network_armour_dur " + string(network_armour_dur));
-//draw_text(x, y - 140, is_local);
+draw_text(x, y + 100, "stats.Health_points " + string(stats.Health_points));
 
-if(is_local){
-	draw_text(x, y - 50, "local armour dur " + string(global.Inventory[# OtherSlot.Armour, Index.slot_durability]));
-}
-
+//draw_text(x, y + 50, "FlashX" + string(FlashLightX));
 if(stats.Health_points > 0){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
 	if (instance_exists(oNetworkManager) && !is_local) {
@@ -89,16 +85,32 @@ if(stats.Health_points > 0){
 	}
 		  
 	#region Draw usable item
-	if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
-		var item_offset_x = 40;
-		var item_offset_y = -10;
-		if(moving_state == states_player.prone_state){
-			item_offset_x = 100;
-			item_offset_y = -3;
+	if(is_local == true){
+		if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
+			var item_offset_x = 40;
+			var item_offset_y = -10;
+			if(moving_state == states_player.prone_state){
+				item_offset_x = 100;
+				item_offset_y = -3;
+			}
+			var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
+			var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
+		    draw_sprite_ext(spr_Items, global.Inventory[# item_use_position, Index.slot_id], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
 		}
-		var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
-		var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
-	    draw_sprite_ext(spr_Items, global.Inventory[# item_use_position, Index.slot_id], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
+	}
+	#endregion
+	
+	#region Draw muzzle flash
+	if(is_local || !instance_exists(oNetworkManager)){
+		if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/1.5 && Healing == false && stats.Health_points > 0){
+			draw_sprite_ext(spr_MuzzleFlash, 0, FlashLightX, FlashLightY, 1, 1, RotationAngle, c_white, 1);
+		}
+	}
+	
+	if(is_remote){
+		if(network_shoot_timer > -1 && Healing == false && stats.Health_points > 0){
+			draw_sprite_ext(spr_MuzzleFlash, 0, FlashLightX, FlashLightY, 1, 1, RotationAngle, c_white, 1);
+		}
 	}
 	#endregion
 	
@@ -121,27 +133,3 @@ if(stats.Health_points > 0){
 	#endregion
 	
 }
-
-#region Networking
-/*
-if (global.debug_network) {
-    // Draw network ID
-    draw_set_color(c_white);
-    draw_text(x, y - 32, "ID: " + string(network_id));
-    
-    if (is_local) {
-        draw_set_color(c_lime);
-        draw_text(x, y - 48, "LOCAL");
-    }
-    
-    if (is_remote) {
-        draw_set_color(c_yellow);
-        draw_text(x, y - 48, "REMOTE");
-        
-        // Draw interpolation target
-        draw_set_alpha(0.3);
-        draw_circle(target_x, target_y, 8, false);
-        draw_set_alpha(1);
-    }
-}*/
-#endregion

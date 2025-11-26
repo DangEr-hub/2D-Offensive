@@ -313,6 +313,7 @@ function switch_weapon_number(){
 				}
 			break;
 		}
+		with(id){ weapon_network_propagate(); }
 	}
 }
 	

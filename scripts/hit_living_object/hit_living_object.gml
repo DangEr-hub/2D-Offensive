@@ -82,8 +82,14 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		has_godmode = bit_state_has(hit_object.network_bit_state, PLAYER_FLAGS.GODMODE);
 		armour_id = hit_object.network_armour_id;
 		helmet_id = hit_object.network_helmet_id;
-		armour_durability = hit_object.network_armour_dur;
-		helmet_durability = hit_object.network_helmet_dur;
+		
+		if(is_net){
+			armour_durability = hit_object.network_armour_dur;
+			helmet_durability = hit_object.network_helmet_dur;
+		}else{
+			helmet_durability = global.Inventory[# OtherSlot.Helmet, Index.slot_durability];
+			armour_durability = global.Inventory[# OtherSlot.Armour, Index.slot_durability];
+		}
 	}
 	/*************/
 	
@@ -98,10 +104,12 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		has_godmode = global.GodMode;	
 		armour_id = ArmourID;
 		helmet_id = HelmetID;
-		helmet_durability = global.Inventory[# OtherSlot.Helmet, Index.slot_durability];
-		armour_durability = global.Inventory[# OtherSlot.Armour, Index.slot_durability];
 	}
 	/********************/
+	
+	if(is_bot){
+		has_godmode = false;
+	}
 	
 	/* Hit marker */
 	oCrosshair.HitMarker = 0;
@@ -272,6 +280,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    }
 		    hit_object.KilledByName = attacking_item.stats.Owner_name;
 		    hit_object.KilledByWeapon = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.Name];
+			hit_object.stats.Health_points = -1;
 		} else {
 			statistics_hit("Health", hit_object.attack_damage, hit_object);
 		}
@@ -315,96 +324,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 
 		
 		
-		// DAMAGE TO BODY
-		if (BodyPart != HitBox.Head && BodyPart != HitBox.HeadProne) {
-		    // SOUND EFFECT WITHOUT ARMOUR
-		    if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
-		        || BodyPart == HitBox.ArmWithAssaultRifle 
-		        || BodyPart == HitBox.ArmWithoutWeapon 
-		        || BodyPart == HitBox.ArmWithPistol 
-		        || BodyPart == HitBox.LegProne
-			){
-		        if !audio_is_playing(snd_BulletHit) {play_sound(impact_x, impact_y, snd_BulletHit, attacking_item.stats.Object);}
-		    }else{
-		        // DURABILITY LOSS
-		        var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
-
-		        if (is_player) {
-		            if (hit_object.is_local) {
-		                // LOCAL PLAYER
-		                global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= dmg_loss;
-		                global.Inventory[# OtherSlot.Armour, Index.slot_durability] = max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], 0);
-		            }else{
-		                // REMOTE PLAYER
-		                hit_object.network_armour_dur -= dmg_loss;
-		                hit_object.network_armour_dur = max(hit_object.network_armour_dur, 0);
-		            }
-		        }else{
-		            // BOT
-		            hit_object.ArmourDurability[0] -= dmg_loss;
-		            hit_object.ArmourDurability[0] = max(hit_object.ArmourDurability[0], 0);
-		        }
-		        // PARTICLES + SOUND WITH ARMOUR
-		        for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
-		            var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
-		            part_type_color1(oParticleSystem.headshot_particle, c_gray);
-		            part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
-		            part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
-		            part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
-		            part_type_color1(oParticleSystem.headshot_particle, c_white);
-		        }
-
-		        var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
-		        if !audio_is_playing(sound_effect) {
-		            play_sound(impact_x, impact_y, sound_effect, attacking_item.stats.Object);
-		        }
-		    }
-		// DAMAGE TO HEAD
-		}else{
-			// SOUND EFFECT WITHOUT ARMOUR
-		    if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
-		        var sound_effect = choose(snd_HeadShot1, snd_HeadShot2);
-		        if !audio_is_playing(sound_effect) {
-		            play_sound(impact_x, impact_y, sound_effect, attacking_item.stats.Object);
-		        }
-		    } else {
-
-		        // DURABILITY LOSS
-		        var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[#helmet_id, ItemStat.Defense];
-		        if (is_player) {
-		            if (hit_object.is_local) {
-		                // LOCAL
-		                global.Inventory[# OtherSlot.Helmet, Index.slot_durability] -= dmg_loss;
-		                global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability], 0);
-						////////
-		            }
-		            else {
-		                // REMOTE
-		                hit_object.network_helmet_dur -= dmg_loss;
-		                hit_object.network_helmet_dur = max(hit_object.network_helmet_dur, 0);
-						/////////
-		            }
-		        }
-		        else {
-		            // BOT
-		            hit_object.ArmourDurability[1] -= dmg_loss;
-		            hit_object.ArmourDurability[1] = max(hit_object.ArmourDurability[1], 0);
-					//////
-		        }
-
-			    // PARTICLES + SOUND WITH ARMOUR
-			    for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
-			        var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
-			        part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
-			        part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
-			        part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
-			    }
-		        if !audio_is_playing(snd_HeadShotHelmet) {
-		            play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_item.stats.Object);
-		        }
-				/////////////////////////////////
-		    }
-		}
+		hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item, hit_object, is_player);
 		
         if (is_net) {
             send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [hit_object.network_armour_dur, hit_object.network_helmet_dur]);

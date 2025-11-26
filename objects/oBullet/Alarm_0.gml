@@ -21,4 +21,4 @@ if(global.DrawBulletImpact == true){
 	}
 }
 
-instance_destroy(self);
+instance_destroy(id);

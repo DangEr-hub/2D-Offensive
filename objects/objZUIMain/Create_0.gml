@@ -1,3 +1,4 @@
+ui_scale_set_window_size(960, 540);
 with (objZUIMain) {
 	if (id != other.id) {
 		show_error("Do not create ZUIMain twice", true);
@@ -8,5 +9,6 @@ with (objZUIMain) {
 zui_set_size(display_get_gui_width(), display_get_gui_height());
 zui_set_anchor(0, 0);
 
-global.__zui_mx = 0;
-global.__zui_my = 0;
+gui_scale = 1;
+gui_offx = 0;
+gui_offy = 0;

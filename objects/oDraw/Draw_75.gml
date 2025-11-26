@@ -9,5 +9,3 @@ console_draw(global.my_console, global.ConsoleHeight * global.GUIMultiplier,c_gr
 
 
 
-
-

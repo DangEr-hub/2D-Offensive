@@ -52,6 +52,24 @@ function equip_network_propagate(){
 	}
 }
 
+function weapon_network_propagate(){
+	/* oPlayer local function */
+	if (is_local && instance_exists(oNetworkManager)) {
+		oNetworkManager.weapon_changed = true;
+
+		// pokud je to server hráč (pid 0), musí aktualizovat player_states
+		if (oNetworkManager.is_server) {
+			var data = ds_map_find_value(oNetworkManager.player_states, network_id);
+			if (is_undefined(data)) {
+				data = ds_map_create();
+				ds_map_add(oNetworkManager.player_states, network_id, data);
+			}
+
+			ds_map_set(data, "weapon_id",  global.Inventory[# WeaponID, Index.slot_id]);
+		}
+	}
+}
+
 
 function get_local_player(){
     with (oPlayer) {
@@ -92,7 +110,6 @@ function create_local_player(pid) {
         ds_map_add(player_states, pid, player_data);
     }
     
-    //write_debug("Created local player with ID: " + string(pid), "server_debug.txt");
     return player;
 }
 
@@ -177,9 +194,10 @@ function sync_object_destroy(inst_id) {
                 socket_key = ds_map_find_next(clients, socket_key);
             }
         } else {
-            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer))
+            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }
         
         instance_destroy(inst_id);
     }
 }
+

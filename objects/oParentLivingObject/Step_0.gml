@@ -34,15 +34,15 @@ if(stats.Health_points <= 0){
 }
 
 #region Muzzle flash light
-if(DestroyTimer > -1){
-	DestroyTimer --;	
+if(flash_effect_timer > -1){
+	flash_effect_timer --;	
 }
 
 if(MuzzleFlashLight != undefined){
 	MuzzleFlashLight.alpha -= ALPHA_SPEED;
 	MuzzleFlashLight.x = FlashLightX;
 	MuzzleFlashLight.y = FlashLightY;
-	if(DestroyTimer <= -1){
+	if(flash_effect_timer <= -1){
 		MuzzleFlashLight.Destroy();
 		MuzzleFlashLight = undefined;
 	}

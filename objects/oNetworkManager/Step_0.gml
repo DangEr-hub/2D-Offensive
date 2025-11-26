@@ -18,15 +18,23 @@ if (is_server) {
 				
 				var bit_states = 0;
 				if (global.GodMode) { bit_states |= PLAYER_FLAGS.GODMODE; }
+				if(Moving){ bit_states |= PLAYER_FLAGS.MOVING; }
+				if(Reloading){ bit_states |= PLAYER_FLAGS.RELOADING; }
+				if(Flashed){ bit_states |= PLAYER_FLAGS.FLASHED; }
 				ds_map_set(data, "state",  bit_states);
             }
             ds_map_set(data, "timestamp", current_time);
         }
-        send_player_state_to_all();
+        send_player_state_broadcast();
 		
 		if(equipment_changed){
-			send_equipment_to_all();	
+			send_equipment_broadcast();	
 			equipment_changed = false;
+		}
+		
+		if(weapon_changed){
+			send_weapon_broadcast();
+			weapon_changed = false;
 		}
 		
         accum_server = 0;
@@ -53,6 +61,11 @@ if (!is_server && is_connected) {
 	if(equipment_changed){
 	    send_equipment_update_client();
 	    equipment_changed = false; // Reset flag after sending
+	}
+	
+	if(weapon_changed){
+	    send_weapon_update_client();
+	    weapon_changed = false; // Reset flag after sending
 	}
 }
 

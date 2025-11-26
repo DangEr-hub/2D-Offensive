@@ -56,6 +56,10 @@ function handle_client_receive() {
 			case PACKET.HIT:
 				handle_hit_client();
 			break;
+			
+			case PACKET.WEAPON_SYNC:
+				handle_weapon_update_client();
+			break;
         }
     }
 }
@@ -171,6 +175,39 @@ function handle_equipment_update_client() {
     }
 }
 
+function handle_weapon_update_client() {
+    with (oNetworkManager) {
+        var player_count = buffer_read(receive_buffer, buffer_u8);
+        
+        for (var i = 0; i < player_count; i++) {
+            var pid = buffer_read(receive_buffer, buffer_u16);
+            var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+            
+            // Skip local player (we already have our own equipment)
+            if (pid == my_pid) {
+                continue;
+            }
+            
+            // Store in player_states
+            var player_data = ds_map_find_value(player_states, pid);
+            if (is_undefined(player_data)) {
+                player_data = ds_map_create();
+                ds_map_add(player_states, pid, player_data);
+            }
+            
+            ds_map_set(player_data, "weapon_id", weapon_id);
+            
+            // Update remote player object
+            var player = find_player_by_network_id(pid);
+            if (instance_exists(player)) {
+                with (player) {
+                    network_weapon_id = weapon_id;
+                }
+            }
+        }
+    }
+}
+
 function send_equipment_update_client() {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
@@ -187,6 +224,25 @@ function send_equipment_update_client() {
             buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
             buffer_write(other.send_buffer, buffer_u16, global.Inventory[# OtherSlot.Armour, Index.slot_id]);
             buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
+        }
+        
+        network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
+function send_weapon_update_client() {
+    with (oNetworkManager) {
+        if (!is_connected || client_socket < 0) return;
+        
+        var player = find_player_by_network_id(my_pid);
+        if (!instance_exists(player)) return;
+        
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.WEAPON_SYNC);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        
+        with (player) {
+            buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, Index.slot_id]);
         }
         
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
@@ -210,9 +266,11 @@ function send_player_state_update_client() {
             buffer_write(other.send_buffer, buffer_f16, RotationAngle);
 			
 			var bit_states = 0;
-			if(global.GodMode == true){
-				bit_states |= PLAYER_FLAGS.GODMODE;
-			}
+			if(global.GodMode == true){bit_states |= PLAYER_FLAGS.GODMODE;}
+			if(Moving == true){bit_states |= PLAYER_FLAGS.MOVING;}
+			if(Reloading == true){bit_states |= PLAYER_FLAGS.RELOADING; }
+			if(Flashed == true){bit_states |= PLAYER_FLAGS.FLASHED; }
+				
 			buffer_write(other.send_buffer, buffer_u8, bit_states);
 			buffer_write(other.send_buffer, buffer_f16, stats.Health_points);
         }
@@ -292,6 +350,8 @@ function handle_hit_packet_client() {
         var impact_x     = buffer_read(receive_buffer, buffer_f16);
         var impact_y     = buffer_read(receive_buffer, buffer_f16);
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
+		var armour_dur = buffer_read(send_buffer, buffer_f16);
+		var helmet_dur = buffer_read(send_buffer, buffer_f16);
 
         if (victim_pid != my_pid) {
             return;
@@ -299,7 +359,7 @@ function handle_hit_packet_client() {
 
         var player = find_player_by_network_id(my_pid);
         if (instance_exists(player)) {
-			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier);
+			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
         }
     }
 }

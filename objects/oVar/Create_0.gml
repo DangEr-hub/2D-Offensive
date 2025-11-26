@@ -43,11 +43,6 @@ global.draw_other_models = false;
 global.Weather = "sun";
 global.crosshair_color = c_white;
 global.sound_emitters = ds_map_create();
-window_set_fullscreen(true);
-display_set_gui_size(1920, 1080);
-global.GuiW = display_get_gui_width();
-global.GuiH = display_get_gui_height();
-//window_resize();
 
 global.player_stats_struct = {
 	Name: "DangEr",
@@ -114,11 +109,11 @@ for (var i = 0; i < MapIndex.Total; i++) {
 global.MapID = MapIndex.Desert;//-1;
 global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
 global.MapProperties[#MapIndex.Desert, MapProperty.Name] = "Desert";
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(178, 141, 35);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(229, 181, 45);
+global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(208, 141, 35);
+global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(249, 151, 25);
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .25;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .8;
+global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .7;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
@@ -246,7 +241,11 @@ enum Hit{
 rank_database();
 InventoryInit();
 load_game();
+display_set_gui_size(1920, 1080);
+global.GuiW = display_get_gui_width();
+global.GuiH = display_get_gui_height();
 console_settings(global.my_console," ",false);
 console_preset(global.my_console);
 audio_master_gain(global.sound_gain/100);
+window_resize();
 room_goto_next();

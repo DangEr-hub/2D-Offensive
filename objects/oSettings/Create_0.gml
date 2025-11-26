@@ -16,76 +16,39 @@ anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
 text_height = string_height("a")*2;
 
-window_width_function = function() {
-    window_sizes = [480, 960, 1366, 1600, 1280, 1920, 2560, 3840];
-    current_index = -1;
-    for (i = 0; i < array_length(window_sizes); i++) {
-        if (global.window_width == window_sizes[i]) {
-            current_index = i;
+window_resolution_callback = function() {
+    var resolutions = [
+        [480, 270],
+        [960, 540],
+        [1280, 720],
+        [1366, 768],
+        [1600, 900],
+        [1920, 1080]
+    ];
+
+    var index = -1;
+
+    // najdi současné rozlišení
+    for (var i = 0; i < array_length(resolutions); i++) {
+        if (global.window_width == resolutions[i][0] &&
+            global.window_height == resolutions[i][1]) 
+        {
+            index = i;
             break;
         }
     }
 
-    var found = false;
-    var next_index = current_index;
-    for (var j = 1; j <= array_length(window_sizes); j++) {
-        next_index = (current_index + j) % array_length(window_sizes); 
-        if (window_sizes[next_index] <= display_get_width()) {
-            found = true;
-            break;
-        }
+    // další index
+    index = (index + 1) mod array_length(resolutions);
+
+	ui_scale_set_window_size(resolutions[index][0], resolutions[index][1]);
+
+    // update caption
+    with (window_resolution_button) {
+        caption = string(global.window_width) + " x " + string(global.window_height);
     }
 
-    if (found) {
-        global.window_width = window_sizes[next_index];
-    } else {
-        global.window_width = window_sizes[0];
-    }
-	
-	with(window_width_checkbox){
-		value = 0;
-	}
-
-    with (window_width_button) {
-        caption = string(global.window_width);
-    }
-	save_game();
-};
-
-window_height_function = function() {
-    window_sizes = [270, 540, 768, 900, 1024, 1080, 1440, 2160];
-    current_index = -1;
-    for (i = 0; i < array_length(window_sizes); i++) {
-        if (global.window_height == window_sizes[i]) {
-            current_index = i;
-            break;
-        }
-    }
-
-    var found = false;
-    var next_index = current_index;
-    for (var j = 1; j <= array_length(window_sizes); j++) {
-        next_index = (current_index + j) % array_length(window_sizes); 
-        if (window_sizes[next_index] <= display_get_height()) {
-            found = true;
-            break;
-        }
-    }
-
-    if (found) {
-        global.window_height = window_sizes[next_index];
-    } else {
-        global.window_height = window_sizes[0];
-    }
-	
-	with(window_height_checkbox){
-		value = 0;
-	}
-
-    with (window_height_button) {
-        caption = string(global.window_height);
-    }
-	save_game();
+    save_game();
 };
 
 gui_scale_callback = function() {
@@ -320,7 +283,6 @@ with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, 
 	callback = function(){
 		value = !value;
 		window_set_fullscreen(value);
-		window_resize();
 	};
 }
 #endregion
@@ -342,77 +304,33 @@ with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3
 }
 #endregion
 
-#region Window width
-window_width_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*7 - checkbox_size/2, objUICheckbox);
-with(window_width_checkbox){
-	zui_set_anchor(0, 0);
-	zui_set_size(other.checkbox_size, other.checkbox_size);
-	value = 1;
-	callback = function(){
-	    if (window_get_fullscreen() == false) {
-			value = 0;
-	        display_set_gui_size(global.window_width, global.window_height);
-	        window_set_size(global.window_width, global.window_height);
-	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
-			room_restart();
-	    }
-	};
-}
+#region Window size
 with(zui_create(position_x, position_y + text_height*7, objUILabel)){
 	color = c_white;
-	caption = "Window width: ";
+	caption = "Window size: ";
 }
 
-window_width_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*7, objUIButton);
-with(window_width_button){
-	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
-	
-	caption = global.window_width;
-	callback = other.window_width_function;
-}
-#endregion
+window_resolution_button = zui_create(position_x + gap, position_y + text_height * 6.5, objUIButton);
 
-#region Window height
-window_height_checkbox = zui_create(position_x + gap + 64 * global.GUIMultiplier, position_y + text_height*8 - checkbox_size/2, objUICheckbox);
-with(window_height_checkbox){
-	zui_set_anchor(0, 0);
-	zui_set_size(other.checkbox_size, other.checkbox_size);
-	value = 1;
-	callback = function(){
-	    if (window_get_fullscreen() == false) {
-			value = 0;
-	        display_set_gui_size(global.window_width, global.window_height);
-	        window_set_size(global.window_width, global.window_height);
-	        window_set_position(display_get_height() / 2 - window_get_height() / 2, display_get_height() / 2 - window_get_height() / 2);
-			room_restart();
-	    }
-	};
-}
-with(zui_create(position_x, position_y + text_height*8, objUILabel)){
-	color = c_white;
-	caption = "Window height: ";
+with (window_resolution_button) {
+    zui_set_anchor(0.5, 0);
+    zui_set_width(96 * global.GUIMultiplier);
+    zui_set_height(24 * global.GUIMultiplier);
+
+    caption = string(global.window_width) + " x " + string(global.window_height);
+    callback = other.window_resolution_callback;
 }
 
-window_height_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*8, objUIButton);
-with(window_height_button){
-	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
-	
-	caption = global.window_height;
-	callback = other.window_height_function;
-}
+
 #endregion
 
 #region GUI scale
-with(zui_create(position_x, position_y + text_height*9, objUILabel)){
+with(zui_create(position_x, position_y + text_height*8, objUILabel)){
 	color = c_white;
 	caption = "GUI scale: ";
 }
 
-gui_scale_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*9, objUIButton);
+gui_scale_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*8, objUIButton);
 with(gui_scale_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);

@@ -845,4 +845,3 @@ with(oCrosshair){
 	}
 }
 #endregion
-

@@ -1,8 +1,9 @@
 /* NetworkManager - Create Event */
 enum PLAYER_FLAGS {
-    GODMODE = 1  // 0b00000001 1 << 0
-   //VISIBLE = 2,  // 0b00000010 1 << 1
-   // CROUCH  = 4   // 0b00000100 1 << 2
+    GODMODE = 1,  // 0b00000001 1 << 0
+    MOVING = 2, // 0b00000010 1 << 1
+    RELOADING = 4,   // 0b00000100 1 << 2
+	FLASHED = 8
 }
 
 
@@ -46,11 +47,12 @@ enum PACKET {
     HEARTBEAT,
     PLAYER_STATE,
 	EQUIP_SYNC,
-	HIT
-	
+	HIT,
+	WEAPON_SYNC
 }
 
 equipment_changed = false;
+weapon_changed = false;
 send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
 accum_server = 0;   // časování PLAYER_STATE na serveru

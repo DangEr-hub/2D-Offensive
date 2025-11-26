@@ -37,7 +37,7 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 			EnemyWeaponID,
 			point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
 			global.BulletSpeed,
-			global.ItemIndex[#global.Inventory[# EnemyWeaponID, Index.slot_id], ItemStat.Range]
+			global.ItemIndex[# EnemyWeaponID, ItemStat.Range]
 		],
 		id,
 		global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
@@ -191,8 +191,8 @@ function EnemyShooting(DangerX, DangerY){
 		}
 		
 		#region Create flash effect
-		if(DestroyTimer == -1){
-			DestroyTimer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * 2);
+		if(flash_effect_timer == -1){
+			flash_effect_timer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * 2);
 			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 			MuzzleFlashLight.angle = RotationAngle;
 			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;

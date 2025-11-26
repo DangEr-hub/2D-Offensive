@@ -22,12 +22,37 @@ if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNi
 }
 #endregion
 
+
+
 if (is_remote) {
     if (distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance) {
         instance_destroy();
     }
-    exit; ///Dále nejedeme, nic se neřeší pro remote tracer
 }
+
+#region Normal bullet tracer
+if(image_index == 0){
+	if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
+		var bullet = create_bullet(
+			stats.Shot_x,
+			stats.Shot_y,
+			stats.Damage,
+			stats.Starting_x,
+			stats.Starting_y,
+			stats.Object,
+			stats.Item_id,
+			stats.Penetration_damage*10,
+			image_index,
+			stats.Object_index,
+			stats.Owner_name,
+			direction,
+			stats.Owner_id
+		);
+		bullet.is_remote = is_remote;
+		instance_destroy(id);
+	}
+}
+#endregion
 
 if(is_local){
 
@@ -120,29 +145,6 @@ if(is_local){
 				2,
 				128
 			);	
-			instance_destroy(id);
-		}
-	}
-	#endregion
-
-	#region Normal bullet tracer
-	if(image_index == 0){
-		if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
-			create_bullet(
-				stats.Shot_x,
-				stats.Shot_y,
-				stats.Damage,
-				stats.Starting_x,
-				stats.Starting_y,
-				stats.Object,
-				stats.Item_id,
-				stats.Penetration_damage*10,
-				image_index,
-				stats.Object_index,
-				stats.Owner_name,
-				direction,
-				stats.Owner_id
-			);
 			instance_destroy(id);
 		}
 	}

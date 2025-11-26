@@ -4,7 +4,6 @@ global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
 
-
 if(instance_exists(oPlayer)){
 	
 	#region Bird spawning
@@ -87,11 +86,11 @@ if(instance_exists(oPlayer)){
 		item_description_destroy();
 	}
 
-	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || global.local_player.player_can_shoot == false){
+	//if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || global.local_player.player_can_shoot == false){
 		window_set_cursor(cr_default);
-	}else{
-		window_set_cursor(cr_none);	
-	}
+	//}else{
+		//window_set_cursor(cr_none);	
+	//}
 
 	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false){

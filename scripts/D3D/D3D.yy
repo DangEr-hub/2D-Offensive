@@ -5,7 +5,7 @@
   "isCompatibility": false,
   "isDnD": false,
   "parent": {
-    "name": "Game",
-    "path": "folders/Scripts/Game.yy",
+    "name": "Draw+GUI",
+    "path": "folders/Scripts/Draw+GUI.yy",
   },
 }

@@ -38,14 +38,6 @@ map_callbacks = [
     function() { 
 		set_map_rounds(MapIndex.RainForest);
 		room_goto(rm_RainForest); 
-	},
-    function() { 
-		set_map_rounds(MapIndex.City);
-		room_goto(rm_Desert); 
-	},
-    function() { 
-		set_map_rounds(MapIndex.Nuclear);
-		room_goto(rm_Desert); 
 	}
 ];
 
@@ -54,7 +46,7 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 	draggable = 1;
 }
 
-for(i=0;i<4;i++){
+for(i=0;i<array_length(map_callbacks);i++){
 	with (zui_create(map_image_position_x + i*map_image_gap, map_image_position_y, objUIImage)){
 		zui_set_anchor(0, 0);
 		sprite = spr_MapImage;
@@ -91,11 +83,6 @@ with (zui_create(play_unranked_tab_width * .85, 64, objUICheckbox)) {
 with (zui_create(play_unranked_tab_width * .85 + hard_mode_checkbox_width + checkbox_gap, 64 + hard_mode_checkbox_height/2, objUILabel)) {
 	color = c_white;
 	caption = "Hardmode";
-}
-
-with (zui_create(play_unranked_tab_width * .5, zui_get_height() - 16 - string_count_lines(unranked_description_string)*string_height("a"), objUILabel)) {
-	color = c_white;
-	caption = other.unranked_description_string;
 }
 
 with (zui_create(zui_get_width() * .1, zui_get_height() * .7, objUIButton)) {

@@ -42,6 +42,11 @@ function handle_projectile_spawn_client() {
 			[false, true],
 			[proj_id, owner_pid]
 		);
+		
+		var p = find_player_by_network_id(owner_pid);
+		if(p != noone){
+			p.network_shoot_timer = 2;
+		}
     }
 }
 
@@ -88,6 +93,11 @@ function handle_projectile_spawn_server(key) {
 				[proj_id, owner_pid]
 			);
         }
+		
+		var p = find_player_by_network_id(owner_pid);
+		if(p != noone){
+			p.network_shoot_timer = 2;
+		}
 		
 
         // rebroadcast
@@ -149,7 +159,7 @@ function send_projectile_spawn(start_pos, angle_spd_id_dist, shot_pos, damage, i
             // Broadcast to all clients
             var socket_key = ds_map_find_first(clients);
             for (var i = 0; i < ds_map_size(clients); i++) {
-                sent_server_udp(server_socket, socket_key, send_buffer)
+                sent_server_udp(server_socket, socket_key, send_buffer);
                 socket_key = ds_map_find_next(clients, socket_key);
             }
         } else {

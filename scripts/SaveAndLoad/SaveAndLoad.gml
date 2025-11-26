@@ -112,9 +112,6 @@ function load_game(){
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
-		//if(window_get_fullscreen() == false){	
-		//}
-		
 		global.map_rounds = array_create(MapIndex.Total);
 		for (var i = 0; i < MapIndex.Total; i++) {
 		    global.map_rounds[i] = array_create(3);

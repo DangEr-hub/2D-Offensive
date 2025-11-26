@@ -1,9 +1,10 @@
 //haze_start(true, false);
 event_inherited();
-window_resize();
 alarm[0] = 1;
 Weapon = -1;
+wpn_id = Item.None;
 Knife = -1;
+AmmoNeeded = 0;
 in_water_timer = -1;
 flashed_muffled_sounds = 1; ///Pro efekt muffled soundu u flashbangu
 rotation_direction = 1; ///Pro view bobbing
@@ -143,7 +144,7 @@ LegHitBox.MainObject = id;
 
 // Network properties
 network_id = -1;
-is_local = false;//false;
+is_local = true;
 is_remote = false;
 // Interpolation for remote players
 target_x = x;
@@ -157,5 +158,11 @@ network_armour_id = Item.None;
 network_helmet_id = Item.None;
 network_armour_dur = 0;
 network_helmet_dur = 0;
+network_weapon_id = Item.None;
+network_shoot_timer = -1;
 
 #endregion
+
+Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
+
+global.local_player = get_local_player();

@@ -12,7 +12,7 @@ hard_mode_checkbox_width = 16 * global.GUIMultiplier;
 hard_mode_checkbox_height = 16 * global.GUIMultiplier;
 map_play_button_width = 64 * global.GUIMultiplier;
 map_play_button_height = 16 * global.GUIMultiplier;
-map_name_array = ["Dust", "Cache", "Nuke", "Mirage"];
+map_name_array = ["Dust", "Cache"];
 map_image_sprite_height = 64 * global.GUIMultiplier;
 map_image_sprite_width = 128 * global.GUIMultiplier;
 map_image_position_x = 32;
@@ -22,9 +22,7 @@ map_image_gap = map_image_sprite_width * 1.1;
 
 map_callbacks = [
     function() { room_goto(rm_Desert); },
-    function() { room_goto(rm_Desert); },
-    function() { room_goto(rm_Desert); },
-    function() { room_goto(rm_Desert); }
+    function() { room_goto(rm_RainForest); },
 ];
 
 with (zui_create(0, 0, objUIWindowCaption)) {
@@ -32,7 +30,7 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 	draggable = 1;
 }
 
-for(i=0;i<4;i++){
+for(i=0;i<array_length(map_callbacks);i++){
 	with (zui_create(map_image_position_x + i*map_image_gap, map_image_position_y, objUIImage)){
 		zui_set_anchor(0, 0);
 		sprite = spr_MapImage;
@@ -70,10 +68,3 @@ with (zui_create(play_unranked_tab_width * .85 + hard_mode_checkbox_width + chec
 	color = c_white;
 	caption = "Hardmode";
 }
-
-with (zui_create(play_unranked_tab_width * .5, zui_get_height() - 16 - string_count_lines(unranked_description_string)*string_height("a"), objUILabel)) {
-	outline_color = c_black;
-	color = c_white;
-	caption = other.unranked_description_string;
-}
-

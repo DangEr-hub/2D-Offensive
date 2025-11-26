@@ -1,3 +1,86 @@
+function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item, hit_object, is_player) {
+
+    // DAMAGE TO BODY
+    if (BodyPart != HitBox.Head && BodyPart != HitBox.HeadProne) {
+
+        if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
+        || BodyPart == HitBox.ArmWithAssaultRifle 
+        || BodyPart == HitBox.ArmWithoutWeapon 
+        || BodyPart == HitBox.ArmWithPistol 
+        || BodyPart == HitBox.LegProne) {
+
+            if !audio_is_playing(snd_BulletHit) {
+                play_sound(impact_x, impact_y, snd_BulletHit, attacking_item.stats.Object);
+            }
+
+        } else {
+
+            var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
+
+            if (is_player) {
+                if (hit_object.is_local) {
+                    global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], dmg_loss, 0);
+                } else {
+                    hit_object.network_armour_dur = max(hit_object.network_armour_dur - dmg_loss, 0);
+                }
+            } else {
+                hit_object.ArmourDurability[0] -= max(hit_object.ArmourDurability[0] - dmg_loss, 0);
+            }
+
+            for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
+                var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
+                part_type_color1(oParticleSystem.headshot_particle, c_gray);
+                part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
+                part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
+                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
+                part_type_color1(oParticleSystem.headshot_particle, c_white);
+            }
+
+            var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
+
+            if !audio_is_playing(sound_effect) {
+                play_sound(impact_x, impact_y, sound_effect, attacking_item.stats.Object);
+            }
+        }
+
+    } else {
+
+        if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
+
+            var sound_effect2 = choose(snd_HeadShot1, snd_HeadShot2);
+            if !audio_is_playing(sound_effect2) {
+                play_sound(impact_x, impact_y, sound_effect2, attacking_item.stats.Object);
+            }
+
+        } else {
+
+            var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense];
+
+            if (is_player) {
+                if (hit_object.is_local) {
+                    global.Inventory[# OtherSlot.Helmet, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability], dmg_loss2, 0);
+                } else {
+                    hit_object.network_helmet_dur = max(hit_object.network_helmet_dur - dmg_loss2, 0);
+                }
+            } else {
+                hit_object.ArmourDurability[1] -= max(hit_object.ArmourDurability[1] - dmg_loss2, 0);
+            }
+
+            for (var j = 0; j < ceil(max(hit_object.attack_damage / 5, 10)); j++) {
+                var randomDirection2 = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
+                part_type_direction(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0);
+                part_type_orientation(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0, false);
+                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
+            }
+
+            if !audio_is_playing(snd_HeadShotHelmet) {
+                play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_item.stats.Object);
+            }
+        }
+    }
+}
+
+
 function array_min(arr) {
     var min_value = arr[0];
     for (var i = 1; i < array_length(arr); i++) {
@@ -9,23 +92,9 @@ function array_min(arr) {
 }
 	
 function window_resize(){
-	var window_h_before = window_get_height();
-	var display_h_before = display_get_height();
-	
-	//var extra_h = display_h_before - window_h_before; // Výška titulku a okrajů
-	var window_scale = 2;
-	
-	//if(window_get_fullscreen() == true || window_h_before ){
-		extra_h = 0;
-	//}
-
-	// Nastavit velikost okna tak, aby vnitřní část byla přesně velikost displeje
-	window_set_size(global.window_width, global.window_height + extra_h);
-	//window_set_rectangle(0, extra_h, global.window_width, global.window_height + extra_h);
-	surface_resize(application_surface, global.CameraWidth*window_scale, global.CameraHeight*window_scale + extra_h);
-	//display_set_gui_size(global.window_width, global.window_height + extra_h);
-	camera_set_view_size(CAMERA, global.CameraWidth, global.CameraHeight);	
-	//window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
+    window_set_size(global.window_width, global.window_height);
+    surface_resize(application_surface, global.CameraWidth, global.CameraHeight);
+    camera_set_view_size(CAMERA, global.CameraWidth, global.CameraHeight);
 }
 
 function array_max(arr) {
@@ -72,7 +141,7 @@ function buy_item(ItemID){
 
 function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1]){
 	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
-	
+	var is_net = instance_exists(oNetworkManager);
 	if(remote == false){
 		var random_x = 0;
 		var random_y = 0;
@@ -102,7 +171,10 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		   BulletDamage, item_dir_spd_dist[0], name_vis[1], name_vis[0]
 	   );
 	    bullet_tracer.network_id = proj_id;
-		bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
+		
+		if(is_net){
+			bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
+		}
 	}else{
 	    bullet_tracer.network_id = proj_own[0];
 	    bullet_tracer.stats.Owner_id = proj_own[1];
@@ -124,14 +196,6 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	bullet_tracer.is_remote = local_remote[1];		   
 	bullet_tracer.stats.Owner_name = name_vis[0];
 	bullet_tracer.stats.Owner_visible = name_vis[1];
-	
-	if(instance_exists(BulletObject) && BulletObject != -1){
-		if(instance_exists(oParticleSystem) && BulletObject.Visible == true){
-			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
-			part_particles_create(global.ParticleSystem, pos[0], pos[1], oParticleSystem.Spark, BulletDamage/5);
-			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
-		}
-	}
 	
 	with(bullet_tracer){
 		image_index = BulletImage;
@@ -211,6 +275,8 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 			);	
 		}
 	}
+	
+	return Bullet;
 }
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
     var collision_info = find_collision_point(starting_x, starting_y, target_x, target_y, object_type);
@@ -445,6 +511,58 @@ function sum(array){
 	return array_sum;
 }
 
+function create_shooting_effects(object){
+	with(object){
+		
+		#region Create smoke effect
+		if(instance_number(oFog) < 10){
+			Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
+			Fog.moving = true;
+			Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
+			Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
+			with(Fog){
+				smoke_effect_create(
+					20,
+					other.RotationAngle - 180,
+					5,
+					5,
+					10,
+					.1,
+					.75,
+					clamp(global.ItemIndex[#other.wpn_id, ItemStat.ShootTimer], 10, 30)
+				);	
+			}
+		}
+		#endregion
+						
+		#region Create bullet casing
+		if(global.ItemIndex[#wpn_id, ItemStat.BulletCasingID] != -1){
+			particle_create(global.ItemIndex[#wpn_id, ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+			0, RotationAngle - 180, 0, true, true, global.ItemIndex[#wpn_id, ItemStat.BulletCasingID], x, y, 1, 60);
+		}
+		#endregion
+				
+		#region Create flash effect
+		if(stats.Health_points > 0){
+			if(flash_effect_timer == -1){
+				flash_effect_timer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * 2);
+				MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
+				MuzzleFlashLight.angle = RotationAngle;
+				MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
+				MuzzleFlashLight.blend = c_red;
+			}
+		}
+		#endregion	
+		
+		if(instance_exists(oParticleSystem)){
+			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
+			part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.Spark, global.ItemIndex[# wpn_id, ItemStat.Damage]/5);
+			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
+		}
+		
+	}
+}
+
 function player_shooting(){
 	
 	if(global.ranked_game == true){
@@ -452,47 +570,9 @@ function player_shooting(){
 		oRatingController.all_shots ++;
 	}
 	
-	#region Create smoke effect
-	if(instance_number(oFog) < 10){
-		Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
-		Fog.moving = true;
-		Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
-		Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
-		with(Fog){
-			smoke_effect_create(
-				20,
-				global.local_player.RotationAngle - 180,
-				5,
-				5,
-				10,
-				.1,
-				.75,
-				clamp(global.local_player.ShootTimer, 10, 30)
-			);	
-		}
-	}
-	#endregion
-						
-	#region Create bullet casing
-	if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.BulletCasingID] != -1){
-		particle_create(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-		0, point_direction(global.local_player.x, global.local_player.y, oCrosshair.x, oCrosshair.y) - 180, 0, true, true, global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.BulletCasingID], x, y, 1, 60);
-	}
-	#endregion
-				
-	#region Create flash effect
-	if(stats.Health_points > 0){
-		if(DestroyTimer == -1){
-			DestroyTimer = ceil(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer] * 2);
-			MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
-			MuzzleFlashLight.angle = RotationAngle;
-			MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
-			MuzzleFlashLight.blend = c_red;
-		}
-	}
-	#endregion
+	create_shooting_effects(id);
 								
-	for(i=0;i<global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Bullets];i++){
+	for(i=0;i<global.ItemIndex[#wpn_id, ItemStat.Bullets];i++){
 						
 		#region Determine shot position
 							
@@ -504,7 +584,7 @@ function player_shooting(){
 		if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None){
 			suppressor_multiplier = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_suppressor], ItemStat.Defense];	
 		}
-		var current_weapon_id = global.Inventory[# WeaponID, Index.slot_id];
+		var current_weapon_id = wpn_id;
 		var kb_phase_1 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback;
 		var kb_phase_2 = global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback;
 		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
@@ -512,7 +592,7 @@ function player_shooting(){
 		var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
 		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackPower];		
 
-		if (global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.random_bullet_spread] == true) {
+		if (global.ItemIndex[#wpn_id, ItemStat.random_bullet_spread] == true) {
 			ShotX = random_range(
 				oCrosshair.x - inaccuracy_formula(current_weapon_id, id), 
 				oCrosshair.x + inaccuracy_formula(current_weapon_id, id)
@@ -542,19 +622,19 @@ function player_shooting(){
 		}
 		#endregion
 			
-		if(global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == "Anti-tank missile"){
+		if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == "Anti-tank missile"){
 			create_bullet_tracer(
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
 				1,
 				[
-					global.Inventory[# WeaponID, Index.slot_id], 
+					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 					25,
-					global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range]
+					global.ItemIndex[#wpn_id, ItemStat.Range]
 				],
 				id,
-				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
 				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
@@ -567,13 +647,13 @@ function player_shooting(){
 				[ShotX,ShotY],
 				0,
 				[
-					global.Inventory[# WeaponID, Index.slot_id], 
+					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 					global.BulletSpeed,
-					global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Range]
+					global.ItemIndex[#wpn_id, ItemStat.Range]
 				],
 				id,
-				global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
 				noone,
@@ -755,7 +835,6 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
 }
 
 function pause(ObjectType){
-	//part_particles_clear(global.ParticleSystem);
 	if(instance_exists(oWeaponAttachments)){
 		global.local_player.player_can_shoot = true;
 		with(oWeaponAttachments){
@@ -780,7 +859,6 @@ function pause(ObjectType){
 	}
 	camera_set_view_angle(CAMERA, 0);
 	ObjectType.alarm[0] = 1;
-	window_resize();
 }
 
 function unpause(ObjectType){

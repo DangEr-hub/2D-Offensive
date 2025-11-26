@@ -208,7 +208,7 @@ function console_submit(Console) {
 	                    if(no == 1 && string_digits(c[1]) != ""){
 							window_set_fullscreen(real(c[1])); 
 							//window_resize();
-							oConsole.alarm[0] = 10; //Proč to musí byt tolik? Nikdo neví
+							//oConsole.alarm[0] = 10; //Proč to musí byt tolik? Nikdo neví
 						}
 					break;
 					case "hostage":
@@ -228,7 +228,7 @@ function console_submit(Console) {
 							if(real(c[1]) != global.GUIMultiplier){
 								global.GUIMultiplier = clamp(real(c[1]), 1, 2);
 								reset_gui();
-								window_resize();
+								//window_resize();
 							}
 						}
 					break;
@@ -346,10 +346,7 @@ function console_submit(Console) {
 					        global.window_height = clamp(real(string_digits(c[2])), 480, display_get_height());
 							
 							if(window_get_fullscreen() == false){
-								display_set_gui_size(global.window_width, global.window_height);
-								surface_resize(application_surface, global.window_width, global.window_height);
-								window_set_size(global.window_width, global.window_height);
-								window_set_position(display_get_width()/2 - window_get_width()/2, display_get_height()/2 - window_get_height()/2);
+								ui_scale_set_window_size(clamp(real(string_digits(c[1])), 540, display_get_width()), clamp(real(string_digits(c[2])), 480, display_get_height()));
 							}
 					    }
 					break;
