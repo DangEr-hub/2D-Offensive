@@ -1,11 +1,11 @@
 event_inherited();
 //draw_text(x, y - 70, network_id);
-draw_text(x, y + 100, "stats.Health_points " + string(stats.Health_points));
+//draw_text(x, y + 100, "ammo" + string(global.local_player));
 
 //draw_text(x, y + 50, "FlashX" + string(FlashLightX));
 if(stats.Health_points > 0){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-	if (instance_exists(oNetworkManager) && !is_local) {
+	if (IS_NET && !is_local) {
 	    armour_id = network_armour_id;
 	}
 
@@ -66,7 +66,7 @@ if(stats.Health_points > 0){
 	}
 	
 	var helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-	if(instance_exists(oNetworkManager) && is_local == false){
+	if(IS_NET && is_local == false){
 		helmet_id = network_helmet_id;
 	}
 
@@ -101,7 +101,7 @@ if(stats.Health_points > 0){
 	#endregion
 	
 	#region Draw muzzle flash
-	if(is_local || !instance_exists(oNetworkManager)){
+	if(is_local || !IS_NET){
 		if(CanShoot == false && ShootTimer >= global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ShootTimer]/1.5 && Healing == false && stats.Health_points > 0){
 			draw_sprite_ext(spr_MuzzleFlash, 0, FlashLightX, FlashLightY, 1, 1, RotationAngle, c_white, 1);
 		}

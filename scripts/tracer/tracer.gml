@@ -3,13 +3,13 @@ function handle_projectile_spawn_client() {
     with (oNetworkManager) {
         var proj_id   = buffer_read(receive_buffer, buffer_u16);
         var owner_pid = buffer_read(receive_buffer, buffer_u16);
-        var x_pos     = buffer_read(receive_buffer, buffer_f32);
-        var y_pos     = buffer_read(receive_buffer, buffer_f32);
-        var angle       = buffer_read(receive_buffer, buffer_f32);
-        var spd       = buffer_read(receive_buffer, buffer_f32);
+        var x_pos     = buffer_read(receive_buffer, buffer_f16);
+        var y_pos     = buffer_read(receive_buffer, buffer_f16);
+        var angle       = buffer_read(receive_buffer, buffer_f16);
+        var spd       = buffer_read(receive_buffer, buffer_f16);
 		var index	  = buffer_read(receive_buffer, buffer_u8);
-        var bx     = buffer_read(receive_buffer, buffer_f32);
-        var by     = buffer_read(receive_buffer, buffer_f32);
+        var bx     = buffer_read(receive_buffer, buffer_f16);
+        var by     = buffer_read(receive_buffer, buffer_f16);
 		var dmg       = buffer_read(receive_buffer, buffer_f16);
 		var item_id   = buffer_read(receive_buffer, buffer_u16);
 		var owner_visible = buffer_read(receive_buffer, buffer_u8);
@@ -43,7 +43,7 @@ function handle_projectile_spawn_client() {
 			[proj_id, owner_pid]
 		);
 		
-		var p = find_player_by_network_id(owner_pid);
+		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		if(p != noone){
 			p.network_shoot_timer = 2;
 		}
@@ -57,13 +57,13 @@ function handle_projectile_spawn_server(key) {
 
         var proj_id = buffer_read(receive_buffer, buffer_u16);
         var owner_pid = buffer_read(receive_buffer, buffer_u16);
-        var x_pos = buffer_read(receive_buffer, buffer_f32);
-        var y_pos = buffer_read(receive_buffer, buffer_f32);
-        var angle = buffer_read(receive_buffer, buffer_f32);
-        var spd   = buffer_read(receive_buffer, buffer_f32);
+        var x_pos = buffer_read(receive_buffer, buffer_f16);
+        var y_pos = buffer_read(receive_buffer, buffer_f16);
+        var angle = buffer_read(receive_buffer, buffer_f16);
+        var spd   = buffer_read(receive_buffer, buffer_f16);
         var index = buffer_read(receive_buffer, buffer_u8);
-        var bx    = buffer_read(receive_buffer, buffer_f32);
-        var by    = buffer_read(receive_buffer, buffer_f32);
+        var bx    = buffer_read(receive_buffer, buffer_f16);
+        var by    = buffer_read(receive_buffer, buffer_f16);
 		var dmg   = buffer_read(receive_buffer, buffer_f16);
 		var item_id = buffer_read(receive_buffer, buffer_u16);
 		var owner_visible = buffer_read(receive_buffer, buffer_u8);
@@ -94,7 +94,7 @@ function handle_projectile_spawn_server(key) {
 			);
         }
 		
-		var p = find_player_by_network_id(owner_pid);
+		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		if(p != noone){
 			p.network_shoot_timer = 2;
 		}
@@ -106,13 +106,13 @@ function handle_projectile_spawn_server(key) {
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         buffer_write(send_buffer, buffer_u16, proj_id);
         buffer_write(send_buffer, buffer_u16, owner_pid);
-        buffer_write(send_buffer, buffer_f32, x_pos);
-        buffer_write(send_buffer, buffer_f32, y_pos);
-        buffer_write(send_buffer, buffer_f32, angle);
-        buffer_write(send_buffer, buffer_f32, spd);
+        buffer_write(send_buffer, buffer_f16, x_pos);
+        buffer_write(send_buffer, buffer_f16, y_pos);
+        buffer_write(send_buffer, buffer_f16, angle);
+        buffer_write(send_buffer, buffer_f16, spd);
         buffer_write(send_buffer, buffer_u8,  index);
-        buffer_write(send_buffer, buffer_f32, bx);
-        buffer_write(send_buffer, buffer_f32, by);
+        buffer_write(send_buffer, buffer_f16, bx);
+        buffer_write(send_buffer, buffer_f16, by);
 		buffer_write(send_buffer, buffer_f16, dmg);
 		buffer_write(send_buffer, buffer_u16, item_id);
 		buffer_write(send_buffer, buffer_u8,  owner_visible);
@@ -139,13 +139,13 @@ function send_projectile_spawn(start_pos, angle_spd_id_dist, shot_pos, damage, i
 		buffer_write(send_buffer, buffer_u32, send_sequence++);
 		buffer_write(send_buffer, buffer_u16, proj_id);
 		buffer_write(send_buffer, buffer_u16, my_pid);
-		buffer_write(send_buffer, buffer_f32, start_pos[0]);
-		buffer_write(send_buffer, buffer_f32, start_pos[1]);
-		buffer_write(send_buffer, buffer_f32, angle_spd_id_dist[0]);
-		buffer_write(send_buffer, buffer_f32, angle_spd_id_dist[1]);
+		buffer_write(send_buffer, buffer_f16, start_pos[0]);
+		buffer_write(send_buffer, buffer_f16, start_pos[1]);
+		buffer_write(send_buffer, buffer_f16, angle_spd_id_dist[0]);
+		buffer_write(send_buffer, buffer_f16, angle_spd_id_dist[1]);
 		buffer_write(send_buffer, buffer_u8,  angle_spd_id_dist[2]);
-		buffer_write(send_buffer, buffer_f32, shot_pos[0]);
-		buffer_write(send_buffer, buffer_f32, shot_pos[1]);
+		buffer_write(send_buffer, buffer_f16, shot_pos[0]);
+		buffer_write(send_buffer, buffer_f16, shot_pos[1]);
 		buffer_write(send_buffer, buffer_f16, damage);
 		buffer_write(send_buffer, buffer_u16, item_id);
         buffer_write(send_buffer, buffer_u8,  owner_visible);

@@ -1,4 +1,4 @@
-
+/* oItems Create event */
 PushForce = 0;
 scope_attachment = -1;
 barrel_attachment = -1;
@@ -18,3 +18,16 @@ ClipAmmo = -1;
 Ammo = -1;
 Durability = -1;
 alarm[0] = 1;
+network_id = -1;
+
+if (IS_NET && IS_SERVER) {
+    network_id = compute_item_network_id();
+    
+    var data = ds_map_create();
+    ds_map_set(data, "object_index", object_index);
+    ds_map_set(data, "x", x);
+    ds_map_set(data, "y", y);
+    ds_map_set(data, "image_index", image_index);
+    
+    ds_map_set(oNetworkManager.item_registry, network_id, data);
+}

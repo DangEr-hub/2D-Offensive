@@ -291,22 +291,11 @@ function console_submit(Console) {
 					
 					case "set_weather":
 						if(no == 1 && string_digits(c[1]) != ""){
-							switch(real(c[1])){
-								case 0:
-									global.Weather = "sun";
-								break;
-								
-								case 1:
-									global.Weather = "rain";
-								break;
-								
-								case 2:
-									global.Weather = "snow";
-								break;
-								
-								default:
-									global.Weather = "sun";
-								break;
+							if(!IS_NET || global.sv_cheats == true){
+								global.Weather = real(c[1]);
+								if(IS_NET){
+									send_weather_broadcast();
+								}
 							}
 						}
 					break;

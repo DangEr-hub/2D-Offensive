@@ -2,6 +2,7 @@ randomize();
 global.my_console = console_create();
 global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 global.local_player = -1;
+global.sv_cheats = false;
 global.aberration_level = 0;
 global.saturation_level = 1.8;
 global.InventoryEquipLeftTopCorner = [-1, -1];
@@ -40,7 +41,7 @@ global.hard_mode = false;
 global.window_width = 1920;
 global.window_height = 1080;
 global.draw_other_models = false;
-global.Weather = "sun";
+global.Weather = 0;
 global.crosshair_color = c_white;
 global.sound_emitters = ds_map_create();
 
@@ -85,6 +86,12 @@ enum weapon_attachments{
 
 for (var i = 0; i < 3; i++) {
     global.weapon_attachments[i] = array_create(weapon_attachments.Total, Item.None);
+}
+
+enum WEATHER{
+	SUN,
+	RAIN,
+	SNOW
 }
 
 

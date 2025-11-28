@@ -28,7 +28,7 @@ function create_blood_particle(splash_number, xx, yy, color, part_number){
 }
 
 function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
-    if (!instance_exists(oNetworkManager)) { return;}
+    if (!IS_NET) { return;}
     if (hit_object.object_index != oPlayer) {return;} ///zatím jen hráče
 
     var attacker_pid = attacking_item.stats.Owner_id;
@@ -73,7 +73,6 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var helmet_durability = 0;
 	var armour_durability = 0;
 	var blood_color = c_red;
-	var is_net  = instance_exists(oNetworkManager);
 	var data = -1;
 	var hp = hit_object.stats.Health_points;
 	
@@ -83,7 +82,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		armour_id = hit_object.network_armour_id;
 		helmet_id = hit_object.network_helmet_id;
 		
-		if(is_net){
+		if(IS_NET){
 			armour_durability = hit_object.network_armour_dur;
 			helmet_durability = hit_object.network_helmet_dur;
 		}else{
@@ -100,7 +99,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	
 	
 	/* Offline gameplay  */
-	if!(is_net){
+	if!(IS_NET){
 		has_godmode = global.GodMode;	
 		armour_id = ArmourID;
 		helmet_id = HelmetID;
@@ -230,17 +229,16 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		}
 		
 		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.reward];
-		var is_host = is_net && oNetworkManager.is_server;
 
 		if (hp <= hit_object.attack_damage) {
-		    if (!is_net) {
+		    if (!IS_NET) {
 		        // SINGLEPLAYER REWARD
 		        global.player_stats_struct.Money += reward;
 		        if (global.ranked_game) {
 		            global.player_stats_struct.Kills++;
 		            oRatingController.kills++;
 		        }
-		    } else if (is_host) {
+		    } else if (IS_SERVER) {
 		        // MULTIPLAYER REWARD – jen host zapisuje statistiky (anti-cheat)
 		        if (attacker_pid >= 0) {
 		            with (oNetworkManager) {
@@ -291,7 +289,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    hit_object.AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
 		} else {
 		    if (global.ranked_game) {
-		        if (!is_net) {
+		        if (!IS_NET) {
 		            // SINGLEPLAYER
 		            global.player_stats_struct.Hit_shots++;
 		            oRatingController.hit_shots++;
@@ -299,7 +297,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		                global.player_stats_struct.Headshots++;
 		                oRatingController.headshots++;
 		            }
-		        } else if (is_host && attacker_pid >= 0) {
+		        } else if (IS_SERVER && attacker_pid >= 0) {
 		            // MULTIPLAYER HOST
 		            with (oNetworkManager) {
 		                var stats = ds_map_find_value(player_stats, attacker_pid);
@@ -326,7 +324,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		
 		hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item, hit_object, is_player);
 		
-        if (is_net) {
+        if (IS_NET) {
             send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [hit_object.network_armour_dur, hit_object.network_helmet_dur]);
         }
 		

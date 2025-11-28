@@ -9,7 +9,6 @@ enum PLAYER_FLAGS {
 
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
-global.debug_text = "kokot";
 network_type = network_socket_udp; // UDP for real-time gameplay
 server_port = 50000;
 server_ip = "127.0.0.1"; // Default to localhost
@@ -35,27 +34,30 @@ receive_buffer = buffer_create(1024, buffer_grow, 1);
 player_states = ds_map_create();
 projectiles_seen = ds_map_create(); // key = proj_id, val = true
 player_stats = ds_map_create();
+item_registry = ds_map_create();
 
 // Packet types
 enum PACKET {
     CONNECT_REQUEST,
     CONNECT_ACCEPT,
     DISCONNECT,
-    PLAYER_UPDATE,
     PROJECTILE_SPAWN,
     OBJECT_SYNC,
     HEARTBEAT,
-    PLAYER_STATE,
+    TICK_UPDATE,
 	EQUIP_SYNC,
 	HIT,
-	WEAPON_SYNC
+	WEAPON_SYNC,
+	INIT,
+	REQUEST_INIT,
+	WEATHER_SYNC
 }
 
-equipment_changed = false;
-weapon_changed = false;
+equipment_sync = false;
+weapon_sync = false;
 send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
-accum_server = 0;   // časování PLAYER_STATE na serveru
+accum_server = 0;   // časování TICK_UPDATE na serveru
 hb_client    = 0;   // heartbeat na klientovi
 
 // Sequence numbers for packet ordering
@@ -63,5 +65,5 @@ send_sequence = 0;
 receive_sequences = ds_map_create();
 
 // Prediction and reconciliation
-client_input_buffer = ds_list_create();
-last_processed_input = 0;
+//client_input_buffer = ds_list_create();
+//last_processed_input = 0;

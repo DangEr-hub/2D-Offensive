@@ -5,7 +5,7 @@
 ///       is_headshot = true/false
 ///       victim_is_bot = true/false (když chceš rozlišovat pro summary)
 function server_add_player_kill(attacker_pid, reward, is_headshot, victim_is_bot) {
-    if (!instance_exists(oNetworkManager)) return;
+    if (!IS_NET) return;
 
     with (oNetworkManager) {
 

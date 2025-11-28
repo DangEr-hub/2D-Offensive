@@ -35,7 +35,7 @@ function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope,
 					global.Inventory[# Slot, Index.slot_suppressor] = (Itemsuppressor != -1) ? Itemsuppressor : global.Inventory[# Slot, Index.slot_suppressor];
 	            }
 				if(Destroy == true){
-					instance_destroy();
+					destroy_pickup_instance(id);
 				}
 	            break;
 	        }
@@ -52,7 +52,7 @@ function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope,
 	            global.Inventory[# yy, 1] += Amount;
 	            PickedUp = true;
 				if(Destroy == true){
-					instance_destroy();
+					destroy_pickup_instance(id);
 				}
 	            break;
 	        }else{
@@ -68,7 +68,7 @@ function GainItem(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope,
 	                global.Inventory[# yy, 0] = ID;
 	                global.Inventory[# yy, 1] += Amount;
 					if(Destroy == true){
-						instance_destroy();
+						destroy_pickup_instance(id);
 					}
 	                PickedUp = true;
 	                break;
@@ -163,7 +163,6 @@ function InventoryInit() {
 }
 
 function ItemDeclare(){
-	Damage = global.ItemIndex[#image_index, ItemStat.Damage];
 
 	if(Durability <= -1){
 		Durability = global.ItemIndex[#image_index, ItemStat.BaseDurability];
@@ -207,7 +206,7 @@ function ItemAddWeight(ID, OtherID){
 	global.player_stats_struct.Weight = clamp(global.player_stats_struct.Weight, 0, global.player_stats_struct.Max_weight);
 }
 
-function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAmmo = 0, ObjectDurability = 0, ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
+function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = -1, ObjectClipAmmo = -1, ObjectDurability = -1, ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
 	if(percent_chance(Chance)){
 		ItemDropped = instance_create_layer(PositionX, PositionY, "ItemsO", oItems);
 		ItemDropped.Amount = ObjectAmount;
@@ -230,17 +229,19 @@ function ItemDrop(ID, PositionX, PositionY, Chance, ObjectAmmo = 0, ObjectClipAm
 				ItemDropped.suppressor_attachment = OWsuppressorA;
 			}
 			ItemDropped.Ammo = global.ItemIndex[#ID, ItemStat.Ammo];
-			if(ObjectAmmo != 0){
+			if(ObjectAmmo != -1){
 				ItemDropped.Ammo = ObjectAmmo;
 			}
 			ItemDropped.ClipAmmo = global.ItemIndex[#ID, ItemStat.ClipAmmo];
-			if(ObjectClipAmmo != 0){
+			if(ObjectClipAmmo != -1){
 				ItemDropped.ClipAmmo = ObjectClipAmmo;
 			}
 		}else if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || 
 		global.ItemIndex[#ID, ItemStat.Type] == "Helmet"){
 			ItemDropped.Durability = ObjectDurability;
 		}
+		
+		ItemDropped.network_id = compute_item_network_id();
 	}
 }
 

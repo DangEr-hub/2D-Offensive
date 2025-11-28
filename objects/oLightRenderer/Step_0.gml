@@ -1,17 +1,14 @@
-tickCounter++;
-if (tickCounter >= global.TimeSpeed) {
-    CurrentMinute++;
-    tickCounter = 0;
+if (!IS_NET || oNetworkManager.is_server) {
+    tickCounter++;
+
+    if (tickCounter >= global.TimeSpeed) { tickCounter = 0; CurrentMinute++; }
+
+    if (CurrentMinute >= 60) { CurrentMinute = 0;CurrentHour++; }
+
+    if (CurrentHour >= 24) { CurrentHour = 0; }
+
 }
 
-if (CurrentMinute >= 60) {
-    CurrentHour++;
-    CurrentMinute = 0;
-}
-
-if(CurrentHour >= 24){
-	CurrentHour = 0;	
-}
 
 var endIntensity = global.MapProperties[#global.MapID, MapProperty.MapEndIntensity];
 var startIntensity = global.MapProperties[#global.MapID, MapProperty.MapStartIntensity];

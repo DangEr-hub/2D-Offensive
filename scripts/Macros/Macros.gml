@@ -1,3 +1,5 @@
+#macro IS_NET instance_exists(oNetworkManager)
+#macro IS_SERVER IS_NET && oNetworkManager.is_server
 #macro SHADOW_DIST 24
 #macro RD_OFFSET 1.0 // stabilní hráč je považován s RD_ES = 1.0
 #macro RD_START 200

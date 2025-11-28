@@ -35,14 +35,13 @@ if (is_remote) {
 	}
 
 	if(Reloading == true){
-		ReloadTime ++;
-		
-		if(ReloadTime == 1){
+		if(ReloadTime >= global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed] - 1){
 			if(wpn_id != Item.Javelin){
 				particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
 				random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ItemStat.AmmoSpriteID], x, y);		
 			}
 		}
+		ReloadTime ++;
 	}else{
 		ReloadTime = 0;
 	}
@@ -933,10 +932,8 @@ if (instance_exists(oDraw)){
 			if(FlashLight != undefined){
 				FlashLight.angle = RotationAngle; FlashLight.x = FlashLightX; FlashLight.y = FlashLightY;
 			}
-			Weapon.FlashLightX = FlashLightX;
-			Weapon.FlashLightY = FlashLightY;
-			cx = Weapon.FlashLightX;
-			cy = Weapon.FlashLightY;
+			Weapon.FlashLightX = FlashLightX; Weapon.FlashLightY = FlashLightY;
+			cx = Weapon.FlashLightX; cy = Weapon.FlashLightY;
 			ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
 			ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
 			bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);
@@ -957,32 +954,24 @@ if (instance_exists(oDraw)){
 			#endregion
 	
 			#region Shooting mode
-			var Shoot = -1;
-			var shooting_mode = ds_list_find_value(global.ItemIndex[#wpn_id, ItemStat.ShootingMode], weapon_shooting_mode);
+			var Shoot = -1; var shooting_mode = ds_list_find_value(global.ItemIndex[#wpn_id, ItemStat.ShootingMode], weapon_shooting_mode);
 	
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyChangeMode]) && shooting == false){
 				var list_size = ds_list_size(global.ItemIndex[#wpn_id, ItemStat.ShootingMode]);
-				if(weapon_shooting_mode < list_size){
-					weapon_shooting_mode = (weapon_shooting_mode + 1) % list_size;
-				}
+				if(weapon_shooting_mode < list_size){ weapon_shooting_mode = (weapon_shooting_mode + 1) % list_size; }
 			}
 	
-			if(shooting_reset_timer > -1){
-				shooting_reset_timer --;
-			}
+			if(shooting_reset_timer > -1){ shooting_reset_timer --; }
 	
 			if(shooting_mode == "Auto"){	
-				if(KickBack > 1){
+				if(KickBack > 1){ 
 					KickBackTime = round(.08 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
 				}else{
 					KickBackTime = round(.5 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
 				}
 				Shoot = mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]);
 				if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse])) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true)){
-					kick_back_timer = KickBackTime;
-					shooting = false;
-					crosshair_position[0] = oCrosshair.x;
-					crosshair_position[1] = oCrosshair.y;
+					kick_back_timer = KickBackTime; shooting = false; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
 			}else if(shooting_mode == "Semi" || shooting_mode == "Burst"){
 				KickBackTime = round(.25 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
@@ -992,22 +981,16 @@ if (instance_exists(oDraw)){
 					shooting_reset_timer = KickBackTime;
 				}
 				if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] > 0) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true && shooting_reset_timer == -1)){
-					shooting_reset_timer = KickBackTime;
-					kick_back_timer = KickBackTime;
-					crosshair_position[0] = oCrosshair.x;
-					crosshair_position[1] = oCrosshair.y;
+					shooting_reset_timer = KickBackTime; kick_back_timer = KickBackTime; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
-				if(shooting_reset_timer == 0){
-					shooting = false;
-				}
+				
+				if(shooting_reset_timer == 0){ shooting = false; }
 			}
 	
 			#endregion	
 	
 			#region Burst fire
-			if(burst_fire_timer > -1){
-				burst_fire_timer --;
-			}
+			if(burst_fire_timer > -1){ burst_fire_timer --; }
 			if (burst_fire == true) {
 				if (burst_fire_timer <= 0) {
 					if (burst_shots_fired < burst_shot_limit) {		
@@ -1053,8 +1036,7 @@ if (instance_exists(oDraw)){
 								#endregion	
 				
 						        if(CanShoot == true){
-					
-							
+
 					
 									if(shooting_mode == "Burst"){
 						
@@ -1119,38 +1101,31 @@ if (instance_exists(oDraw)){
 				var Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
 				var Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
 				var Down = keyboard_check(global.KeyBinds[| KeyBind.KeyDown]);
+				MoveDirection = point_direction(Left, Up, Right, Down);
 				var Delta = delta_time / 1000000;
 				var xpos = Right - Left;
 				var ypos = Down - Up;
-				MoveDirection = point_direction(Left, Up, Right, Down);
 				var move_xpos = abs(xpos);
 				var move_ypos = abs(ypos);
 	
 				#region Move speed multiplier
-				if(AimPunchTimer == -1){
-					aimpunch_speed_multiplier = 1;
-				}
 				var ShootingSpeedMultiplier = 1;
-				if(CanShoot == false && ShootTimer >= global.ItemIndex[#wpn_id, ItemStat.ShootTimer]/2){
-					ShootingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ShootSpdMul];
-				}
 				var ReloadingSpeedMultiplier = 1;
-				if(Reloading == true){
-					ReloadingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ReloadSpdMul];
-				}
-				var moving_speed_multiplier = 1;	
-				if(moving_state == states_player.prone_state){
-					moving_speed_multiplier	= .135;
-				}
-	
+				var moving_speed_multiplier = 1;
 				var WeightSpeedMultiplier = 1 / (global.player_stats_struct.Weight/50 + 1);
-	
 				var WeaponSpeedMultiplier = 1;
+				
+				if(AimPunchTimer == -1){ aimpunch_speed_multiplier = 1; }
+				if(CanShoot == false && ShootTimer >= global.ItemIndex[#wpn_id, ItemStat.ShootTimer]/2){ ShootingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ShootSpdMul]; }
+				if(Reloading == true){ ReloadingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ReloadSpdMul]; }
+				if(moving_state == states_player.prone_state){ moving_speed_multiplier = .135; }
+	
 				if(global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul] != 0 && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 					WeaponSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul];
-				}
+					}
 	
-				SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * aimpunch_speed_multiplier * moving_speed_multiplier * WeightSpeedMultiplier * WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
+				SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * aimpunch_speed_multiplier * moving_speed_multiplier * WeightSpeedMultiplier *
+						   WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
 
 				#endregion
 
@@ -1162,27 +1137,18 @@ if (instance_exists(oDraw)){
 					}
 				}
 
-				if(MovingStabilizationTimer > -1){
-					MovingStabilizationTimer --;
-				}
+				if(MovingStabilizationTimer > -1){ MovingStabilizationTimer --; }
 
-				if(MovingStabilizationTimer == 0){
-					Moving = false;
-				}
+				if(MovingStabilizationTimer == 0){ Moving = false; }
 
-				if!(Left || Right){
-					RelativeSpeedX = max(0, RelativeSpeedX - (RelativeSpeedValue * 2));
-				}
+				if!(Left || Right){ RelativeSpeedX = max(0, RelativeSpeedX - (RelativeSpeedValue * 2)); }
 
-				if!(Up || Down){
-					RelativeSpeedY = max(0, RelativeSpeedY - (RelativeSpeedValue * 2));
-				}
+				if!(Up || Down){ RelativeSpeedY = max(0, RelativeSpeedY - (RelativeSpeedValue * 2)); }
 
 				if(Moving == true){
 					if(moving_state != states_player.prone_state){
 						if(FootStepTimer == -1){
-							FootStepTimer = 5;
-							FootSteps ++;
+							FootStepTimer = 5; FootSteps ++;
 						}
 						if(FootStepTimer == 0 && Visible == true){
 							particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
@@ -1192,12 +1158,9 @@ if (instance_exists(oDraw)){
 						XSpeed = RelativeSpeedX * dcos(MoveDirection) * Delta * SpeedMul;
 				        if (place_meeting(x + XSpeed, y, oParentTile)){
 				            while (!place_meeting(x + sign(XSpeed),y,oParentTile))
-								x += sign(XSpeed);
-								XSpeed = 0;
+								x += sign(XSpeed); XSpeed = 0;
 						}else{
-							if(RelativeSpeedX < MoveSpeed){
-								RelativeSpeedX += RelativeSpeedValue;
-							}
+							if(RelativeSpeedX < MoveSpeed){ RelativeSpeedX += RelativeSpeedValue; }
 							x += min(XSpeed, MoveSpeed);
 						}
 						if(moving_state != states_player.prone_state && Visible == true){
@@ -1209,12 +1172,9 @@ if (instance_exists(oDraw)){
 						YSpeed =  RelativeSpeedY * -dsin(MoveDirection) * Delta * SpeedMul;
 				        if(place_meeting(x, y + YSpeed, oParentTile)){
 				            while (!place_meeting(x,y + sign(YSpeed),oParentTile))
-								y += sign(YSpeed);
-								YSpeed = 0;
+								y += sign(YSpeed); YSpeed = 0;
 						}else{
-							if(RelativeSpeedY < MoveSpeed){
-								RelativeSpeedY += RelativeSpeedValue;
-							}
+							if(RelativeSpeedY < MoveSpeed){ RelativeSpeedY += RelativeSpeedValue; }
 							y += min(YSpeed, MoveSpeed);
 						}
 						if(moving_state != states_player.prone_state && Visible == true){
@@ -1222,8 +1182,7 @@ if (instance_exists(oDraw)){
 						}
 					}
 				}else{
-					FootSteps = 0;
-					FootStepTimer = -1;
+					FootSteps = 0; FootStepTimer = -1;
 		
 					#region Knockback
 					XSpeed = -lengthdir_x(Weapon.KickBackEffect/10, RotationAngle);
@@ -1573,11 +1532,12 @@ if (instance_exists(oDraw)){
 
 				#region Item pickup
 				if(instance_exists(oItems)){
-				    Items = instance_nearest(x, y, oItems);
+				    var Items = instance_nearest(x, y, oItems);
 				    if(distance_to_object(Items) <= PickUpDistance){   
 				        if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
 				            with(Items){
 				                GainItem(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
+								destroy_pickup_instance(id);
 				            }
 				        }
 				    }
@@ -2022,7 +1982,7 @@ if (instance_exists(oDraw)){
 }
 
 #region Death
-if!(instance_exists(oNetworkManager)){
+if!(IS_NET){
 	if(stats.Health_points <= 0 && oDraw.RespawnMenu == false){
 		flashed_muffled_sounds = 1;
 		oDraw.KilledByWeapon = KilledByWeapon;
@@ -2035,6 +1995,7 @@ if!(instance_exists(oNetworkManager)){
 }else{
 	if(stats.Health_points <= 0){
 		stats.Health_points = 100;
+		play_sound(x, y, choose(snd_Death1, snd_Death2));
 	}
 }
 #endregion

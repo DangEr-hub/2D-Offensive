@@ -5,12 +5,12 @@ var cam_x = camera_get_view_x(CAMERA);
 var cam_y = camera_get_view_y(CAMERA);
 var cam_width = camera_get_view_width(CAMERA);
 var cam_height = camera_get_view_height(CAMERA);
-if(global.Weather == "rain"){
+if(global.Weather == 1){
 	if(instance_exists(oParticleSystem)){
 		part_emitter_region(global.ParticleSystem, oParticleSystem.rain_emitter, cam_x, cam_x + cam_width, cam_y, cam_y + cam_height, ps_shape_rectangle, ps_distr_linear);
 		part_emitter_burst(global.ParticleSystem, oParticleSystem.rain_emitter, oParticleSystem.rain_particle, 5);
 	}
-}else if(global.Weather == "snow"){
+}else if(global.Weather == 2){
 	if(percent_chance(100)){
 		if(instance_exists(oParticleSystem)){
 			part_emitter_region(global.ParticleSystem, oParticleSystem.rain_emitter, cam_x, cam_x + cam_width, cam_y, cam_y + cam_height, ps_shape_rectangle, ps_distr_linear);

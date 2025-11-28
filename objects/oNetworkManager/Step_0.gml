@@ -3,7 +3,7 @@ if (is_server) {
     // ~20 Hz broadcast
     accum_server += delta_time / 1000000;
     if (accum_server >= 1/20) {
-        var srv = find_player_by_network_id(0);
+        var srv = find_instance_by_network_id(oPlayer, 0);
         if (instance_exists(srv)) {
             var data = ds_map_find_value(player_states, 0);
             if (is_undefined(data)) {
@@ -25,16 +25,16 @@ if (is_server) {
             }
             ds_map_set(data, "timestamp", current_time);
         }
-        send_player_state_broadcast();
+        send_tick_broadcast();
 		
-		if(equipment_changed){
+		if(equipment_sync){
 			send_equipment_broadcast();	
-			equipment_changed = false;
+			equipment_sync = false;
 		}
 		
-		if(weapon_changed){
+		if(weapon_sync){
 			send_weapon_broadcast();
-			weapon_changed = false;
+			weapon_sync = false;
 		}
 		
         accum_server = 0;
@@ -47,7 +47,7 @@ if (!is_server && is_connected) {
     // player update ~30 Hz
     send_timer += delta_time / 1000000;
     if (send_timer >= send_rate) {
-        send_player_state_update_client();
+        send_tick_update_client();
         send_timer = 0;
     }
 
@@ -58,14 +58,14 @@ if (!is_server && is_connected) {
         hb_client = 0;
     }
 	
-	if(equipment_changed){
+	if(equipment_sync){
 	    send_equipment_update_client();
-	    equipment_changed = false; // Reset flag after sending
+	    equipment_sync = false; // Reset flag after sending
 	}
 	
-	if(weapon_changed){
+	if(weapon_sync){
 	    send_weapon_update_client();
-	    weapon_changed = false; // Reset flag after sending
+	    weapon_sync = false; // Reset flag after sending
 	}
 }
 

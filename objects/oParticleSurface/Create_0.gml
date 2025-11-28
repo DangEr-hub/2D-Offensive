@@ -3,8 +3,9 @@
 
 alarm[0] = global.clear_particles_timer;
 if(percent_chance(90)){
-	global.Weather = "sun";
+	global.Weather = 0;
 }else{
-	global.Weather = choose("rain", "snow");	
+	global.Weather = choose(1, 2);	
 }	
+
 ParticleSurface = -1;

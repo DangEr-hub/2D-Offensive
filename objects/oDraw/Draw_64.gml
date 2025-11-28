@@ -102,13 +102,13 @@ if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == 
 	#endregion
 	
 	#region Draw snow fog
-	if(global.Weather == "snow"){
+	if(global.Weather == 2){
 		draw_set_color(c_white);
 		draw_set_alpha(.1);
 		draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
 		draw_set_color(c_white);
 		draw_set_alpha(1);
-	}else if(global.Weather == "rain"){
+	}else if(global.Weather == 1){
 		draw_set_color(c_dkgray);
 		draw_set_alpha(.5);
 		draw_rectangle(0, 0, global.GuiW, global.GuiH, false);

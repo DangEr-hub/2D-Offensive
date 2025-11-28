@@ -141,7 +141,6 @@ function buy_item(ItemID){
 
 function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1]){
 	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
-	var is_net = instance_exists(oNetworkManager);
 	if(remote == false){
 		var random_x = 0;
 		var random_y = 0;
@@ -172,7 +171,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	   );
 	    bullet_tracer.network_id = proj_id;
 		
-		if(is_net){
+		if(IS_NET){
 			bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
 		}
 	}else{

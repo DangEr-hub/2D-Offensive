@@ -92,7 +92,7 @@ with (zui_create(zui_get_width() * .1, zui_get_height() * .7, objUIButton)) {
 	caption = "Host server";
 	callback = function(){
 		/* Creating server - Menu button */
-		if (!instance_exists(oNetworkManager)) {
+		if (!IS_NET) {
 		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
 		}
     
@@ -113,7 +113,7 @@ with (zui_create(zui_get_width() * .1, zui_get_height() * .8, objUIButton)) {
 	caption = "Join server";
 	callback = function(){
 		/* Joining the game - Menu button */
-		if (!instance_exists(oNetworkManager)) {
+		if (!IS_NET) {
 		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
 		}
     

@@ -31,7 +31,7 @@ VelocityY = 0;
 game_set_speed(60, gamespeed_fps);
 shooting = false;
 item_use_position = 0;
-PickUpDistance = 16;
+PickUpDistance = 8;
 WeaponNumber = 0;
 WeaponNumberMax = 2;
 CanShoot = true;

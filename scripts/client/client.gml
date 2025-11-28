@@ -3,13 +3,11 @@ function connect_to_server(ip, port) {
     with (oNetworkManager) {
         server_ip = ip;
         server_port = port;
-        
         client_socket = network_create_socket(network_type);
 		is_server = false;
         
         if (client_socket < 0) {
-            show_debug_message("Failed to create client socket!");
-            return false;
+            show_debug_message("Failed to create client socket!");return false;
         }
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -18,7 +16,6 @@ function connect_to_server(ip, port) {
         buffer_write(send_buffer, buffer_string, "Player_" + string(irandom(9999)));
 
         var result = network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
-		global.debug_text = "SEND result = " + string(result);
         	
         return true;
     }
@@ -31,38 +28,134 @@ function handle_client_receive() {
         var packet_type = buffer_read(receive_buffer, buffer_u8);
         var sequence = buffer_read(receive_buffer, buffer_u32);
 		
-		global.debug_text = "Client received packet type: " + string(packet_type);
         
         switch (packet_type) {
-            case PACKET.CONNECT_ACCEPT:
-                handle_connect_accept();
-                break;
+            case PACKET.CONNECT_ACCEPT: handle_connect_accept(); break;
                 
-            case PACKET.PLAYER_STATE:
-                handle_player_state_update_client();
-            break;
+            case PACKET.TICK_UPDATE: handle_tick_update_client(); break;
                 
-            case PACKET.PROJECTILE_SPAWN:
-                handle_projectile_spawn_client();
-                break;
+            case PACKET.PROJECTILE_SPAWN: handle_projectile_spawn_client(); break;
                 
-            case PACKET.DISCONNECT:
-                handle_player_disconnect_client();
-                break;
-            case PACKET.EQUIP_SYNC:
-                handle_equipment_update_client();
-            break;
+            case PACKET.DISCONNECT: handle_player_disconnect_client(); break;
 			
-			case PACKET.HIT:
-				handle_hit_client();
-			break;
+            case PACKET.EQUIP_SYNC: handle_equipment_update_client(); break;
 			
-			case PACKET.WEAPON_SYNC:
-				handle_weapon_update_client();
-			break;
+			case PACKET.OBJECT_SYNC: handle_object_sync_client(); break;
+			
+			case PACKET.HIT: handle_hit_client(); break;
+			
+			case PACKET.WEAPON_SYNC: handle_weapon_update_client(); break;
+			
+			case PACKET.INIT: handle_init_sync_client(); break;
+			
+			case PACKET.WEATHER_SYNC: handle_weather_update_client(); break;
         }
     }
 }
+
+function handle_object_sync_client() {
+    with (oNetworkManager) {
+        var action = buffer_read(receive_buffer, buffer_u8);
+
+        switch (action) {
+            case 0: { // create
+                var net_id  = buffer_read(receive_buffer, buffer_u16);
+                var o_index = buffer_read(receive_buffer, buffer_u16);
+                var x_pos   = buffer_read(receive_buffer, buffer_f16);
+                var y_pos   = buffer_read(receive_buffer, buffer_f16);
+                var img_idx = buffer_read(receive_buffer, buffer_u8);
+
+                var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
+                inst.network_id = net_id;
+                inst.image_index = img_idx;
+                break;
+            }
+            case 1: { // destroy
+                var net_id_destroy = buffer_read(receive_buffer, buffer_u16);
+				var obj_ind_destroy = buffer_read(receive_buffer, buffer_u16);
+                var inst_destroy = find_instance_by_network_id(obj_ind_destroy, net_id_destroy);
+
+                if (instance_exists(inst_destroy)) {
+                    instance_destroy(inst_destroy);
+                }
+                break;
+            }
+        }
+    }
+}
+
+function handle_init_sync_client() {
+    with (oNetworkManager) {	
+		/// Itemy
+        var count = buffer_read(receive_buffer, buffer_u16);
+        for (var i = 0; i < count; i++) {
+            var net_id  = buffer_read(receive_buffer, buffer_u16);
+            var o_index = buffer_read(receive_buffer, buffer_u16);
+            var x_pos   = buffer_read(receive_buffer, buffer_f16);
+            var y_pos   = buffer_read(receive_buffer, buffer_f16);
+            var img_idx = buffer_read(receive_buffer, buffer_u8);
+            var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
+            inst.network_id  = net_id;
+            inst.image_index = img_idx;
+        }
+
+		// Weather
+        global.Weather = buffer_read(receive_buffer, buffer_u8);
+
+		// Hráči
+        var player_count = buffer_read(receive_buffer, buffer_u8);
+        for (var i = 0; i < player_count; i++) {
+            var pid        = buffer_read(receive_buffer, buffer_u16);
+            var helmet_id  = buffer_read(receive_buffer, buffer_u16);
+            var helmet_dur = buffer_read(receive_buffer, buffer_f16);
+            var armour_id  = buffer_read(receive_buffer, buffer_u16);
+            var armour_dur = buffer_read(receive_buffer, buffer_f16);
+            var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+
+            if (pid == my_pid) continue;
+
+            // ulož vše do player_states
+            var player_data = ds_map_find_value(player_states, pid);
+            if (is_undefined(player_data)) {
+                player_data = ds_map_create();
+                ds_map_add(player_states, pid, player_data);
+            }
+            ds_map_set(player_data, "helmet_id",  helmet_id);
+            ds_map_set(player_data, "helmet_dur", helmet_dur);
+            ds_map_set(player_data, "armour_id",  armour_id);
+            ds_map_set(player_data, "armour_dur", armour_dur);
+            ds_map_set(player_data, "weapon_id",  weapon_id);
+
+            var p = find_instance_by_network_id(oPlayer, pid);
+            if (instance_exists(p)) {
+                with (p) {
+                    network_helmet_id  = helmet_id;
+                    network_helmet_dur = helmet_dur;
+                    network_armour_id  = armour_id;
+                    network_armour_dur = armour_dur;
+                    network_weapon_id  = weapon_id;
+                }
+            }
+        }
+    }
+}
+
+
+/// @function send_request_init()
+/// @desc Klient požádá server o inicializační synchronizaci objektů
+function send_request_init() {
+    with (oNetworkManager) {
+
+        if (!is_connected || client_socket < 0) return;
+
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.REQUEST_INIT);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+
+        network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
 
 function handle_hit_client() {
 	with (oNetworkManager) {
@@ -77,7 +170,7 @@ function handle_hit_client() {
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
 
-		var victim = find_player_by_network_id(victim_pid);
+		var victim = find_instance_by_network_id(oPlayer, victim_pid);
 		if (instance_exists(victim)) {
 			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
 		}
@@ -93,27 +186,24 @@ function handle_connect_accept() {
     }
 }
 
-function handle_player_state_update_client() {
+function handle_tick_update_client() {
     with (oNetworkManager) {
         var player_count = buffer_read(receive_buffer, buffer_u8);
         
         for (var i = 0; i < player_count; i++) {
             var pid = buffer_read(receive_buffer, buffer_u16);
-            var x_pos = buffer_read(receive_buffer, buffer_f32);
-            var y_pos = buffer_read(receive_buffer, buffer_f32);
+            var x_pos = buffer_read(receive_buffer, buffer_f16);
+            var y_pos = buffer_read(receive_buffer, buffer_f16);
             var direction_facing = buffer_read(receive_buffer, buffer_f16);
 			var bit_states = buffer_read(receive_buffer, buffer_u8);
 			var hp = buffer_read(receive_buffer, buffer_f16);
 			
             
             // Přeskoč lokálního hráče
-            if (pid == my_pid) {
-                continue;
-            }
+            if (pid == my_pid) {continue;}
             
             // Update or create remote player
-            var player = find_player_by_network_id(pid);
-            
+            var player = find_instance_by_network_id(oPlayer, pid);   
             if (player == noone) {
                 player = create_remote_player(pid, x_pos, y_pos);
             }
@@ -130,6 +220,9 @@ function handle_player_state_update_client() {
                 }
             }
         }
+		oLightRenderer.tickCounter = buffer_read(receive_buffer, buffer_u8);
+		oLightRenderer.CurrentHour = buffer_read(receive_buffer, buffer_u8);
+		oLightRenderer.CurrentMinute = buffer_read(receive_buffer, buffer_u8);
     }
 }
 
@@ -145,9 +238,7 @@ function handle_equipment_update_client() {
             var armour_dur = buffer_read(receive_buffer, buffer_f16);
             
             // Skip local player (we already have our own equipment)
-            if (pid == my_pid) {
-                continue;
-            }
+            if (pid == my_pid) {continue;}
             
             // Store in player_states
             var player_data = ds_map_find_value(player_states, pid);
@@ -162,7 +253,7 @@ function handle_equipment_update_client() {
             ds_map_set(player_data, "armour_dur", armour_dur);
             
             // Update remote player object
-            var player = find_player_by_network_id(pid);
+            var player = find_instance_by_network_id(oPlayer, pid);
             if (instance_exists(player)) {
                 with (player) {
                     network_helmet_id = helmet_id;
@@ -183,22 +274,19 @@ function handle_weapon_update_client() {
             var pid = buffer_read(receive_buffer, buffer_u16);
             var weapon_id  = buffer_read(receive_buffer, buffer_u16);
             
-            // Skip local player (we already have our own equipment)
-            if (pid == my_pid) {
-                continue;
-            }
+            // Přeskoč local player (víme weapon)
+            if (pid == my_pid) {continue;}
             
-            // Store in player_states
+			//Uložíme weapon_id na serveru pro PID hráče
             var player_data = ds_map_find_value(player_states, pid);
             if (is_undefined(player_data)) {
                 player_data = ds_map_create();
                 ds_map_add(player_states, pid, player_data);
             }
-            
             ds_map_set(player_data, "weapon_id", weapon_id);
             
-            // Update remote player object
-            var player = find_player_by_network_id(pid);
+            // Update remote player
+            var player = find_instance_by_network_id(oPlayer, pid);
             if (instance_exists(player)) {
                 with (player) {
                     network_weapon_id = weapon_id;
@@ -212,7 +300,7 @@ function send_equipment_update_client() {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
         
-        var player = find_player_by_network_id(my_pid);
+        var player = find_instance_by_network_id(oPlayer, my_pid);
         if (!instance_exists(player)) return;
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -234,7 +322,7 @@ function send_weapon_update_client() {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
         
-        var player = find_player_by_network_id(my_pid);
+        var player = find_instance_by_network_id(oPlayer, my_pid);
         if (!instance_exists(player)) return;
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -249,20 +337,20 @@ function send_weapon_update_client() {
     }
 }
 
-function send_player_state_update_client() {
+function send_tick_update_client() {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
         
-        var player = find_player_by_network_id(my_pid);
+        var player = find_instance_by_network_id(oPlayer, my_pid);
         if (!instance_exists(player)) return;
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
-        buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_UPDATE);
+        buffer_write(send_buffer, buffer_u8, PACKET.TICK_UPDATE);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         
         with (player) {
-            buffer_write(other.send_buffer, buffer_f32, x);
-            buffer_write(other.send_buffer, buffer_f32, y);
+            buffer_write(other.send_buffer, buffer_f16, x);
+            buffer_write(other.send_buffer, buffer_f16, y);
             buffer_write(other.send_buffer, buffer_f16, RotationAngle);
 			
 			var bit_states = 0;
@@ -277,6 +365,12 @@ function send_player_state_update_client() {
         
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
     }
+}
+
+function handle_weather_update_client(){
+    with (oNetworkManager) {
+        global.Weather = buffer_read(receive_buffer, buffer_u8);
+	}
 }
 
 function send_heartbeat() {
@@ -357,7 +451,7 @@ function handle_hit_packet_client() {
             return;
         }
 
-        var player = find_player_by_network_id(my_pid);
+        var player = find_instance_by_network_id(oPlayer, my_pid);
         if (instance_exists(player)) {
 			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
         }

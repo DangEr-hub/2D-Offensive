@@ -3,6 +3,13 @@ function bit_state_has(st, flag){
 	return (st & flag) != 0; 
 }
 
+function compute_item_network_id() {
+    static next_id = 0; //Nezmění se při dalším volání zpátky na nulu
+    next_id = (next_id + 1) & 0x01FF; // 0..511, max 512 itemů
+    return next_id;
+}
+
+
 function hit_remote_object(damage, object, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur){
 	
 	var blood_color = c_red;
@@ -33,11 +40,11 @@ function write_debug(text, file_name = "debug_log.txt"){
 
 function equip_network_propagate(){
 	/* oPlayer local function */
-	if (is_local && instance_exists(oNetworkManager)) {
-		oNetworkManager.equipment_changed = true;
+	if (is_local && IS_NET) {
+		oNetworkManager.equipment_sync = true;
 
 		// pokud je to server hráč (pid 0), musí aktualizovat player_states
-		if (oNetworkManager.is_server) {
+		if (IS_SERVER) {
 			var data = ds_map_find_value(oNetworkManager.player_states, network_id);
 			if (is_undefined(data)) {
 				data = ds_map_create();
@@ -54,11 +61,11 @@ function equip_network_propagate(){
 
 function weapon_network_propagate(){
 	/* oPlayer local function */
-	if (is_local && instance_exists(oNetworkManager)) {
-		oNetworkManager.weapon_changed = true;
+	if (is_local && IS_NET) {
+		oNetworkManager.weapon_sync = true;
 
 		// pokud je to server hráč (pid 0), musí aktualizovat player_states
-		if (oNetworkManager.is_server) {
+		if (IS_SERVER) {
 			var data = ds_map_find_value(oNetworkManager.player_states, network_id);
 			if (is_undefined(data)) {
 				data = ds_map_create();
@@ -121,83 +128,154 @@ function create_remote_player(pid, x_pos, y_pos) {
     player.is_remote = true;
     player.target_x = x_pos;
     player.target_y = y_pos;
-    
-    //write_debug("Created remote player with ID: " + string(pid), "server_debug.txt");
+	
+    var h_id = 0, h_dur = 0, a_id = 0, a_dur = 0, w_id = 0;
+    with (oNetworkManager) {
+        var pdata = ds_map_find_value(player_states, pid);
+        if (!is_undefined(pdata)) {
+            other.h_id  = ds_map_find_value(pdata, "helmet_id");
+            other.h_dur = ds_map_find_value(pdata, "helmet_dur");
+            other.a_id  = ds_map_find_value(pdata, "armour_id");
+            other.a_dur = ds_map_find_value(pdata, "armour_dur");
+            other.w_id  = ds_map_find_value(pdata, "weapon_id");
+        }
+    }
+	write_debug(h_id);
+    with (player) {
+        network_helmet_id  = h_id;
+        network_helmet_dur = h_dur;
+        network_armour_id  = a_id;
+        network_armour_dur = a_dur;
+        network_weapon_id  = w_id;
+    }
+
     return player;
 }
 
-/// @function find_player_by_network_id(pid)
-function find_player_by_network_id(pid) {
-    with (oPlayer) {
-        if (network_id == pid) {
-            return id;
-        }
-    }
-    return noone;
+
+function find_instance_by_network_id(object, net_id) {
+	with (object) {
+	    if (network_id == net_id) {
+	            return id;
+	    }
+	}
+	return noone;
 }
 
-/// @function sync_object_create(object, x_pos, y_pos, layer_name)
-/// Synchronizes object creation across network
-function sync_object_create(object, x_pos, y_pos, layer_name) {
+function sync_object_create(object_ind, x_pos, y_pos, net_id) {
     with (oNetworkManager) {
-        if (!is_server && !is_connected) return noone;
+        if (!is_server) return noone;
         
-        var obj_id = irandom(65535);
+        var obj_id = net_id;
+        if (is_undefined(obj_id)) {
+            obj_id = compute_item_network_id();
+        }
+        
+        var inst = instance_create_layer(x_pos, y_pos, "ItemsO", object_ind);
+        inst.network_id = obj_id;
+        
+        var data = ds_map_create();
+        ds_map_set(data, "object_index", object_ind);
+        ds_map_set(data, "x", x_pos);
+        ds_map_set(data, "y", y_pos);
+        ds_map_set(data, "image_index", inst.image_index);
+        ds_map_set(item_registry, obj_id, data);
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_SYNC);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u8, 0); // 0 = create
-        buffer_write(send_buffer, buffer_u16, obj_id);
-        buffer_write(send_buffer, buffer_u16, object);
-        buffer_write(send_buffer, buffer_f32, x_pos);
-        buffer_write(send_buffer, buffer_f32, y_pos);
+        buffer_write(send_buffer, buffer_u8, 0);       // create
+        buffer_write(send_buffer, buffer_u16, obj_id); // net_id
+        buffer_write(send_buffer, buffer_u16, object_ind); // object_index
+        buffer_write(send_buffer, buffer_f16, x_pos);
+        buffer_write(send_buffer, buffer_f16, y_pos);
+        buffer_write(send_buffer, buffer_u8,  inst.image_index);
         
-        if (is_server) {
-            var socket_key = ds_map_find_first(clients);
-            for (var i = 0; i < ds_map_size(clients); i++) {
-                sent_server_udp(server_socket, socket_key, send_buffer)
-                socket_key = ds_map_find_next(clients, socket_key);
-            }
-        } else {
-            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer))
+        var socket_key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, socket_key, send_buffer);
+            socket_key = ds_map_find_next(clients, socket_key);
         }
-        
-        // Create locally
-        var inst = instance_create_layer(x_pos, y_pos, layer_name, object);
-        inst.network_id = obj_id;
         
         return inst;
     }
 }
 
+
 /// @function sync_object_destroy(inst_id)
-/// Synchronizes object destruction across network
 function sync_object_destroy(inst_id) {
     with (oNetworkManager) {
-        if (!is_server && !is_connected) return;
-        
+        if (!is_server) return;
         if (!instance_exists(inst_id)) return;
+        if (is_undefined(inst_id.network_id)) {
+            instance_destroy(inst_id);
+            return;
+        }
         
         var net_id = inst_id.network_id;
+		var obj_ind = inst_id.object_index;
+        
+        if (ds_map_exists(item_registry, net_id)) {
+            var data = ds_map_find_value(item_registry, net_id);
+            ds_map_destroy(data);
+            ds_map_delete(item_registry, net_id);
+        }
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_SYNC);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u8, 1); // 1 = destroy
-        buffer_write(send_buffer, buffer_u16, net_id);
+        buffer_write(send_buffer, buffer_u8, 1);       // destroy
+        buffer_write(send_buffer, buffer_u16, net_id); // id itemu
+		buffer_write(send_buffer, buffer_u16, obj_ind);
         
-        if (is_server) {
-            var socket_key = ds_map_find_first(clients);
-            for (var i = 0; i < ds_map_size(clients); i++) {
-                sent_server_udp(server_socket, socket_key, send_buffer)
-                socket_key = ds_map_find_next(clients, socket_key);
-            }
-        } else {
-            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+        var socket_key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, socket_key, send_buffer);
+            socket_key = ds_map_find_next(clients, socket_key);
         }
         
         instance_destroy(inst_id);
+    }
+}
+
+/// @function destroy_pickup_instance(inst_id)
+/// Routes pickup destruction through the networking layer when available
+function destroy_pickup_instance(inst_id) {
+    if (!instance_exists(inst_id)) return;
+
+    if (inst_id.object_index == oItems && IS_NET) {
+        request_item_pickup(inst_id);
+    } else {
+		instance_destroy(inst_id);
+    }
+}
+
+/// @function request_item_pickup(inst_id)
+/// Sends a destroy request for an item pickup, or destroys immediately when hosting
+function request_item_pickup(inst_id) {
+    if (!instance_exists(inst_id)) return;
+
+    with (oNetworkManager) {
+        if (!is_connected) {
+            instance_destroy(inst_id);
+            return;
+        }
+
+        if (is_server) {
+            sync_object_destroy(inst_id);
+        } else {
+            var net_id = inst_id.network_id;
+			var obj_ind = inst_id.object_index;
+
+            buffer_seek(send_buffer, buffer_seek_start, 0);
+            buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_SYNC);
+            buffer_write(send_buffer, buffer_u32, send_sequence++);
+            buffer_write(send_buffer, buffer_u8, 1); // destroy request
+            buffer_write(send_buffer, buffer_u16, net_id);
+			buffer_write(send_buffer, buffer_u16, obj_ind);
+
+            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+        }
     }
 }
 
