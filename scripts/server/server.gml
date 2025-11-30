@@ -61,10 +61,6 @@ function handle_connect_request(sender_ip, sender_port) {
         var client_key = sender_ip + ":" + string(sender_port);
         ds_map_add(clients, client_key, pid);
         ds_map_add(client_timeout, client_key, current_time);
-		
-		///Broadcast v step eventu oNetworkManagera pro rozeslání všech equipmentů a zbraní
-		//equipment_sync = true;
-		//weapon_sync = true;
 
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.CONNECT_ACCEPT);
@@ -113,9 +109,33 @@ function handle_tick_update_server(socket_id) {
 				stats.Health_points = hp;
             }
         }
-    }
-	
+    }	
 }
+
+function send_object_pos_sync_broadcast() {
+    with (oNetworkManager) {
+        var count = ds_list_size(item_pos_buffer);        
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_POS_SYNC);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        buffer_write(send_buffer, buffer_u16, count);
+
+        for (var i = 0; i < count; i++) {
+            var inst = item_pos_buffer[| i];
+
+            buffer_write(send_buffer, buffer_u16, inst.network_id);
+            buffer_write(send_buffer, buffer_f16, inst.x);
+            buffer_write(send_buffer, buffer_f16, inst.y);
+        }
+
+        var key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, key, send_buffer);
+            key = ds_map_find_next(clients, key);
+        }
+    }
+}
+
 
 function handle_weather_update_server(socket_id) {
 	/* DO BUDOUCNA - POKUD BUDE MÍT KLIENT SV_CHEATS=1, BUDE MOCT MĚNIT POČASÍ */
@@ -391,13 +411,13 @@ function send_equipment_broadcast() {
     }
 }
 
-function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur) {
+function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_id) {
     with (oNetworkManager) {
         if (!is_server) return;
 
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (instance_exists(victim_obj)) {	
-			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur);
+			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, net_id);
         }
 
         if (victim_pid == my_pid) {
@@ -418,6 +438,7 @@ function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impac
 		buffer_write(send_buffer, buffer_f16, aimpunch_modifier);
 		buffer_write(send_buffer, buffer_f16, equip_dur[0]);
 		buffer_write(send_buffer, buffer_f16, equip_dur[1]);
+		buffer_write(send_buffer, buffer_u16, net_id);
 
         var k = ds_map_find_first(clients);
         var n = ds_map_size(clients);
@@ -442,13 +463,14 @@ function handle_hit_server(socket_key) {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
+		var net_id = buffer_read(receive_buffer, buffer_u16);
 
         var attacker_pid = ds_map_find_value(clients, socket_key);
         if (attacker_pid < 0) {
             attacker_pid = attacker_pid_claim;
         }
 
-        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
+        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], net_id);
     }
 }
 	
@@ -498,6 +520,10 @@ function handle_object_sync_server(socket_id) {
 
 function handle_init_sync_server(socket_id) {
     with (oNetworkManager) {
+		///Broadcast v step eventu oNetworkManagera pro rozeslání všech equipmentů a zbraní
+		equipment_sync = true;
+		weapon_sync = true;
+		
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.INIT);
         buffer_write(send_buffer, buffer_u32, send_sequence++);

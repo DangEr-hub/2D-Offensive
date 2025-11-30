@@ -35,20 +35,20 @@ if (is_remote) {
 	}
 
 	if(Reloading == true){
+		ReloadTime ++;
 		if(ReloadTime >= global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed] - 1){
 			if(wpn_id != Item.Javelin){
 				particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
 				random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ItemStat.AmmoSpriteID], x, y);		
 			}
 		}
-		ReloadTime ++;
 	}else{
 		ReloadTime = 0;
 	}
 
-    x = lerp(x, target_x, interpolation_speed);
-    y = lerp(y, target_y, interpolation_speed);
-    RotationAngle = lerp(RotationAngle, target_direction, interpolation_speed);
+    x = lerp(x, target_x, INTERPOLATION_SPD);
+    y = lerp(y, target_y, INTERPOLATION_SPD);
+    RotationAngle = lerp(RotationAngle, target_direction, INTERPOLATION_SPD);
 	Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 	KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 	Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
@@ -1000,7 +1000,6 @@ if (instance_exists(oDraw)){
 						}
 						ShootTimer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);
 						player_shooting();		
-						play_sound(x, y, sound_id);
 						Weapon.KickBackEffect = global.ItemIndex[#wpn_id, ItemStat.KickBackPower];
 						KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 						KickBack ++;
@@ -1057,7 +1056,6 @@ if (instance_exists(oDraw)){
 										}
 										ShootTimer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
 										player_shooting();
-										play_sound(x, y, sound_id);
 										Weapon.KickBackEffect = global.ItemIndex[#wpn_id, ItemStat.KickBackPower];
 										KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 										KickBack ++;

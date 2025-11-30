@@ -1,86 +1,3 @@
-function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item, hit_object, is_player) {
-
-    // DAMAGE TO BODY
-    if (BodyPart != HitBox.Head && BodyPart != HitBox.HeadProne) {
-
-        if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
-        || BodyPart == HitBox.ArmWithAssaultRifle 
-        || BodyPart == HitBox.ArmWithoutWeapon 
-        || BodyPart == HitBox.ArmWithPistol 
-        || BodyPart == HitBox.LegProne) {
-
-            if !audio_is_playing(snd_BulletHit) {
-                play_sound(impact_x, impact_y, snd_BulletHit, attacking_item.stats.Object);
-            }
-
-        } else {
-
-            var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
-
-            if (is_player) {
-                if (hit_object.is_local) {
-                    global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], dmg_loss, 0);
-                } else {
-                    hit_object.network_armour_dur = max(hit_object.network_armour_dur - dmg_loss, 0);
-                }
-            } else {
-                hit_object.ArmourDurability[0] -= max(hit_object.ArmourDurability[0] - dmg_loss, 0);
-            }
-
-            for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
-                var randomDirection = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
-                part_type_color1(oParticleSystem.headshot_particle, c_gray);
-                part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
-                part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
-                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
-                part_type_color1(oParticleSystem.headshot_particle, c_white);
-            }
-
-            var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
-
-            if !audio_is_playing(sound_effect) {
-                play_sound(impact_x, impact_y, sound_effect, attacking_item.stats.Object);
-            }
-        }
-
-    } else {
-
-        if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
-
-            var sound_effect2 = choose(snd_HeadShot1, snd_HeadShot2);
-            if !audio_is_playing(sound_effect2) {
-                play_sound(impact_x, impact_y, sound_effect2, attacking_item.stats.Object);
-            }
-
-        } else {
-
-            var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense];
-
-            if (is_player) {
-                if (hit_object.is_local) {
-                    global.Inventory[# OtherSlot.Helmet, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability], dmg_loss2, 0);
-                } else {
-                    hit_object.network_helmet_dur = max(hit_object.network_helmet_dur - dmg_loss2, 0);
-                }
-            } else {
-                hit_object.ArmourDurability[1] -= max(hit_object.ArmourDurability[1] - dmg_loss2, 0);
-            }
-
-            for (var j = 0; j < ceil(max(hit_object.attack_damage / 5, 10)); j++) {
-                var randomDirection2 = random_range(attacking_item.stats.Object.RotationAngle - 180 - 90, attacking_item.stats.Object.RotationAngle - 180 + 90);
-                part_type_direction(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0);
-                part_type_orientation(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0, false);
-                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
-            }
-
-            if !audio_is_playing(snd_HeadShotHelmet) {
-                play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_item.stats.Object);
-            }
-        }
-    }
-}
-
-
 function array_min(arr) {
     var min_value = arr[0];
     for (var i = 1; i < array_length(arr); i++) {
@@ -204,6 +121,16 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		LightObject.castShadows = false;
 		move_towards_point(shot_pos[0], shot_pos[1], item_dir_spd_dist[2]);	
 	}
+	
+	var sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
+	var instance_emitter = bullet_tracer.stats.Object;
+	if(IS_NET){
+		instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
+		if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
+			instance_emitter = global.local_player;
+		}
+	}
+	play_sound(pos[0], pos[1], sound_id, instance_emitter);
 	
 	return bullet_tracer;
 	

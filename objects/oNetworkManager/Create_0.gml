@@ -6,15 +6,15 @@ enum PLAYER_FLAGS {
 	FLASHED = 8
 }
 
-
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
-network_type = network_socket_udp; // UDP for real-time gameplay
+network_type = network_socket_udp; // transportní protokol UDP
 server_port = 50000;
-server_ip = "127.0.0.1"; // Default to localhost
+server_ip = "127.0.0.1"; // zatím localhost
 max_clients = 4;
 
 // Network state
+
 is_server = false;
 is_connected = false;
 server_socket = -1;
@@ -30,11 +30,13 @@ timeout_threshold = 5000; // 5 seconds without heartbeat = disconnect
 send_buffer = buffer_create(1024, buffer_grow, 1);
 receive_buffer = buffer_create(1024, buffer_grow, 1);
 
-// Player data tracking
+// tracking
 player_states = ds_map_create();
 projectiles_seen = ds_map_create(); // key = proj_id, val = true
 player_stats = ds_map_create();
 item_registry = ds_map_create();
+item_pos_buffer = ds_list_create();
+
 
 // Packet types
 enum PACKET {
@@ -50,7 +52,8 @@ enum PACKET {
 	WEAPON_SYNC,
 	INIT,
 	REQUEST_INIT,
-	WEATHER_SYNC
+	WEATHER_SYNC,
+	OBJECT_POS_SYNC
 }
 
 equipment_sync = false;

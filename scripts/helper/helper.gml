@@ -10,15 +10,17 @@ function compute_item_network_id() {
 }
 
 
-function hit_remote_object(damage, object, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur){
+function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_id){
 	
 	var blood_color = c_red;
-	if(hitbox_type <= HitBox.HeadProne){
+	if(BodyPart <= HitBox.HeadProne){
 		blood_color = c_maroon;
 	}
 	
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, icons.health);
-	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));		
+	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
+	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
+	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, net_id), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
 	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
 	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
@@ -128,26 +130,6 @@ function create_remote_player(pid, x_pos, y_pos) {
     player.is_remote = true;
     player.target_x = x_pos;
     player.target_y = y_pos;
-	
-    var h_id = 0, h_dur = 0, a_id = 0, a_dur = 0, w_id = 0;
-    with (oNetworkManager) {
-        var pdata = ds_map_find_value(player_states, pid);
-        if (!is_undefined(pdata)) {
-            other.h_id  = ds_map_find_value(pdata, "helmet_id");
-            other.h_dur = ds_map_find_value(pdata, "helmet_dur");
-            other.a_id  = ds_map_find_value(pdata, "armour_id");
-            other.a_dur = ds_map_find_value(pdata, "armour_dur");
-            other.w_id  = ds_map_find_value(pdata, "weapon_id");
-        }
-    }
-	write_debug(h_id);
-    with (player) {
-        network_helmet_id  = h_id;
-        network_helmet_dur = h_dur;
-        network_armour_id  = a_id;
-        network_armour_dur = a_dur;
-        network_weapon_id  = w_id;
-    }
 
     return player;
 }

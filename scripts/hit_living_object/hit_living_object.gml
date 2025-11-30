@@ -39,7 +39,7 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
 
     with (oNetworkManager) {
         if (is_server) {
-                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1]]);
+                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1]], attacker_pid);
         } else if (is_connected) {
                 buffer_seek(send_buffer, buffer_seek_start, 0);
                 buffer_write(send_buffer, buffer_u8, PACKET.HIT);
@@ -54,6 +54,7 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
 				buffer_write(send_buffer, buffer_f16, hit_object.AimPunchMultiplier);
 				buffer_write(send_buffer, buffer_f16, equip_dur[0]); ///Armour dur
 				buffer_write(send_buffer, buffer_f16, equip_dur[1]); ///Helmet dur
+				buffer_write(send_buffer, buffer_u16, attacker_pid);
 
                 network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }
@@ -322,7 +323,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 
 		
 		
-		hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item, hit_object, is_player);
+		hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_item.stats.Object, hit_object, is_player);
 		
         if (IS_NET) {
             send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [hit_object.network_armour_dur, hit_object.network_helmet_dur]);
@@ -339,4 +340,83 @@ function apply_stealth_damage(hit_object){
 	}else{
 		return false;	
 	}
+}
+
+function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_object, hit_object, is_player) { 
+
+    // DAMAGE TO BODY
+    if (BodyPart != HitBox.Head && BodyPart != HitBox.HeadProne) {
+
+        if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
+        || BodyPart == HitBox.LegProne) {
+
+            if !audio_is_playing(snd_BulletHit) {
+                play_sound(impact_x, impact_y, snd_BulletHit, attacking_object);
+            }
+
+        } else {
+
+            var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
+
+            if (is_player) {
+                if (hit_object.is_local) {
+                    global.Inventory[# OtherSlot.Armour, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Armour, Index.slot_durability], dmg_loss, 0);
+                } else {
+                    hit_object.network_armour_dur = max(hit_object.network_armour_dur - dmg_loss, 0);
+                }
+            } else {
+                hit_object.ArmourDurability[0] -= max(hit_object.ArmourDurability[0] - dmg_loss, 0);
+            }
+
+            for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
+                var randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
+                part_type_color1(oParticleSystem.headshot_particle, c_gray);
+                part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
+                part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
+                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
+                part_type_color1(oParticleSystem.headshot_particle, c_white);
+            }
+
+            var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
+
+            if !audio_is_playing(sound_effect) {
+                play_sound(impact_x, impact_y, sound_effect, attacking_object);
+            }
+        }
+
+    } else {
+
+        if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
+
+            var sound_effect2 = choose(snd_HeadShot1, snd_HeadShot2);
+            if !audio_is_playing(sound_effect2) {
+                play_sound(impact_x, impact_y, sound_effect2, attacking_object);
+            }
+
+        } else {
+
+            var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense];
+
+            if (is_player) {
+                if (hit_object.is_local) {
+                    global.Inventory[# OtherSlot.Helmet, Index.slot_durability] -= max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability], dmg_loss2, 0);
+                } else {
+                    hit_object.network_helmet_dur = max(hit_object.network_helmet_dur - dmg_loss2, 0);
+                }
+            } else {
+                hit_object.ArmourDurability[1] -= max(hit_object.ArmourDurability[1] - dmg_loss2, 0);
+            }
+
+            for (var j = 0; j < ceil(max(hit_object.attack_damage / 5, 10)); j++) {
+                var randomDirection2 = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
+                part_type_direction(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0);
+                part_type_orientation(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0, false);
+                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
+            }
+
+            if !audio_is_playing(snd_HeadShotHelmet) {
+                play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_object);
+            }
+        }
+    }
 }

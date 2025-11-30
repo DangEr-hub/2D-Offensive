@@ -27,15 +27,31 @@ if (is_server) {
         }
         send_tick_broadcast();
 		
+		/// Player equipments update
 		if(equipment_sync){
 			send_equipment_broadcast();	
 			equipment_sync = false;
 		}
 		
+		/// Player weapons update
 		if(weapon_sync){
 			send_weapon_broadcast();
 			weapon_sync = false;
 		}
+		
+		///// Item position update
+        ds_list_clear(item_pos_buffer);
+
+        with (oItems) {
+            if (needs_sync) {
+                ds_list_add(other.item_pos_buffer, id);
+                needs_sync = false;
+            }
+        }
+
+        if (ds_list_size(item_pos_buffer) > 0) {
+            send_object_pos_sync_broadcast();
+        }
 		
         accum_server = 0;
     }

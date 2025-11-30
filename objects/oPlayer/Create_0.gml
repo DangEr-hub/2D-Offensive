@@ -150,7 +150,6 @@ is_remote = false;
 target_x = x;
 target_y = y;
 target_direction = 0;
-interpolation_speed = 0.3;
 
 // Network state
 network_bit_state = 0;

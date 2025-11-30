@@ -1,4 +1,4 @@
-if(visible == true && other.is_remote == false){
+if(other.is_remote == false){
 	if(other.stats.Object != MainObject || other.stats.Tracer_image == 2){
 		var ObjectArmourID = global.Inventory[# OtherSlot.Armour, Index.slot_id];
 		var ObjectHelmetID = global.Inventory[# OtherSlot.Helmet, Index.slot_id];

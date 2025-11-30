@@ -10,6 +10,9 @@ if (ds_exists(item_registry, ds_type_map)) {
     ds_map_destroy(item_registry);
 }
 
+ds_list_destroy(item_pos_buffer);
+
+
 if (IS_SERVER) {
     // Server shutdown
     if (server_socket >= 0) {

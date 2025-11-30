@@ -49,6 +49,31 @@ function handle_client_receive() {
 			case PACKET.INIT: handle_init_sync_client(); break;
 			
 			case PACKET.WEATHER_SYNC: handle_weather_update_client(); break;
+			
+			case PACKET.OBJECT_POS_SYNC: handle_object_pos_sync_client(); break;
+        }
+    }
+}
+
+function handle_object_pos_sync_client() {
+    with (oNetworkManager) {
+        var count = buffer_read(receive_buffer, buffer_u16);
+
+        for (var i = 0; i < count; i++) {
+            var net_id = buffer_read(receive_buffer, buffer_u16);
+            var x_pos  = buffer_read(receive_buffer, buffer_f16);
+            var y_pos  = buffer_read(receive_buffer, buffer_f16);
+
+            var inst = find_instance_by_network_id(oItems, net_id);
+
+            if (instance_exists(inst)) {
+                with (inst) {
+                    target_x = x_pos;
+                    target_y = y_pos;
+				   //x = x_pos;
+				  //y = y_pos;
+                }
+            }
         }
     }
 }
@@ -169,10 +194,11 @@ function handle_hit_client() {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
+		var net_id = buffer_read(receive_buffer, buffer_u16);
 
 		var victim = find_instance_by_network_id(oPlayer, victim_pid);
 		if (instance_exists(victim)) {
-			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
+			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], net_id);
 		}
 	}
 }
@@ -429,6 +455,7 @@ function handle_player_disconnect_client() {
         // Remove player object
         with (oPlayer) {
             if (network_id == pid) {
+				instance_destroy(Weapon);
                 instance_destroy();
             }
         }
