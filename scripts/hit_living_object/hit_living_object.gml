@@ -273,10 +273,10 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		        }
 		    }
 
-		    var death_sound_effect = choose(snd_Death1, snd_Death2);
-		    if !audio_is_playing(death_sound_effect) {
-		        play_sound(impact_x, impact_y, death_sound_effect, attacking_item.stats.Object);
-		    }
+		    //var death_sound_effect = choose(snd_Death1, snd_Death2);
+		   // if !audio_is_playing(death_sound_effect) {
+		    //    play_sound(impact_x, impact_y, death_sound_effect, attacking_item.stats.Object);
+		   // }
 		    hit_object.KilledByName = attacking_item.stats.Owner_name;
 		    hit_object.KilledByWeapon = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.Name];
 			hit_object.stats.Health_points = -1;

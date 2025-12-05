@@ -1,6 +1,6 @@
 event_inherited();
 //draw_text(x, y - 70, network_id);
-//draw_text(x, y + 100, "ammo" + string(global.local_player));
+//draw_text(x, y + 100, "should_handle_death" + string(should_handle_death));
 
 //draw_text(x, y + 50, "FlashX" + string(FlashLightX));
 if(stats.Health_points > 0){

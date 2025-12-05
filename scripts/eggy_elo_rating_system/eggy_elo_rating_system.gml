@@ -399,14 +399,18 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 }
 
 function round_end(round_result){
-	save_game();
-	oRatingController.round_ended = true;
-	if(global.ranked_game == true){
-		if(round_result == "Win"){
-			oRatingController.player_win = true;
+	if(!IS_NET){
+		save_game();
+		oRatingController.round_ended = true;
+		if(global.ranked_game == true){
+			if(round_result == "Win"){
+				oRatingController.player_win = true;
+			}else{
+				global.player_stats_struct.Deaths ++;
+				oRatingController.player_win = false;
+			}
 		}else{
-			global.player_stats_struct.Deaths ++;
-			oRatingController.player_win = false;
+			oDraw.RespawnMenu = true;
 		}
 	}else{
 		oDraw.RespawnMenu = true;

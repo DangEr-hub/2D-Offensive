@@ -795,7 +795,7 @@ function unpause(ObjectType){
 		PopupWindow = "";
 		Alpha = 0;
 		BackGround = -1;
-		if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
+		if(sprite_exists(BackGround) && BackGround > -1){sprite_delete(BackGround);}
 		instance_activate_all();
 	}
 }

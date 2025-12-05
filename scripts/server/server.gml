@@ -47,6 +47,8 @@ function handle_server_receive(sender_ip, sender_port) {
 			case PACKET.WEAPON_SYNC: handle_weapon_update_server(key); break;
 			
 			case PACKET.REQUEST_INIT: handle_init_sync_server(key); break;
+			
+			case PACKET.PLAYER_DEATH: handle_player_death_server(key); break;
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
         }
@@ -411,6 +413,22 @@ function send_equipment_broadcast() {
     }
 }
 
+function player_death_broadcast(attacker_pid, victim_pid) {
+    with (oNetworkManager) {
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_DEATH);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        buffer_write(send_buffer, buffer_u16, attacker_pid);
+        buffer_write(send_buffer, buffer_u16, victim_pid);
+
+        var socket_key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, socket_key, send_buffer);
+            socket_key = ds_map_find_next(clients, socket_key);
+        }
+    }
+}
+
 function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_id) {
     with (oNetworkManager) {
         if (!is_server) return;
@@ -418,6 +436,47 @@ function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impac
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (instance_exists(victim_obj)) {	
 			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, net_id);
+        }
+		
+		var player_data = ds_map_find_value(player_states, victim_pid);
+        if (is_undefined(player_data)) {
+            player_data = ds_map_create();
+            ds_map_add(player_states, victim_pid, player_data);
+        }
+
+        var current_hp = ds_map_find_value(player_data, "health");
+        if (is_undefined(current_hp)) {
+            current_hp = global.player_stats_struct.Max_health;
+        }
+
+        var new_hp = max(0, current_hp - damage);
+        ds_map_set(player_data, "health", new_hp);
+
+        if (instance_exists(victim_obj)) {
+            with (victim_obj) {
+                stats.Health_points = new_hp;
+            }
+        }
+
+        if (current_hp > 0 && new_hp <= 0) {
+			
+			// Označ remote obět za mrtvou
+		    with (victim_obj) {
+		        stats.Health_points = 0;
+		        death_from_server = true;
+		    }
+	
+			// Broadcastni všem klientům, že nějaký hráč s victim_pid zemřel
+            player_death_broadcast(attacker_pid, victim_pid);
+			
+			// Umřel host hráč?
+		    if (victim_pid == my_pid && instance_exists(victim_obj)) {
+		        with (victim_obj) {
+		            stats.Health_points = 0;
+		            death_from_server = true;
+		            death_attacker_pid = attacker_pid;
+		        }
+		    }
         }
 
         if (victim_pid == my_pid) {

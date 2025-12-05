@@ -30,4 +30,4 @@ if surface_exists(bloom_surface1) surface_free(bloom_surface1);
 if surface_exists(bloom_surface2) surface_free(bloom_surface2);
 
 
-if(sprite_exists(BackGround) && BackGround != -1){sprite_delete(BackGround);}
+if(sprite_exists(BackGround) && BackGround > -1){sprite_delete(BackGround);}

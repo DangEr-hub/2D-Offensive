@@ -53,11 +53,13 @@ rank_callbacks = [
 
 #region Callbacks
 
-popup_continue_callback_positive = function(){
-	with(objZUIMain){
-		zui_destroy();	
+popup_continue_callback_positive = function(){	
+	if(IS_NET){
+		with(objZUIMain){
+			zui_destroy();	
+		}
+		room_restart();	
 	}
-	room_restart();	
 };
 
 continue_callback = function(){
@@ -181,7 +183,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Continue";
+	caption = "Respawn";
 	callback = other.continue_callback;
 }
 

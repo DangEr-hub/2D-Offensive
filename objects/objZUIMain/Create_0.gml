@@ -1,4 +1,3 @@
-ui_scale_set_window_size(960, 540);
 with (objZUIMain) {
 	if (id != other.id) {
 		show_error("Do not create ZUIMain twice", true);

@@ -119,7 +119,7 @@ if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == 
 	
 	if(global.local_player.player_has_scope != 0 || (global.local_player.player_has_scope == 0 && global.local_player.ScopeIn == false)){
 		
-		#region Draw item switching inside of inventory
+		#region Draw item switching inside an inventory
 		if(instance_exists(oInventory)){
 			draw_set_font(set_font("Console"));
 			var CycleUpString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvUp])) + "] - Cycle up";

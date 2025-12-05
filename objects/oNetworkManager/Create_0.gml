@@ -53,7 +53,8 @@ enum PACKET {
 	INIT,
 	REQUEST_INIT,
 	WEATHER_SYNC,
-	OBJECT_POS_SYNC
+	OBJECT_POS_SYNC,
+	PLAYER_DEATH
 }
 
 equipment_sync = false;

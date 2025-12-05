@@ -151,6 +151,10 @@ target_x = x;
 target_y = y;
 target_direction = 0;
 
+death_from_server = false;
+death_processed = false;
+death_attacker_pid = -1;
+
 // Network state
 network_bit_state = 0;
 network_armour_id = Item.None;

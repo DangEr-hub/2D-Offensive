@@ -51,6 +51,24 @@ function handle_client_receive() {
 			case PACKET.WEATHER_SYNC: handle_weather_update_client(); break;
 			
 			case PACKET.OBJECT_POS_SYNC: handle_object_pos_sync_client(); break;
+			
+			case PACKET.PLAYER_DEATH: handle_player_death_client(); break;
+        }
+    }
+}
+
+function handle_player_death_client() {
+    with (oNetworkManager) {
+        var attacker_pid = buffer_read(receive_buffer, buffer_u16);
+        var victim_pid = buffer_read(receive_buffer, buffer_u16);
+
+        var victim = find_instance_by_network_id(oPlayer, victim_pid);
+        if (instance_exists(victim)) {
+            with (victim) {
+                stats.Health_points = 0;
+                death_from_server = true;
+                death_attacker_pid = attacker_pid;
+            }
         }
     }
 }
