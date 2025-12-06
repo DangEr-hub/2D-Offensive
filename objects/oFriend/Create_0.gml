@@ -89,7 +89,7 @@ ChasingDistance = min(768 * get_rank_boost(global.rating_struct.Enemy_ep[global.
 #region Legs
 FootStepTimer = -1;
 FootSteps = 0;
-Legs = instance_create_depth(x,y,depth + 1, oObjectLegs);
+Legs = instance_create_depth(x,y,depth + 2, oObjectLegs);
 Legs.Object = id;
 #endregion
 

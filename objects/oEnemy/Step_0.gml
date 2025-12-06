@@ -507,7 +507,7 @@ if(instance_exists(ChasingObject) && ChasingObject != noone){
 
 #region Spot a grenade and landmine
 NearestDangerX = -1;
-NearestDangerX = -1;
+NearestDangerY = -1;
 var nearestGrenade = noone;
 var nearestLandMine = noone;
 var distToGrenade = 10000, distToLandMine = 10000;
@@ -787,42 +787,45 @@ if(stats.Health_points <= 0){
 	instance_destroy(ArmHitBox);
 	instance_destroy(Legs);
 	drop_experience(1, xp_value, x, y, sqrt(power(sprite_width, 2) + power(sprite_height, 2))/4);
-	ItemDrop(
-		WeaponID[WeaponPositionID], 
-		x + lengthdir_x(WeaponDistance, RotationAngle), 
-		y + lengthdir_y(WeaponDistance, RotationAngle), 
-		10,
-		Ammo[WeaponPositionID],
-		ClipAmmo[WeaponPositionID],
-		0,
-		1,
-		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_scope],
-		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_barrel],
-		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_grip],
-		global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor]
-		
-	);
-	if(ArmourID != Item.None){
+	if(percent_chance(10)){
 		ItemDrop(
-			ArmourID, 
-			random_range(x - sprite_width/2, x + sprite_width/2), 
-			random_range(y - sprite_height/2, y + sprite_height/2), 
-			10, 
-			0, 
+			WeaponID[WeaponPositionID], 
+			x + lengthdir_x(WeaponDistance, RotationAngle), 
+			y + lengthdir_y(WeaponDistance, RotationAngle), 
+			Ammo[WeaponPositionID],
+			ClipAmmo[WeaponPositionID],
 			0,
-			ArmourDurability[0]
+			1,
+			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_scope],
+			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_barrel],
+			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_grip],
+			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor]
+		
 		);
 	}
+	if(ArmourID != Item.None){
+		if(percent_chance(10)){
+			ItemDrop(
+				ArmourID, 
+				random_range(x - sprite_width/2, x + sprite_width/2), 
+				random_range(y - sprite_height/2, y + sprite_height/2), 
+				0, 
+				0,
+				ArmourDurability[0]
+			);
+		}
+	}
 	if(HelmetID != Item.None){
-		ItemDrop(
-			HelmetID, 
-			random_range(x - sprite_width/2, x + sprite_width/2), 
-			random_range(y - sprite_height/2, y + sprite_height/2), 
-			10, 
-			0, 
-			0,
-			ArmourDurability[1]
-		);
+		if(percent_chance(10)){
+			ItemDrop(
+				HelmetID, 
+				random_range(x - sprite_width/2, x + sprite_width/2), 
+				random_range(y - sprite_height/2, y + sprite_height/2), 
+				0, 
+				0,
+				ArmourDurability[1]
+			);
+		}
 	}
 	var EnemyDead = instance_create_depth(x, y, depth, oEnemyDead);
 	EnemyDead.mask_index = spr_EnemyBasicDead;

@@ -9,8 +9,7 @@ function compute_item_network_id() {
     return next_id;
 }
 
-
-function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_id){
+function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_pid){
 	
 	var blood_color = c_red;
 	if(BodyPart <= HitBox.HeadProne){
@@ -20,7 +19,7 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, icons.health);
 	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
 	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
-	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, net_id), object, true); //true - serverově to je zatím vždy hráč
+	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, net_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
 	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
 	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
@@ -74,7 +73,7 @@ function weapon_network_propagate(){
 				ds_map_add(oNetworkManager.player_states, network_id, data);
 			}
 
-			ds_map_set(data, "weapon_id",  global.Inventory[# WeaponID, Index.slot_id]);
+			ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);
 		}
 	}
 }
@@ -161,8 +160,15 @@ function sync_object_create(object_ind, x_pos, y_pos, net_id) {
         ds_map_set(data, "x", x_pos);
         ds_map_set(data, "y", y_pos);
         ds_map_set(data, "image_index", inst.image_index);
+		ds_map_set(data, "scope", inst.scope_attachment);
+		ds_map_set(data, "barrel", inst.barrel_attachment);
+		ds_map_set(data, "grip", inst.grip_attachment);
+		ds_map_set(data, "suppressor", inst.suppressor_attachment);
+		ds_map_set(data, "clip_ammo", inst.ClipAmmo);
+		ds_map_set(data, "ammo", inst.Ammo);
+		ds_map_set(data, "durability", inst.Durability);
         ds_map_set(item_registry, obj_id, data);
-        
+				
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_SYNC);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
@@ -172,6 +178,13 @@ function sync_object_create(object_ind, x_pos, y_pos, net_id) {
         buffer_write(send_buffer, buffer_f16, x_pos);
         buffer_write(send_buffer, buffer_f16, y_pos);
         buffer_write(send_buffer, buffer_u8,  inst.image_index);
+        buffer_write(send_buffer, buffer_u8,  inst.scope_attachment);
+        buffer_write(send_buffer, buffer_u8,  inst.barrel_attachment);
+        buffer_write(send_buffer, buffer_u8,  inst.grip_attachment);
+        buffer_write(send_buffer, buffer_u8,  inst.suppressor_attachment);
+        buffer_write(send_buffer, buffer_u16,  inst.ClipAmmo);
+        buffer_write(send_buffer, buffer_u8,  inst.Ammo);
+        buffer_write(send_buffer, buffer_f16,  inst.Durability);
         
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -182,7 +195,6 @@ function sync_object_create(object_ind, x_pos, y_pos, net_id) {
         return inst;
     }
 }
-
 
 /// @function sync_object_destroy(inst_id)
 function sync_object_destroy(inst_id) {
@@ -259,5 +271,44 @@ function request_item_pickup(inst_id) {
             network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }
     }
+}
+
+function request_item_drop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClipAmmo = -1, ObjectDurability = -1,ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
+    // V singleplayeru rovnou dropni item
+    if (!IS_NET) {
+        ItemDrop(ID, PositionX, PositionY,
+            ObjectAmmo, ObjectClipAmmo, ObjectDurability,
+            ObjectAmount, OWSA, OWBA, OWGA, OWsuppressorA);
+        return;
+    }else{
+	    with (oNetworkManager) {
+	        if (is_server) {
+	            // Servere prostě to udělej rovnou
+	            ItemDrop(ID, PositionX, PositionY,
+	                ObjectAmmo, ObjectClipAmmo, ObjectDurability,
+	                ObjectAmount, OWSA, OWBA, OWGA, OWsuppressorA);
+	        } else {
+	            // Kliente pošli request o dropnutí itemu
+	            buffer_seek(send_buffer, buffer_seek_start, 0);
+	            buffer_write(send_buffer, buffer_u8,  PACKET.OBJECT_SYNC);
+	            buffer_write(send_buffer, buffer_u32, send_sequence++);
+	            buffer_write(send_buffer, buffer_u8,  0); // creatnutí itemu
+
+	            buffer_write(send_buffer, buffer_u8,  ID);
+	            buffer_write(send_buffer, buffer_f16, PositionX);
+	            buffer_write(send_buffer, buffer_f16, PositionY);
+	            buffer_write(send_buffer, buffer_u8,  ObjectAmount);
+	            buffer_write(send_buffer, buffer_u8,  OWSA);
+	            buffer_write(send_buffer, buffer_u8,  OWBA);
+	            buffer_write(send_buffer, buffer_u8,  OWGA);
+	            buffer_write(send_buffer, buffer_u8,  OWsuppressorA);
+	            buffer_write(send_buffer, buffer_u16, ObjectClipAmmo);
+	            buffer_write(send_buffer, buffer_u8,  ObjectAmmo);
+	            buffer_write(send_buffer, buffer_f16, ObjectDurability);
+
+	            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+	        }
+	    }
+	}
 }
 

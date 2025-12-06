@@ -48,15 +48,13 @@ function handle_server_receive(sender_ip, sender_port) {
 			
 			case PACKET.REQUEST_INIT: handle_init_sync_server(key); break;
 			
-			case PACKET.PLAYER_DEATH: handle_player_death_server(key); break;
+			case PACKET.PLAYER_RESPAWN: handle_player_respawn_server(key); break;
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
         }
     }
 }
 
-
-/// @function handle_connect_request(socket_id)
 function handle_connect_request(sender_ip, sender_port) {
     with (oNetworkManager) {
         var pid = ds_map_size(clients) + 1;
@@ -67,8 +65,86 @@ function handle_connect_request(sender_ip, sender_port) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.CONNECT_ACCEPT);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u16, pid);
+        buffer_write(send_buffer, buffer_u8, pid);
         network_send_udp(server_socket, sender_ip, sender_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
+function player_respawn_broadcast(player_pid, hp) {
+        with (oNetworkManager) {
+                buffer_seek(send_buffer, buffer_seek_start, 0);
+                buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_RESPAWN);
+                buffer_write(send_buffer, buffer_u32, send_sequence++);
+                buffer_write(send_buffer, buffer_u8, player_pid);
+				buffer_write(send_buffer, buffer_f16, hp);
+
+                var socket_key = ds_map_find_first(clients);
+                for (var i = 0; i < ds_map_size(clients); i++) {
+                        sent_server_udp(server_socket, socket_key, send_buffer);
+                        socket_key = ds_map_find_next(clients, socket_key);
+                }
+        }
+}
+
+function process_server_respawn(){
+	/* Host hráč má PID=0 */
+    with (oNetworkManager){
+        var player_data = ds_map_find_value(player_states, 0);
+        if (is_undefined(player_data)) {
+            player_data = ds_map_create();
+            ds_map_add(player_states, 0, player_data);
+        }
+
+        ds_map_set(player_data, "health", global.player_stats_struct.Max_health);
+
+        var p = find_instance_by_network_id(oPlayer, 0);		
+		oDraw.RespawnMenu = false;
+		with(objUIBlack){zui_destroy();}
+		with(objUIWindow){ zui_destroy();}
+        if (instance_exists(p)) {
+            with (p) {
+                stats.Health_points = global.player_stats_struct.Max_health;
+                death_from_server = false;
+                x = respawn_x;
+                y = respawn_y;
+                depth = 100;
+            }
+        }
+
+        player_respawn_broadcast(0, global.player_stats_struct.Max_health);
+    }
+}
+
+function handle_player_respawn_server(socket_key) {
+    with (oNetworkManager) {
+        if (!ds_map_exists(clients, socket_key)) return;
+
+        var pid_claim = buffer_read(receive_buffer, buffer_u8);
+        var pid = ds_map_find_value(clients, socket_key);
+        if (pid < 0) {
+			pid = pid_claim;
+        }
+
+        var player_data = ds_map_find_value(player_states, pid);
+        if (is_undefined(player_data)) {
+            player_data = ds_map_create();
+            ds_map_add(player_states, pid, player_data);
+        }
+
+        ds_map_set(player_data, "health", global.player_stats_struct.Max_health);
+
+        var player_obj = find_instance_by_network_id(oPlayer, pid);
+        if (instance_exists(player_obj)) {
+            with (player_obj) {
+                stats.Health_points = global.player_stats_struct.Max_health;
+                death_from_server = false;
+				x = respawn_x;
+				y = respawn_y;
+				depth = 100;
+            }
+        }
+
+        player_respawn_broadcast(pid, global.player_stats_struct.Max_health);
     }
 }
 
@@ -138,12 +214,10 @@ function send_object_pos_sync_broadcast() {
     }
 }
 
-
 function handle_weather_update_server(socket_id) {
 	/* DO BUDOUCNA - POKUD BUDE MÍT KLIENT SV_CHEATS=1, BUDE MOCT MĚNIT POČASÍ */
 }
 
-/// @function send_weather_broadcast()
 function send_weather_broadcast() {
     with (oNetworkManager) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -160,7 +234,6 @@ function send_weather_broadcast() {
     }
 }
 
-/// @function send_tick_broadcast()
 function send_tick_broadcast() {
     with (oNetworkManager) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -177,7 +250,7 @@ function send_tick_broadcast() {
             var pid = key;
             var player_data = ds_map_find_value(player_states, pid);
             
-            buffer_write(send_buffer, buffer_u16, pid);
+            buffer_write(send_buffer, buffer_u8, pid);
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(player_data, "x"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(player_data, "y"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(player_data, "dir"));
@@ -217,7 +290,7 @@ function handle_client_disconnect(socket_id) {
                 }
             }
             // Notify other clients
-            broadcast_player_disconnect(pid);
+            player_disconnect_broadcast(pid);
         }
     }
 }
@@ -246,12 +319,12 @@ function check_client_timeouts() {
     }
 }
 	
-function broadcast_player_disconnect(pid) {
+function player_disconnect_broadcast(pid) {
     with (oNetworkManager) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.DISCONNECT);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u16, pid);
+        buffer_write(send_buffer, buffer_u8, pid);
         
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -268,9 +341,9 @@ function handle_equipment_update_server(socket_id) {
         var pid = ds_map_find_value(clients, socket_id);
         
         // Read equipment data
-        var helmet_id  = buffer_read(receive_buffer, buffer_u16);
+        var helmet_id  = buffer_read(receive_buffer, buffer_u8);
         var helmet_dur = buffer_read(receive_buffer, buffer_f16);
-        var armour_id  = buffer_read(receive_buffer, buffer_u16);
+        var armour_id  = buffer_read(receive_buffer, buffer_u8);
         var armour_dur = buffer_read(receive_buffer, buffer_f16);
         
         // Store in player_states
@@ -307,7 +380,7 @@ function handle_weapon_update_server(socket_id) {
         var pid = ds_map_find_value(clients, socket_id);
         
         // Read equipment data
-        var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+        var weapon_id  = buffer_read(receive_buffer, buffer_u8);
         
         // Store in player_states
         var player_data = ds_map_find_value(player_states, pid);
@@ -352,8 +425,8 @@ function send_weapon_broadcast() {
 
             if (is_undefined(weapon_id))  weapon_id  = 0;
 
-            buffer_write(send_buffer, buffer_u16, pid);
-            buffer_write(send_buffer, buffer_u16, weapon_id);
+            buffer_write(send_buffer, buffer_u8, pid);
+            buffer_write(send_buffer, buffer_u8, weapon_id);
             key = ds_map_find_next(player_states, key);
         }
         
@@ -395,10 +468,10 @@ function send_equipment_broadcast() {
             if (is_undefined(armour_dur)) armour_dur = 0;
 
             // Write safe values to buffer
-            buffer_write(send_buffer, buffer_u16, pid);
-            buffer_write(send_buffer, buffer_u16, helmet_id);
+            buffer_write(send_buffer, buffer_u8, pid);
+            buffer_write(send_buffer, buffer_u8, helmet_id);
             buffer_write(send_buffer, buffer_f16, helmet_dur);
-            buffer_write(send_buffer, buffer_u16, armour_id);
+            buffer_write(send_buffer, buffer_u8, armour_id);
             buffer_write(send_buffer, buffer_f16, armour_dur);
 
             key = ds_map_find_next(player_states, key);
@@ -418,8 +491,8 @@ function player_death_broadcast(attacker_pid, victim_pid) {
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_DEATH);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u16, attacker_pid);
-        buffer_write(send_buffer, buffer_u16, victim_pid);
+        buffer_write(send_buffer, buffer_u8, attacker_pid);
+        buffer_write(send_buffer, buffer_u8, victim_pid);
 
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -429,13 +502,13 @@ function player_death_broadcast(attacker_pid, victim_pid) {
     }
 }
 
-function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_id) {
+function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_pid) {
     with (oNetworkManager) {
         if (!is_server) return;
 
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (instance_exists(victim_obj)) {	
-			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, net_id);
+			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, net_pid);
         }
 		
 		var player_data = ds_map_find_value(player_states, victim_pid);
@@ -487,8 +560,8 @@ function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impac
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8,  PACKET.HIT);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u16, attacker_pid);
-        buffer_write(send_buffer, buffer_u16, victim_pid);
+        buffer_write(send_buffer, buffer_u8, attacker_pid);
+        buffer_write(send_buffer, buffer_u8, victim_pid);
         buffer_write(send_buffer, buffer_f16, damage);
         buffer_write(send_buffer, buffer_u8,  hitbox_type);
         buffer_write(send_buffer, buffer_f16, impact_pos[0]);
@@ -512,8 +585,8 @@ function handle_hit_server(socket_key) {
     with (oNetworkManager) {
         if (!ds_map_exists(clients, socket_key)) return;
 
-        var attacker_pid_claim = buffer_read(receive_buffer, buffer_u16);
-        var victim_pid   = buffer_read(receive_buffer, buffer_u16);
+        var attacker_pid_claim = buffer_read(receive_buffer, buffer_u8);
+        var victim_pid   = buffer_read(receive_buffer, buffer_u8);
         var damage       = buffer_read(receive_buffer, buffer_f16);
         var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
         var impact_x     = buffer_read(receive_buffer, buffer_f16);
@@ -540,15 +613,9 @@ function handle_object_sync_server(socket_id) {
         var action = buffer_read(receive_buffer, buffer_u8);
 
         switch (action) {
-            case 0: {
+            case 0:
                 // Client nesmí spawnovat item, jen ignore (kdyby náhodou klient poslal paket o vytvoření itemu)
-                var _net_id   = buffer_read(receive_buffer, buffer_u16);
-                var _obj_idx  = buffer_read(receive_buffer, buffer_u16);
-                var _x_pos    = buffer_read(receive_buffer, buffer_f16);
-                var _y_pos    = buffer_read(receive_buffer, buffer_f16);
-                var _img_idx  = buffer_read(receive_buffer, buffer_u8);
-                break;
-            }
+            break;
             case 1: { // destroy request
                 var net_id = buffer_read(receive_buffer, buffer_u16);
 				var obj_ind = buffer_read(receive_buffer, buffer_u16);
@@ -598,7 +665,14 @@ function handle_init_sync_server(socket_id) {
             buffer_write(send_buffer, buffer_u16, ds_map_find_value(data, "object_index"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "x"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "y"));
-            buffer_write(send_buffer, buffer_u8,  ds_map_find_value(data, "image_index"));
+            buffer_write(send_buffer, buffer_u8,  ds_map_find_value(data, "image_index"));			
+            buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "scope"));
+            buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "barrel"));
+            buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "grip"));
+            buffer_write(send_buffer, buffer_u8,  ds_map_find_value(data, "suppressor"));
+            buffer_write(send_buffer, buffer_u16, ds_map_find_value(data, "clip_ammo"));
+            buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "ammo"));
+            buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "durability"));
             key = ds_map_find_next(item_registry, key);
         }
 		
@@ -627,13 +701,12 @@ function handle_init_sync_server(socket_id) {
             if (is_undefined(armour_dur)) armour_dur = 0;
 			 if (is_undefined(weapon_id)) weapon_id  = 0;
 
-            // Write safe values to buffer
-            buffer_write(send_buffer, buffer_u16, pid);
-            buffer_write(send_buffer, buffer_u16, helmet_id);
+            buffer_write(send_buffer, buffer_u8, pid);
+            buffer_write(send_buffer, buffer_u8, helmet_id);
             buffer_write(send_buffer, buffer_f16, helmet_dur);
-            buffer_write(send_buffer, buffer_u16, armour_id);
+            buffer_write(send_buffer, buffer_u8, armour_id);
             buffer_write(send_buffer, buffer_f16, armour_dur);
-            buffer_write(send_buffer, buffer_u16, weapon_id);
+            buffer_write(send_buffer, buffer_u8, weapon_id);
 
             p_key = ds_map_find_next(player_states, p_key);
         }

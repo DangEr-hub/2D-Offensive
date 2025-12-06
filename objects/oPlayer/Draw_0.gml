@@ -2,7 +2,7 @@ event_inherited();
 //draw_text(x, y - 70, network_id);
 //draw_text(x, y + 100, "should_handle_death" + string(should_handle_death));
 
-//draw_text(x, y + 50, "FlashX" + string(FlashLightX));
+draw_text(x, y + 50, "death_from_server" + string(death_from_server));
 if(stats.Health_points > 0){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
 	if (IS_NET && !is_local) {

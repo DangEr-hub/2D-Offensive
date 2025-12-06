@@ -10,16 +10,19 @@ var xx22 = (global.InventoryEquipRightBottomCorner[0] - oDraw.ViewX) * (global.G
 var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 
 if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
-	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[#0, Index.slot_id] != Item.None){
-		ItemDrop(
+	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[# 0, Index.slot_id] != Item.None){
+		request_item_drop(
 			global.MouseSlot[# 0, Index.slot_id],
 			global.local_player.x,
 			global.local_player.y,
-			100,
 			global.MouseSlot[# 0, Index.slot_ammo],
 			global.MouseSlot[# 0, Index.slot_clip_ammo],
 			global.MouseSlot[# 0, Index.slot_durability],
-			global.MouseSlot[# 0, Index.SlotAmount]
+			global.MouseSlot[# 0, Index.SlotAmount],
+			-1,
+			-1,
+			-1,
+			-1,
 		);	
 		
 		for(var i=0;i<ds_grid_height(global.MouseSlot);i++){

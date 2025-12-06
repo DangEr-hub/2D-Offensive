@@ -53,14 +53,16 @@ function handle_client_receive() {
 			case PACKET.OBJECT_POS_SYNC: handle_object_pos_sync_client(); break;
 			
 			case PACKET.PLAYER_DEATH: handle_player_death_client(); break;
+			
+			case PACKET.PLAYER_RESPAWN: handle_player_respawn_client(); break;
         }
     }
 }
 
 function handle_player_death_client() {
     with (oNetworkManager) {
-        var attacker_pid = buffer_read(receive_buffer, buffer_u16);
-        var victim_pid = buffer_read(receive_buffer, buffer_u16);
+        var attacker_pid = buffer_read(receive_buffer, buffer_u8);
+        var victim_pid = buffer_read(receive_buffer, buffer_u8);
 
         var victim = find_instance_by_network_id(oPlayer, victim_pid);
         if (instance_exists(victim)) {
@@ -71,6 +73,30 @@ function handle_player_death_client() {
             }
         }
     }
+}
+
+function handle_player_respawn_client() {
+    with (oNetworkManager) {
+        var player_pid = buffer_read(receive_buffer, buffer_u8);
+        var new_hp = buffer_read(receive_buffer, buffer_f16);
+
+        var player = find_instance_by_network_id(oPlayer, player_pid);
+		
+		if(player_pid == my_pid){
+			oDraw.RespawnMenu = false;
+			with(objUIBlack){zui_destroy();}
+			with(objUIWindow){ zui_destroy();}
+		}
+        if (instance_exists(player)) {
+            with (player) {
+                stats.Health_points = new_hp;
+                death_from_server = false;
+				x = respawn_x;
+				y = respawn_y;
+				depth = 100;
+            }
+		}
+	}
 }
 
 function handle_object_pos_sync_client() {
@@ -88,8 +114,6 @@ function handle_object_pos_sync_client() {
                 with (inst) {
                     target_x = x_pos;
                     target_y = y_pos;
-				   //x = x_pos;
-				  //y = y_pos;
                 }
             }
         }
@@ -107,10 +131,24 @@ function handle_object_sync_client() {
                 var x_pos   = buffer_read(receive_buffer, buffer_f16);
                 var y_pos   = buffer_read(receive_buffer, buffer_f16);
                 var img_idx = buffer_read(receive_buffer, buffer_u8);
+				var scope = buffer_read(receive_buffer, buffer_u8);
+				var barrel = buffer_read(receive_buffer, buffer_u8);
+				var grip = buffer_read(receive_buffer, buffer_u8);
+				var suppressor = buffer_read(receive_buffer, buffer_u8);
+				var clip_ammo = buffer_read(receive_buffer, buffer_u16);
+				var ammo = buffer_read(receive_buffer, buffer_u8);
+				var durability = buffer_read(receive_buffer, buffer_f16);
 
                 var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
                 inst.network_id = net_id;
                 inst.image_index = img_idx;
+				inst.scope_attachment = scope;
+				inst.barrel_attachment = barrel;
+				inst.grip_attachment = grip;
+				inst.suppressor_attachment = suppressor;
+				inst.ClipAmmo = clip_ammo;
+				inst.Ammo = ammo;
+				inst.Durability = durability;
                 break;
             }
             case 1: { // destroy
@@ -137,9 +175,24 @@ function handle_init_sync_client() {
             var x_pos   = buffer_read(receive_buffer, buffer_f16);
             var y_pos   = buffer_read(receive_buffer, buffer_f16);
             var img_idx = buffer_read(receive_buffer, buffer_u8);
+			var scope = buffer_read(receive_buffer, buffer_u8);
+			var barrel = buffer_read(receive_buffer, buffer_u8);
+			var grip = buffer_read(receive_buffer, buffer_u8);
+			var suppressor = buffer_read(receive_buffer, buffer_u8);
+			var clip_ammo = buffer_read(receive_buffer, buffer_u16);
+			var ammo = buffer_read(receive_buffer, buffer_u8);
+			var durability = buffer_read(receive_buffer, buffer_f16);
+
             var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
-            inst.network_id  = net_id;
+            inst.network_id = net_id;
             inst.image_index = img_idx;
+			inst.scope_attachment = scope;
+			inst.barrel_attachment = barrel;
+			inst.grip_attachment = grip;
+			inst.suppressor_attachment = suppressor;
+			inst.ClipAmmo = clip_ammo;
+			inst.Ammo = ammo;
+			inst.Durability = durability;
         }
 
 		// Weather
@@ -148,12 +201,12 @@ function handle_init_sync_client() {
 		// Hráči
         var player_count = buffer_read(receive_buffer, buffer_u8);
         for (var i = 0; i < player_count; i++) {
-            var pid        = buffer_read(receive_buffer, buffer_u16);
-            var helmet_id  = buffer_read(receive_buffer, buffer_u16);
+            var pid        = buffer_read(receive_buffer, buffer_u8);
+            var helmet_id  = buffer_read(receive_buffer, buffer_u8);
             var helmet_dur = buffer_read(receive_buffer, buffer_f16);
-            var armour_id  = buffer_read(receive_buffer, buffer_u16);
+            var armour_id  = buffer_read(receive_buffer, buffer_u8);
             var armour_dur = buffer_read(receive_buffer, buffer_f16);
-            var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+            var weapon_id  = buffer_read(receive_buffer, buffer_u8);
 
             if (pid == my_pid) continue;
 
@@ -183,9 +236,19 @@ function handle_init_sync_client() {
     }
 }
 
+function send_player_respawn_request() {
+    with (oNetworkManager) {
+        if (!is_connected || client_socket < 0) return;
 
-/// @function send_request_init()
-/// @desc Klient požádá server o inicializační synchronizaci objektů
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_RESPAWN);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        buffer_write(send_buffer, buffer_u8, my_pid);
+
+        network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
 function send_request_init() {
     with (oNetworkManager) {
 
@@ -199,11 +262,10 @@ function send_request_init() {
     }
 }
 
-
 function handle_hit_client() {
 	with (oNetworkManager) {
-		var attacker_pid = buffer_read(receive_buffer, buffer_u16);
-		var victim_pid   = buffer_read(receive_buffer, buffer_u16);
+		var attacker_pid = buffer_read(receive_buffer, buffer_u8);
+		var victim_pid   = buffer_read(receive_buffer, buffer_u8);
 		var damage       = buffer_read(receive_buffer, buffer_f16);
 		var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
 		var impact_x     = buffer_read(receive_buffer, buffer_f16);
@@ -212,18 +274,17 @@ function handle_hit_client() {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
-		var net_id = buffer_read(receive_buffer, buffer_u16);
 
 		var victim = find_instance_by_network_id(oPlayer, victim_pid);
 		if (instance_exists(victim)) {
-			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], net_id);
+			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], victim_pid);
 		}
 	}
 }
 
 function handle_connect_accept() {
     with (oNetworkManager) {
-        my_pid = buffer_read(receive_buffer, buffer_u16);
+        my_pid = buffer_read(receive_buffer, buffer_u8);
         is_connected = true;
         show_debug_message("Connected! My player ID: " + string(my_pid));
         room_goto(rm_ServerTest);
@@ -235,7 +296,7 @@ function handle_tick_update_client() {
         var player_count = buffer_read(receive_buffer, buffer_u8);
         
         for (var i = 0; i < player_count; i++) {
-            var pid = buffer_read(receive_buffer, buffer_u16);
+            var pid = buffer_read(receive_buffer, buffer_u8);
             var x_pos = buffer_read(receive_buffer, buffer_f16);
             var y_pos = buffer_read(receive_buffer, buffer_f16);
             var direction_facing = buffer_read(receive_buffer, buffer_f16);
@@ -275,10 +336,10 @@ function handle_equipment_update_client() {
         var player_count = buffer_read(receive_buffer, buffer_u8);
         
         for (var i = 0; i < player_count; i++) {
-            var pid = buffer_read(receive_buffer, buffer_u16);
-            var helmet_id  = buffer_read(receive_buffer, buffer_u16);
+            var pid = buffer_read(receive_buffer, buffer_u8);
+            var helmet_id  = buffer_read(receive_buffer, buffer_u8);
             var helmet_dur = buffer_read(receive_buffer, buffer_f16);
-            var armour_id  = buffer_read(receive_buffer, buffer_u16);
+            var armour_id  = buffer_read(receive_buffer, buffer_u8);
             var armour_dur = buffer_read(receive_buffer, buffer_f16);
             
             // Skip local player (we already have our own equipment)
@@ -315,8 +376,8 @@ function handle_weapon_update_client() {
         var player_count = buffer_read(receive_buffer, buffer_u8);
         
         for (var i = 0; i < player_count; i++) {
-            var pid = buffer_read(receive_buffer, buffer_u16);
-            var weapon_id  = buffer_read(receive_buffer, buffer_u16);
+            var pid = buffer_read(receive_buffer, buffer_u8);
+            var weapon_id  = buffer_read(receive_buffer, buffer_u8);
             
             // Přeskoč local player (víme weapon)
             if (pid == my_pid) {continue;}
@@ -352,9 +413,9 @@ function send_equipment_update_client() {
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         
         with (player) {
-            buffer_write(other.send_buffer, buffer_u16, global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
             buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
-            buffer_write(other.send_buffer, buffer_u16, global.Inventory[# OtherSlot.Armour, Index.slot_id]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Armour, Index.slot_id]);
             buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
         }
         
@@ -443,7 +504,6 @@ function handle_server_disconnect() {
     }
 }
 
-/// @function disconnect_from_server()
 function disconnect_from_server() {
     with (oNetworkManager) {
         if (client_socket >= 0) {
@@ -466,7 +526,7 @@ function disconnect_from_server() {
 
 function handle_player_disconnect_client() {
     with (oNetworkManager) {
-        var pid = buffer_read(receive_buffer, buffer_u16);
+        var pid = buffer_read(receive_buffer, buffer_u8);
         
         show_debug_message("Player " + string(pid) + " disconnected");
         
@@ -482,8 +542,8 @@ function handle_player_disconnect_client() {
 
 function handle_hit_packet_client() {
     with (oNetworkManager) {
-        var attacker_pid = buffer_read(receive_buffer, buffer_u16);
-        var victim_pid   = buffer_read(receive_buffer, buffer_u16);
+        var attacker_pid = buffer_read(receive_buffer, buffer_u8);
+        var victim_pid   = buffer_read(receive_buffer, buffer_u8);
         var damage       = buffer_read(receive_buffer, buffer_f16);
         var hitbox_type    = buffer_read(receive_buffer, buffer_u8);
         var impact_x     = buffer_read(receive_buffer, buffer_f16);
@@ -498,7 +558,7 @@ function handle_hit_packet_client() {
 
         var player = find_instance_by_network_id(oPlayer, my_pid);
         if (instance_exists(player)) {
-			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
+			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], victim_pid);
         }
     }
 }

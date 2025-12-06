@@ -7,8 +7,13 @@ alarm[5] = check_other_enemies_time;
 hidden = false;
 check_smokes_timer = -1;
 EquippedLandMine = Item.None;
+stats = {};
+NearestDangerX = -1;
+NearestDangerY = -1;
 stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
 WeaponID = [0, 0];
+WeaponDistance = 0;
+RotationAngle = 0;
 Ammo = [0, 0];
 ClipAmmo = [0, 0];
 MaxAmmo = [0, 0];
@@ -89,7 +94,7 @@ ChasingDistance = min(768 * get_rank_boost(global.rating_struct.Enemy_ep[global.
 #region Legs
 FootStepTimer = -1;
 FootSteps = 0;
-Legs = instance_create_depth(x,y,depth + 1,oObjectLegs);
+Legs = instance_create_depth(x,y,depth + 2,oObjectLegs);
 Legs.Object = id;
 #endregion
 

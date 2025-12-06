@@ -5,6 +5,8 @@ Weapon = -1;
 wpn_id = Item.None;
 Knife = -1;
 AmmoNeeded = 0;
+respawn_x = x;
+respawn_y = y;
 in_water_timer = -1;
 flashed_muffled_sounds = 1; ///Pro efekt muffled soundu u flashbangu
 rotation_direction = 1; ///Pro view bobbing
@@ -120,7 +122,7 @@ MovingStabilizationTimer = -1;
 #region Legs
 FootStepTimer = -1;
 FootSteps = 0;
-Legs = instance_create_depth(x,y,depth + 1,oObjectLegs);
+Legs = instance_create_depth(x,y,depth + 2,oObjectLegs);
 Legs.Object = id;
 #endregion
 
@@ -152,7 +154,6 @@ target_y = y;
 target_direction = 0;
 
 death_from_server = false;
-death_processed = false;
 death_attacker_pid = -1;
 
 // Network state

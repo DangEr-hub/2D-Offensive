@@ -6,6 +6,5 @@ if(stats.Speed > .1){
 	draw_sprite_ext(sprite_index, image_index, x, y, 
 	image_xscale, image_yscale, image_angle, c_black, .5);
 }
-//draw_text(x, y - 35, Object);
 draw_sprite_ext(sprite_index, image_index, x, y - z, image_xscale, image_yscale, image_angle, image_blend, image_alpha);
 

@@ -275,7 +275,7 @@ if(z <= 0){
 z = clamp(z, 0, 99999);
 
 
-scale = 1 + (z/100);
+var scale = 1 + (z/100);
 
 image_xscale = scale;
 image_yscale = scale;

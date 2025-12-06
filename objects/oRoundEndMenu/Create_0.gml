@@ -53,17 +53,23 @@ rank_callbacks = [
 
 #region Callbacks
 
-popup_continue_callback_positive = function(){	
-	if(IS_NET){
+popup_respawn_callback_positive = function(){	
+	if(!IS_NET){
 		with(objZUIMain){
 			zui_destroy();	
 		}
 		room_restart();	
+	}else{
+		if(oNetworkManager.is_server){
+			process_server_respawn();
+		}else{
+			send_player_respawn_request();
+		}
 	}
 };
 
-continue_callback = function(){
-	ui_show_popup("Continue to the next round?", "Continue", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_continue_callback_positive, -1);		
+respawn_callback = function(){
+	ui_show_popup("Respawn?", "Continue", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_respawn_callback_positive, -1);		
 };
 
 popup_exit_callback_positive = function(){
@@ -184,7 +190,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
 	caption = "Respawn";
-	callback = other.continue_callback;
+	callback = other.respawn_callback;
 }
 
 with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_height*4.5, objUIButton, -999)){

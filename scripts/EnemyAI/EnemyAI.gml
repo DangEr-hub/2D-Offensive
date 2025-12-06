@@ -29,24 +29,26 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 		suppressor_multiplier = global.ItemIndex[#global.ItemIndex[#EnemyWeaponID, ItemStat.Defense], ItemStat.Defense];	
 	}
 	
-	create_bullet_tracer(
-		[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
-		[EnemyShotX, EnemyShotY],
-		0,
-		[
-			EnemyWeaponID,
-			point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
-			global.BulletSpeed,
-			global.ItemIndex[# EnemyWeaponID, ItemStat.Range]
-		],
-		id,
-		global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
-		object_index,
-		[stats.Name, Visible],
-		noone,
-		[id.x, id.y],
-		false
-	);
+	with(id){
+		create_bullet_tracer(
+			[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
+			[EnemyShotX, EnemyShotY],
+			0,
+			[
+				EnemyWeaponID,
+				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
+				global.BulletSpeed,
+				global.ItemIndex[# EnemyWeaponID, ItemStat.Range]
+			],
+			id,
+			global.ItemIndex[#EnemyWeaponID, ItemStat.Damage] * suppressor_multiplier,
+			object_index,
+			[stats.Name, Visible],
+			noone,
+			[id.x, id.y],
+			false
+		);
+	}
 }
 
 function check_enemy_rotation(EnemyObject, ChasingObject){

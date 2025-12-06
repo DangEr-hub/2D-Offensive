@@ -44,8 +44,8 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
                 buffer_seek(send_buffer, buffer_seek_start, 0);
                 buffer_write(send_buffer, buffer_u8, PACKET.HIT);
                 buffer_write(send_buffer, buffer_u32, send_sequence++);
-                buffer_write(send_buffer, buffer_u16, attacker_pid);
-                buffer_write(send_buffer, buffer_u16, victim_pid);
+                buffer_write(send_buffer, buffer_u8, attacker_pid);
+                buffer_write(send_buffer, buffer_u8, victim_pid);
                 buffer_write(send_buffer, buffer_f16, damage);
                 buffer_write(send_buffer, buffer_u8, BodyPart);
                 buffer_write(send_buffer, buffer_f16, impact_pos[0]);
@@ -54,7 +54,6 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
 				buffer_write(send_buffer, buffer_f16, hit_object.AimPunchMultiplier);
 				buffer_write(send_buffer, buffer_f16, equip_dur[0]); ///Armour dur
 				buffer_write(send_buffer, buffer_f16, equip_dur[1]); ///Helmet dur
-				buffer_write(send_buffer, buffer_u16, attacker_pid);
 
                 network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }

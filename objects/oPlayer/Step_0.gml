@@ -60,7 +60,6 @@ if (is_remote) {
 
 #endregion
 
-
 if (instance_exists(oDraw) && stats.Health_points > 0){
 	
 	#region Weapon texture
@@ -2001,7 +2000,7 @@ if (should_handle_death) {
     Weapon.image_index = 0;
     image_index = 3;
 	ScopeIn = false;
-	depth = 10;
+	depth = 101;
 
 	if(is_local || !IS_NET){
 	    round_end("Loss");

@@ -2,7 +2,7 @@ draw_set_font(set_font("Console"));
 var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
 
-if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
+if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
 	
 	#region Draw lens flare
 	if(instance_exists(oObjectLamp)){

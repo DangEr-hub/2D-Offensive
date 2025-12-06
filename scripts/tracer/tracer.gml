@@ -2,7 +2,7 @@
 function handle_projectile_spawn_client() {
     with (oNetworkManager) {
         var proj_id   = buffer_read(receive_buffer, buffer_u16);
-        var owner_pid = buffer_read(receive_buffer, buffer_u16);
+        var owner_pid = buffer_read(receive_buffer, buffer_u8);
         var x_pos     = buffer_read(receive_buffer, buffer_f16);
         var y_pos     = buffer_read(receive_buffer, buffer_f16);
         var angle       = buffer_read(receive_buffer, buffer_f16);
@@ -56,7 +56,7 @@ function handle_projectile_spawn_server(key) {
         if (!ds_map_exists(clients, key)) return; // neznámý klient
 
         var proj_id = buffer_read(receive_buffer, buffer_u16);
-        var owner_pid = buffer_read(receive_buffer, buffer_u16);
+        var owner_pid = buffer_read(receive_buffer, buffer_u8);
         var x_pos = buffer_read(receive_buffer, buffer_f16);
         var y_pos = buffer_read(receive_buffer, buffer_f16);
         var angle = buffer_read(receive_buffer, buffer_f16);
@@ -105,7 +105,7 @@ function handle_projectile_spawn_server(key) {
         buffer_write(send_buffer, buffer_u8,  PACKET.PROJECTILE_SPAWN);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         buffer_write(send_buffer, buffer_u16, proj_id);
-        buffer_write(send_buffer, buffer_u16, owner_pid);
+        buffer_write(send_buffer, buffer_u8, owner_pid);
         buffer_write(send_buffer, buffer_f16, x_pos);
         buffer_write(send_buffer, buffer_f16, y_pos);
         buffer_write(send_buffer, buffer_f16, angle);
@@ -138,7 +138,7 @@ function send_projectile_spawn(start_pos, angle_spd_id_dist, shot_pos, damage, i
 		buffer_write(send_buffer, buffer_u8,  PACKET.PROJECTILE_SPAWN);
 		buffer_write(send_buffer, buffer_u32, send_sequence++);
 		buffer_write(send_buffer, buffer_u16, proj_id);
-		buffer_write(send_buffer, buffer_u16, my_pid);
+		buffer_write(send_buffer, buffer_u8, my_pid);
 		buffer_write(send_buffer, buffer_f16, start_pos[0]);
 		buffer_write(send_buffer, buffer_f16, start_pos[1]);
 		buffer_write(send_buffer, buffer_f16, angle_spd_id_dist[0]);
