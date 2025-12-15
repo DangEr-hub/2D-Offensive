@@ -116,3 +116,38 @@ if(Bounce == true){
 		move_bounce_all(true);
 	}
 }
+
+if (sprite_index == spr_RainSplash){
+    switch (RainPhase){
+        // =====================
+        // PADÁNÍ Z NEBE
+        // =====================
+        case 0:
+            z_height -= fall_speed;
+
+            // simulace vzdálení od kamery
+            var sc = clamp(z_height / 30, 0.2, 1.25);
+            image_xscale = sc;
+            image_yscale = sc;
+			image_blend = c_white;
+
+            if (z_height <= 0)
+            {
+                RainPhase = 1;
+                image_index = 1;
+            }
+        break;
+
+        // =====================
+        // SPLASH NA ZEMI
+        // =====================
+        case 1:
+			image_index += .15;
+			image_blend = c_white;
+            if (image_index >= 4 || image_alpha <= 0){
+				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.rain_particle, 5);
+                instance_destroy();
+			}
+        break;
+    }
+}

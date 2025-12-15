@@ -49,6 +49,8 @@ function handle_server_receive(sender_ip, sender_port) {
 			case PACKET.REQUEST_INIT: handle_init_sync_server(key); break;
 			
 			case PACKET.PLAYER_RESPAWN: handle_player_respawn_server(key); break;
+			
+			case PACKET.PING: handle_ping_server(sender_ip, sender_port); break;
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
         }
@@ -112,6 +114,23 @@ function process_server_respawn(){
         }
 
         player_respawn_broadcast(0, global.player_stats_struct.Max_health);
+    }
+}
+
+function handle_ping_server(sender_ip, sender_port) {
+    with (oNetworkManager) {
+        var ping_type = buffer_read(receive_buffer, buffer_u8); // 0=request, 1=response
+        var client_timestamp = buffer_read(receive_buffer, buffer_u32);
+
+        if (ping_type == 0) {
+            buffer_seek(send_buffer, buffer_seek_start, 0);
+            buffer_write(send_buffer, buffer_u8, PACKET.PING);
+            buffer_write(send_buffer, buffer_u32, send_sequence++);
+            buffer_write(send_buffer, buffer_u8, 1); // response
+            buffer_write(send_buffer, buffer_u32, client_timestamp);
+
+            network_send_udp(server_socket, sender_ip, sender_port, send_buffer, buffer_tell(send_buffer));
+        }
     }
 }
 
@@ -502,13 +521,13 @@ function player_death_broadcast(attacker_pid, victim_pid) {
     }
 }
 
-function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_pid) {
+function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur) {
     with (oNetworkManager) {
         if (!is_server) return;
 
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (instance_exists(victim_obj)) {	
-			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, net_pid);
+			hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid);
         }
 		
 		var player_data = ds_map_find_value(player_states, victim_pid);
@@ -570,7 +589,6 @@ function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impac
 		buffer_write(send_buffer, buffer_f16, aimpunch_modifier);
 		buffer_write(send_buffer, buffer_f16, equip_dur[0]);
 		buffer_write(send_buffer, buffer_f16, equip_dur[1]);
-		buffer_write(send_buffer, buffer_u16, net_id);
 
         var k = ds_map_find_first(clients);
         var n = ds_map_size(clients);
@@ -595,14 +613,13 @@ function handle_hit_server(socket_key) {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
-		var net_id = buffer_read(receive_buffer, buffer_u16);
 
         var attacker_pid = ds_map_find_value(clients, socket_key);
         if (attacker_pid < 0) {
             attacker_pid = attacker_pid_claim;
         }
 
-        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], net_id);
+        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
     }
 }
 	
@@ -614,12 +631,42 @@ function handle_object_sync_server(socket_id) {
 
         switch (action) {
             case 0:
-                // Client nesmí spawnovat item, jen ignore (kdyby náhodou klient poslal paket o vytvoření itemu)
+                var item_id = buffer_read(receive_buffer, buffer_u8);
+				var o_index = buffer_read(receive_buffer, buffer_u16);
+                var x_pos   = buffer_read(receive_buffer, buffer_f16);
+                var y_pos   = buffer_read(receive_buffer, buffer_f16);
+                var scope   = buffer_read(receive_buffer, buffer_u8);
+                var barrel  = buffer_read(receive_buffer, buffer_u8);
+                var grip    = buffer_read(receive_buffer, buffer_u8);
+                var suppressor = buffer_read(receive_buffer, buffer_u8);
+                var clip_ammo  = buffer_read(receive_buffer, buffer_u16);
+                var ammo    = buffer_read(receive_buffer, buffer_u8);
+                var durability = buffer_read(receive_buffer, buffer_f16);
+				var amount  = buffer_read(receive_buffer, buffer_u8);
+
+                var create_data = {
+                    img_index: item_id,
+                    amount: amount,
+                    scope: scope,
+                    barrel: barrel,
+                    grip: grip,
+                    suppressor: suppressor,
+                    clip_ammo: clip_ammo,
+                    ammo: ammo,
+                    durability: durability,
+					obj_index: o_index
+                };
+
+                sync_object_create(x_pos, y_pos, create_data);
             break;
             case 1: { // destroy request
                 var net_id = buffer_read(receive_buffer, buffer_u16);
-				var obj_ind = buffer_read(receive_buffer, buffer_u16);
-                var inst = find_instance_by_network_id(obj_ind, net_id);
+				var o_index = buffer_read(receive_buffer, buffer_u16);
+                var inst = find_instance_by_network_id(oItems, net_id);
+				
+		        if (net_id >= 0) {
+		            ds_stack_push(free_item_ids, net_id);
+		        }
 
                 if (instance_exists(inst)) {
                     sync_object_destroy(inst);
@@ -629,7 +676,7 @@ function handle_object_sync_server(socket_id) {
                     buffer_write(send_buffer, buffer_u32, send_sequence++);
                     buffer_write(send_buffer, buffer_u8, 1);
                     buffer_write(send_buffer, buffer_u16, net_id);
-					buffer_write(send_buffer, buffer_u16, obj_ind);
+					buffer_write(send_buffer, buffer_u16, o_index);
 
 					///broadcast
                     var socket_key = ds_map_find_first(clients);
@@ -662,7 +709,7 @@ function handle_init_sync_server(socket_id) {
         for (var i = 0; i < count; i++) {
             var data = ds_map_find_value(item_registry, key);
             buffer_write(send_buffer, buffer_u16, key); // net_id
-            buffer_write(send_buffer, buffer_u16, ds_map_find_value(data, "object_index"));
+            buffer_write(send_buffer, buffer_u16, ds_map_find_value(data, "obj_index"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "x"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "y"));
             buffer_write(send_buffer, buffer_u8,  ds_map_find_value(data, "image_index"));			
@@ -673,6 +720,7 @@ function handle_init_sync_server(socket_id) {
             buffer_write(send_buffer, buffer_u16, ds_map_find_value(data, "clip_ammo"));
             buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "ammo"));
             buffer_write(send_buffer, buffer_f16, ds_map_find_value(data, "durability"));
+			buffer_write(send_buffer, buffer_u8, ds_map_find_value(data, "amount"));
             key = ds_map_find_next(item_registry, key);
         }
 		

@@ -1,9 +1,9 @@
 /* oItems Create event */
 PushForce = 0;
-scope_attachment = -1;
-barrel_attachment = -1;
-grip_attachment = -1;
-suppressor_attachment = -1;
+scope_attachment = Item.None;
+barrel_attachment = Item.None;
+grip_attachment = Item.None;
+suppressor_attachment = Item.None;
 ClipAmmo = -1;
 Ammo = -1;
 Durability = -1;
@@ -18,11 +18,11 @@ LightObject = undefined;
 PushTimer = -1;
 PushDirection = 0;
 alarm[0] = 1;
-network_id = -1;
 target_x = x;
 target_y = y;
 last_x = x;
 last_y = y;
-network_id = compute_item_network_id();
+network_id = -1;
+creating_network_item = false;
 needs_sync = false;
 

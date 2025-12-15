@@ -7,3 +7,4 @@ move_dir = 0;
 moving = false;
 moving_x = 0;
 moving_y = 0;
+radius = 50;

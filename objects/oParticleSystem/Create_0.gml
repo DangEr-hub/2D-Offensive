@@ -79,18 +79,16 @@ part_type_direction(dust_particle, 0, 360, 0, .5);
 part_type_orientation(dust_particle, 0, 360, 0, .1, 0);
 
 //Rain
-rain_emitter = part_emitter_create(global.ParticleSystem);
+
 rain_particle = part_type_create();
 part_type_alpha2(rain_particle, .5, .59);
-part_type_shape(rain_particle, pt_shape_pixel);
-part_type_direction(rain_particle, 270, 270, 0, 1);
-part_type_orientation(rain_particle,350,350,0,0,1);
-part_type_scale(rain_particle, 8, 0.75);
-part_type_gravity(rain_particle, .1 * (game_get_speed(gamespeed_fps)/60), 270);
-part_type_speed(rain_particle, 9 * (game_get_speed(gamespeed_fps)/60), 10  * (game_get_speed(gamespeed_fps)/60), 0, 0);
-part_type_blend(rain_particle, 1);
-part_type_color1(rain_particle, c_gray);
-part_type_life(rain_particle, ceil(global.CameraHeight/2), ceil(global.CameraHeight/1));
+part_type_shape(rain_particle, pt_shape_line);
+part_type_direction(rain_particle, 0, 360, 0, 1);
+part_type_orientation(rain_particle,0,360,0,0,1);
+part_type_scale(rain_particle, 0.1, 0.1);
+part_type_speed(rain_particle, 3 * (game_get_speed(gamespeed_fps)/60), 4  * (game_get_speed(gamespeed_fps)/60), 0, 1);
+part_type_color1(rain_particle, c_aqua);
+part_type_life(rain_particle, 5, 7);
 
 //Leaf
 leaf_particle = part_type_create();
@@ -103,6 +101,7 @@ part_type_orientation(leaf_particle, 0, 359, 0.1, 15, 0);
 part_type_alpha3(leaf_particle, 0.5, 1, 0.02);
 
 //snow_particle
+weather_emitter = part_emitter_create(global.ParticleSystem);
 snow_particle = part_type_create();
 part_type_blend(snow_particle, 1);
 part_type_shape(snow_particle, pt_shape_pixel);

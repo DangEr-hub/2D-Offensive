@@ -44,8 +44,6 @@ EquippedGrenadeTimer = -1;
 EquippedGrenadeTime = .25 * game_get_speed(gamespeed_fps);
 FacingX = ChasingObject.x;
 FacingY = ChasingObject.y;
-VisibilityTimer = -1;
-VisibilityTime = 2 * game_get_speed(gamespeed_fps);
 EquippedGrenadeID = Item.None;
 xp_value = 1;
 grenade_angle = random(360);
@@ -127,10 +125,7 @@ BodyHitBox.MainObject = id;
 ArmHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
 ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
 ArmHitBox.MainObject = id;
-//LegHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-//LegHitBox.image_index = HitBox.LegProne;
-//LegHitBox.MainObject = id;
-//LegHitBox.visible = false;
+LegHitBox = noone;
 #endregion
 
 

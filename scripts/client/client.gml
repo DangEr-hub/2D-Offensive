@@ -55,6 +55,8 @@ function handle_client_receive() {
 			case PACKET.PLAYER_DEATH: handle_player_death_client(); break;
 			
 			case PACKET.PLAYER_RESPAWN: handle_player_respawn_client(); break;
+			
+			case PACKET.PING: handle_ping_response_client(); break;
         }
     }
 }
@@ -138,6 +140,7 @@ function handle_object_sync_client() {
 				var clip_ammo = buffer_read(receive_buffer, buffer_u16);
 				var ammo = buffer_read(receive_buffer, buffer_u8);
 				var durability = buffer_read(receive_buffer, buffer_f16);
+				var amount  = buffer_read(receive_buffer, buffer_u8);
 
                 var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
                 inst.network_id = net_id;
@@ -149,12 +152,13 @@ function handle_object_sync_client() {
 				inst.ClipAmmo = clip_ammo;
 				inst.Ammo = ammo;
 				inst.Durability = durability;
+				inst.Amount = amount;
                 break;
             }
             case 1: { // destroy
                 var net_id_destroy = buffer_read(receive_buffer, buffer_u16);
 				var obj_ind_destroy = buffer_read(receive_buffer, buffer_u16);
-                var inst_destroy = find_instance_by_network_id(obj_ind_destroy, net_id_destroy);
+                var inst_destroy = find_instance_by_network_id(oItems, net_id_destroy);
 
                 if (instance_exists(inst_destroy)) {
                     instance_destroy(inst_destroy);
@@ -182,6 +186,7 @@ function handle_init_sync_client() {
 			var clip_ammo = buffer_read(receive_buffer, buffer_u16);
 			var ammo = buffer_read(receive_buffer, buffer_u8);
 			var durability = buffer_read(receive_buffer, buffer_f16);
+			var amount = buffer_read(receive_buffer, buffer_u8);
 
             var inst = instance_create_layer(x_pos, y_pos, "ItemsO", o_index);
             inst.network_id = net_id;
@@ -193,6 +198,7 @@ function handle_init_sync_client() {
 			inst.ClipAmmo = clip_ammo;
 			inst.Ammo = ammo;
 			inst.Durability = durability;
+			inst.Amount = amount;
         }
 
 		// Weather
@@ -236,10 +242,40 @@ function handle_init_sync_client() {
     }
 }
 
-function send_player_respawn_request() {
+function send_ping_request() {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
 
+        ping_send_time = current_time;
+
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.PING);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        buffer_write(send_buffer, buffer_u8, 0); // request
+        buffer_write(send_buffer, buffer_u32, ping_send_time);
+
+        network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
+function handle_ping_response_client() {
+    with (oNetworkManager) {
+        var ping_type = buffer_read(receive_buffer, buffer_u8);
+        var sent_timestamp = buffer_read(receive_buffer, buffer_u32);
+
+        if (ping_type == 1) {
+            ping_ms = max(0, current_time - sent_timestamp);
+        }
+    }
+}
+
+
+function send_player_respawn_request() {
+    with (oNetworkManager) {
+        if (!is_connected || client_socket < 0) return;
+		oDraw.RespawnMenu = false;
+		with(objUIBlack){zui_destroy();}
+		with(objUIWindow){ zui_destroy();}
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_RESPAWN);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
@@ -277,7 +313,7 @@ function handle_hit_client() {
 
 		var victim = find_instance_by_network_id(oPlayer, victim_pid);
 		if (instance_exists(victim)) {
-			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], victim_pid);
+			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], attacker_pid);
 		}
 	}
 }
@@ -558,7 +594,7 @@ function handle_hit_packet_client() {
 
         var player = find_instance_by_network_id(oPlayer, my_pid);
         if (instance_exists(player)) {
-			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], victim_pid);
+			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], attacker_pid);
         }
     }
 }

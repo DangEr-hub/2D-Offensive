@@ -23,71 +23,52 @@ if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNi
 #endregion
 
 
-
-if (is_remote) {
-    if (distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance) {
-        instance_destroy();
-    }
-}
-
-#region Normal bullet tracer
-if(image_index == 0){
-	if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
-		var bullet = create_bullet(
-			stats.Shot_x,
-			stats.Shot_y,
-			stats.Damage,
-			stats.Starting_x,
-			stats.Starting_y,
-			stats.Object,
-			stats.Item_id,
-			stats.Penetration_damage*10,
-			image_index,
-			stats.Object_index,
-			stats.Owner_name,
-			direction,
-			stats.Owner_id
-		);
-		bullet.is_remote = is_remote;
-		instance_destroy(id);
-	}
-}
-#endregion
-
 if(is_local){
 
 	#region Bullet enemy penetration
-	if (instance_exists(oEnemy)) {
-		var Enemy = instance_nearest(x, y, oEnemy);
+	var Enemy = instance_nearest(x, y, oParentLivingObject);
+
+	if (Enemy != noone && Enemy.object_index == oPlayer && Enemy.is_local){
+		Enemy = noone;
+	}
+
     
-		if (instance_exists(Enemy)) {
-		    if (instance_exists(Enemy.HeadHitBox) && instance_exists(Enemy.BodyHitBox) && instance_exists(Enemy.ArmHitBox)) {
-				var head_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.HeadHitBox, false);
-				var body_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.BodyHitBox, false);
-				var arm_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.ArmHitBox, false);
-		        if (head_collision != noone) {
-					if(ds_list_find_index(HitList, head_collision.instance_id.MainObject) == -1){
-		                if (ds_list_size(HitList) != 0) {
-		                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
-		                }
-		                ds_list_add(HitList, head_collision.instance_id.MainObject);
+	if (instance_exists(Enemy)) {
+		if (instance_exists(Enemy.HeadHitBox) && instance_exists(Enemy.BodyHitBox) && instance_exists(Enemy.ArmHitBox)) {
+			var head_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.HeadHitBox, false);
+			var body_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.BodyHitBox, false);
+			var arm_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.ArmHitBox, false);
+			var leg_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.LegHitBox, false);
+		    if (head_collision != noone) {
+				if(ds_list_find_index(HitList, Enemy.HeadHitBox.MainObject) == -1){
+		            if (ds_list_size(HitList) != 0) {
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-				}
-		        if (body_collision != noone) {
-					if(ds_list_find_index(HitList, body_collision.instance_id.MainObject) == -1){
-		                if (ds_list_size(HitList) != 0) {
-		                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
-		                }
-		                ds_list_add(HitList, body_collision.instance_id.MainObject);
+		            ds_list_add(HitList, Enemy.HeadHitBox.MainObject);
+		        }
+			}
+		    if (body_collision != noone) {
+				if(ds_list_find_index(HitList, Enemy.BodyHitBox.MainObject) == -1){
+		            if (ds_list_size(HitList) != 0) {
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-				}
-		        if (arm_collision != noone) {
-					if(ds_list_find_index(HitList, arm_collision.instance_id.MainObject) == -1){
-		                if (ds_list_size(HitList) != 0) {
-		                    stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
-		                }
-		                ds_list_add(HitList, arm_collision.instance_id.MainObject);
+		            ds_list_add(HitList, Enemy.BodyHitBox.MainObject);
+		        }
+			}
+		    if (arm_collision != noone) {
+				if(ds_list_find_index(HitList, Enemy.ArmHitBox.MainObject) == -1){
+		            if (ds_list_size(HitList) != 0) {
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
+		            ds_list_add(HitList, Enemy.ArmHitBox.MainObject);
+		        }
+		    }
+		    if (leg_collision != noone) {
+				if(ds_list_find_index(HitList, Enemy.LegHitBox.MainObject) == -1){
+		            if (ds_list_size(HitList) != 0) {
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		            }
+		            ds_list_add(HitList, Enemy.LegHitBox.MainObject);
 		        }
 		    }
 		}
@@ -194,3 +175,27 @@ if(is_local){
 	#endregion
 
 }
+
+#region Normal bullet tracer
+if(image_index == 0){
+	if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
+		var bullet = create_bullet(
+			stats.Shot_x,
+			stats.Shot_y,
+			stats.Damage,
+			stats.Starting_x,
+			stats.Starting_y,
+			stats.Object,
+			stats.Item_id,
+			stats.Penetration_damage*10,
+			image_index,
+			stats.Object_index,
+			stats.Owner_name,
+			direction,
+			stats.Owner_id
+		);
+		bullet.is_remote = is_remote;
+		instance_destroy(id);
+	}
+}
+#endregion

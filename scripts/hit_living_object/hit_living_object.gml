@@ -39,7 +39,7 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
 
     with (oNetworkManager) {
         if (is_server) {
-                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1]], attacker_pid);
+                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1]]);
         } else if (is_connected) {
                 buffer_seek(send_buffer, buffer_seek_start, 0);
                 buffer_write(send_buffer, buffer_u8, PACKET.HIT);
@@ -407,9 +407,9 @@ function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_d
             }
 
             for (var j = 0; j < ceil(max(hit_object.attack_damage / 5, 10)); j++) {
-                var randomDirection2 = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
-                part_type_direction(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0);
-                part_type_orientation(oParticleSystem.headshot_particle, randomDirection2, randomDirection2, 0, 0, false);
+                var randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
+                part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
+                part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
                 part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
             }
 

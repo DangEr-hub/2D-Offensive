@@ -8,7 +8,7 @@ stats = {
 	"Object": noone,
 	"Item_id": 0,
 	"Penetration_damage": 0,
-	"Object_index": -1,
+	"obj_index": -1,
 	"Owner_name": "Noone",
 	"Distance": 0,
 	"Nearest_enemy": noone,
@@ -28,6 +28,6 @@ image_speed = 0;
 HitList = ds_list_create();
 
 owner_id = -1;
-network_id = -1;
+bullet_network_id = -1;
 
 //create_haze_effect(x, y, 2 * game_get_speed(gamespeed_fps), id, "Circle", true, 128);

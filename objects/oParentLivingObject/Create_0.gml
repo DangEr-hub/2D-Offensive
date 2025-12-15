@@ -1,5 +1,8 @@
 event_inherited();
 stats = {};
+VisibilityTimer = -1;
+Visible = true;
+VisibilityTime = 2 * game_get_speed(gamespeed_fps);
 RotationAngle = 0;
 in_water = false;
 hit_timer = -1;

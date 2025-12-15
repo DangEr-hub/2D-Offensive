@@ -19,7 +19,8 @@ if(!IS_NET){
 	instance_activate_object(objUIBlack);
 	instance_activate_object(oPause);
 	instance_activate_object(oConsole);
+	instance_activate_object(oPlayer);
+}else{
+	BackGround = -2;
 }
-
-BackGround = -2;
 part_particles_clear(global.ParticleSystem);

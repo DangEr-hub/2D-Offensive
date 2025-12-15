@@ -54,8 +54,8 @@ if(instance_exists(global.local_player)){
 	#region Recoil
 	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
 	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackPower];	
-	var recoilY = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilY] * horizontal_recoil_multiplier;
-	var recoilX = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilX] * vertical_recoil_multiplier;
+	var recoilY = global.ItemIndex[# global.local_player.wpn_id, ItemStat.RecoilY] * horizontal_recoil_multiplier;
+	var recoilX = global.ItemIndex[# global.local_player.wpn_id, ItemStat.RecoilX] * vertical_recoil_multiplier;
 	
 	if(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.HardRecoil] == true){
 		

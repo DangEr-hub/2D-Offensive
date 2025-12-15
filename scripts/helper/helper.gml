@@ -4,12 +4,15 @@ function bit_state_has(st, flag){
 }
 
 function compute_item_network_id() {
-    static next_id = 0; //Nezmění se při dalším volání zpátky na nulu
-    next_id = (next_id + 1) & 0x01FF; // 0..511, max 512 itemů
-    return next_id;
+    with (oNetworkManager) {
+        // Použij volné item id
+        if (ds_stack_size(free_item_ids) > 0) {
+            return ds_stack_pop(free_item_ids);
+        }
+    }
 }
 
-function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, net_pid){
+function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid){
 	
 	var blood_color = c_red;
 	if(BodyPart <= HitBox.HeadProne){
@@ -19,15 +22,17 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, icons.health);
 	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
 	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
-	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, net_pid), object, true); //true - serverově to je zatím vždy hráč
+	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
 	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
 	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
-	with(object){
-	    AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
-		AimPunchTimer = AimPunchTime;
-		AimPunchMultiplier = aimpunch_modifier;
-		aimpunch_speed_multiplier = hit_spd_mod;
+	if(damage > 2){
+		with(object){
+			AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
+			AimPunchTimer = AimPunchTime;
+			AimPunchMultiplier = aimpunch_modifier;
+			aimpunch_speed_multiplier = hit_spd_mod;
+		}
 	}
 }
 
@@ -143,20 +148,25 @@ function find_instance_by_network_id(object, net_id) {
 	return noone;
 }
 
-function sync_object_create(object_ind, x_pos, y_pos, net_id) {
+function sync_object_create(x_pos, y_pos, create_data) {
     with (oNetworkManager) {
         if (!is_server) return noone;
         
-        var obj_id = net_id;
-        if (is_undefined(obj_id)) {
-            obj_id = compute_item_network_id();
-        }
-        
-        var inst = instance_create_layer(x_pos, y_pos, "ItemsO", object_ind);
-        inst.network_id = obj_id;
+        var inst = instance_create_layer(x_pos, y_pos, "ItemsO", create_data.obj_index);
+		inst.creating_network_item = true;
+        inst.network_id = compute_item_network_id();
+        inst.image_index = create_data.img_index;
+        inst.scope_attachment = create_data.scope;
+        inst.barrel_attachment = create_data.barrel;
+        inst.grip_attachment = create_data.grip;
+        inst.suppressor_attachment = create_data.suppressor;
+        inst.ClipAmmo = create_data.clip_ammo;
+        inst.Ammo = create_data.ammo;
+        inst.Durability = create_data.durability;
+		inst.Amount = create_data.amount;
         
         var data = ds_map_create();
-        ds_map_set(data, "object_index", object_ind);
+        ds_map_set(data, "obj_index", inst.object_index);
         ds_map_set(data, "x", x_pos);
         ds_map_set(data, "y", y_pos);
         ds_map_set(data, "image_index", inst.image_index);
@@ -167,14 +177,15 @@ function sync_object_create(object_ind, x_pos, y_pos, net_id) {
 		ds_map_set(data, "clip_ammo", inst.ClipAmmo);
 		ds_map_set(data, "ammo", inst.Ammo);
 		ds_map_set(data, "durability", inst.Durability);
-        ds_map_set(item_registry, obj_id, data);
+		ds_map_set(data, "amount", inst.Amount);
+        ds_map_set(item_registry, inst.network_id, data);
 				
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.OBJECT_SYNC);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         buffer_write(send_buffer, buffer_u8, 0);       // create
-        buffer_write(send_buffer, buffer_u16, obj_id); // net_id
-        buffer_write(send_buffer, buffer_u16, object_ind); // object_index
+        buffer_write(send_buffer, buffer_u16, inst.network_id); // net_id
+        buffer_write(send_buffer, buffer_u16, inst.object_index); // object_index
         buffer_write(send_buffer, buffer_f16, x_pos);
         buffer_write(send_buffer, buffer_f16, y_pos);
         buffer_write(send_buffer, buffer_u8,  inst.image_index);
@@ -185,6 +196,7 @@ function sync_object_create(object_ind, x_pos, y_pos, net_id) {
         buffer_write(send_buffer, buffer_u16,  inst.ClipAmmo);
         buffer_write(send_buffer, buffer_u8,  inst.Ammo);
         buffer_write(send_buffer, buffer_f16,  inst.Durability);
+		buffer_write(send_buffer, buffer_u8,  inst.Amount);
         
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -201,10 +213,10 @@ function sync_object_destroy(inst_id) {
     with (oNetworkManager) {
         if (!is_server) return;
         if (!instance_exists(inst_id)) return;
-        if (is_undefined(inst_id.network_id)) {
-            instance_destroy(inst_id);
-            return;
-        }
+       // if (is_undefined(inst_id.network_id)) {
+      //      instance_destroy(inst_id);
+       //     return;
+       // }
         
         var net_id = inst_id.network_id;
 		var obj_ind = inst_id.object_index;
@@ -213,6 +225,10 @@ function sync_object_destroy(inst_id) {
             var data = ds_map_find_value(item_registry, net_id);
             ds_map_destroy(data);
             ds_map_delete(item_registry, net_id);
+        }
+		
+        if (net_id >= 0) {
+            ds_stack_push(free_item_ids, net_id);
         }
         
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -295,9 +311,9 @@ function request_item_drop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClip
 	            buffer_write(send_buffer, buffer_u8,  0); // creatnutí itemu
 
 	            buffer_write(send_buffer, buffer_u8,  ID);
+				buffer_write(send_buffer, buffer_u16, oItems);
 	            buffer_write(send_buffer, buffer_f16, PositionX);
 	            buffer_write(send_buffer, buffer_f16, PositionY);
-	            buffer_write(send_buffer, buffer_u8,  ObjectAmount);
 	            buffer_write(send_buffer, buffer_u8,  OWSA);
 	            buffer_write(send_buffer, buffer_u8,  OWBA);
 	            buffer_write(send_buffer, buffer_u8,  OWGA);
@@ -305,6 +321,7 @@ function request_item_drop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClip
 	            buffer_write(send_buffer, buffer_u16, ObjectClipAmmo);
 	            buffer_write(send_buffer, buffer_u8,  ObjectAmmo);
 	            buffer_write(send_buffer, buffer_f16, ObjectDurability);
+				buffer_write(send_buffer, buffer_u8, ObjectAmount);
 
 	            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
 	        }

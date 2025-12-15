@@ -74,6 +74,13 @@ if (!is_server && is_connected) {
         hb_client = 0;
     }
 	
+    // latency checks ~1 Hz (configurable)
+    ping_timer += delta_time / 1000000;
+    if (ping_timer >= ping_interval) {
+        send_ping_request();
+        ping_timer = 0;
+    }
+	
 	if(equipment_sync){
 	    send_equipment_update_client();
 	    equipment_sync = false; // Reset flag after sending

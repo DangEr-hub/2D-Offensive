@@ -140,7 +140,7 @@ global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_col
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = make_color_rgb(229, 199, 114);
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.5;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.25;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.75;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.7;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
 

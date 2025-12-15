@@ -5,7 +5,7 @@ stats = {
 	"Object": noone,
 	"Item_id": Item.None,
 	"Penetration_damage": 0,
-	"Object_index": -1,
+	"obj_index": -1,
 	"Object_name": "",
 	"Hit_timer": -1,
 };

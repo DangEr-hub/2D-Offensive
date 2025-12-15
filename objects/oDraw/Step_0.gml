@@ -121,16 +121,17 @@ if(instance_exists(oPlayer)){
 	}
 
 
-	if(RespawnMenu == true && BackGround == -1 && alarm[0] == -1){
+	if(RespawnMenu == true && alarm[0] == -1){
 		with(zui_main()){
-			if(other.GameEndMenu == true){
+			if(other.GameEndMenu == true && !instance_exists(oGameEndMenu)){
 				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 					alpha_value = 0;
 					alpha = global.GUIHUDAlpha * 2.25; 
 					window_id = id;
 				}
-			}else{
+			}
+			if(other.GameEndMenu == false && !instance_exists(oRoundEndMenu)){
 				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 					alpha_value = 0;

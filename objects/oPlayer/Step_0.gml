@@ -24,6 +24,8 @@ if (is_remote) {
 		Weapon.KickBackEffect = global.ItemIndex[# wpn_id, ItemStat.KickBackPower];
 	}
 	
+	
+	
 	if(Weapon != noone && (wpn_id != Item.None && (global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote))){
 		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance, RotationAngle);
 	}else{
@@ -34,16 +36,23 @@ if (is_remote) {
 		FlashLight.angle = RotationAngle; FlashLight.x = FlashLightX; FlashLight.y = FlashLightY;
 	}
 
+	if(ReloadTimer > -1){
+		ReloadTimer --;	
+	}
+	
+	
 	if(Reloading == true){
+		if(ReloadTimer == -1) { ReloadTimer = global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed]; }
 		ReloadTime ++;
-		if(ReloadTime >= global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed] - 1){
-			if(wpn_id != Item.Javelin){
-				particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
-				random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ItemStat.AmmoSpriteID], x, y);		
-			}
-		}
 	}else{
 		ReloadTime = 0;
+	}
+	
+	if(wpn_id != Item.None && wpn_id != Item.Javelin && ReloadTimer == 0){
+		if(wpn_id != Item.Javelin){
+			particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
+			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ItemStat.AmmoSpriteID], x, y);		
+		}
 	}
 
     x = lerp(x, target_x, INTERPOLATION_SPD);
@@ -2001,7 +2010,6 @@ if (should_handle_death) {
     image_index = 3;
 	ScopeIn = false;
 	depth = 101;
-
 	if(is_local || !IS_NET){
 	    round_end("Loss");
 	    camera_set_view_angle(CAMERA, 0);

@@ -348,7 +348,9 @@ function console_submit(Console) {
 					
 					case "set_enemy_visibility":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.enemy_visibility = return_logical_value(real(c[1]));
+							if(!IS_NET || global.sv_cheats == true){
+								global.enemy_visibility = return_logical_value(real(c[1]));
+							}
 						}
 					break;
 					
@@ -389,6 +391,12 @@ function console_submit(Console) {
 					case "set_player_money":
 						if(no == 1 && string_digits(c[1]) != ""){
 							global.player_stats_struct.Money = real(c[1]);
+						}
+					break;
+					
+					case "get_latency":
+						if(no == 1){
+							console_write_debug("[LATENCY] " + string(oNetworkManager.ping_ms) + " ms");	
 						}
 					break;
 	            } 

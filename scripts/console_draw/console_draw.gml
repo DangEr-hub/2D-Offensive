@@ -94,7 +94,6 @@ function console_draw(c,h,b1,b2,t1,t2,a,w) {
 	    }
     
 	    /* Draw cursor */
-	  // draw_text(ws*0.92+string_width(string_hash_to_newline("> "))+string_width(string_hash_to_newline(string_copy(c[? "string"],1,c[? "string_pos"]-1))),h+(p*2.25),string_hash_to_newline("|"));
 		draw_text(ws+gsw/2+sw,h+(p*2.25),"|");
 
 	    /* Reset alpha */

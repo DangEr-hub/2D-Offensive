@@ -54,12 +54,13 @@ rank_callbacks = [
 #region Callbacks
 
 popup_respawn_callback_positive = function(){	
-	if(!IS_NET){
+	if(!instance_exists(oNetworkManager)){
 		with(objZUIMain){
 			zui_destroy();	
 		}
 		room_restart();	
 	}else{
+		with(objZUIMain){zui_destroy();}
 		if(oNetworkManager.is_server){
 			process_server_respawn();
 		}else{

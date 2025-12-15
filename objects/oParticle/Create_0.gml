@@ -32,3 +32,9 @@ Breakable = false;
 Stay = true;
 Bounce = false;
 FadeAwayTimer = 1;
+
+// === RAIN SETUP ===
+RainPhase = 0; // 0 = falling, 1 = splash
+z_height = irandom_range(20, 40);
+fall_speed = random_range(1.5, 1.75);
+alarm[0] = 1;

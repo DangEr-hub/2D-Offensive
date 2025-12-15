@@ -11,6 +11,9 @@ if (ds_exists(item_registry, ds_type_map)) {
 }
 
 ds_list_destroy(item_pos_buffer);
+if(free_item_ids != -1){
+	ds_stack_destroy(free_item_ids);
+}
 
 
 if (IS_SERVER) {
@@ -31,6 +34,66 @@ if (IS_SERVER) {
     }
 } else {
     // Client disconnect
+	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+		request_item_drop(
+			global.Inventory[# OtherSlot.Primary, Index.slot_id],
+			global.local_player.x,
+			global.local_player.y,
+			global.Inventory[# OtherSlot.Primary, Index.slot_ammo],
+			global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo],
+			global.Inventory[# OtherSlot.Primary, Index.slot_durability],
+			global.Inventory[# OtherSlot.Primary, Index.SlotAmount],
+			-1,
+			-1,
+			-1,
+			-1,
+		);
+	}
+	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	request_item_drop(
+		global.Inventory[# OtherSlot.Secondary, Index.slot_id],
+		global.local_player.x,
+		global.local_player.y,
+		global.Inventory[# OtherSlot.Secondary, Index.slot_ammo],
+		global.Inventory[# OtherSlot.Secondary, Index.slot_clip_ammo],
+		global.Inventory[# OtherSlot.Secondary, Index.slot_durability],
+		global.Inventory[# OtherSlot.Secondary, Index.SlotAmount],
+		-1,
+		-1,
+		-1,
+		-1,
+	);
+	}
+	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	request_item_drop(
+		global.Inventory[# OtherSlot.Helmet, Index.slot_id],
+		global.local_player.x,
+		global.local_player.y,
+		global.Inventory[# OtherSlot.Helmet, Index.slot_ammo],
+		global.Inventory[# OtherSlot.Helmet, Index.slot_clip_ammo],
+		global.Inventory[# OtherSlot.Helmet, Index.slot_durability],
+		global.Inventory[# OtherSlot.Helmet, Index.SlotAmount],
+		-1,
+		-1,
+		-1,
+		-1,
+	);
+	}
+	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	request_item_drop(
+		global.Inventory[# OtherSlot.Armour, Index.slot_id],
+		global.local_player.x,
+		global.local_player.y,
+		global.Inventory[# OtherSlot.Armour, Index.slot_ammo],
+		global.Inventory[# OtherSlot.Armour, Index.slot_clip_ammo],
+		global.Inventory[# OtherSlot.Armour, Index.slot_durability],
+		global.Inventory[# OtherSlot.Armour, Index.SlotAmount],
+		-1,
+		-1,
+		-1,
+		-1,
+	);
+	}
     disconnect_from_server();
 }
 

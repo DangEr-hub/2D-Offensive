@@ -16,7 +16,7 @@ if(wall_collision != noone){
 	if(image_index == 2){
 		WallParticles = 1;	
 	}
-	if(wall_collision.instance_id.Type == "Metal"){
+	if(wall_collision.inst_id.Type == "Metal"){
 		wall_sound = snd_BulletMetal;
 	}
 	#endregion
@@ -26,26 +26,26 @@ if(wall_collision != noone){
 		#region Bullet and shrapnel hits wall
 		
 		if(ds_exists(HitList, ds_type_list)){
-			if(ds_list_find_index(HitList, wall_collision.instance_id) == -1){
+			if(ds_list_find_index(HitList, wall_collision.inst_id) == -1){
 				
 				if!(audio_is_playing(wall_sound)){
 					play_sound(wall_collision.x, wall_collision.y, wall_sound, stats.Object);
 				}
 				
 				#region Barrel
-				if(wall_collision.instance_id.object_index == oBarrel){
-					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.instance_id.x, wall_collision.instance_id.y));
-					wall_collision.instance_id.stats.Object_name = stats.Owner_name;
-					wall_collision.instance_id.stats.Object_index = stats.Object_index;
-					wall_collision.instance_id.stats.Object = stats.Object;
-					wall_collision.instance_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
+				if(wall_collision.inst_id.object_index == oBarrel){
+					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.inst_id.x, wall_collision.inst_id.y));
+					wall_collision.inst_id.stats.Object_name = stats.Owner_name;
+					wall_collision.inst_id.stats.Object_index = stats.Object_index;
+					wall_collision.inst_id.stats.Object = stats.Object;
+					wall_collision.inst_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
 				}
 				#endregion
 				
 				#region Barrel
-				if(wall_collision.instance_id.object_index == oGlass){
-					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.instance_id.x, wall_collision.instance_id.y));
-					wall_collision.instance_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
+				if(wall_collision.inst_id.object_index == oGlass){
+					var bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.inst_id.x, wall_collision.inst_id.y));
+					wall_collision.inst_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
 				}
 				#endregion
 			
@@ -118,7 +118,7 @@ if(wall_collision != noone){
 				);
 				#endregion
 			
-				ds_list_add(HitList, wall_collision.instance_id);
+				ds_list_add(HitList, wall_collision.inst_id);
 			
 			}
 		}

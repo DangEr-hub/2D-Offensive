@@ -8,7 +8,7 @@ enum PLAYER_FLAGS {
 
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
-network_type = network_socket_udp; // transportní protokol UDP
+network_type = network_socket_udp;
 server_port = 50000;
 server_ip = "127.0.0.1"; // zatím localhost
 max_clients = 4;
@@ -36,6 +36,7 @@ projectiles_seen = ds_map_create(); // key = proj_id, val = true
 player_stats = ds_map_create();
 item_registry = ds_map_create();
 item_pos_buffer = ds_list_create();
+free_item_ids = -1;
 
 
 // Packet types
@@ -55,7 +56,8 @@ enum PACKET {
 	WEATHER_SYNC,
 	OBJECT_POS_SYNC,
 	PLAYER_DEATH,
-	PLAYER_RESPAWN
+	PLAYER_RESPAWN,
+	PING
 }
 
 equipment_sync = false;
@@ -64,6 +66,12 @@ send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
 accum_server = 0;   // časování TICK_UPDATE na serveru
 hb_client    = 0;   // heartbeat na klientovi
+
+/// ping
+ping_interval = 1;  // how often to measure latency
+ping_timer = 0;
+ping_ms = 0;
+ping_send_time = 0;
 
 // Sequence numbers for packet ordering
 send_sequence = 0;

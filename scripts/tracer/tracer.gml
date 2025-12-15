@@ -20,6 +20,7 @@ function handle_projectile_spawn_client() {
         if (owner_pid == my_pid) return;
 
         ds_map_set(projectiles_seen, proj_id, true);
+		var p = find_instance_by_network_id(oPlayer, owner_pid)
 
         // Spawn traceru
 		var tracer_object = create_bullet_tracer(
@@ -32,7 +33,7 @@ function handle_projectile_spawn_client() {
 				spd,
 				max_dist
 			],
-			-1,
+			p,
 			dmg,
 			-1,
 			[owner_name, owner_visible],
@@ -42,8 +43,6 @@ function handle_projectile_spawn_client() {
 			[false, true],
 			[proj_id, owner_pid]
 		);
-		
-		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		if(p != noone){
 			p.network_shoot_timer = 2;
 		}
@@ -69,6 +68,7 @@ function handle_projectile_spawn_server(key) {
 		var owner_visible = buffer_read(receive_buffer, buffer_u8);
 		var owner_name    = buffer_read(receive_buffer, buffer_string);
 		var max_dist = buffer_read(receive_buffer, buffer_f16);
+		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		
         // tracer pro hosta
         if (owner_pid != my_pid) {
@@ -82,7 +82,7 @@ function handle_projectile_spawn_server(key) {
 					spd,
 					global.ItemIndex[#global.Inventory[# item_id, Index.slot_id], ItemStat.Range]
 				],
-				-1,
+				p,
 				dmg,
 				-1,
 				[owner_name, owner_visible],
@@ -94,7 +94,6 @@ function handle_projectile_spawn_server(key) {
 			);
         }
 		
-		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		if(p != noone){
 			p.network_shoot_timer = 2;
 		}

@@ -86,13 +86,13 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		   [bullet_x, bullet_y], 
 		   BulletDamage, item_dir_spd_dist[0], name_vis[1], name_vis[0]
 	   );
-	    bullet_tracer.network_id = proj_id;
+	    bullet_tracer.bullet_network_id = proj_id;
 		
 		if(IS_NET){
 			bullet_tracer.stats.Owner_id = oNetworkManager.my_pid;
 		}
 	}else{
-	    bullet_tracer.network_id = proj_own[0];
+	    bullet_tracer.bullet_network_id = proj_own[0];
 	    bullet_tracer.stats.Owner_id = proj_own[1];
 	}
 	bullet_tracer.stats.Speed = item_dir_spd_dist[2];
@@ -162,17 +162,13 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	);
 	if(instance_exists(oParticleSystem)){
 		part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.Spark, ceil(particles_number));
-		var posX = BulletX;
-		var posY = BulletY;
-		var partSystem = global.ParticleSystem;
-		var partType = oParticleSystem.headshot_particle;
 		for (var i = 0; i < ceil(particles_number); i++) {
 			var randomDirection = random_range(BulletDirection - 180 - 90, BulletDirection - 180 + 90);
-			part_type_color1(partType, c_gray);
-			part_type_direction(partType, randomDirection, randomDirection, 0, 0);
-			part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
-			part_particles_create(partSystem, posX, posY, partType, 1);
-			part_type_color1(partType, c_white);
+			part_type_color1(oParticleSystem.headshot_particle, c_gray);
+			part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
+			part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
+			part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.headshot_particle, 1);
+			part_type_color1(oParticleSystem.headshot_particle, c_white);
 		}
 	}
 	Bullet.direction = BulletDirection;
@@ -210,7 +206,7 @@ function process_bullet_collision(starting_x, starting_y, current_x, current_y, 
         var collision_details = {
             "x": collision_info[0],
             "y": collision_info[1],
-            "instance_id": collision_info[2]
+            "inst_id": collision_info[2]
         };
         
         var bullet_distance = point_distance(starting_x, starting_y, current_x, current_y);
@@ -663,18 +659,18 @@ function inaccuracy_formula(WID, ObjectType){
 	}
 }
 
-function play_sound(PositionX, PositionY, Sound, instance_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
-	if(instance_exists(instance_id)){
+function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
+	if(instance_exists(inst_id)){
 	    var playerInstance = global.local_player;//instance_find(Player, 0);
-		audio_emitter_gain(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
-		audio_emitter_pitch(instance_id.Emitter, playerInstance.flashed_muffled_sounds);
-	    audio_emitter_position(instance_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
-	    audio_emitter_falloff(instance_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
-	    audio_play_sound_on(instance_id.Emitter, Sound, Priority, false);
+		audio_emitter_gain(inst_id.Emitter, playerInstance.flashed_muffled_sounds);
+		audio_emitter_pitch(inst_id.Emitter, playerInstance.flashed_muffled_sounds);
+	    audio_emitter_position(inst_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
+	    audio_emitter_falloff(inst_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
+	    audio_play_sound_on(inst_id.Emitter, Sound, Priority, false);
 	}
 }
 	
-function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time){
+function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time, move = false){
 	if(Radius >= 96){
 		smoke_tile = instance_create_layer(x, y, "OtherO", oSmokeTile);
 		smoke_tile.image_xscale = Radius/smoke_tile.sprite_width*2;
@@ -689,6 +685,7 @@ function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num,
 	image_alpha = Alpha; //cloud alpha
 	cloud_fade = Fade;  //governs how quickly clouds particles fade in and out (should be near 1.0
 	alarm[0] = Time;
+	moving = move;
 
 	for (var i = 0; i < num_cloud_particles; i++)
 	{

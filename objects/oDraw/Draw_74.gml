@@ -162,12 +162,14 @@ if(instance_exists(oPlayer)){
 }
 
 
-if (global.local_player.in_water == true) {
-    var alpha = 0.25 * (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps);
+if(instance_exists(oPlayer)){
+	if (global.local_player.in_water == true) {
+	    var alpha = 0.25 * (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps);
     
-    draw_set_alpha(alpha);
-    draw_set_color(c_aqua);
-    draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
-    draw_set_alpha(1);
+	    draw_set_alpha(alpha);
+	    draw_set_color(c_aqua);
+	    draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
+	    draw_set_alpha(1);
+	}
 }
 

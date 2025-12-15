@@ -452,41 +452,42 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		}
 	
 		#region Player
-		with(get_local_player()){
+		with(oPlayer){
 			var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 			var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 			draw_set_font(set_font("Console"));
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
 			
-
-			if(Healing == true){
-			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-			    draw_sprite_ext(spr_HealthBar, 5, xx - sprite_width/2, default_yy,
-			    (HealingTime/global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-			    default_yy -= bar_spacing;
-			}
-
 			if(Reloading == true){
-			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-			    draw_sprite_ext(spr_HealthBar, 1, xx - sprite_width/2, default_yy,
-			    (ReloadTime/global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				draw_sprite_ext(spr_HealthBar, 1, xx - sprite_width/2, default_yy,
+				(ReloadTime/global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 				default_yy -= bar_spacing;
 			}
 			
-			if(equip_timer > -1){
-			    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-			    draw_sprite_ext(spr_HealthBar, 7, xx - sprite_width/2, default_yy,
-			    (equip_time/global.ItemIndex[# global.Inventory[# min(max(OtherSlot.Secondary - WeaponID, OtherSlot.Primary), OtherSlot.Knife), Index.slot_id], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-				default_yy -= bar_spacing;
-			}
+			if(is_local){
+				if(Healing == true){
+				    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				    draw_sprite_ext(spr_HealthBar, 5, xx - sprite_width/2, default_yy,
+				    (HealingTime/global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				    default_yy -= bar_spacing;
+				}
 			
-			var rank_position = 0;
-			if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
-				rank_position = get_rank(global.rating_struct.Player_ep);	
-			}
-			if!(instance_exists(oInventory)){
-				draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+				if(equip_timer > -1){
+				    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				    draw_sprite_ext(spr_HealthBar, 7, xx - sprite_width/2, default_yy,
+				    (equip_time/global.ItemIndex[# global.Inventory[# min(max(OtherSlot.Secondary - WeaponID, OtherSlot.Primary), OtherSlot.Knife), Index.slot_id], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					default_yy -= bar_spacing;
+				}
+			
+				var rank_position = 0;
+				if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
+					rank_position = get_rank(global.rating_struct.Player_ep);	
+				}
+				if!(instance_exists(oInventory)){
+					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+				}
 			}
 		}
 		#endregion

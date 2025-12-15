@@ -26,8 +26,76 @@ if(object_index == oEnemy || object_index == oFriend){
 	}
 	#endregion
 
-	
 }
+
+#region Visibility
+
+if (VisibilityTimer > -1) VisibilityTimer--;
+if (VisibilityTimer == 0) Visible = false;
+
+// kdo je pozorovatel
+var observer = global.local_player;
+
+// jestli tenhle objekt má být skrýván
+var is_target = (object_index == oEnemy) || (object_index == oPlayer && is_remote);
+
+// lokální hráč je vždy viditelný
+if (id == observer) {
+    Visible = true;
+}else if (is_target) {
+
+    if (!global.enemy_visibility) {
+
+
+		var in_fov =
+            point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+            point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+            point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+            point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
+
+        var force_visible =  stats.Health_points <= 0 || ((object_index == oEnemy) && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
+
+        if (in_fov || force_visible) {
+
+            var col = collision_line(x, y, observer.x, observer.y, oParentTile, true, false)
+                   || collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
+
+            if (col) {
+                if (!(observer.moving_state == states_player.machine_gun_state
+                   && col.object_index == oMachineGunFloor)) {
+
+                    if (Visible && VisibilityTimer == -1)
+                        VisibilityTimer = VisibilityTime;
+
+                } else {
+                    Visible = true;
+                }
+            } else {
+                Visible = true;
+            }
+
+        } else {
+            if (Visible && VisibilityTimer == -1)
+                VisibilityTimer = VisibilityTime;
+        }
+
+    } else {
+        Visible = true;
+    }
+}
+
+
+if(FlashLight != undefined){
+	FlashLight.visible = Visible;
+}
+HeadHitBox.Visible  = Visible;
+BodyHitBox.Visible  = Visible;
+ArmHitBox.Visible   = Visible;
+Weapon.Visible      = Visible;
+Legs.Visible        = Visible;
+
+#endregion
+
 
 if(stats.Health_points <= 0){
 	event_user(0);	

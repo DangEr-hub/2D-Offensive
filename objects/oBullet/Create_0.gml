@@ -18,7 +18,7 @@ stats = {
     "Item_id": Item.None,
     "Penetration_damage": 0,
     "Tracer_image": 0,
-    "Object_index": -1,
+    "obj_index": -1,
     "Owner_name": "Noone",
     "Owner_id": -1
 };

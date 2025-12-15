@@ -399,7 +399,7 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 }
 
 function round_end(round_result){
-	if(!IS_NET){
+	if(!instance_exists(oNetworkManager)){
 		save_game();
 		oRatingController.round_ended = true;
 		if(global.ranked_game == true){

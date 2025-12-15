@@ -12,9 +12,13 @@
     {"name":"inst_67D6A5B5","path":"rooms/rm_ServerTest/rm_ServerTest.yy",},
     {"name":"inst_228F6481","path":"rooms/rm_ServerTest/rm_ServerTest.yy",},
     {"name":"inst_10A956EF","path":"rooms/rm_ServerTest/rm_ServerTest.yy",},
+    {"name":"inst_5B03D4B9","path":"rooms/rm_ServerTest/rm_ServerTest.yy",},
   ],
   "isDnd": false,
   "layers": [
+    {"resourceType":"GMRTileLayer","resourceVersion":"1.1","name":"WallTiles","depth":300,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"properties":[],"tiles":{"SerialiseHeight":34,"SerialiseWidth":60,"TileCompressedData":[
+-194,-2147483648,10,1,2,3,4,5,6,3,4,5,6,-50,-2147483648,10,33,34,35,36,37,38,35,36,37,38,-50,-2147483648,10,1,2,3,4,5,6,3,4,5,6,-50,-2147483648,10,1,2,3,4,5,6,35,36,37,38,-50,-2147483648,10,1,2,3,4,5,
+6,3,4,5,6,-50,-2147483648,10,33,34,35,36,37,38,35,36,37,38,-1536,-2147483648,],"TileDataFormat":1,},"tilesetId":{"name":"tl_DustTiles","path":"tilesets/tl_DustTiles/tl_DustTiles.yy",},"userdefinedDepth":true,"visible":true,"x":0,"y":0,},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"LivingO","depth":100,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[],"layers":[],"properties":[],"userdefinedDepth":true,"visible":true,},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"ItemsO","depth":200,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_8096101","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":7,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oItems","path":"objects/oItems/oItems.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":384.0,"y":480.0,},
@@ -24,6 +28,7 @@
       ],"layers":[],"properties":[],"userdefinedDepth":true,"visible":true,},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"OtherO","depth":300,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_10A956EF","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oLightRenderer","path":"objects/oLightRenderer/oLightRenderer.yy",},"properties":[],"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":0.0,"y":0.0,},
+        {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_5B03D4B9","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"objectId":{"name":"oParentTile","path":"objects/oParentTile/oParentTile.yy",},"properties":[],"rotation":0.0,"scaleX":4.5,"scaleY":3.0,"x":608.0,"y":192.0,},
       ],"layers":[],"properties":[],"userdefinedDepth":false,"visible":true,},
     {"resourceType":"GMRBackgroundLayer","resourceVersion":"1.0","name":"Background","animationFPS":30.0,"animationSpeedType":0,"colour":4294967295,"depth":400,"effectEnabled":true,"effectType":null,"gridX":32,"gridY":32,"hierarchyFrozen":false,"hspeed":0.0,"htiled":true,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"properties":[],"spriteId":{"name":"spr_Sand","path":"sprites/spr_Sand/spr_Sand.yy",},"stretch":false,"userdefinedAnimFPS":false,"userdefinedDepth":false,"visible":true,"vspeed":0.0,"vtiled":true,"x":0,"y":0,},
   ],

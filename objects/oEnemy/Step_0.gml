@@ -164,14 +164,6 @@ if(ReactionTimer > -1){
 	ReactionTimer --;
 }
 
-if(VisibilityTimer > -1){
-	VisibilityTimer --;	
-}
-
-if(VisibilityTimer == 0){
-	Visible = false;	
-}
-
 if(FlashedTimer > -1){
 	FlashedTimer --;
 }
@@ -259,72 +251,6 @@ VelocityY *= 0.8;
 // Reset acceleration each step to only apply it after collision
 AccelX = 0;
 AccelY = 0;		
-#endregion
-	
-#region Visibility
-if(global.enemy_visibility == false){
-	if(instance_exists(oPlayer)){
-		if (
-			point_in_triangle(bbox_left, bbox_top, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_right, bbox_top, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_left, bbox_bottom, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy) || 
-			point_in_triangle(bbox_right, bbox_bottom, oPlayer.ax, oPlayer.ay, 
-			oPlayer.bx, oPlayer.by, 
-			oPlayer.cx, oPlayer.cy)
-		|| 
-			State == States.ThrowGrenade
-		|| 
-			HPTimer != -1
-		||
-			State == States.LayDownLandMine
-		){
-			var collision_object = collision_line(x, y, oPlayer.x, oPlayer.y, oParentTile, true, false);
-			if(collision_object || collision_line(x, y, oPlayer.x, oPlayer.y, oSmokeTile, true, false)){
-				if!(oPlayer.moving_state == states_player.machine_gun_state && collision_object.object_index == oMachineGunFloor){
-					if(Visible == true){
-						if(VisibilityTimer == -1){
-							VisibilityTimer = VisibilityTime;
-						}
-					}
-				}else{
-					Visible = true;	
-				}
-			}else{
-				Visible = true;
-			}
-		}else{
-			if(Visible == true){
-				if(VisibilityTimer == -1){
-					VisibilityTimer = VisibilityTime;
-				}
-			}
-		}
-	}
-}else{
-	Visible = true;
-}
-	
-if(Visible == false){
-	HeadHitBox.Visible = false;
-	BodyHitBox.Visible = false;
-	ArmHitBox.Visible = false;
-	Weapon.Visible = false;
-	Legs.Visible = false;
-	//uls_set_light_alpha(FlashLight, 0);
-}else{
-	HeadHitBox.Visible = true;
-	BodyHitBox.Visible = true;
-	ArmHitBox.Visible = true;
-	Weapon.Visible = true;
-	Legs.Visible = true;
-	//uls_set_light_alpha(FlashLight, FLASHLIGHT_ALPHA);
-}
 #endregion
 	
 #region Reloading
