@@ -142,7 +142,7 @@ if (sprite_index == spr_RainSplash){
         // SPLASH NA ZEMI
         // =====================
         case 1:
-			image_index += .15;
+			image_index += .1;
 			image_blend = c_white;
             if (image_index >= 4 || image_alpha <= 0){
 				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.rain_particle, 5);

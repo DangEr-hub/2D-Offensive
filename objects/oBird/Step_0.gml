@@ -1,4 +1,5 @@
-if(x >= room_width || x <= 0 || y >= room_height || y <= 0){
+var margin = 64;
+if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin) || y <= (0 - margin)){
 	instance_destroy();	
 }
 

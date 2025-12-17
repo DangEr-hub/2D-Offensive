@@ -7,7 +7,7 @@ if(instance_exists(MainObject)){
 	image_angle = MainObject.RotationAngle;
 	
 	
-	if(MainObject.object_index == oEnemy){
+	if(MainObject.object_index == oBot){
 		
 		#region Knife hit
 		var knife_object = instance_nearest(x, y, oKnife);
@@ -33,10 +33,5 @@ if(instance_exists(MainObject)){
 		}
 		#endregion
 
-		if(instance_exists(MainObject.ChasingObject)){
-			if(MainObject.ChasingObject.object_index != oPlayer){
-				MainObject.ChasingObject = oPlayer;
-			}
-		}
 	}
 }

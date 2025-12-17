@@ -121,7 +121,7 @@ if(instance_exists(oPlayer)){
 	}
 
 
-	if(RespawnMenu == true && alarm[0] == -1){
+	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0){
 		with(zui_main()){
 			if(other.GameEndMenu == true && !instance_exists(oGameEndMenu)){
 				zui_create(0, 0, objUIBlack, -1000);

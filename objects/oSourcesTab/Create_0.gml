@@ -1,0 +1,79 @@
+event_inherited();
+tab_width = 768 * global.GUIMultiplier;
+tab_height = 512 * global.GUIMultiplier;
+draw_set_font(set_font("Menu_small"));
+zui_set_size(tab_width, tab_height);
+
+pos_x = zui_get_width() * .01;
+pos_y = zui_get_height() * .1;
+gap = 170 * global.GUIMultiplier;
+text_height = string_height("a")*2;
+
+with (zui_create(0, 0, objUIWindowCaption)) {
+	caption = "Sources";
+	draggable = 1;
+}
+
+
+source_names = [
+	"Headshot sound (1): ",
+	"AWM sound: ",
+	"Spas-12 sound: ",
+	"Empty magazine sound: ",
+	"SSG 08 sound: ",
+	"Bullet nearby sound: ",
+	"Glock-17 sound: ",
+	"USP unsilenced sound: ",
+	"Metallic sound: ",
+	"Explosion sound: ",
+	"Birds sound: ",
+	"Rain sound: ",
+	"GUI engine: ",
+	"Bloom shader: ",
+	"Blur shader: ",
+];
+
+sources = [
+	"https://pixabay.com/sound-effects/086230-headshotwav-40654/",
+	"https://pixabay.com/sound-effects/sniper-rifle-5989/",
+	"https://pixabay.com/sound-effects/shotgun-firing-4-6746/",
+	"https://pixabay.com/sound-effects/empty-gun-shot-6209/",
+	"https://pixabay.com/sound-effects/gun-shot-1-176892/",
+	"https://pixabay.com/sound-effects/visceralbulletimpacts-6738/",
+	"https://freesound.org/people/JD_Brick_Productions/sounds/678527/",
+	"https://freesound.org/people/JD_Brick_Productions/sounds/678527/",
+	"https://pixabay.com/sound-effects/metal-slam-5-189786/",
+	"https://pixabay.com/sound-effects/medium-explosion-40472/",
+	"https://pixabay.com/sound-effects/birds-chirping-75156/",
+	"https://pixabay.com/sound-effects/real-rain-sound-379215/",
+	"https://marketplace.gamemaker.io/assets/649/zui-engine",
+	"https://www.youtube.com/watch?v=qbIkMMFxX3g&",
+	"https://github.com/GameMakerDiscord/blur-shaders"
+	
+	
+	
+];
+
+
+for(i = 0; i < array_length(sources); i++){
+	src_but = zui_create(pos_x + gap, pos_y - text_height/4 + text_height*i, objUIButton);
+    with(src_but){
+        zui_set_anchor(0.5, 0);
+        zui_set_width(64 * global.GUIMultiplier);
+        zui_set_height(16 * global.GUIMultiplier);
+        caption = "Open";
+
+        link_url = other.sources[other.i];
+
+        callback = function(){
+            url_open(link_url);
+        };
+    }
+	
+	with(zui_create(pos_x, pos_y + text_height*i, objUILabel)){
+		color = c_white;
+		caption = other.source_names[other.i];
+	}
+
+}
+

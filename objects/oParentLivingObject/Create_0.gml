@@ -1,4 +1,5 @@
 event_inherited();
+ChasingObject = noone;
 stats = {};
 VisibilityTimer = -1;
 Visible = true;

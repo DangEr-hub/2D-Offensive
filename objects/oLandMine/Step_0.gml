@@ -6,7 +6,7 @@ if (alpha_timer > -1) {
 }
 
 if (!explode) {
-    explode = shouldExplode(oPlayer, stats.Object) || shouldExplode(oEnemy, stats.Object) || shouldExplode(oGrenade, stats.Object);
+    explode = shouldExplode(oPlayer, stats.Object) || shouldExplode(oBot, stats.Object) || shouldExplode(oGrenade, stats.Object);
 }
 
 if(explode == true){

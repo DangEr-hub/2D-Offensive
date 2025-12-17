@@ -6,7 +6,7 @@ if(Visible == true){
 	gpu_set_tex_filter(false);
 }
 
-with(oEnemy){
+with(oBot){
 	if(Visible == true){
 		if(CanShoot == false && ShootTimer >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]/1.5 && healing == false){
 			draw_sprite_ext(spr_MuzzleFlash, 0, Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), 

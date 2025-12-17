@@ -2,8 +2,7 @@ event_inherited();
 //draw_text(x, y - 70, network_id);
 //draw_text(x, y + 100, "should_handle_death" + string(should_handle_death));
 
-draw_text(x, y + 50, "zuimain" + string(instance_exists(objZUIMain)));
-draw_text(x, y + 75, "roundendmenu" + string(instance_exists(oRoundEndMenu)));
+draw_text(x, y + 50, selected_bot);
 //draw_text(x, y + 100, "Reloadtime" + string(ReloadTime));
 if(Visible == true){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];

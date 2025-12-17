@@ -30,6 +30,7 @@ function save_game(){
 	ini_write_real("Vars", "window_height", global.window_height);
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
+	ini_write_real("Vars", "anti_aliasing", global.anti_aliasing);
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -85,6 +86,30 @@ function save_game(){
 
 function load_game(){
 	
+	global.aberration_level = 0;
+	global.saturation_level = 1.8;
+	global.TimeSpeed = 15;
+	global.GodMode = 0;
+	global.MapID = MapIndex.Desert;
+	global.CrosshairAlpha = 1;
+	global.DynamicCrosshair = 0;
+	global.PlayerInaccuracy = 1;
+	global.EnemyCanMove = 1;
+	global.DrawBulletImpact = 0;
+	global.ViewShake = 1;
+	global.AdminHUD = 0;
+	global.DrawParticles = 1;
+	global.crosshair_color = c_white;
+	global.draw_other_models = 0;
+	global.sound_gain = 100;
+	global.BloomShader = 1;
+	global.enemy_visibility = 0;
+	global.GUIMultiplier = 1;
+	global.window_width = 1920;
+	global.window_height = 1080;
+	global.anti_aliasing = 0;
+	global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
+	
 	#region Load game
 	if(file_exists("save_game.ini")){
 		ini_open("save_game.ini");
@@ -110,6 +135,7 @@ function load_game(){
 		global.window_width = ini_read_real("Vars", "window_width", global.window_width);
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
+		global.anti_aliasing = ini_read_real("Vars", "anti_aliasing", global.anti_aliasing);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
 		global.map_rounds = array_create(MapIndex.Total);

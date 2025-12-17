@@ -6,26 +6,27 @@ var cam_y = camera_get_view_y(CAMERA);
 var cam_width = camera_get_view_width(CAMERA);
 var cam_height = camera_get_view_height(CAMERA);
 if(global.Weather == 1){
+	if!(audio_is_playing(snd_Rain)){
+		audio_play_sound(snd_Rain, 0, true);
+	}
 	if(instance_exists(oParticleSystem)){
-	    repeat (3){
-			particle_create(
-				1,
-				0,
-				0,
-				spr_RainSplash,
-				0,                  
-				0,
-				0,
-				0,                 
-				false,
-				false, 
-				0,
-				random_range(cam_x, cam_x + cam_width),
-				random_range(cam_y, cam_y + cam_height),
-				0.8, 
-				-1
-			);
-		}
+		particle_create(
+			2,
+			0,
+			0,
+			spr_RainSplash,
+			0,                  
+			0,
+			0,
+			0,                 
+			false,
+			false, 
+			0,
+			random_range(cam_x, cam_x + cam_width),
+			random_range(cam_y, cam_y + cam_height),
+			random_range(0.1, 0.25), 
+			-1
+		);
 	}
 	if(percent_chance(1)){
 		var m = 64;

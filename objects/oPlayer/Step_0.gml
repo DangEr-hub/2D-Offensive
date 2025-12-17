@@ -27,7 +27,11 @@ if (is_remote) {
 	
 	
 	if(Weapon != noone && (wpn_id != Item.None && (global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote))){
-		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance, RotationAngle);
+		var suppressor_len = 1;
+		if(network_suppressor != Item.None){
+			suppressor_len = 1.25;
+		}
+		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppresor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 	}else{
 		FlashLightX = x; FlashLightY = y;
 	}
@@ -658,6 +662,56 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 			}
 			#endregion
+			
+			#region Bot selection and command
+			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeySelectBot])){
+			    ds_list_clear(bot_select_list);
+
+
+			    var bot_count = collision_circle_list(
+			        x,
+			        y,
+			        BOT_SELECT_RADIUS,
+			        oBot,
+			        false,
+			        false,
+			        bot_select_list,
+			        true
+			    );
+
+			    // filtr FRIENDLY botů
+			    for(var i = bot_count - 1; i >= 0; i--){
+			        var bot = bot_select_list[| i];
+			        if(!instance_exists(bot) || bot.team != TEAM.FRIENDLY){
+			            ds_list_delete(bot_select_list, i);
+			        }
+			    }
+				
+				bot_count = ds_list_size(bot_select_list);
+				
+			    if(bot_count > 0){
+			        bot_select_index++;
+			        if(bot_select_index >= bot_count){ bot_select_index = 0; }
+
+			        selected_bot = bot_select_list[| bot_select_index];
+			    }else{
+			        selected_bot = noone;
+			        bot_select_index = -1;
+			    }
+			}
+			
+			if(!instance_exists(selected_bot)){
+			    selected_bot = noone;
+			    bot_select_index = -1;
+			}
+			
+			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommandBot])){
+			    if(selected_bot != noone){
+			        with(selected_bot){
+			        }
+			    }
+			}
+			#endregion
 	
 			#region Hidden flag
 			var hidden_in_smoke = false;
@@ -934,7 +988,11 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Flashlight
 			if(Weapon != noone && (wpn_id != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None)){
-				FlashLightX = Weapon.x + lengthdir_x(WeaponDistance, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance, RotationAngle);
+				var suppressor_len = 1;
+				if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None){
+					suppressor_len = 1.25;
+				}
+				FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppresor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 			}else{
 				FlashLightX = x; FlashLightY = y;
 			}
@@ -1003,10 +1061,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if (burst_fire == true) {
 				if (burst_fire_timer <= 0) {
 					if (burst_shots_fired < burst_shot_limit) {		
-						var sound_id = global.ItemIndex[#wpn_id, ItemStat.SoundID];
-						if(global.Inventory[# WeaponID, Index.slot_suppressor] == Item.military_suppressor){
-							sound_id = snd_Silencer;
-						}
 						ShootTimer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);
 						player_shooting();		
 						Weapon.KickBackEffect = global.ItemIndex[#wpn_id, ItemStat.KickBackPower];
@@ -1059,10 +1113,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 									}else{
 						
 										#region Normal fire
-										var sound_id = global.ItemIndex[#wpn_id, ItemStat.SoundID];
-										if(global.Inventory[# WeaponID, Index.slot_suppressor] == Item.military_suppressor){
-											sound_id = snd_Silencer;
-										}
 										ShootTimer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
 										player_shooting();
 										Weapon.KickBackEffect = global.ItemIndex[#wpn_id, ItemStat.KickBackPower];
@@ -1277,8 +1327,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Object push player
-			if(place_meeting(x, y, oEnemy)) {
-			    var Enemy = instance_nearest(x, y, oEnemy);
+			if(place_meeting(x, y, oBot)) {
+			    var Enemy = instance_nearest(x, y, oBot);
 				var dir = point_direction(Enemy.x, Enemy.y, x, y);
 				AccelX = 5 * cos(degtorad(dir));
 				AccelY = -5 * sin(degtorad(dir));
@@ -1930,7 +1980,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			var deactivateRight = deactivateLeft + camera_get_view_width(CAMERA) + 2 * DEACTIVATE_MARGIN;
 			var deactivateBottom = deactivateTop + camera_get_view_height(CAMERA) + 2 * DEACTIVATE_MARGIN;
 
-			with (oEnemy) {
+			with (oBot) {
 			    if (x < deactivateLeft || x > deactivateRight || y < deactivateTop || y > deactivateBottom) {
 			        Visible = false;
 					FlashLight.visible = false;

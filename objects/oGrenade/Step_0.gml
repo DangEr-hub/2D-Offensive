@@ -5,7 +5,7 @@ if(stuck == false){
 	y += lengthdir_y(stats.Speed, stats.Direction);
 	stats.Speed *= .95;
 	
-	if!(place_meeting(x, y, oParentTile) && place_meeting(x, y, oEnemy)){
+	if!(place_meeting(x, y, oParentTile) && place_meeting(x, y, oBot)){
 		image_angle += stats.Speed*2;
 	}
 
@@ -22,8 +22,8 @@ if(stats.Item_id == Item.StickyGrenade){
 		        stuck_offset_y = y - stuck_to.y;
 		    }
 		}
-		if(instance_exists(oEnemy)){
-		    var collision_instance = instance_place(x, y, oEnemy);
+		if(instance_exists(oBot)){
+		    var collision_instance = instance_place(x, y, oBot);
 		    if (collision_instance != noone) {
 		        stuck = true;
 		        stuck_to = collision_instance;
@@ -33,7 +33,7 @@ if(stats.Item_id == Item.StickyGrenade){
 		}
 	} else {
 		if(instance_exists(stuck_to)){
-			if(stuck_to.object_index = oEnemy){
+			if(stuck_to.object_index = oBot){
 				if(stuck_to.Visible == false){
 					visible = false;
 				}else{
@@ -106,19 +106,19 @@ if(ExplosionTimer == -1){
 					#endregion					
 				}
 			}
-			if(instance_exists(oEnemy)){
-				if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
-					if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
+			if(instance_exists(oBot)){
+				if!(collision_line(x, y, oBot.x, oBot.y, oParentTile, true, false)){
+					if (point_distance(x, y, oBot.x, oBot.y) < global.FlashBangMaxDistance) {
 						
 						#region Flash enemy
-						if(instance_exists(oEnemy)){
-							var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
+						if(instance_exists(oBot)){
+							var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
 							if (angular_diff > 180){
 								angular_diff = 360 - angular_diff;
 							}
-							oEnemy.Reloading = false;
-							oEnemy.Flashed = true;
-							oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
+							oBot.Reloading = false;
+							oBot.Flashed = true;
+							oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
 						}
 						#endregion
 						
@@ -203,19 +203,19 @@ if(ExplodeTimer == -1){
 				
 			}
 		}
-		if(instance_exists(oEnemy)){
-			if!(collision_line(x, y, oEnemy.x, oEnemy.y, oParentTile, true, false)){
-				if (point_distance(x, y, oEnemy.x, oEnemy.y) < global.FlashBangMaxDistance) {
+		if(instance_exists(oBot)){
+			if!(collision_line(x, y, oBot.x, oBot.y, oParentTile, true, false)){
+				if (point_distance(x, y, oBot.x, oBot.y) < global.FlashBangMaxDistance) {
 						
 					#region Flash enemy
-					if(instance_exists(oEnemy)){
-						var angular_diff = abs(point_direction(oEnemy.x, oEnemy.y, x, y) - oEnemy.RotationAngle);
+					if(instance_exists(oBot)){
+						var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
 						if (angular_diff > 180){
 							angular_diff = 360 - angular_diff;
 						}
-						oEnemy.Reloading = false;
-						oEnemy.Flashed = true;
-						oEnemy.FlashedTimer = ceil(oEnemy.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oEnemy.x, oEnemy.y) / global.FlashBangMaxDistance)*.1));
+						oBot.Reloading = false;
+						oBot.Flashed = true;
+						oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
 					}
 					#endregion
 						
@@ -301,8 +301,8 @@ if(stuck == false){
 	#region Collision with enemy
 
 	x += lengthdir_x(stats.Speed, stats.Direction);
-	if (place_meeting(x, y, oEnemy)) {
-		var EnemyNearest = instance_nearest(x, y, oEnemy);
+	if (place_meeting(x, y, oBot)) {
+		var EnemyNearest = instance_nearest(x, y, oBot);
 		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
 			stats.Speed *= .75;
 		    stats.Direction = -stats.Direction * random_range(.75, 1);
@@ -311,8 +311,8 @@ if(stuck == false){
 	}
 
 	y += lengthdir_y(stats.Speed, stats.Direction);
-	if(instance_exists(oEnemy)){
-		var EnemyNearest = instance_nearest(x, y, oEnemy);
+	if(instance_exists(oBot)){
+		var EnemyNearest = instance_nearest(x, y, oBot);
 		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
 			stats.Speed *= .75;
 		    stats.Direction = (180 - stats.Direction) * random_range(.75, 1);

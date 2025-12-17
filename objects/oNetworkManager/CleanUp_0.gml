@@ -16,7 +16,7 @@ if(free_item_ids != -1){
 }
 
 
-if (IS_SERVER) {
+if (oNetworkManager.is_server) {
     // Server shutdown
     if (server_socket >= 0) {
         // Notify all clients

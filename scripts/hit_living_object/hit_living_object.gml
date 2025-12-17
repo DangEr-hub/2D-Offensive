@@ -1,5 +1,7 @@
 function enemy_initialized(hitObj, enemy_key, enemy_name) {
     var enemyStatsMap;
+	
+	if(!instance_exists(hitObj)){ return; }
 
     if (!ds_map_exists(hitObj.HitMap, enemy_key)) {
         enemyStatsMap = ds_map_create();
@@ -66,7 +68,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	}
 	
 	var is_player = (hit_object.object_index == oPlayer);
-	var is_bot = (hit_object.object_index == oEnemy);
+	var is_bot = (hit_object.object_index == oBot);
 	var has_godmode = false;
 	var armour_id = Item.None;
 	var helmet_id = Item.None;
@@ -75,6 +77,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var blood_color = c_red;
 	var data = -1;
 	var hp = hit_object.stats.Health_points;
+	var attacker = attacking_item.stats.Object;
 	
 	/* Networking */
 	if(is_player){
@@ -111,9 +114,11 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	}
 	
 	/* Hit marker */
-	oCrosshair.HitMarker = 0;
-	if(BodyPart <= HitBox.HeadProne){
-		oCrosshair.HitMarker = 4;
+	if(instance_exists(attacker) && attacker.object_index == oPlayer && attacker.is_local == true){
+		oCrosshair.HitMarker = 0;
+		if(BodyPart <= HitBox.HeadProne){
+			oCrosshair.HitMarker = 4;
+		}
 	}
 	/**************/
 
@@ -132,7 +137,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		}
 		/*****************************/
 		
-		if(hit_object.object_index == oEnemy){
+		if(hit_object.object_index == oBot){
 			with(hit_object){
 				if(ChasingObjectSpotted == false){
 					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
@@ -169,7 +174,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		hit_object.attack_damage *= DamageMultiplier / (attacking_item.stats.Penetration_damage + 1);
 		hit_object.attack_damage = ceil(hit_object.attack_damage);
 		
-		if(hit_object.object_index == oEnemy){
+		if(hit_object.object_index == oBot){
 			hit_object.enemy_aimpunch = hit_object.attack_damage;
 		}
 		create_blood_particle(ceil(hit_object.attack_damage / 5), impact_x, impact_y, blood_color, ceil(hit_object.attack_damage / 2));		
@@ -178,7 +183,6 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		var attacker_name = "";
 		var victim_key = -1;
 		var victim_name = "";
-		var attacker = attacking_item.stats.Object;
 
 		#region Hitmap
 		if (instance_exists(attacker)) {
@@ -238,7 +242,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		            global.player_stats_struct.Kills++;
 		            oRatingController.kills++;
 		        }
-		    } else if (IS_SERVER) {
+		    } else if (oNetworkManager.is_server) {
 		        // MULTIPLAYER REWARD – jen host zapisuje statistiky (anti-cheat)
 		        if (attacker_pid >= 0) {
 		            with (oNetworkManager) {
@@ -297,7 +301,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		                global.player_stats_struct.Headshots++;
 		                oRatingController.headshots++;
 		            }
-		        } else if (IS_SERVER && attacker_pid >= 0) {
+		        } else if (oNetworkManager.is_server && attacker_pid >= 0) {
 		            // MULTIPLAYER HOST
 		            with (oNetworkManager) {
 		                var stats = ds_map_find_value(player_stats, attacker_pid);

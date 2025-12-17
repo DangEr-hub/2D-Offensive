@@ -661,7 +661,7 @@ function handle_object_sync_server(socket_id) {
             break;
             case 1: { // destroy request
                 var net_id = buffer_read(receive_buffer, buffer_u16);
-				var o_index = buffer_read(receive_buffer, buffer_u16);
+				o_index = buffer_read(receive_buffer, buffer_u16);
                 var inst = find_instance_by_network_id(oItems, net_id);
 				
 		        if (net_id >= 0) {

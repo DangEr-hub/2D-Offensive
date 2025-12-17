@@ -124,12 +124,27 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	
 	var sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
 	var instance_emitter = bullet_tracer.stats.Object;
+	
 	if(IS_NET){
 		instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
 		if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
 			instance_emitter = global.local_player;
 		}
+		if(instance_emitter.network_weapon_suppresor == Item.military_suppressor){
+			sound_id = snd_Silencer;
+		}
+	}else{
+		if(bullet_tracer.stats.Object_index == oPlayer){
+			if(global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor){
+				sound_id = snd_Silencer;
+			}
+		}else{
+			if(global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None){
+				sound_id = snd_Silencer;
+			}
+		}
 	}
+	
 	play_sound(pos[0], pos[1], sound_id, instance_emitter);
 	
 	return bullet_tracer;
@@ -295,16 +310,16 @@ function shouldExplode(ObjectType, Placer) {
         var landminePlacerType = stats.Object_index;
 
         // Additional check: if the landmine is placed by an enemy, do not trigger for other enemies
-        if (landminePlacerType == oEnemy && instance_to_check.object_index == oEnemy) {
+        if (landminePlacerType == oBot && instance_to_check.object_index == oBot) {
             isNotPlacer = false;
         }
 
         // Check for grenade specific conditions
         if (ObjectType == oGrenade) {
-            if (landminePlacerType == oEnemy && instance_to_check.stats.Object_index != oPlayer) {
+            if (landminePlacerType == oBot && instance_to_check.stats.Object_index != oPlayer) {
                 return false;
             }
-            if (landminePlacerType == oPlayer && instance_to_check.stats.Object_index != oEnemy) {
+            if (landminePlacerType == oPlayer && instance_to_check.stats.Object_index != oBot) {
                 return false;
             }
         }
@@ -559,7 +574,7 @@ function player_shooting(){
 				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
-				instance_nearest(oCrosshair.x, oCrosshair.y, oEnemy),
+				instance_nearest(oCrosshair.x, oCrosshair.y, oBot),
 				[id.x, id.y],
 				false
 			);
@@ -571,7 +586,7 @@ function player_shooting(){
 				[
 					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
-					global.BulletSpeed,
+					BULLET_SPEED,
 					global.ItemIndex[#wpn_id, ItemStat.Range]
 				],
 				id,
@@ -622,8 +637,8 @@ function inaccuracy_formula(WID, ObjectType){
 				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
 				(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1) * ObjectType.stamina_inaccuracy), 175);
 			}
-		}else if(ObjectType.object_index == oEnemy){
-			if(instance_exists(oEnemy)){
+		}else if(ObjectType.object_index == oBot){
+			if(instance_exists(oBot)){
 				var behind_smoke_inaccuracy = 1;
 				var FlashedInaccuracy = 1;
 				var InSmokeInaccuracy = 1;
@@ -736,10 +751,8 @@ function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBase
         Age: age,
         Name: EnemyName, 
         Damage_health_points: Health,
-        Max_health_points: Health,
 		Stamina_points: Stamina,
 		Damage_stamina_points: Stamina,
-		Max_stamina_points: Stamina
     };
 	
     return enemy_struct;
@@ -900,7 +913,7 @@ function reset_gui(){
 }
 	
 function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
-	if(object_index == oEnemy){
+	if(object_index == oBot){
 		if(Visible == true){
 			Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
 			Indicator.Font = DamageIndicatorFont;

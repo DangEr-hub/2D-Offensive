@@ -81,7 +81,7 @@ part_type_orientation(dust_particle, 0, 360, 0, .1, 0);
 //Rain
 
 rain_particle = part_type_create();
-part_type_alpha2(rain_particle, .5, .59);
+part_type_alpha2(rain_particle, .4, .5);
 part_type_shape(rain_particle, pt_shape_line);
 part_type_direction(rain_particle, 0, 360, 0, 1);
 part_type_orientation(rain_particle,0,360,0,0,1);

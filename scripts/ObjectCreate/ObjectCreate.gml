@@ -29,7 +29,7 @@ function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness
 				Stay = CanStay;
 				Bounce = CanBounce;
 				image_index = ImageIndex;
-				image_alpha = Alpha;
+				alpha = Alpha;
 				FadeAwayTimer = FadeAwayTime;
 				motion_add(Dir + AngleRandomness, Speed);
 			}
@@ -60,7 +60,7 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 			[
 				Id,
 				i * (360/ShrapnelNumber),
-				global.BulletSpeed * .75,
+				BULLET_SPEED * .75,
 				ExplosionDistance,
 			],
 			ObjectType,

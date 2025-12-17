@@ -1,5 +1,82 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function pick_chasing_object(range){
+    var best_target = noone;
+    var best_importance = -100000;
+
+    var list = ds_list_create();
+    var count = collision_circle_list(
+        x, y,
+        range,
+        oParentLivingObject,
+        false, true,
+        list,
+        false
+    );
+
+    for (var i = 0; i < count; i++){
+        var inst = list[| i];
+        if (!instance_exists(inst)) continue;
+        if (inst == id) continue;
+        if (inst.team == team) continue;
+        if (inst.stats.Health_points <= 0) continue;
+
+        var dist = point_distance(x, y, inst.x, inst.y);
+        if (dist > range) continue;
+
+        var importance = 0;
+
+        // 1) vzdálenost (blíž = lepší)
+        importance += (range - dist);
+
+        // 2) držení současného cíle
+        if (inst == ChasingObject){
+            importance += 100;
+		}
+		
+		if(team == TEAM.FRIENDLY && (instance_exists(inst.ChasingObject) && inst.ChasingObject.object_index == oPlayer)){
+			importance += 300;
+		}
+
+        // 3) viditelnost
+        if (inst.Visible){
+            importance += 200;
+		}else{
+            importance -= 300;
+		}
+
+        // 4) hrozba – tenhle cíl po mně jde
+        if (inst.ChasingObject == id){
+            importance += 350;
+		}
+
+        // 5) dorážení zraněných
+		var max_hp = global.player_stats_struct.Max_health;
+		if(inst.object_index != oPlayer){
+			max_hp = inst.stats.Max_health_points;
+		}
+        importance += (max_hp - inst.stats.Health_points) * 1.5;
+
+        // 6) typová preference
+        if (team == TEAM.ENEMIES && inst.object_index == oPlayer){
+            importance += 200;
+		}
+
+
+        if (importance > best_importance){
+            best_importance = importance;
+            best_target = inst;
+        }
+    }
+	
+
+    ds_list_destroy(list);
+    return best_target;
+}
+
+
+
+
 function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enemy"){
 	
 	var shoot_inaccuracy = .5;
@@ -10,7 +87,7 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 	}
 	
 	var rank_less = get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
-	if(Type == "Friend"){
+	if(Type == TEAM.FRIENDLY){
 		rank_less = 0;
 	}
 	
@@ -37,7 +114,7 @@ function bot_bullet_create(DangerShotX, DangerShotY, EnemyWeaponID, Type = "Enem
 			[
 				EnemyWeaponID,
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
-				global.BulletSpeed,
+				BULLET_SPEED,
 				global.ItemIndex[# EnemyWeaponID, ItemStat.Range]
 			],
 			id,
@@ -58,8 +135,8 @@ function check_enemy_rotation(EnemyObject, ChasingObject){
     var enemy_x = EnemyObject.x;
     var enemy_y = EnemyObject.y;
         
-    var angle_to_player = point_direction(enemy_x, enemy_y, ChasingObject.x, ChasingObject.y);
-    var angle_diff = angle_to_player - EnemyObject.RotationAngle;
+    var angle_to_target = point_direction(enemy_x, enemy_y, ChasingObject.x, ChasingObject.y);
+    var angle_diff = angle_to_target - EnemyObject.RotationAngle;
     angle_diff = angle_diff % 360;
     if (angle_diff > 180) angle_diff -= 360;
     if (angle_diff < -180) angle_diff += 360;
@@ -71,18 +148,13 @@ function check_enemy_rotation(EnemyObject, ChasingObject){
 	return rotation;
 }
 	
-
 function check_if_available(ObjectType) {
-    if (instance_exists(ObjectType) && ObjectType != noone) {
-		
-		
-        
+    if (instance_exists(ObjectType) && ObjectType != noone) {	       
         return 
         (!collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false) && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.hidden == false && 
         check_enemy_rotation(id, ObjectType) == true);
-    } else {
-        return false;
     }
+	return false;
 }
 
 function MoveRunAway(DangerX, DangerY){
@@ -150,11 +222,6 @@ function EnemyShooting(DangerX, DangerY){
 	}
 	
 	if(CanShoot == true && ChasingObjectSpotted == true && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0 && percent_chance(shoot_chance)){
-		
-		var sound_id = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.SoundID];
-		if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None){
-			sound_id = snd_Silencer;
-		}
 
 		if(Visible == true){
 		
@@ -264,7 +331,6 @@ function move_predictive(PositionX, PositionY) {
     XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
     YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
 }
-
 
 function MoveIdle(){
 	
@@ -458,7 +524,7 @@ function ThrowGrenadeAI() {
         return;
     }
 
-    if (!instance_exists(oParentTile) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oEnemy, true, true)) {
+    if (!instance_exists(oParentTile) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false) || collision_line(x, y, ChasingObject.x, ChasingObject.y, oBot, true, true)) {
         handle_offensive_movement();
         return;
     }

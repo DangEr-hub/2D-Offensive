@@ -5,7 +5,7 @@ if(hit_timer > -1){
 	hit_timer --;
 }
 
-if(object_index == oEnemy || object_index == oFriend){
+if(object_index == oBot){
 	
 	#region Wall collision
 	var tile = instance_place(x, y, oParentTile);
@@ -37,7 +37,7 @@ if (VisibilityTimer == 0) Visible = false;
 var observer = global.local_player;
 
 // jestli tenhle objekt má být skrýván
-var is_target = (object_index == oEnemy) || (object_index == oPlayer && is_remote);
+var is_target = (object_index == oBot) || (object_index == oPlayer && is_remote);
 
 // lokální hráč je vždy viditelný
 if (id == observer) {
@@ -46,14 +46,13 @@ if (id == observer) {
 
     if (!global.enemy_visibility) {
 
+		in_fov =
+	        point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+	        point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+	        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+	        point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
 
-		var in_fov =
-            point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-            point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-            point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-            point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
-
-        var force_visible =  stats.Health_points <= 0 || ((object_index == oEnemy) && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
+        var force_visible = stats.Health_points <= 0 || ((object_index == oBot) && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
 
         if (in_fov || force_visible) {
 

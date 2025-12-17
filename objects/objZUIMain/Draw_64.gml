@@ -1,4 +1,4 @@
-matrix_stack_push();
+matrix_stack_push(matrix_get(matrix_world));
 matrix_set(matrix_world, matrix_build_identity());
 
 zui_draw(0, 0, 1, 1);

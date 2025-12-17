@@ -1,49 +1,24 @@
 randomize();
 global.my_console = console_create();
-global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
-global.local_player = -1;
+global.local_player = oPlayer;
 global.sv_cheats = false;
-global.aberration_level = 0;
-global.saturation_level = 1.8;
 global.InventoryEquipLeftTopCorner = [-1, -1];
 global.InventoryEquipRightBottomCorner = [-1, -1];
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
 global.FlashBangMaxDistance = 512;
-global.DynamicCrosshair = false;
-global.CrosshairAlpha = 1;
-global.BulletSpeed = 75;
-global.DrawBulletImpact = false;
-global.AdminHUD = false;
 global.HitBoxAlpha = .1;
-global.EnemyCanMove = true;
-global.GodMode = false;
 global.Hostage = false;
 global.ConsoleHeight = 256;
 global.ConsoleWidth = 512;
 global.GUIHUDAlpha = .75;
 global.FieldOfView = 10;
-global.BloomShader = true;
-global.TimeSpeed = 15;
-global.ViewShake = true;
-global.PlayerInaccuracy = 1;
-global.DrawParticles = true;
 global.CameraWidth = 1920/2;
 global.CameraHeight = 1080/2;
-global.GUIMultiplier = clamp(display_get_width()/global.CameraWidth, 1, 2);
-global.selected_bots = ds_list_create();
-global.current_selected_bot = -1;
-global.enemy_visibility = false;
-global.anti_aliasing = 0;
-global.sound_gain = 100;
 global.ranked_game = false;
 global.hard_mode = false;
-global.window_width = 1920;
-global.window_height = 1080;
-global.draw_other_models = false;
 global.Weather = 0;
-global.crosshair_color = c_white;
-global.sound_emitters = ds_map_create();
+
 
 global.player_stats_struct = {
 	Name: "DangEr",
@@ -78,6 +53,11 @@ global.rating_struct = ini_player_struct_create();
 
 enum icons{
 	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, total
+}
+
+enum TEAM{
+	FRIENDLY,
+	ENEMIES
 }
 
 enum weapon_attachments{
@@ -169,9 +149,9 @@ enum KeyBind{
 	KeyInventory, KeyPickUp, KeyCycleLeft,
 	KeyCycleRight, KeyCycleUp, KeyShootMouse, KeyReload,
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
-	KeyProne, KeyWeaponAttachments, KeyCommand, KeyGo, 
-	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleDown, 
-	KeyCycleInvLeft, KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown,
+	KeyProne, KeyWeaponAttachments, KeySelectBot, KeyCommandBot, 
+	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleInvLeft,
+	KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown,
 	Total
 }
 
@@ -182,9 +162,10 @@ ds_list_add(
 	ord("I"), vk_space, ord("Q"), 
 	ord("E"), ord("F"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
-	ord("Y"), ord("T"), ord("X"), ord("H"),
-	ord("B"), vk_shift, ord("G"), ord("C"),
-	ord("A"), ord("D"), ord("W"), ord("S"),
+	ord("Y"), ord("T"), ord("X"), ord("C"),
+	ord("B"), vk_shift, ord("G"), ord("A"), 
+	ord("D"), ord("W"), ord("S"),
+	ord("X"), ord("C")
 );
 
 enum player_textures{

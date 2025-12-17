@@ -67,7 +67,7 @@ statistics_callback = function(){
 };
 
 settings_callback = function(){
-	if!(instance_exists(oSettings)){
+	if!(instance_exists(oSettingsTab)){
 		with(zui_main()){
 			var window_id = noone;
 			
@@ -75,7 +75,39 @@ settings_callback = function(){
 				zui_destroy();
 			}
 			
-			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oSettings, -1)) {
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oSettingsTab, -1)) {
+				window_id = id;
+			}
+		}
+	}
+};
+
+keyboard_callback = function(){
+	if!(instance_exists(oKeyboardTab)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oKeyboardTab, -1)) {
+				window_id = id;
+			}
+		}
+	}
+};
+
+sources_callback = function(){
+	if!(instance_exists(oSourcesTab)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oSourcesTab, -1)) {
 				window_id = id;
 			}
 		}
@@ -130,11 +162,19 @@ with (zui_main()) {
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
-		caption = "Keyboard input";
-		callback = oController.exit_callback;
+		caption = "Keyboard settings";
+		callback = oController.keyboard_callback;
 	}
 	
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*9, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(button_width);
+		zui_set_height(button_height);
+		caption = "Sources";
+		callback = oController.sources_callback;
+	}
+	
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*10.5, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);

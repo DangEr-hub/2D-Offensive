@@ -50,7 +50,7 @@ function equip_network_propagate(){
 		oNetworkManager.equipment_sync = true;
 
 		// pokud je to server hráč (pid 0), musí aktualizovat player_states
-		if (IS_SERVER) {
+		if (oNetworkManager.is_server) {
 			var data = ds_map_find_value(oNetworkManager.player_states, network_id);
 			if (is_undefined(data)) {
 				data = ds_map_create();
@@ -71,7 +71,7 @@ function weapon_network_propagate(){
 		oNetworkManager.weapon_sync = true;
 
 		// pokud je to server hráč (pid 0), musí aktualizovat player_states
-		if (IS_SERVER) {
+		if (oNetworkManager.is_server) {
 			var data = ds_map_find_value(oNetworkManager.player_states, network_id);
 			if (is_undefined(data)) {
 				data = ds_map_create();

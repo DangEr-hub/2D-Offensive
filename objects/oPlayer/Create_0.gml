@@ -1,5 +1,9 @@
 //haze_start(true, false);
 event_inherited();
+team = TEAM.FRIENDLY;
+selected_bot = noone;
+bot_select_index = -1;
+bot_select_list = ds_list_create();
 alarm[0] = 1;
 Weapon = -1;
 wpn_id = Item.None;
@@ -164,6 +168,10 @@ network_armour_dur = 0;
 network_helmet_dur = 0;
 network_weapon_id = Item.None;
 network_shoot_timer = -1;
+network_suppressor = Item.None;
+network_barrel = Item.None;
+network_scope = Item.None;
+network_grip = Item.None;
 
 #endregion
 

@@ -14,7 +14,7 @@ stats = {
     "Damage": 0,
     "Starting_x": 0,
     "Starting_y": 0,
-    "Object": -1,
+    "Object": noone,
     "Item_id": Item.None,
     "Penetration_damage": 0,
     "Tracer_image": 0,

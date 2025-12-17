@@ -185,7 +185,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		#endregion
 
 		#region Draw enemy health
-		with(oEnemy){
+		with(oBot){
 			if(stats.Health_points > 0 && Visible == true){
 				var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
@@ -197,6 +197,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
 				draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 				draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				
+				if(id == global.local_player.selected_bot){
+					draw_sprite_ext(spr_BotSelect, 0, HealthX, HealthY, 1.5, 1.5, false, c_white, 1);
+				}
 
 				if(healing == true){
 					draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);

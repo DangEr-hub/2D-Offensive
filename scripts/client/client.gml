@@ -57,9 +57,11 @@ function handle_client_receive() {
 			case PACKET.PLAYER_RESPAWN: handle_player_respawn_client(); break;
 			
 			case PACKET.PING: handle_ping_response_client(); break;
+			
         }
     }
 }
+
 
 function handle_player_death_client() {
     with (oNetworkManager) {

@@ -74,7 +74,7 @@ function spawn_enemies(map_index) {
 
 	            if (attempts < max_attempts) {
 	                // Spawn the enemy at the valid point
-	                instance_create_layer(spawn_x, spawn_y, "LivingO", oEnemy);
+	                instance_create_layer(spawn_x, spawn_y, "LivingO", oBot);
 	            } else {
 					return false;
 	            }

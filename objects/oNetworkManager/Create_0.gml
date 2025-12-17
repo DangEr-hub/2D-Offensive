@@ -57,7 +57,8 @@ enum PACKET {
 	OBJECT_POS_SYNC,
 	PLAYER_DEATH,
 	PLAYER_RESPAWN,
-	PING
+	PING,
+	BIRD_SPAWN
 }
 
 equipment_sync = false;
