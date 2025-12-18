@@ -58,10 +58,87 @@ function handle_client_receive() {
 			
 			case PACKET.PING: handle_ping_response_client(); break;
 			
+			case PACKET.BIRD_SYNC: handle_bird_sync_client(); break;
+			
         }
     }
 }
 
+function send_bird_death_request(net_id) {
+    with (oNetworkManager) {
+        if (!is_connected || client_socket < 0) return;
+
+        buffer_seek(send_buffer, buffer_seek_start, 0);
+        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+        buffer_write(send_buffer, buffer_u32, send_sequence++);
+        buffer_write(send_buffer, buffer_u8, 1); // destroy
+        buffer_write(send_buffer, buffer_u8, net_id);
+
+        network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+    }
+}
+
+
+function handle_bird_sync_client() {
+    with (oNetworkManager) {
+        var action = buffer_read(receive_buffer, buffer_u8);
+
+        switch (action) {
+            case 0:
+                var net_id = buffer_read(receive_buffer, buffer_u8);
+                var x_pos = buffer_read(receive_buffer, buffer_f16);
+                var y_pos = buffer_read(receive_buffer, buffer_f16);
+				var dir = buffer_read(receive_buffer, buffer_f16);
+				var spd = buffer_read(receive_buffer, buffer_f16);
+				var timer = buffer_read(receive_buffer, buffer_s16);
+
+                var bird_inst = instance_create_depth(x_pos, y_pos, -100, oBird);
+                bird_inst.network_id = net_id;
+				bird_inst.is_local = false;
+				bird_inst.direction = dir;
+				bird_inst.image_angle = dir;
+				bird_inst.speed = spd;
+				bird_inst.alarm[0] = timer;
+            break;
+            case 1: 
+                var net_id_destroy = buffer_read(receive_buffer, buffer_u8);
+                var inst_destroy = find_instance_by_network_id(oBird, net_id_destroy);
+
+                if (instance_exists(inst_destroy)) {
+                    instance_destroy(inst_destroy);
+                }
+            break;
+			
+			case 2:
+                net_id = buffer_read(receive_buffer, buffer_u8);
+				var bird_state = buffer_read(receive_buffer, buffer_u8);
+				dir = buffer_read(receive_buffer, buffer_f16);
+				spd = buffer_read(receive_buffer, buffer_f16);
+				timer = buffer_read(receive_buffer, buffer_s16);
+
+                var bird_inst = find_instance_by_network_id(oBird, net_id);
+                if (instance_exists(bird_inst)) {
+					bird_inst.direction = dir;
+					bird_inst.image_angle = dir;
+					bird_inst.speed = spd;
+					bird_inst.state = bird_state;
+					bird_inst.alarm[0] = timer;
+					bird_inst.image_index = 0;
+					
+					if(bird_state == 1){
+						bird_inst.sprite_index = spr_BirdWalking;
+						bird_inst.image_speed = 0.25;
+						bird_inst.depth = 100;
+					}else{
+						bird_inst.sprite_index = spr_BirdFlying;
+						bird_inst.image_speed = 0.75;
+						bird_inst.depth = -100;
+					}
+                }
+			break;
+        }
+    }
+}
 
 function handle_player_death_client() {
     with (oNetworkManager) {
@@ -205,6 +282,38 @@ function handle_init_sync_client() {
 
 		// Weather
         global.Weather = buffer_read(receive_buffer, buffer_u8);
+		
+        // Birds
+        var bird_count = buffer_read(receive_buffer, buffer_u8);
+        for (var b = 0; b < bird_count; b++) {
+            var bird_id = buffer_read(receive_buffer, buffer_u8);
+			var bird_state = buffer_read(receive_buffer, buffer_u8);
+            var bird_x = buffer_read(receive_buffer, buffer_f16);
+            var bird_y = buffer_read(receive_buffer, buffer_f16);
+			var bird_dir = buffer_read(receive_buffer, buffer_f16);
+			var bird_spd = buffer_read(receive_buffer, buffer_f16);
+			var timer = buffer_read(receive_buffer, buffer_s16);
+
+            var bird_inst = instance_create_depth(bird_x, bird_y, -100, oBird);
+            bird_inst.network_id = bird_id;
+			bird_inst.is_local = false;
+			bird_inst.state = bird_state;
+			bird_inst.direction = bird_dir;
+			bird_inst.image_angle = bird_dir;
+			bird_inst.speed = bird_spd;
+			bird_inst.alarm[0] = timer;
+			
+			if(bird_state == 1){
+				bird_inst.sprite_index = spr_BirdWalking;
+				bird_inst.image_speed = 0.25;
+				bird_inst.depth = 100;
+			}else{
+				bird_inst.sprite_index = spr_BirdFlying;
+				bird_inst.image_speed = 0.75;
+				bird_inst.depth = -100;
+			}
+			
+        }
 
 		// Hráči
         var player_count = buffer_read(receive_buffer, buffer_u8);

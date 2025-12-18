@@ -35,8 +35,10 @@ player_states = ds_map_create();
 projectiles_seen = ds_map_create(); // key = proj_id, val = true
 player_stats = ds_map_create();
 item_registry = ds_map_create();
+bird_registry = ds_map_create();
 item_pos_buffer = ds_list_create();
 free_item_ids = -1;
+free_bird_ids = -1;
 
 
 // Packet types
@@ -58,7 +60,7 @@ enum PACKET {
 	PLAYER_DEATH,
 	PLAYER_RESPAWN,
 	PING,
-	BIRD_SPAWN
+	BIRD_SYNC
 }
 
 equipment_sync = false;

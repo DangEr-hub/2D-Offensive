@@ -31,7 +31,7 @@ if (is_remote) {
 		if(network_suppressor != Item.None){
 			suppressor_len = 1.25;
 		}
-		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppresor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
+		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppressor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 	}else{
 		FlashLightX = x; FlashLightY = y;
 	}
@@ -992,7 +992,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None){
 					suppressor_len = 1.25;
 				}
-				FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppresor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
+				FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppressor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 			}else{
 				FlashLightX = x; FlashLightY = y;
 			}

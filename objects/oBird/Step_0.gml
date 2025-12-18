@@ -1,12 +1,19 @@
+/* oBird step event */
 var margin = 64;
 if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin) || y <= (0 - margin)){
-	instance_destroy();	
+    if (IS_NET && oNetworkManager.is_server) {
+        server_process_bird_death(id);
+        exit;
+    }
+
+    instance_destroy();
 }
+
 
 #region Knife hit
 if(instance_exists(global.local_player) && instance_exists(oKnife)){
 	var knife_object = instance_nearest(x, y, oKnife);
-	if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer && state == "Walking") {
+	if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer && state == 0) {
 		if (knife_object.stats.Object.knife_attack_timer >= 5) {
 			var hitbox_corners = get_hitbox_corners(knife_object, 25, 50, 20, knife_object.stats.Object.RotationAngle);
 
@@ -38,7 +45,7 @@ if(instance_exists(global.local_player) && instance_exists(oKnife)){
 }
 #endregion
 
-if (state == "Walking") { 
+if (state == 0) { 
     if (move_timer == -1) {
         move_timer = irandom_range(1, 2) * game_get_speed(gamespeed_fps);
         

@@ -7,7 +7,7 @@ global.local_player = get_local_player();
 if(instance_exists(oPlayer)){
 	
 	#region Bird spawning
-	if(percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
+	if((!IS_NET || oNetworkManager.is_server) && percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
 		var birds = random_range(1, 3);
 		var offset = 8;
 		var areas = {
@@ -22,7 +22,11 @@ if(instance_exists(oPlayer)){
 		repeat(birds){
 			var area_key = choose("top", "left", "bottom", "right");
 			var area = areas[$ area_key];
-			instance_create_depth(random_range(area[0], area[2]), random_range(area[1], area[3]), -100, oBird);	
+			var bird = instance_create_depth(random_range(area[0], area[2]), random_range(area[1], area[3]), -100, oBird);	
+
+            if (IS_NET && oNetworkManager.is_server) {
+                    server_process_bird_change(bird, 0);
+            }
 		}
 	}
 	#endregion

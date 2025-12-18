@@ -51,8 +51,125 @@ function handle_server_receive(sender_ip, sender_port) {
 			case PACKET.PLAYER_RESPAWN: handle_player_respawn_server(key); break;
 			
 			case PACKET.PING: handle_ping_server(sender_ip, sender_port); break;
+			
+			case PACKET.BIRD_SYNC: handle_bird_sync_server(key); break;
+			
+			
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
+        }
+    }
+}
+
+function handle_bird_sync_server(socket_key) {
+	/* Funkce pokud client zabije ptáka u sebe */
+    with (oNetworkManager) {
+        if (!ds_map_exists(clients, socket_key)) return;
+
+        var action = buffer_read(receive_buffer, buffer_u8);
+
+        switch (action) {
+            case 1:
+                var bird_id = buffer_read(receive_buffer, buffer_u8);
+                var inst = find_instance_by_network_id(oBird, bird_id);
+
+                if (instance_exists(inst)) {
+                    server_process_bird_death(inst);
+                } else {
+                    ds_map_delete(bird_registry, bird_id);
+					
+					/// broadcast
+					if(is_server){
+		
+					    buffer_seek(send_buffer, buffer_seek_start, 0);
+					    buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+					    buffer_write(send_buffer, buffer_u32, send_sequence++);
+					    buffer_write(send_buffer, buffer_u8, 1); // destroy
+					    buffer_write(send_buffer, buffer_u8, bird_id);	
+					
+				        var first_socket_key = ds_map_find_first(clients);
+				        for (var i = 0; i < ds_map_size(clients); i++) {
+				            sent_server_udp(server_socket, first_socket_key, send_buffer);
+				            first_socket_key = ds_map_find_next(clients, first_socket_key);
+				        }
+					}
+                }
+            break;
+        }
+    }
+}
+
+function server_process_bird_death(bird_inst){
+    with (oNetworkManager) {
+        if (!is_server) return;
+		
+		net_id = bird_inst.network_id;
+
+        if (!is_undefined(net_id)) {
+            ds_map_delete(bird_registry, net_id);
+		    if (net_id >= 0) {
+		        ds_stack_push(free_bird_ids, net_id);
+		    }
+			
+			/// broadcast
+	        buffer_seek(send_buffer, buffer_seek_start, 0);
+	        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+	        buffer_write(send_buffer, buffer_u32, send_sequence++);
+	        buffer_write(send_buffer, buffer_u8, 1); // destroy
+	        buffer_write(send_buffer, buffer_u8, net_id);				
+	        var socket_key = ds_map_find_first(clients);
+	        for (var i = 0; i < ds_map_size(clients); i++) {
+	            sent_server_udp(server_socket, socket_key, send_buffer);
+	            socket_key = ds_map_find_next(clients, socket_key);
+	        }
+        }
+    }
+    instance_destroy(bird_inst);
+}
+
+function server_process_bird_change(bird_inst, action) {
+    with (oNetworkManager) {
+        if (!is_server) return;
+
+        if (is_undefined(bird_inst.network_id) || bird_inst.network_id < 0) {
+            bird_inst.network_id = compute_bird_network_id();
+        }
+
+        ds_map_set(bird_registry, bird_inst.network_id, [bird_inst.state, bird_inst.x, bird_inst.y, bird_inst.direction, bird_inst.speed, bird_inst.alarm[0]]);
+
+		switch(action){
+			case 0:
+		        buffer_seek(send_buffer, buffer_seek_start, 0);
+		        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+		        buffer_write(send_buffer, buffer_u32, send_sequence++);
+		        buffer_write(send_buffer, buffer_u8, 0); // spawn
+		        buffer_write(send_buffer, buffer_u8, bird_inst.network_id);
+		        buffer_write(send_buffer, buffer_f16, bird_inst.x);
+		        buffer_write(send_buffer, buffer_f16, bird_inst.y);
+				buffer_write(send_buffer, buffer_f16, bird_inst.direction);
+				buffer_write(send_buffer, buffer_f16, bird_inst.speed);
+				buffer_write(send_buffer, buffer_s16, bird_inst.alarm[0]);
+			break;
+		
+			case 2:
+		        buffer_seek(send_buffer, buffer_seek_start, 0);
+		        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+		        buffer_write(send_buffer, buffer_u32, send_sequence++);
+		        buffer_write(send_buffer, buffer_u8, 2); // change state
+		        buffer_write(send_buffer, buffer_u8, bird_inst.network_id);
+				buffer_write(send_buffer, buffer_u8, bird_inst.state);
+				buffer_write(send_buffer, buffer_f16, bird_inst.direction);
+				buffer_write(send_buffer, buffer_f16, bird_inst.speed);
+				buffer_write(send_buffer, buffer_s16, bird_inst.alarm[0]);
+			break;
+		
+		}
+
+		// broadcast
+        var socket_key = ds_map_find_first(clients);
+        for (var i = 0; i < ds_map_size(clients); i++) {
+            sent_server_udp(server_socket, socket_key, send_buffer);
+            socket_key = ds_map_find_next(clients, socket_key);
         }
     }
 }
@@ -727,6 +844,24 @@ function handle_init_sync_server(socket_id) {
 		// Počasí
 		buffer_write(send_buffer, buffer_u8, global.Weather);
 		
+
+        // Birds
+        var bird_count = ds_map_size(bird_registry);
+        buffer_write(send_buffer, buffer_u8, bird_count);
+
+        var bird_key = ds_map_find_first(bird_registry);
+        for (var b = 0; b < bird_count; b++) {
+            var bird_data = ds_map_find_value(bird_registry, bird_key);
+            buffer_write(send_buffer, buffer_u8, bird_key);
+			buffer_write(send_buffer, buffer_u8, bird_data[0]);
+            buffer_write(send_buffer, buffer_f16, bird_data[1]);
+            buffer_write(send_buffer, buffer_f16, bird_data[2]);
+			buffer_write(send_buffer, buffer_f16, bird_data[3]);
+			buffer_write(send_buffer, buffer_f16, bird_data[4]);
+			buffer_write(send_buffer, buffer_s16, bird_data[5]);
+            bird_key = ds_map_find_next(bird_registry, bird_key);
+        }
+		
 		// Hráči
         var player_count = ds_map_size(player_states);
         buffer_write(send_buffer, buffer_u8, player_count);
@@ -736,7 +871,7 @@ function handle_init_sync_server(socket_id) {
             var pid = p_key;
             var player_data = ds_map_find_value(player_states, pid);
 
-            // Read values with safe defaults (fix undefined crash)
+            // Read values with safe defaults
             var helmet_id  = ds_map_find_value(player_data, "helmet_id");
             var helmet_dur = ds_map_find_value(player_data, "helmet_dur");
             var armour_id  = ds_map_find_value(player_data, "armour_id");

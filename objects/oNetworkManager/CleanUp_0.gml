@@ -15,6 +15,7 @@ if(free_item_ids != -1){
 	ds_stack_destroy(free_item_ids);
 }
 
+ds_map_destroy(bird_registry);
 
 if (oNetworkManager.is_server) {
     // Server shutdown

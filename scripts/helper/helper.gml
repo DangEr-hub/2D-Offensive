@@ -12,6 +12,15 @@ function compute_item_network_id() {
     }
 }
 
+function compute_bird_network_id() {
+    with (oNetworkManager) {
+        // Použij volné bird id
+        if (ds_stack_size(free_bird_ids) > 0) {
+            return ds_stack_pop(free_bird_ids);
+        }
+    }
+}
+
 function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid){
 	
 	var blood_color = c_red;

@@ -11,6 +11,15 @@ if(instance_exists(oParticleSystem)){
 	part_particles_create(global.ParticleSystem, other.x, other.y, oParticleSystem.BloodParticle, BloodParticleNumber);
 }
 
+if (IS_NET) {
+    if (oNetworkManager.is_server) {
+            server_process_bird_death(id);
+            exit;
+    } else if (network_id >= 0) {
+            send_bird_death_request(network_id);
+    }
+}
+
 play_sound(other.x, other.y, snd_BirdDeath, global.local_player);
 instance_destroy(id);
 
