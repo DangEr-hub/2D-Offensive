@@ -64,7 +64,7 @@ function handle_client_receive() {
     }
 }
 
-function send_bird_death_request(net_id) {
+function send_bird_death_request(net_id, damage) {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
 
@@ -73,11 +73,11 @@ function send_bird_death_request(net_id) {
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         buffer_write(send_buffer, buffer_u8, 1); // destroy
         buffer_write(send_buffer, buffer_u8, net_id);
+		buffer_write(send_buffer, buffer_f16, damage);
 
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
     }
 }
-
 
 function handle_bird_sync_client() {
     with (oNetworkManager) {
@@ -86,6 +86,7 @@ function handle_bird_sync_client() {
         switch (action) {
             case 0:
                 var net_id = buffer_read(receive_buffer, buffer_u8);
+				var bird_state = buffer_read(receive_buffer, buffer_u8);
                 var x_pos = buffer_read(receive_buffer, buffer_f16);
                 var y_pos = buffer_read(receive_buffer, buffer_f16);
 				var dir = buffer_read(receive_buffer, buffer_f16);
@@ -99,19 +100,46 @@ function handle_bird_sync_client() {
 				bird_inst.image_angle = dir;
 				bird_inst.speed = spd;
 				bird_inst.alarm[0] = timer;
+				
+                if(bird_state == 1){
+                        bird_inst.sprite_index = spr_BirdFlying;
+                        bird_inst.image_speed = 0.75;
+                        bird_inst.depth = -100;
+                }else{
+                        bird_inst.sprite_index = spr_BirdWalking;
+                        bird_inst.image_speed = 0.25;
+                        bird_inst.depth = 100;
+                }
+				
             break;
             case 1: 
                 var net_id_destroy = buffer_read(receive_buffer, buffer_u8);
+				var damage = buffer_read(receive_buffer, buffer_f16);
+				var make_snd = buffer_read(receive_buffer, buffer_u8);
                 var inst_destroy = find_instance_by_network_id(oBird, net_id_destroy);
 
-                if (instance_exists(inst_destroy)) {
+				var BloodSplashNumber = ceil(damage / 5);
+				var BloodParticleNumber = ceil(damage / 2);
+				if (instance_exists(inst_destroy)) {
+					if(make_snd == true){
+						repeat(BloodSplashNumber){
+							var BloodSplash = instance_create_layer(inst_destroy.x, inst_destroy.y, "ItemsO", oBloodSplash);
+							BloodSplash.image_blend = c_red;
+						}
+						if(instance_exists(oParticleSystem)){
+							part_type_color1(oParticleSystem.BloodParticle, c_red);
+							part_particles_create(global.ParticleSystem, inst_destroy.x, inst_destroy.y, oParticleSystem.BloodParticle, BloodParticleNumber);
+						}
+				
+						play_sound(x, y, snd_BirdDeath, find_instance_by_network_id(oPlayer, oNetworkManager.my_pid));
+					}
                     instance_destroy(inst_destroy);
                 }
             break;
 			
 			case 2:
                 net_id = buffer_read(receive_buffer, buffer_u8);
-				var bird_state = buffer_read(receive_buffer, buffer_u8);
+				bird_state = buffer_read(receive_buffer, buffer_u8);
 				dir = buffer_read(receive_buffer, buffer_f16);
 				spd = buffer_read(receive_buffer, buffer_f16);
 				timer = buffer_read(receive_buffer, buffer_s16);
@@ -126,15 +154,29 @@ function handle_bird_sync_client() {
 					bird_inst.image_index = 0;
 					
 					if(bird_state == 1){
-						bird_inst.sprite_index = spr_BirdWalking;
-						bird_inst.image_speed = 0.25;
-						bird_inst.depth = 100;
-					}else{
 						bird_inst.sprite_index = spr_BirdFlying;
 						bird_inst.image_speed = 0.75;
 						bird_inst.depth = -100;
+					}else{
+						bird_inst.sprite_index = spr_BirdWalking;
+						bird_inst.image_speed = 0.25;
+						bird_inst.depth = 100;
 					}
                 }
+			break;
+			
+            case 3:
+	            net_id = buffer_read(receive_buffer, buffer_u8);
+	            var move_timer = buffer_read(receive_buffer, buffer_s16);
+	            var move_x = buffer_read(receive_buffer, buffer_f16);
+	            var move_y = buffer_read(receive_buffer, buffer_f16);
+
+	            var bird_inst = find_instance_by_network_id(oBird, net_id);
+	            if (instance_exists(bird_inst)) {
+	                bird_inst.move_timer = move_timer;
+	                bird_inst.move_pos[0] = move_x;
+	                bird_inst.move_pos[1] = move_y;
+	            }
 			break;
         }
     }
@@ -293,6 +335,9 @@ function handle_init_sync_client() {
 			var bird_dir = buffer_read(receive_buffer, buffer_f16);
 			var bird_spd = buffer_read(receive_buffer, buffer_f16);
 			var timer = buffer_read(receive_buffer, buffer_s16);
+            var move_timer = buffer_read(receive_buffer, buffer_s16);
+            var move_x = buffer_read(receive_buffer, buffer_f16);
+            var move_y = buffer_read(receive_buffer, buffer_f16);
 
             var bird_inst = instance_create_depth(bird_x, bird_y, -100, oBird);
             bird_inst.network_id = bird_id;
@@ -302,15 +347,18 @@ function handle_init_sync_client() {
 			bird_inst.image_angle = bird_dir;
 			bird_inst.speed = bird_spd;
 			bird_inst.alarm[0] = timer;
+            bird_inst.move_timer = move_timer;
+            bird_inst.move_pos[0] = move_x;
+            bird_inst.move_pos[1] = move_y;
 			
 			if(bird_state == 1){
-				bird_inst.sprite_index = spr_BirdWalking;
-				bird_inst.image_speed = 0.25;
-				bird_inst.depth = 100;
-			}else{
 				bird_inst.sprite_index = spr_BirdFlying;
 				bird_inst.image_speed = 0.75;
 				bird_inst.depth = -100;
+			}else{
+				bird_inst.sprite_index = spr_BirdWalking;
+				bird_inst.image_speed = 0.25;
+				bird_inst.depth = 100;
 			}
 			
         }
@@ -379,7 +427,6 @@ function handle_ping_response_client() {
         }
     }
 }
-
 
 function send_player_respawn_request() {
     with (oNetworkManager) {

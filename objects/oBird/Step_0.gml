@@ -2,7 +2,7 @@
 var margin = 64;
 if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin) || y <= (0 - margin)){
     if (IS_NET && oNetworkManager.is_server) {
-        server_process_bird_death(id);
+        server_process_bird_death(id, 0, false);
         exit;
     }
 
@@ -46,7 +46,14 @@ if(instance_exists(global.local_player) && instance_exists(oKnife)){
 #endregion
 
 if (state == 0) { 
-    if (move_timer == -1) {
+    var can_choose_target = true;
+
+	// Jen server vybírá místo k pohybu
+    if (IS_NET && !oNetworkManager.is_server && !is_local) {
+        can_choose_target = false;
+    }
+	
+    if (move_timer == -1 && can_choose_target == true) {
         move_timer = irandom_range(1, 2) * game_get_speed(gamespeed_fps);
         
         var tries = 10;
@@ -57,6 +64,10 @@ if (state == 0) {
             if (!place_meeting(move_pos[0], move_pos[1], oParentTile)) {
                 break; // Našli jsme volné místo
             }
+        }
+		
+        if (IS_NET && oNetworkManager.is_server) {
+            server_process_bird_change(id, 3);
         }
     }
 

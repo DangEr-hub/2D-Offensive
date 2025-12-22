@@ -7,11 +7,30 @@ function array_min(arr) {
     }
     return min_value;
 }
-	
-function window_resize(){
-    window_set_size(global.window_width, global.window_height);
-    surface_resize(application_surface, global.CameraWidth, global.CameraHeight);
-    camera_set_view_size(CAMERA, global.CameraWidth, global.CameraHeight);
+
+function input_check(keycode, pressed = false, release = false){
+    var is_mouse =
+        keycode == mb_left ||
+        keycode == mb_right ||
+        keycode == mb_middle;
+
+    if(is_mouse){
+        if(pressed){
+            return mouse_check_button_pressed(keycode);
+        }
+        if(release){
+            return mouse_check_button_released(keycode);
+        }
+        return mouse_check_button(keycode);
+    }else{
+        if(pressed){
+            return keyboard_check_pressed(keycode);
+        }
+        if(release){
+            return keyboard_check_released(keycode);
+        }
+        return keyboard_check(keycode);
+    }
 }
 
 function array_max(arr) {
@@ -124,25 +143,35 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	
 	var sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
 	var instance_emitter = bullet_tracer.stats.Object;
-	
+	var has_suppressor = false;
+
 	if(IS_NET){
-		instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
-		if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
-			instance_emitter = global.local_player;
-		}
-		if(instance_emitter.network_weapon_suppresor == Item.military_suppressor){
-			sound_id = snd_Silencer;
-		}
+	    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
+	    if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
+	        instance_emitter = global.local_player;
+	    }
+	}
+
+	if(IS_NET){
+	    if(instance_emitter.is_local){
+	        has_suppressor =
+	            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
+	    }else{
+	        has_suppressor =
+	            instance_emitter.network_suppressor == Item.military_suppressor;
+	    }
 	}else{
-		if(bullet_tracer.stats.Object_index == oPlayer){
-			if(global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor){
-				sound_id = snd_Silencer;
-			}
-		}else{
-			if(global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None){
-				sound_id = snd_Silencer;
-			}
-		}
+	    if(bullet_tracer.stats.Object_index == oPlayer){
+	        has_suppressor =
+	            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
+	    }else{
+	        has_suppressor =
+	            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
+	    }
+	}
+
+	if(has_suppressor){
+	    sound_id = snd_Silencer;
 	}
 	
 	play_sound(pos[0], pos[1], sound_id, instance_emitter);
@@ -276,30 +305,7 @@ function find_collision_point(x1, y1, x2, y2, object) {
     }
 }
 
-function item_description_destroy(){
-	if(instance_exists(oItemDescription)){
-		with(oItemDescription){
-			zui_destroy();
-		}
-	}
-	if(instance_exists(oWeaponDescription)){
-		with(oWeaponDescription){
-			zui_destroy();
-		}	
-	}
-	if(oArmourDescription){
-		with(oArmourDescription){
-			zui_destroy();
-		}
-	}
-	if(oUsableItemDescription){
-		with(oUsableItemDescription){
-			zui_destroy();
-		}
-	}
-}
-
-function shouldExplode(ObjectType, Placer) {
+function should_explode(ObjectType, Placer) {
     var instance_to_check = instance_nearest(x, y, ObjectType);
 
     if (instance_exists(instance_to_check)) {
@@ -338,7 +344,7 @@ function ds_list_to_array(list) {
     return array;
 }
 
-function Approach(argument0, argument1, argument2) {
+function approach(argument0, argument1, argument2) {
 	if (argument0 < argument1){
 	    return min(argument0 + argument2,argument1); 
 	}else{
@@ -376,7 +382,6 @@ function get_angle(desiredDirection, maxTurn) {
 }
 
 function percent_chance(argument0) {
-	
 	return (random(100) <= argument0);
 }
 	
@@ -609,7 +614,7 @@ function inaccuracy_formula(WID, ObjectType){
 			if(instance_exists(oPlayer)){
 				var MovingIn = 1;
 				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
-				var range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+				var range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.accuracy_drop]);
 				var moving_state_inaccuracy = 1;
 	
 				if(ObjectType.moving_state == states_player.prone_state){
@@ -644,7 +649,7 @@ function inaccuracy_formula(WID, ObjectType){
 				var InSmokeInaccuracy = 1;
 				var EnemyMovingInaccuracy = 1;
 				var EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
-				global.ItemIndex[#WID, ItemStat.RangeInaccuracyMultiplier]);
+				global.ItemIndex[#WID, ItemStat.accuracy_drop]);
 
 				var smoke_list = ds_list_create();
 				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x, oSmokeTile, true, false, smoke_list, false);
@@ -768,166 +773,4 @@ function create_player(PlayerHP, PlayerStamina, PlayerName){
     };
 	
     return player_struct;
-}
-
-function pause(ObjectType){
-	if(instance_exists(oWeaponAttachments)){
-		global.local_player.player_can_shoot = true;
-		with(oWeaponAttachments){
-			zui_destroy();
-		}
-	}
-	if(instance_exists(oBuyMenu)){
-		global.local_player.player_can_shoot = true;
-		with(oBuyMenuDescription){
-			zui_destroy();
-		}
-		with(oBuyMenu){
-			zui_destroy();
-		}
-	}
-	with(zui_main()){
-		zui_create(0, 0, objUIBlack, -1000);
-		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
-			alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
-			window_id = id;
-		}
-	}
-	camera_set_view_angle(CAMERA, 0);
-	ObjectType.alarm[0] = 1;
-}
-
-function unpause(ObjectType){
-	with(zui_main()){
-		zui_destroy();
-	}
-	with(ObjectType){
-		PopupWindow = "";
-		Alpha = 0;
-		BackGround = -1;
-		if(sprite_exists(BackGround) && BackGround > -1){sprite_delete(BackGround);}
-		instance_activate_all();
-	}
-}
-
-function set_crosshair_color(ColorString){
-	if (string_length(ColorString) == 9) {
-		var r = string_copy(ColorString, 1, 3);
-		var g = string_copy(ColorString, 4, 3);
-		var b = string_copy(ColorString, 7, 3);
-
-		r = real(r);
-		g = real(g);
-		b = real(b);
-
-		r = clamp(r, 0, 255);
-		g = clamp(g, 0, 255);
-		b = clamp(b, 0, 255);
-
-		global.crosshair_color = make_color_rgb(r, g, b);
-	}
-}
-	
-function reset_gui(){	
-	if(instance_exists(oWeaponAttachments)){
-		with(oWeaponAttachments){
-			zui_destroy();
-		}
-		instance_destroy(objZUIMain);
-		with(zui_main()){
-			with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
-						
-			}
-		}
-	}
-	if(instance_exists(oInventory)){
-		instance_destroy(oInventory);
-		instance_destroy(oSlot);
-		instance_create_layer(global.local_player.x, global.local_player.y, "OtherO", oInventory);
-	}
-	if(instance_exists(oController)){
-		instance_destroy(oController);	
-		instance_create_depth(0, 0, -1000, oController);
-	}
-	if(instance_exists(oBuyMenu)){
-		with(oBuyMenu){
-			zui_destroy();
-		}
-		instance_destroy(objZUIMain);
-		with(zui_main()){
-			zui_create(zui_get_width() * .5, zui_get_height() * .5, oBuyMenu);
-		}
-	}
-	if(instance_exists(oDraw)){
-		with(oDraw){
-			if(PauseMenu == true){
-				instance_destroy(objZUIMain);
-				pause(id);
-			}else if(RespawnMenu == true){
-				instance_destroy(objZUIMain);
-				with(zui_main()){
-					if(other.GameEndMenu == true){
-						zui_create(0, 0, objUIBlack, -1000);
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
-							alpha_value = 0;
-							alpha = global.GUIHUDAlpha * 2.25; 
-							window_id = id;
-						}
-					}else{
-						zui_create(0, 0, objUIBlack, -1000);
-						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
-							alpha_value = 0;
-							alpha = global.GUIHUDAlpha * 2.25; 
-							window_id = id;
-						}
-					}
-				}
-				alarm[0] = 1;
-			}
-			
-			if(oDraw.DrawInfo == true){
-				instance_destroy(objZUIMain);
-				with(zui_main()){
-					var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
-						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
-							alpha = global.GUIHUDAlpha * 3;
-						}
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
-						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
-							alpha = global.GUIHUDAlpha * 3;
-						}
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
-						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
-							alpha = global.GUIHUDAlpha * 3;
-						}
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
-						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
-							alpha = global.GUIHUDAlpha * 3;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-	
-function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
-	if(object_index == oBot){
-		if(Visible == true){
-			Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
-			Indicator.Font = DamageIndicatorFont;
-			Indicator.Damage_Indicator = DamageIndicatorString;
-			Indicator.Color = DamageIndicatorColor;
-			Indicator.Sprite = DamageIndicatorSprite;
-			Indicator.SpriteID = DamageIndicatorSpriteID;
-		}
-	}else{
-		Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);
-		Indicator.Font = DamageIndicatorFont;
-		Indicator.Damage_Indicator = DamageIndicatorString;
-		Indicator.Color = DamageIndicatorColor;
-		Indicator.Sprite = DamageIndicatorSprite;
-		Indicator.SpriteID = DamageIndicatorSpriteID;
-	}
 }

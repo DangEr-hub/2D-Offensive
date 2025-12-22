@@ -130,19 +130,19 @@ function InventoryInit() {
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, military_suppressor, m4a1, awm, usp, base_explosion,
-		nuclear_explosion, basic_machine_gun, galil, p250, m4_carbine, famas, MolotovGrenade, steel_knife, tec9, Total
+		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, Total
 	}
 
 	enum ItemStat{
 		/* Draw weapon stats */
-	    Damage, Ammo, ClipAmmo, ReloadSpeed, Range, MovingInaccuracyMultiplier, Inaccuracy, ShootTimer, KickBackInaccuracyMultiplier, DamageDrop, RangeInaccuracyMultiplier, 
+	    Damage, Ammo, ClipAmmo, ReloadSpeed, Range, MovingInaccuracyMultiplier, Inaccuracy, ShootTimer, KickBackInaccuracyMultiplier, DamageDrop, accuracy_drop, 
 		WeaponTypeClass, MovingSpdMul, PenetrationPower, ShootingMode,
 		
 		/* Draw armour stats */
 		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, MaxKickBack, SniperScope, ShootSpdMul, has_barrel, EquipTime, has_suppressor,
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
 		EnemyInaccuracyCompensation, MaxAmmo, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
-		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, Total
+		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, Total
 	}
 	
 	enum OtherSlot{

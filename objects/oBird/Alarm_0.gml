@@ -15,7 +15,7 @@ if(is_local){
 			state = 1;
 			direction = random(360);
 			image_angle = direction;
-			speed = random_range(4, 5);
+			speed = random_range(1, 2);
 			image_speed = 0.75;
 			depth = -100;
 		}

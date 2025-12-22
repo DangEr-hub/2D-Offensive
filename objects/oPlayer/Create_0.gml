@@ -113,9 +113,8 @@ ViewShakeValuePower = 0;
 #endregion
 
 #region Movement vars
-MoveSpeed = 700;
 SpeedMul = 1;
-RelativeSpeedValue = MoveSpeed * 0.1;
+RelativeSpeedValue = MOVE_SPD * 0.1;
 RelativeSpeedX = 0;
 RelativeSpeedY = 0;
 MovingStabilizationTime = ceil(.025 * game_get_speed(gamespeed_fps));

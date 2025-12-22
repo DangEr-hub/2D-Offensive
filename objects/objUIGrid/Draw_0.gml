@@ -141,7 +141,7 @@ if(type == "Respawn menu"){
 						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 5) + "%/Unit";
 					break;
 									
-					case ItemStat.RangeInaccuracyMultiplier:
+					case ItemStat.accuracy_drop:
 						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 4) + "%/Unit";
 					break;
 

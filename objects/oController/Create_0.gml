@@ -114,6 +114,22 @@ sources_callback = function(){
 	}
 };
 
+weapons_callback = function(){
+	if!(instance_exists(oWeaponsTab)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oWeaponsTab, -1)) {
+				window_id = id;
+			}
+		}
+	}
+};
+
 
 with (zui_main()) {
 	var window_id = noone;
@@ -148,6 +164,7 @@ with (zui_main()) {
 		zui_set_width(button_width);
 		zui_set_height(button_height);
 		caption = "Weapons";
+		callback = oController.weapons_callback;
 	}
 	
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*6, objUIButton)){

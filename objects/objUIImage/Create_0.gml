@@ -15,6 +15,7 @@ sprite_width_size = 128;
 sprite_height_size = 128;
 sprite_image_index = -1;
 sprite = -1;
+drawable = true;
 
 
 

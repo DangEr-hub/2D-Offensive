@@ -762,7 +762,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Buy menu
-			if (!global.my_console[$ "active"] && !instance_exists(oInventory) && moving_state != states_player.mortar_state && 
+			if (!global.my_console[? "active"] && !instance_exists(oInventory) && moving_state != states_player.mortar_state && 
 			keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyBuyMenu])) {
 			    if (instance_exists(oBuyMenu)) {
 			        player_can_shoot = true;
@@ -1036,18 +1036,18 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}else{
 					KickBackTime = round(.5 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
 				}
-				Shoot = mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]);
-				if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse])) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true)){
+				Shoot = input_check(global.KeyBinds[| KeyBind.KeyShootMouse]);
+				if(input_check(global.KeyBinds[| KeyBind.KeyShootMouse], false, true) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true)){
 					kick_back_timer = KickBackTime; shooting = false; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
 			}else if(shooting_mode == "Semi" || shooting_mode == "Burst"){
 				KickBackTime = round(.25 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
-				Shoot = mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]);
+				Shoot = input_check(global.KeyBinds[| KeyBind.KeyShootMouse], true);
 				/* Jelikož se při auto modu vždycky resetne "shooting" na false po tom co hráč releasne tlačítko na střílení, musel jsem přidat "shooting_reset_timer" */
-				if(mouse_check_button(global.KeyBinds[| KeyBind.KeyShootMouse]) && shooting_reset_timer == -1){
+				if(input_check(global.KeyBinds[| KeyBind.KeyShootMouse], false, false) && shooting_reset_timer == -1){
 					shooting_reset_timer = KickBackTime;
 				}
-				if((mouse_check_button_released(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] > 0) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true && shooting_reset_timer == -1)){
+				if((input_check(global.KeyBinds[| KeyBind.KeyShootMouse], false, true) && global.Inventory[# WeaponID, Index.slot_ammo] > 0) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true && shooting_reset_timer == -1)){
 					shooting_reset_timer = KickBackTime; kick_back_timer = KickBackTime; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
 				
@@ -1081,7 +1081,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if!(global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] == -1){
 				if(wpn_id != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != states_player.mortar_state && item_equip_timer == -1){
 					if (player_can_shoot == true && !global.my_console[? "active"]) {
-						if(mouse_check_button_pressed(global.KeyBinds[| KeyBind.KeyShootMouse]) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
+						if(input_check(global.KeyBinds[| KeyBind.KeyShootMouse], true, false) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
 							play_sound(x, y, snd_empty_magazine);
 						}
 					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#wpn_id, ItemStat.Defense] == 1))){
@@ -1179,7 +1179,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	
 				if(global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul] != 0 && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 					WeaponSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul];
-					}
+				}
 	
 				SpeedMul = ReloadingSpeedMultiplier * ShootingSpeedMultiplier * aimpunch_speed_multiplier * moving_speed_multiplier * WeightSpeedMultiplier *
 						   WeaponSpeedMultiplier / (ScopeIn + 1) * (game_get_speed(gamespeed_fps)/60) / (Healing + 1);
@@ -1217,8 +1217,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				            while (!place_meeting(x + sign(XSpeed),y,oParentTile))
 								x += sign(XSpeed); XSpeed = 0;
 						}else{
-							if(RelativeSpeedX < MoveSpeed){ RelativeSpeedX += RelativeSpeedValue; }
-							x += min(XSpeed, MoveSpeed);
+							if(RelativeSpeedX < MOVE_SPD){ RelativeSpeedX += RelativeSpeedValue; }
+							x += min(XSpeed, MOVE_SPD);
 						}
 						if(moving_state != states_player.prone_state && Visible == true){
 							particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
@@ -1231,8 +1231,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				            while (!place_meeting(x,y + sign(YSpeed),oParentTile))
 								y += sign(YSpeed); YSpeed = 0;
 						}else{
-							if(RelativeSpeedY < MoveSpeed){ RelativeSpeedY += RelativeSpeedValue; }
-							y += min(YSpeed, MoveSpeed);
+							if(RelativeSpeedY < MOVE_SPD){ RelativeSpeedY += RelativeSpeedValue; }
+							y += min(YSpeed, MOVE_SPD);
 						}
 						if(moving_state != states_player.prone_state && Visible == true){
 							particle_create(round(abs(YSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(YSpeed) * -1, abs(YSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
@@ -1297,7 +1297,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(player_can_shoot == true){
 			
 				#region Light attack
-				if(mouse_check_button_pressed(mb_left) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
+				if(input_check(global.KeyBinds[| KeyBind.KeyKnifeLight], true, false) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
 					if(knife_attack_timer == -1){
 						knife_attack_timer = global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed];
 						Knife.stats.Reward = global.ItemIndex[# wpn_id, ItemStat.reward];
@@ -1309,7 +1309,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 		
 				#region Heavy attack
-				if(mouse_check_button_pressed(mb_right) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
+				if(input_check(global.KeyBinds[| KeyBind.KeyKnifeHeavy], true, false) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
 					if(knife_attack_timer == -1){
 						knife_attack_timer = global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed];
 						Knife.stats.Reward = global.ItemIndex[# wpn_id, ItemStat.reward];
@@ -1679,7 +1679,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 
 				#region Item use
-				if(mouse_check_button_pressed(mb_left) && !instance_exists(oInventory)){
+				if(input_check(global.KeyBinds[| KeyBind.KeyUseItem], true, false) && !instance_exists(oInventory)){
 					var Id = global.Inventory[# item_use_position, Index.slot_id];
 			
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" && !instance_exists(oWeaponAttachments)){
@@ -1845,7 +1845,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 		
 				#region Scope
-				var ScopeButton = mouse_check_button(mb_right);
+				var ScopeButton = input_check(global.KeyBinds[| KeyBind.KeyScope], false, false);
 				if!(instance_exists(oInventory)){
 					if(global.Inventory[# WeaponID, Index.slot_scope] != Item.None && CanShoot == true && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 						if(ScopeButton){

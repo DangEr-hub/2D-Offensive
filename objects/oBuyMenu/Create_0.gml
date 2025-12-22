@@ -11,7 +11,7 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	draggable = 1;
 }
 
-items = [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.m4_carbine];
+items = [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.MK18];
 item_number = 7;
 position_x = zui_get_width() * .1;
 position_y = zui_get_height() * .1;

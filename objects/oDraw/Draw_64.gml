@@ -328,7 +328,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var Value = 0;
 			var money_string = "Money: " + string(global.player_stats_struct.Money);
 			var money_x = HUDShift;
-			var money_y = StaminaY - bar_gap*4;
+			var money_y = StaminaY - bar_gap*4.5;
 		
 			if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None){
 				for(var i=0;i<AmmoDrawValue;i++){
@@ -543,7 +543,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		
 			//Player velocity
 			var PlayerVelocity = sqrt(power(global.local_player.XSpeed, 2) + power(global.local_player.YSpeed, 2)) * game_get_speed(gamespeed_fps);
-			var SpdString = "Velocity: " + string_format(min(PlayerVelocity, global.local_player.MoveSpeed * game_get_speed(gamespeed_fps)), 0, 1) + " Units/Second";
+			var SpdString = "Velocity: " + string_format(min(PlayerVelocity, MOVE_SPD * game_get_speed(gamespeed_fps)), 0, 1) + " Units/Second";
 			draw_text_outlined(AdminHUDX - string_width(SpdString), AdminHUDY, SpdString, c_white, c_black, 1);	
 		
 			//Crosshair range

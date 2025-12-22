@@ -1,7 +1,7 @@
 {
   "resourceType": "GMSound",
   "resourceVersion": "1.0",
-  "name": "snd_m4_carbine",
+  "name": "snd_MK18",
   "audioGroupId": {
     "name": "audiogroup_default",
     "path": "audiogroups/audiogroup_default",
@@ -17,7 +17,7 @@
   },
   "preload": false,
   "sampleRate": 44100,
-  "soundFile": "snd_m4_carbine.wav",
+  "soundFile": "snd_MK18.wav",
   "type": 0,
   "volume": 0.5,
 }

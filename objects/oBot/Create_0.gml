@@ -100,7 +100,7 @@ Legs.Object = id;
 #endregion
 
 #region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.m4_carbine, Item.famas);
+WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.MK18, Item.famas);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250, Item.tec9);
 Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];

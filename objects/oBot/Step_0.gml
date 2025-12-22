@@ -333,7 +333,7 @@ if(instance_exists(ChasingObjectBullet) && instance_exists(ChasingObjectBullet.s
 // Hear the target
 if(instance_exists(ChasingObject) && ChasingObject.team != team && distance_to_object(ChasingObject) <= ChasingDistance){
 	var velocity = sqrt(power(ChasingObject.XSpeed, 2) + power(ChasingObject.YSpeed, 2)) * game_get_speed(gamespeed_fps);
-	if(ChasingObject.Moving == true && velocity >= ChasingObject.MoveSpeed/3 && percent_chance(1 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+	if(ChasingObject.Moving == true && velocity >= MOVE_SPD/3 && percent_chance(1 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
 		if(ChasingObjectSpotted == false){
 			ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
 		}
@@ -410,8 +410,8 @@ XSpeed = clamp(XSpeed, -MaxSpeed, MaxSpeed);
 YSpeed = clamp(YSpeed, -MaxSpeed, MaxSpeed);
 	
 // Friction
-XSpeed = Approach(XSpeed, 0, Friction);
-YSpeed = Approach(YSpeed, 0, Friction);
+XSpeed = approach(XSpeed, 0, Friction);
+YSpeed = approach(YSpeed, 0, Friction);
 	
 if(XSpeed > 0 || YSpeed > 0){
 	Legs.image_speed = 1;

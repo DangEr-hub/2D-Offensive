@@ -104,7 +104,7 @@ function load_game(){
 	global.sound_gain = 100;
 	global.BloomShader = 1;
 	global.enemy_visibility = 0;
-	global.GUIMultiplier = 1;
+	global.GUIMultiplier = 2;
 	global.window_width = 1920;
 	global.window_height = 1080;
 	global.anti_aliasing = 0;

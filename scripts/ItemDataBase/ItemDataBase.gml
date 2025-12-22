@@ -100,7 +100,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.famas, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.galil, ["Auto", "Safety"]);
 	add_shooting_modes(Item.p250, ["Semi", "Safety"]);
-	add_shooting_modes(Item.m4_carbine, ["Auto", "Semi", "Burst", "Safety"]);
+	add_shooting_modes(Item.MK18, ["Auto", "Semi", "Burst", "Safety"]);
 	add_shooting_modes(Item.steel_knife, ["Semi", "Safety"]);
 	add_shooting_modes(Item.tec9, ["Semi", "Safety"]);
 	
@@ -118,6 +118,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.AKM, ItemStat.advantages] = "-High damage\n-High range\n-Fast equipping";
 	global.ItemIndex[#Item.AKM, ItemStat.ItemColor] = c_orange;
 	global.ItemIndex[#Item.AKM, ItemStat.AmmoSpriteID] = 0;
+	global.ItemIndex[#Item.AKM, ItemStat.is_locked] = true;
 	global.ItemIndex[#Item.AKM, ItemStat.Description] = "Known for its challenging handling yet unmatched lethality on the battlefield. Mastering its recoil demands skill, but once tamed, it becomes a devastating tool capable of swiftly dispatching foes with deadly precision.";
 	
 	global.ItemIndex[#Item.KevlarHelm, ItemStat.Type] = "Helmet";
@@ -299,15 +300,15 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Glock, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.Glock, ItemStat.Description] = "The Glock-17 balances moderate damage with a generous magazine capacity, but its limited armor penetration capabilities make it less effective against heavily protected targets.";
 
-	global.ItemIndex[#Item.m4_carbine, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.m4_carbine, "MK18", 2.1 * game_get_speed(gamespeed_fps), 730, 33, 700, 30, "Primary", 1, 7, 5.5, snd_m4_carbine, 2, 1, true,
+	global.ItemIndex[#Item.MK18, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.MK18, "MK18", 2.1 * game_get_speed(gamespeed_fps), 730, 33, 700, 30, "Primary", 1, 7, 5.5, snd_MK18, 2, 1, true,
 	10, 20, 13, 9, 30, .01, 8, 3.5, .001, 0, 10, .9, 0, "Assault rifle", .89, .71, .00015, .2 * game_get_speed(gamespeed_fps), .73, 300, .75, 5);
-	global.ItemIndex[#Item.m4_carbine, ItemStat.difficulty] = 3;
-	global.ItemIndex[#Item.m4_carbine, ItemStat.disadvantages] = "-Low penetration power\n-High recoil";
-	global.ItemIndex[#Item.m4_carbine, ItemStat.advantages] = "-Good mobility\n-Low bullet spread";
-	global.ItemIndex[#Item.m4_carbine, ItemStat.ItemColor] = c_gray;
-	global.ItemIndex[#Item.m4_carbine, ItemStat.AmmoSpriteID] = 8;
-	global.ItemIndex[#Item.m4_carbine, ItemStat.Description] = "MK18 is a potent rifle renowned for its rapid fire rate and exceptional accuracy over longer distances, though with a punchier recoil. While sacrificing some armor penetration, its swift RPM makes it ideal for precise engagements, striking a balance between speed and effectiveness on the battlefield.";
+	global.ItemIndex[#Item.MK18, ItemStat.difficulty] = 3;
+	global.ItemIndex[#Item.MK18, ItemStat.disadvantages] = "-Low penetration power\n-High recoil";
+	global.ItemIndex[#Item.MK18, ItemStat.advantages] = "-Good mobility\n-Low bullet spread";
+	global.ItemIndex[#Item.MK18, ItemStat.ItemColor] = c_gray;
+	global.ItemIndex[#Item.MK18, ItemStat.AmmoSpriteID] = 8;
+	global.ItemIndex[#Item.MK18, ItemStat.Description] = "MK18 is a potent rifle renowned for its rapid fire rate and exceptional accuracy over longer distances, though with a punchier recoil. While sacrificing some armor penetration, its swift RPM makes it ideal for precise engagements, striking a balance between speed and effectiveness on the battlefield.";
 
 	global.ItemIndex[#Item.m4a1, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 790, 34, 300, 25, "Primary", 1, 5, 6, snd_m4a1, 2.5, 1, true,

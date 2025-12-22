@@ -5,6 +5,6 @@ if(console_submit(global.my_console)){
     }
 }
 
-if(keyboard_check_pressed(192)){
+if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyConsole])){
     console_toggle(global.my_console);
 }

@@ -60,7 +60,7 @@ function WeaponStats(){
 	global.ItemIndex[#ItemID, ItemStat.KickBackInaccuracyMultiplier] = argument[20];
 	global.ItemIndex[#ItemID, ItemStat.MovingInaccuracyMultiplier] = argument[21];
 	global.ItemIndex[#ItemID, ItemStat.KickBackPower] = argument[22];
-	global.ItemIndex[#ItemID, ItemStat.RangeInaccuracyMultiplier] = argument[23];
+	global.ItemIndex[#ItemID, ItemStat.accuracy_drop] = argument[23];
 	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetX] = argument[24];
 	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetY] = argument[25];
 	global.ItemIndex[#ItemID, ItemStat.ShootSpdMul] = argument[26];

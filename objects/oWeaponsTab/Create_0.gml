@@ -1,0 +1,230 @@
+event_inherited();
+tab_width = 768 * global.GUIMultiplier;
+tab_height = 512 * global.GUIMultiplier;
+draw_set_font(set_font("Menu_small"));
+zui_set_size(tab_width, tab_height);
+
+stat_x = zui_get_width() * .55;
+stat_y = zui_get_height() * .125;
+gap = 170 * global.GUIMultiplier;
+c_x = zui_get_width() * .5;
+c_y = zui_get_height() * .5;
+text_height = string_height("a")*1.25;
+wpn_index = 0;
+is_locked = false;
+img_lock = noone;
+img_lockbg = noone;
+wpn_sprite = noone;
+wpn_desc = noone;
+
+wpn_desc_txt = "";
+wpn_string = array_create(22, "");
+ui_objects = array_create(22, noone);
+
+
+
+refresh_weapon_ui = function(){
+	with(oWeaponsTab){
+	    wpn = weapons[wpn_index];
+		wpn_desc_txt = global.ItemIndex[# wpn, ItemStat.Description];
+		
+		var fire_modes = "";
+		for(var i = 0; i < ds_list_size(global.ItemIndex[# wpn, ItemStat.ShootingMode]);i ++){
+			fire_modes += string(global.ItemIndex[# wpn, ItemStat.ShootingMode][| i]);
+			
+			if(i != ds_list_size(global.ItemIndex[# wpn, ItemStat.ShootingMode]) - 1){
+				fire_modes += ", ";
+			}
+		}
+		
+		wpn_string = [
+			global.ItemIndex[# wpn, ItemStat.Name],
+			"Ammo: " + string(global.ItemIndex[# wpn, ItemStat.Ammo]) + "/" + string(global.ItemIndex[# wpn, ItemStat.ClipAmmo]),
+			"Price: " + string(global.ItemIndex[# wpn, ItemStat.Cost]),
+			"RPM: " + string(round(3600 / global.ItemIndex[# wpn, ItemStat.ShootTimer])),
+			"Base damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage], 0, 1),
+			"Body damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * BODY_MULTIPLIER, 0, 1),
+			"Head damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * HEADSHOT_MULTIPLIER, 0, 1),
+			"Arm damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * ARM_MULTIPLIER, 0, 1),
+			"Leg damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * LEG_MULTIPLIER, 0, 1),
+			"Movement speed: " + string_format(MOVE_SPD * global.ItemIndex[# wpn, ItemStat.MovingSpdMul], 0, 1) + " units/s",
+			"Base Spread: " + string(global.ItemIndex[# wpn, ItemStat.Inaccuracy]) + " units",
+			"Penetration power: " + string_format(global.ItemIndex[# wpn, ItemStat.PenetrationPower] * 100, 0, 1) + "%",
+			"Reload time: " + string_format(global.ItemIndex[# wpn, ItemStat.ReloadSpeed] / 60, 0, 1) + "s",
+			"Kill reward: " + string(global.ItemIndex[# wpn, ItemStat.reward]),
+			"Damage drop: " + string_format(global.ItemIndex[# wpn, ItemStat.DamageDrop] * 10000 / (global.ItemIndex[# wpn, ItemStat.Damage]), 0, 3) + "% per 100 units",
+			"Spread increase: " + string_format(10000 * global.ItemIndex[# wpn, ItemStat.accuracy_drop], 0, 1) + "% per 100 units",
+			"Maximal range: " + string_format(global.ItemIndex[# wpn, ItemStat.Range], 0, 1) + " units",
+			"Fire modes: " + fire_modes,
+			"Type: " + string(global.ItemIndex[# wpn, ItemStat.WeaponTypeClass]),
+			"Usage: " + string(global.ItemIndex[# wpn, ItemStat.WeaponType]),
+			"Moving spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.MovingInaccuracyMultiplier] * 100, 0, 1) + "%",
+			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + "% per bullet"
+		];
+	    var is_locked = global.ItemIndex[# wpn, ItemStat.is_locked];
+		
+		for(var i = 0;i < array_length(ui_objects);i ++){
+			if(instance_exists(ui_objects[i])){
+		        var wpn_txt = oWeaponsTab.wpn_string[i];
+
+		        if(is_locked && i != 0){
+		            var p = string_pos(":", wpn_txt);
+		            if(p > 0){
+		                wpn_txt = string_copy(wpn_txt, 1, p) + " ?";
+		            }
+		        }
+				with(ui_objects[i]){ caption = wpn_txt;}
+				
+				var reward = string_pos("Kill reward", wpn_txt) || string_pos("Price", wpn_txt);
+				
+				if(reward > 0){
+					if(is_locked == false){
+						with(ui_objects[i]){
+							icon_sprite_index = spr_Coin;
+							icon_image_index = 0;
+							icon_after = true;
+							sprite_scale = 3;
+						}
+					}else{
+						with(ui_objects[i]){
+							icon_sprite_index = -1;
+							icon_image_index = -1;
+							icon_after = false;
+						}						
+					}
+				}
+				
+			}
+		}
+
+	    if(instance_exists(img_lock)){
+	        with(img_lock){ drawable = is_locked; }
+	    }
+		
+		with(wpn_sprite){ sprite_image_index = oWeaponsTab.wpn; }
+		
+		with(wpn_desc){ caption = oWeaponsTab.wpn_desc_txt; item_id = oWeaponsTab.wpn; }
+
+	    if(instance_exists(img_lockbg)){
+	        with(img_lockbg){ drawable = is_locked; }
+	    }
+	}
+};
+
+draw_set_font(set_font("Console"));
+weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, Item.famas, Item.awm, Item.SSG08, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.Spas];
+wpn = weapons[0];
+
+
+/* INIT */
+img_lock = zui_create(c_x, c_y, objUIImage);
+img_lockbg = zui_create(c_x, c_y, objUIImage);
+wpn_sprite = zui_create(zui_get_width() * .25, zui_get_height() * .25, objUIImage);
+wpn_desc = zui_create(zui_get_width() * .05, zui_get_height() * .35, objUILabel);
+
+ui_objects[0] = zui_create(c_x - 24 * global.GUIMultiplier, zui_get_height() * .1, objUILabel);	
+with(ui_objects[0]){
+	color = MAIN_COLOR;
+	font = set_font("Title");
+	caption = other.wpn_string[0];
+}
+
+for(j = 1;j < array_length(ui_objects); j ++){
+	ui_objects[j] = zui_create(stat_x, stat_y + text_height*j, objUILabel);	
+	with(ui_objects[j]){
+		color = c_white;
+		font = set_font("Console");
+		caption = other.wpn_string[other.j];
+	}
+}
+
+with(wpn_desc){
+	color = c_white;
+	font = set_font("Console");
+	caption = other.wpn_desc_txt;
+	item_id = other.wpn;
+	description = "Buy_menu";
+	max_width = 350 * global.GUIMultiplier;
+}
+
+with(wpn_sprite){
+	zui_set_size(sprite_get_width(spr_Items) * 2 * global.GUIMultiplier, sprite_get_height(spr_Items) * 2 * global.GUIMultiplier);
+	sprite = spr_Items;
+	clickable = false;
+	sprite_image_index = 0;//oWeaponsTab.wpn;
+	sprite_width_size = sprite_get_width(spr_Items) * 2 * global.GUIMultiplier;
+	sprite_height_size = sprite_get_height(spr_Items) * 2 * global.GUIMultiplier;
+}
+
+with(img_lock){
+	zui_set_size(180 * global.GUIMultiplier, 180 * global.GUIMultiplier);
+	zui_set_depth(-1000);
+	sprite = spr_Lock;
+	clickable = false;
+	drawable = other.is_locked;
+	alpha = .9;
+	sprite_image_index = 0;
+	sprite_width_size = 180 * global.GUIMultiplier;
+	sprite_height_size = 180 * global.GUIMultiplier;
+}
+with(img_lockbg){
+	zui_set_size(other.tab_width, other.tab_height);
+	zui_set_depth(-1000);
+	sprite = spr_lockbg;
+	drawable = other.is_locked;
+	clickable = false;
+	sprite_image_index = 0;
+	sprite_width_size = other.tab_width;
+	sprite_height_size = other.tab_height;
+}
+refresh_weapon_ui();
+/***************************************************/
+
+
+/* Arrows */
+var arrow_w = 32 * global.GUIMultiplier;
+with(zui_create(zui_get_width() * .5 + arrow_w/1.95, zui_get_height() * .9, objUIButton)){
+    zui_set_anchor(0.5, 0);
+    zui_set_width(arrow_w);
+    zui_set_height(16 * global.GUIMultiplier);
+	zui_set_depth(-1001);
+	caption = "->";
+    callback = function(){
+		with(oWeaponsTab){
+	        wpn_index++;
+	        if(wpn_index >= array_length(weapons)){
+	            wpn_index = 0;
+	        }
+			refresh_weapon_ui();
+		}
+    };
+}
+
+with(zui_create(zui_get_width() * .5 - arrow_w/1.95, zui_get_height() * .9, objUIButton)){
+    zui_set_anchor(0.5, 0);
+    zui_set_width(arrow_w);
+    zui_set_height(16 * global.GUIMultiplier);
+	zui_set_depth(-1001);
+	caption = "<-";
+    callback = function(){
+		with(oWeaponsTab){
+	        wpn_index--;
+	        if(wpn_index < 0){
+	            wpn_index = array_length(weapons) - 1;
+	        }
+			refresh_weapon_ui();
+		}
+    };
+}
+/***************************************************/
+
+
+with (zui_create(0, 0, objUIWindowCaption)) {
+	zui_set_depth(-1001);
+	caption = "Weapon database";
+	draggable = 1;
+}
+
+
+
+

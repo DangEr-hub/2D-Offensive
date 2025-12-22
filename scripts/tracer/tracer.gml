@@ -80,7 +80,7 @@ function handle_projectile_spawn_server(key) {
 					item_id,
 					angle,
 					spd,
-					global.ItemIndex[#global.Inventory[# item_id, Index.slot_id], ItemStat.Range]
+					global.ItemIndex[# item_id, ItemStat.Range]
 				],
 				p,
 				dmg,

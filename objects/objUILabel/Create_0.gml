@@ -8,3 +8,7 @@ outline_color = c_black;
 font = set_font("Menu_small");
 color = c_white;
 caption = "";
+drawable = true;
+max_width = 150 * global.GUIMultiplier;
+icon_after = false;
+sprite_scale = 1;

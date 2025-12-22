@@ -71,11 +71,12 @@ function handle_bird_sync_server(socket_key) {
         switch (action) {
             case 1:
                 var bird_id = buffer_read(receive_buffer, buffer_u8);
+				var damage = buffer_read(receive_buffer, buffer_f16);
                 var inst = find_instance_by_network_id(oBird, bird_id);
 
                 if (instance_exists(inst)) {
-                    server_process_bird_death(inst);
-                } else {
+                    server_process_bird_death(inst, damage);
+                }/* else {
                     ds_map_delete(bird_registry, bird_id);
 					
 					/// broadcast
@@ -86,6 +87,7 @@ function handle_bird_sync_server(socket_key) {
 					    buffer_write(send_buffer, buffer_u32, send_sequence++);
 					    buffer_write(send_buffer, buffer_u8, 1); // destroy
 					    buffer_write(send_buffer, buffer_u8, bird_id);	
+						buffer_write(send_buffer, buffer_f16, damage);
 					
 				        var first_socket_key = ds_map_find_first(clients);
 				        for (var i = 0; i < ds_map_size(clients); i++) {
@@ -93,13 +95,13 @@ function handle_bird_sync_server(socket_key) {
 				            first_socket_key = ds_map_find_next(clients, first_socket_key);
 				        }
 					}
-                }
+                }*/
             break;
         }
     }
 }
 
-function server_process_bird_death(bird_inst){
+function server_process_bird_death(bird_inst, damage, make_snd = true){
     with (oNetworkManager) {
         if (!is_server) return;
 		
@@ -116,7 +118,9 @@ function server_process_bird_death(bird_inst){
 	        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
 	        buffer_write(send_buffer, buffer_u32, send_sequence++);
 	        buffer_write(send_buffer, buffer_u8, 1); // destroy
-	        buffer_write(send_buffer, buffer_u8, net_id);				
+	        buffer_write(send_buffer, buffer_u8, net_id);	
+			buffer_write(send_buffer, buffer_f16, damage);
+			buffer_write(send_buffer, buffer_u8, make_snd);
 	        var socket_key = ds_map_find_first(clients);
 	        for (var i = 0; i < ds_map_size(clients); i++) {
 	            sent_server_udp(server_socket, socket_key, send_buffer);
@@ -124,6 +128,21 @@ function server_process_bird_death(bird_inst){
 	        }
         }
     }
+	
+	if(make_snd == true){
+		var BloodSplashNumber = ceil(damage / 5);
+		var BloodParticleNumber = ceil(damage / 2);
+		repeat(BloodSplashNumber){
+			var BloodSplash = instance_create_layer(bird_inst.x, bird_inst.y, "ItemsO", oBloodSplash);
+			BloodSplash.image_blend = c_red;
+		}
+		if(instance_exists(oParticleSystem)){
+			part_type_color1(oParticleSystem.BloodParticle, c_red);
+			part_particles_create(global.ParticleSystem, bird_inst.x, bird_inst.y, oParticleSystem.BloodParticle, BloodParticleNumber);
+		}
+	
+		play_sound(x, y, snd_BirdDeath, find_instance_by_network_id(oPlayer, oNetworkManager.my_pid));
+	}
     instance_destroy(bird_inst);
 }
 
@@ -131,11 +150,12 @@ function server_process_bird_change(bird_inst, action) {
     with (oNetworkManager) {
         if (!is_server) return;
 
-        if (is_undefined(bird_inst.network_id) || bird_inst.network_id < 0) {
+        if (bird_inst.network_id < 0) {
             bird_inst.network_id = compute_bird_network_id();
         }
 
-        ds_map_set(bird_registry, bird_inst.network_id, [bird_inst.state, bird_inst.x, bird_inst.y, bird_inst.direction, bird_inst.speed, bird_inst.alarm[0]]);
+        ds_map_set(bird_registry, bird_inst.network_id, [bird_inst.state, bird_inst.x, bird_inst.y, bird_inst.direction, bird_inst.speed, bird_inst.alarm[0],
+		bird_inst.move_timer, bird_inst.move_pos[0], bird_inst.move_pos[1]]);
 
 		switch(action){
 			case 0:
@@ -144,6 +164,7 @@ function server_process_bird_change(bird_inst, action) {
 		        buffer_write(send_buffer, buffer_u32, send_sequence++);
 		        buffer_write(send_buffer, buffer_u8, 0); // spawn
 		        buffer_write(send_buffer, buffer_u8, bird_inst.network_id);
+				buffer_write(send_buffer, buffer_u8, bird_inst.state);
 		        buffer_write(send_buffer, buffer_f16, bird_inst.x);
 		        buffer_write(send_buffer, buffer_f16, bird_inst.y);
 				buffer_write(send_buffer, buffer_f16, bird_inst.direction);
@@ -161,6 +182,17 @@ function server_process_bird_change(bird_inst, action) {
 				buffer_write(send_buffer, buffer_f16, bird_inst.direction);
 				buffer_write(send_buffer, buffer_f16, bird_inst.speed);
 				buffer_write(send_buffer, buffer_s16, bird_inst.alarm[0]);
+			break;
+			
+			case 3:
+		        buffer_seek(send_buffer, buffer_seek_start, 0);
+		        buffer_write(send_buffer, buffer_u8, PACKET.BIRD_SYNC);
+		        buffer_write(send_buffer, buffer_u32, send_sequence++);
+		        buffer_write(send_buffer, buffer_u8, 3); // movement update
+		        buffer_write(send_buffer, buffer_u8, bird_inst.network_id);
+		        buffer_write(send_buffer, buffer_s16, bird_inst.move_timer);
+		        buffer_write(send_buffer, buffer_f16, bird_inst.move_pos[0]);
+		        buffer_write(send_buffer, buffer_f16, bird_inst.move_pos[1]);
 			break;
 		
 		}
@@ -859,6 +891,9 @@ function handle_init_sync_server(socket_id) {
 			buffer_write(send_buffer, buffer_f16, bird_data[3]);
 			buffer_write(send_buffer, buffer_f16, bird_data[4]);
 			buffer_write(send_buffer, buffer_s16, bird_data[5]);
+            buffer_write(send_buffer, buffer_s16, bird_data[6]);
+            buffer_write(send_buffer, buffer_f16, bird_data[7]);
+            buffer_write(send_buffer, buffer_f16, bird_data[8]);
             bird_key = ds_map_find_next(bird_registry, bird_key);
         }
 		

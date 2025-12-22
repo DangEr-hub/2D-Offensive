@@ -147,11 +147,12 @@ global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
 enum KeyBind{
 	KeyUp, KeyLeft, KeyDown, KeyRight,
 	KeyInventory, KeyPickUp, KeyCycleLeft,
-	KeyCycleRight, KeyCycleUp, KeyShootMouse, KeyReload,
+	KeyCycleRight, KeyShootMouse, KeyReload,
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
 	KeyProne, KeyWeaponAttachments, KeySelectBot, KeyCommandBot, 
 	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleInvLeft,
-	KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown,
+	KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown, KeyConsole,
+	KeyKnifeLight, KeyKnifeHeavy, KeyUseItem, KeyScope,
 	Total
 }
 
@@ -160,13 +161,16 @@ ds_list_add(
 	global.KeyBinds, 
 	ord("W"), ord("A"), ord("S"), ord("D"),
 	ord("I"), vk_space, ord("Q"), 
-	ord("E"), ord("F"), mb_left, ord("R"),
+	ord("E"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
 	ord("Y"), ord("T"), ord("X"), ord("C"),
 	ord("B"), vk_shift, ord("G"), ord("A"), 
-	ord("D"), ord("W"), ord("S"),
-	ord("X"), ord("C")
+	ord("D"), ord("W"), ord("S"), 192,
+	mb_left, mb_right, mb_left, mb_right
 );
+
+global.DefaultKeyBinds = ds_list_create();
+ds_list_copy(global.DefaultKeyBinds, global.KeyBinds);
 
 enum player_textures{
 	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, 
