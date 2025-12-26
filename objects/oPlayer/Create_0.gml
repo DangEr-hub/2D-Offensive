@@ -1,5 +1,9 @@
 //haze_start(true, false);
 event_inherited();
+anim_base = player_textures.prone;
+prev_anim_base = anim_base;
+near_explosion_timer = -1;
+WeaponDistance = 0;
 team = TEAM.FRIENDLY;
 selected_bot = noone;
 bot_select_index = -1;
@@ -12,7 +16,7 @@ AmmoNeeded = 0;
 respawn_x = x;
 respawn_y = y;
 in_water_timer = -1;
-flashed_muffled_sounds = 1; ///Pro efekt muffled soundu u flashbangu
+muffled_sounds = 1; ///Pro efekt muffled soundu
 rotation_direction = 1; ///Pro view bobbing
 rotation_angle = 0; ///Pro view bobbing
 rotation_target = 0; ///Pro view bobbing
@@ -74,7 +78,6 @@ equip_time = 0;
 equip_timer = -1;
 player_has_scope = -1;
 player_can_shoot = true;
-near_explosion = false;
 shooting_reset_timer = -1;
 weapon_shooting_mode = 0;
 grenade_angle = random(360);
@@ -171,6 +174,7 @@ network_suppressor = Item.None;
 network_barrel = Item.None;
 network_scope = Item.None;
 network_grip = Item.None;
+network_throw_grenade = false;
 
 #endregion
 

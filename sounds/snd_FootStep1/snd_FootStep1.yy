@@ -10,7 +10,7 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.263265,
+  "duration": 0.111746,
   "parent": {
     "name": "Other",
     "path": "folders/Sounds/Other.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_FootStep1.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.75,
 }

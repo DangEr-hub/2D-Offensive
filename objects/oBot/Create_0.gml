@@ -1,9 +1,12 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
+shoot_accumulator = 0;
+target_x = x;
+target_y = y;
 refresh_target_timer = 4 * game_get_speed(gamespeed_fps);
 alarm[1] = 1;
-team = choose(TEAM.ENEMIES, TEAM.FRIENDLY);
+team = percent_chance(25) ? TEAM.FRIENDLY : TEAM.ENEMIES;
 NearestDangerObject = noone;
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
@@ -75,7 +78,7 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
-HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
+HelmetID = Item.None;//choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
@@ -102,12 +105,12 @@ Legs.Object = id;
 #region Weapon equip
 WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.MK18, Item.famas);
 WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250, Item.tec9);
-Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
+Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
-MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.Ammo];
-Ammo[1] = global.ItemIndex[#WeaponID[1], ItemStat.Ammo];
+MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
+Ammo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
 ClipAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.ClipAmmo];
-MaxAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.Ammo];
+MaxAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 

@@ -17,6 +17,7 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 
 source_names = [
 	"Headshot sound (1): ",
+	"Headshot sound (2): ",
 	"AWM sound: ",
 	"Spas-12 sound: ",
 	"Empty magazine sound: ",
@@ -31,10 +32,16 @@ source_names = [
 	"GUI engine: ",
 	"Bloom shader: ",
 	"Blur shader: ",
+	"Armour hit sound: ",
+	"Metal hit sound: ",
+	"Hit no armour: ",
+	"Footsteps sound: ",
+	"Ear ring sound: "
 ];
 
 sources = [
 	"https://pixabay.com/sound-effects/086230-headshotwav-40654/",
+	"https://pixabay.com/sound-effects/bullethit-449809/",
 	"https://pixabay.com/sound-effects/sniper-rifle-5989/",
 	"https://pixabay.com/sound-effects/shotgun-firing-4-6746/",
 	"https://pixabay.com/sound-effects/empty-gun-shot-6209/",
@@ -48,7 +55,12 @@ sources = [
 	"https://pixabay.com/sound-effects/real-rain-sound-379215/",
 	"https://marketplace.gamemaker.io/assets/649/zui-engine",
 	"https://www.youtube.com/watch?v=qbIkMMFxX3g&",
-	"https://github.com/GameMakerDiscord/blur-shaders"
+	"https://github.com/GameMakerDiscord/blur-shaders",
+	"https://pixabay.com/sound-effects/080891-bullet-hit-39871/",
+	"https://pixabay.com/sound-effects/metal-hit-12-193278/",
+	"https://pixabay.com/sound-effects/bullethit-449809/",
+	"https://pixabay.com/sound-effects/concrete-footsteps-6752/",
+	"https://pixabay.com/sound-effects/ear-ring-104945/"
 	
 	
 	

@@ -8,6 +8,7 @@ pos_x = zui_get_width() * .01;
 pos_y = zui_get_height() * .1;
 gap = 170 * global.GUIMultiplier;
 text_height = string_height("a")*1.75;
+popup = noone;
 
 waiting_keybind = false;
 waiting_index = -1;
@@ -83,25 +84,39 @@ for(var k = 0; k < rows; k++){
     }
 }
 
+reset_callback = function(){
+	oKeyboardTab.popup = ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_reset_callback_positive, -1);
+}
+
+popup_reset_callback_positive = function(){
+	// přepiš keybindy na default
+	ds_list_copy(global.KeyBinds, global.DefaultKeyBinds);
+
+	// projdi všechny UI buttony v tomhle tabu a updatuj caption
+	with(objUIButton){
+		if(idx != -1){
+		    caption = keycode_to_string(global.KeyBinds[| idx]);
+		    zui_set_width(
+		        min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier)
+		    );
+		}
+	}	
+	
+	with (oKeyboardTab.popup) {
+		with (black){
+			zui_destroy();
+		}
+
+		zui_destroy();
+	}
+}
+
 with(zui_create(zui_get_width() * .5, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(128 * global.GUIMultiplier);
     zui_set_height(16 * global.GUIMultiplier);
 	caption = "Reset";
-	callback = function(){
-	    // přepiš keybindy na default
-	    ds_list_copy(global.KeyBinds, global.DefaultKeyBinds);
-
-	    // projdi všechny UI buttony v tomhle tabu a updatuj caption
-	    with(objUIButton){
-			if(idx != -1){
-		        caption = keycode_to_string(global.KeyBinds[| idx]);
-		        zui_set_width(
-		            min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier)
-		        );
-			}
-	    }
-	};
+	callback = oKeyboardTab.reset_callback;
 }
 
 

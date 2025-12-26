@@ -2,6 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 draw_text(x, y - 150, team);
+//draw_text(x, y - 50, State);
 
 //if(instance_exists(ChasingObject)){
 	//draw_text(x, y - 100, ChasingObject);
@@ -24,7 +25,7 @@ if(Visible == true){
 		armour_sprite_index = 3;
 	}else if(image_index == player_textures.flashed_no_weapon){
 		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload || image_index == player_textures.knife){
+	}else if(image_index == player_textures.reload || image_index == player_textures.knife_attack){
 		armour_sprite_index = 7;
 	}else if(image_index >= player_textures.prone){
 		armour_sprite_index = 5;

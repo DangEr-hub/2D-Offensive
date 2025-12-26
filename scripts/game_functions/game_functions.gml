@@ -8,6 +8,14 @@ function array_min(arr) {
     return min_value;
 }
 
+function throwing_grenade(){
+	if(is_local == true){
+		return (EquippedGrenadeTimer > -1);
+	}else{
+		return network_throw_grenade;	
+	}
+}
+
 function input_check(keycode, pressed = false, release = false){
     var is_mouse =
         keycode == mb_left ||
@@ -63,7 +71,7 @@ function buy_item(ItemID){
 		GainItem(
 			ItemID,
 			1,
-			global.ItemIndex[#ItemID, ItemStat.Ammo], 
+			global.ItemIndex[#ItemID, ItemStat.MaxAmmo], 
 			global.ItemIndex[#ItemID, ItemStat.ClipAmmo], 
 			global.ItemIndex[#ItemID, ItemStat.BaseDurability],
 			global.ItemIndex[#ItemID, ItemStat.has_scope],
@@ -141,40 +149,45 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		move_towards_point(shot_pos[0], shot_pos[1], item_dir_spd_dist[2]);	
 	}
 	
-	var sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
+	var sound_id = -1;
 	var instance_emitter = bullet_tracer.stats.Object;
 	var has_suppressor = false;
-
-	if(IS_NET){
-	    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
-	    if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
-	        instance_emitter = global.local_player;
-	    }
-	}
-
-	if(IS_NET){
-	    if(instance_emitter.is_local){
-	        has_suppressor =
-	            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
-	    }else{
-	        has_suppressor =
-	            instance_emitter.network_suppressor == Item.military_suppressor;
-	    }
-	}else{
-	    if(bullet_tracer.stats.Object_index == oPlayer){
-	        has_suppressor =
-	            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
-	    }else{
-	        has_suppressor =
-	            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
-	    }
-	}
-
-	if(has_suppressor){
-	    sound_id = snd_Silencer;
-	}
 	
-	play_sound(pos[0], pos[1], sound_id, instance_emitter);
+	if(global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.Type] == "Weapon"){
+		sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
+	}
+
+	if(instance_exists(instance_emitter)){
+		if(IS_NET){
+		    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
+		    if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
+		        instance_emitter = global.local_player;
+		    }
+		    if(instance_emitter.is_local){
+		        has_suppressor =
+		            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
+		    }else{
+		        has_suppressor =
+		            instance_emitter.network_suppressor == Item.military_suppressor;
+		    }
+		}else{
+		    if(bullet_tracer.stats.Object_index == oPlayer){
+		        has_suppressor =
+		            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
+		    }else{
+		        has_suppressor =
+		            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
+		    }
+		}
+
+		if(has_suppressor){
+		    sound_id = snd_Silencer;
+		}
+	
+		if(sound_id != -1){
+			play_sound(pos[0], pos[1], sound_id, instance_emitter);
+		}
+	}
 	
 	return bullet_tracer;
 	
@@ -681,9 +694,9 @@ function inaccuracy_formula(WID, ObjectType){
 
 function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
 	if(instance_exists(inst_id)){
-	    var playerInstance = global.local_player;//instance_find(Player, 0);
-		audio_emitter_gain(inst_id.Emitter, playerInstance.flashed_muffled_sounds);
-		audio_emitter_pitch(inst_id.Emitter, playerInstance.flashed_muffled_sounds);
+	    var playerInstance = global.local_player;
+		audio_emitter_gain(inst_id.Emitter, playerInstance.muffled_sounds);
+		audio_emitter_pitch(inst_id.Emitter, playerInstance.muffled_sounds);
 	    audio_emitter_position(inst_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
 	    audio_emitter_falloff(inst_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
 	    audio_play_sound_on(inst_id.Emitter, Sound, Priority, false);

@@ -8,7 +8,7 @@ stats = {
 	Item_id: image_index == 1 ? Item.nuclear_explosion : Item.base_explosion,
 	Damage: 0,
 	Object_index: -1,
-	Object_name: "",
+	Owner_name: "",
 	Object: noone,
 	Health_points: 100 * (image_index + 1),
 };

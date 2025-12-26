@@ -8,7 +8,7 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 	GrenadeObject = instance_create_depth(PositionX, PositionY, depth + 1, oGrenade);
 	GrenadeObject.stats = {
 		Object_index: ObjectType.object_index,
-		Object_name: ObjectType.stats.Name,
+		Owner_name: ObjectType.stats.Name,
 		Speed: max(GrenadeSpeed + (DotProduct * .1), 1),
 		Object: ObjectType,
 		Item_id: ItemID,
@@ -66,7 +66,7 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 			ObjectType,
 			ExplosionDamage,
 			stats.Object_index,
-			[stats.Object_name, false],
+			[stats.Owner_name, false],
 			noone,
 			[id.x, id.y],
 			false
@@ -98,7 +98,7 @@ function landmine_create(PositionX, PositionY, ItemID, ObjectType = id){
 	LandMine.ImageIndex = global.ItemIndex[#ItemID, ItemStat.BulletCasingID];
 	LandMine.image_index = LandMine.ImageIndex;
 	LandMine.stats = {
-		Object_name: ObjectType.stats.Name,
+		Owner_name: ObjectType.stats.Name,
 		Object: ObjectType,
 		Item_id: ItemID,
 		Object_index: ObjectType.object_index

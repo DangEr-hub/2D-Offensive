@@ -1,10 +1,10 @@
 function ui_show_popup(_caption, popup_caption, button_caption_positive, button_caption_negative, popup_width, popup_height, popup_callback_positive, popup_callback_negative) 
-	{
+{
 		popup_height = max(popup_height, 128);
 	with (objZUIMain) {
 		var _black = zui_create(0, 0, objUIBlack, -1000);
-
-		with (zui_create(__width * 0.5, __height * 0.5, objUIWindow, -1001)) {
+		var popup = zui_create(__width * 0.5, __height * 0.5, objUIWindow, -1001);
+		with (popup) {
 			zui_set_size(popup_width, popup_height);
 			black = _black;
   
@@ -71,5 +71,8 @@ function ui_show_popup(_caption, popup_caption, button_caption_positive, button_
 				}
 			}
 		}
+		
+		return popup;
 	}
+	
 }

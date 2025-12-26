@@ -40,13 +40,13 @@ var observer = global.local_player;
 var is_target = (object_index == oBot) || (object_index == oPlayer && is_remote);
 
 // lokální hráč je vždy viditelný
-if (id == observer) {
+if (id == observer || team == TEAM.FRIENDLY) {
     Visible = true;
 }else if (is_target) {
 
     if (!global.enemy_visibility) {
 
-		in_fov =
+		var in_fov =
 	        point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
 	        point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
 	        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||

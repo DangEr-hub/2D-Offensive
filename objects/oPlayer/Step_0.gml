@@ -85,7 +85,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	#endregion
 
 	#region Player texture
-	if(moving_timer > -1){moving_timer --;}
 	
 	if(global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote && stats.Health_points > 0){
 		switch(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass]){
@@ -475,7 +474,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						image_index = player_textures.no_weapon;
 						ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
 					}else{
-						image_index = player_textures.knife;
+						image_index = player_textures.knife_attack;
 						ArmHitBox.image_index = HitBox.ArmKnife;
 					}
 				}else{
@@ -544,8 +543,12 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			HeadHitBox.image_index = HitBox.Head;
 			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 			if(Flashed == false){
-				image_index = player_textures.no_weapon;
-				ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+				if(throwing_grenade()){
+					image_index = player_textures.grenade_throw;
+				}else{
+					image_index = player_textures.no_weapon;
+					ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+				}
 			}else{
 				image_index = player_textures.flashed_no_weapon;
 				ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
@@ -553,31 +556,44 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 		}else{
 			HeadHitBox.image_index = HitBox.HeadProne;
 			BodyHitBox.image_index = HitBox.BodyProne;
-			var image_index_variable;
 			if(Flashed == false){
-				image_index_variable = player_textures.prone;
-				ArmHitBox.image_index = HitBox.ArmProne;
+			    if(throwing_grenade()){
+			        anim_base = player_textures.grenade_prone;
+			        ArmHitBox.image_index = HitBox.ArmProneGrenade;
+			    }else{
+			        anim_base = player_textures.prone;
+			        ArmHitBox.image_index = HitBox.ArmProne;
+			    }
 			}else{
-				image_index_variable = player_textures.flashed_prone;
-				ArmHitBox.image_index = HitBox.ArmProneFlashed;
+			    anim_base = player_textures.flashed_prone;
+			    ArmHitBox.image_index = HitBox.ArmProneFlashed;
+			}
+			
+			if(anim_base != prev_anim_base){
+			    image_index = anim_base;
+			    LegHitBox.image_index = HitBox.LegProne;
+			    prev_anim_base = anim_base;
 			}
 					
 			#region Leg animation mechanics
-			if(Moving == true){
-				if(moving_timer == -1){
-					if(image_index < image_index_variable + 2){	
-						image_index += 1;
-						LegHitBox.image_index += 1;
-					}else{
-						image_index = image_index_variable;	
-						LegHitBox.image_index = HitBox.LegProne;
-					}
-					moving_timer = 10;
-				}
+			if(Moving){
+			    moving_timer --;
+
+			    if(moving_timer <= -1){
+			        image_index++;
+			        LegHitBox.image_index++;
+
+			        if(image_index >= anim_base + 2){
+			            image_index = anim_base;
+			            LegHitBox.image_index = HitBox.LegProne;
+			        }
+
+			        moving_timer = 10;
+			    }
 			}else{
-				moving_timer = -1;
-				image_index = image_index_variable;
-				LegHitBox.image_index = HitBox.LegProne;
+			    image_index = anim_base;
+			    LegHitBox.image_index = HitBox.LegProne;
+			    moving_timer = -1;
 			}
 			#endregion
 					
@@ -611,6 +627,14 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if (FootStepTimer > -1) FootStepTimer--;
 			if (ScopeInaccuracyTimer > -1) ScopeInaccuracyTimer--;
 			if (EquippedGrenadeTimer > -1) EquippedGrenadeTimer--;
+			if (near_explosion_timer > -1) near_explosion_timer--;
+			
+			if(FlashedAlpha > 0.075 || near_explosion_timer > -1 || stats.Health_points <= 0){
+				muffled_sounds = MUFFLE_VALUE;	
+				if(stats.Health_points > 0){
+					if!(audio_is_playing(snd_EarRing)){ audio_play_sound(snd_EarRing, 0, false); }
+				}
+			}else{ muffled_sounds = 1; audio_stop_sound(snd_EarRing); }
 	
 			if(HPTimer == 0){
 				var points = stats.Health_points - attack_damage;
@@ -708,6 +732,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommandBot])){
 			    if(selected_bot != noone){
 			        with(selected_bot){
+						set_state(States.MoveCommand);
+						target_x = oCrosshair.x;
+						target_y = oCrosshair.y;
 			        }
 			    }
 			}
@@ -839,17 +866,20 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#endregion
 		
 					#region Explosion camera shake
-					near_explosion = false;
-					if(instance_exists(oGrenade)){
-						var HEGrenade = instance_nearest(x, y, oGrenade);
-						if(HEGrenade.stats.Item_id == Item.HEGrenade && HEGrenade.ExplosionTimer <= 11 && HEGrenade.ExplosionTimer > -1 && HEGrenade.stats.Speed < .1){
-							if(distance_to_object(HEGrenade) <= 1024){
-								near_explosion = true;
-								ExplosionCrossShake = max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
-								ViewAngleAmplitude += max(10 * (1 - distance_to_object(HEGrenade)/1024), 5);
-								ExplosionViewAngleFrequency = 1;
-							}
+					var explosion = instance_nearest(x, y, oExplosion);
+					var max_dist = 512;
+					var d = clamp(distance_to_object(explosion), 0, max_dist);
+					var t = 1 - (d / max_dist);
+					if(distance_to_object(explosion) <= max_dist && explosion.alarm[1] > explosion.explosion_timer*.75){
+						if(near_explosion_timer <= -1){
+							var max_time = 4 * game_get_speed(gamespeed_fps);
+							var min_time = 0.25 * game_get_speed(gamespeed_fps);
+
+							near_explosion_timer = lerp(min_time, max_time, power(t, 2));
 						}
+						ExplosionCrossShake = max(10 * (1 - distance_to_object(explosion)/max_dist), 5);
+						ViewAngleAmplitude += max(10 * (1 - distance_to_object(explosion)/max_dist), 5);
+						ExplosionViewAngleFrequency = 1;
 					}
 					#endregion
 		
@@ -1007,17 +1037,12 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
 			#endregion
 	
-			#region Texture
-	
-				#region Knife texture
-				if (WeaponID != OtherSlot.Knife || global.Inventory[# item_use_position, Index.slot_id] != Item.None) {
-				    Knife.image_index = 0;
-				} else {
-				    Knife.image_index = (global.ItemIndex[# wpn_id, ItemStat.Name] == "Steel knife") ? 1 : 0;
-				}
-				#endregion
-		
-		
+			#region Knife texture
+			if (WeaponID != OtherSlot.Knife || global.Inventory[# item_use_position, Index.slot_id] != Item.None) {
+				Knife.image_index = 0;
+			} else {
+				Knife.image_index = (global.ItemIndex[# wpn_id, ItemStat.Name] == "Steel knife") ? 1 : 0;
+			}
 			#endregion
 	
 			#region Shooting mode
@@ -1526,12 +1551,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			}
 			if(FlashedAlpha <= 0.075){
 				if(sprite_exists(FlashedBackGround) && FlashedBackGround != -1){sprite_delete(FlashedBackGround);}
-				flashed_muffled_sounds = 1;
 				FlashedAlpha = 0;
 				Flashed = false;
 				FlashedBackGround = -1;
-			}else{
-				flashed_muffled_sounds = lerp(flashed_muffled_sounds, FLASHED_MUFFLE_VALUE, 0.01);	
 			}
 			#endregion
 	
@@ -2053,7 +2075,6 @@ if (!IS_NET) {
 
 
 if (should_handle_death) {
-    flashed_muffled_sounds = 1;
     oDraw.KilledByWeapon = KilledByWeapon;
     oDraw.KilledByName = KilledByName;
     Weapon.image_index = 0;

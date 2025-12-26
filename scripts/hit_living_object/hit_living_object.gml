@@ -1,6 +1,30 @@
 function enemy_initialized(hitObj, enemy_key, enemy_name) {
     var enemyStatsMap;
 	
+	/* 
+	Každý hráč či nepřítel má svou ds_mapu HitMap a v ní vnořenou ds_mapu
+	Takže MĚ dál hráč s key = 12 a jménem DangEr 4 hity.... a bot s key = 45 mi dal 1 hit...
+	Formát ds_mapy HitMap:
+		HitMap = {
+		  12 (key) -> {
+		        "Name"           : "DangEr",
+		        "HitsReceived"   : 4,
+		        "DamageReceived" : 87,
+		        "HitsGiven"      : 2,
+		        "DamageGiven"    : 41
+		       },
+
+		  45 (key) -> {
+		        "Name"           : "Elvis",
+		        "HitsReceived"   : 1,
+		        "DamageReceived" : 12,
+		        "HitsGiven"      : 5,
+		        "DamageGiven"    : 95
+		       }
+		}
+	
+	*/
+	
 	if(!instance_exists(hitObj)){ return; }
 
     if (!ds_map_exists(hitObj.HitMap, enemy_key)) {
@@ -10,9 +34,9 @@ function enemy_initialized(hitObj, enemy_key, enemy_name) {
         ds_map_add(enemyStatsMap, "DamageReceived", 0);
         ds_map_add(enemyStatsMap, "HitsGiven", 0);
         ds_map_add(enemyStatsMap, "DamageGiven", 0);
-        hitObj.HitMap[$ enemy_key] = enemyStatsMap;
+        hitObj.HitMap[? enemy_key] = enemyStatsMap;
     } else {
-        enemyStatsMap = hitObj.HitMap[$ enemy_key];
+        enemyStatsMap = hitObj.HitMap[? enemy_key];
     }
 
     return enemyStatsMap;
@@ -211,13 +235,18 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		
 		// When an enemy hits the hit_object
 		var enemyStatsMap = enemy_initialized(hit_object, attacker_key, attacker_name);
-		ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
-		ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
+		if!(is_undefined(enemyStatsMap)){
+			ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
+			ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
+		}
 
 		// When the hit_object hits back the attacking_item.stats.Object
 	    var hitObjectStatsMap = enemy_initialized(attacker, victim_key, victim_name);
-	    ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
-	    ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
+		
+		if!(is_undefined(hitObjectStatsMap)){
+		    ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
+		    ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
+		}
 		
 		#endregion
 		
@@ -276,10 +305,6 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		        }
 		    }
 
-		    //var death_sound_effect = choose(snd_Death1, snd_Death2);
-		   // if !audio_is_playing(death_sound_effect) {
-		    //    play_sound(impact_x, impact_y, death_sound_effect, attacking_item.stats.Object);
-		   // }
 		    hit_object.KilledByName = attacking_item.stats.Owner_name;
 		    hit_object.KilledByWeapon = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.Name];
 			hit_object.stats.Health_points = -1;
@@ -346,6 +371,12 @@ function apply_stealth_damage(hit_object){
 }
 
 function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_durability, impact_x, impact_y, attacking_object, hit_object, is_player) { 
+	
+	var randomDirection = random(360);
+	
+	if(instance_exists(attacking_object)){
+		randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
+	}
 
     // DAMAGE TO BODY
     if (BodyPart != HitBox.Head && BodyPart != HitBox.HeadProne) {
@@ -372,7 +403,6 @@ function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_d
             }
 
             for (var i = 0; i < ceil(max(hit_object.attack_damage / 5, 10)); i++) {
-                var randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
                 part_type_color1(oParticleSystem.headshot_particle, c_gray);
                 part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
                 part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
@@ -380,7 +410,7 @@ function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_d
                 part_type_color1(oParticleSystem.headshot_particle, c_white);
             }
 
-            var sound_effect = choose(snd_BulletHitArmour1, snd_BulletHitArmour2);
+            var sound_effect = snd_BulletHitArmour1;
 
             if !audio_is_playing(sound_effect) {
                 play_sound(impact_x, impact_y, sound_effect, attacking_object);
@@ -411,7 +441,6 @@ function hit_effects(BodyPart, armour_id, helmet_id, armour_durability, helmet_d
             }
 
             for (var j = 0; j < ceil(max(hit_object.attack_damage / 5, 10)); j++) {
-                var randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
                 part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
                 part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
                 part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);

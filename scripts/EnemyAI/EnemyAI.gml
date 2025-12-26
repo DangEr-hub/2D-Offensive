@@ -210,6 +210,20 @@ function bot_move_shooting(DangerX, DangerY){
 	}
 }
 
+function try_shoot(base){
+    var shoot_timer = min(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer], 30);
+    var gain = (base / shoot_timer) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]) / 10;
+
+    shoot_accumulator += gain;
+
+    var chance = min(shoot_accumulator * 100, 100);
+
+    if(percent_chance(chance)){
+        EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+        shoot_accumulator = 0;
+    }
+}
+
 function EnemyShooting(DangerX, DangerY){
 	var shoot_chance = 100;
 	var collision_tile = collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false);
@@ -226,26 +240,25 @@ function EnemyShooting(DangerX, DangerY){
 		if(Visible == true){
 		
 			#region Create smoke effect
-		if(instance_number(oFog) < 10){
-			Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
-			Fog.moving = true;
-			Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
-			Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
-			Fog.shoot_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer];
-			with(Fog){
-				smoke_effect_create(
-					20,
-					other.RotationAngle - 180,
-					5,
-					5,
-					10,
-					.1,
-					.75,
-					shoot_timer
-				);	
+			if(instance_number(oFog) < 10){
+				Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
+				Fog.moving = true;
+				Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
+				Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
+				Fog.shoot_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer];
+				with(Fog){
+					smoke_effect_create(
+						20,
+						other.RotationAngle - 180,
+						5,
+						5,
+						10,
+						.1,
+						.75,
+						shoot_timer
+					);	
+				}
 			}
-		}
-		//part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.dust_particle, random_range(1, 10));
 		#endregion
 		
 		}
@@ -356,6 +369,7 @@ function SetReactionTimer(Time){
 }
 
 function set_state(state){
+	
 	if(State != state){
 		State = state;
 	}
@@ -491,28 +505,22 @@ function ChooseLandMine(){
 
 function handle_offensive_movement(){
 	if(stats.Health_points <= stats.Max_health_points / 3){
-	    if (percent_chance(25 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveAway) {
-	        State = States.MoveAway;
-	    } else if (percent_chance(40 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveShoot) {
-	        State = States.MoveShoot;
+	    if (percent_chance(25 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))) {
+			set_state(States.MoveAway);
+	    } else if (percent_chance(40 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))) {
+			set_state(States.MoveShoot);
 		}else{
-			State = States.MovePredictive;
+			set_state(States.MovePredictive);
 		}
 	}else{
 		if(percent_chance(10 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.Move){
-				State = States.Move;
-			}
+			set_state(States.Move);
 		}else if(percent_chance(10 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.MoveShoot){
-				State = States.MoveShoot;	
-			}
+			set_state(States.MoveShoot);
 		}else if(percent_chance(75 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.MoveToward){
-				State = States.MoveToward;	
-			}
+			set_state(States.MoveToward);
 		}else{
-			State = States.MovePredictive;
+			set_state(States.MovePredictive);
 		}
 	}
 }
@@ -547,19 +555,13 @@ function LayDownLandMineAI(){
 			if(LandMines[floor(EquippedLandMine/4)] > 0){
 				State = States.LayDownLandMine;	
 			}else{
-				if(State != States.MoveShoot){
-					State = States.MoveShoot;	
-				}
+				set_state(States.MoveShoot);
 			}
 		}else{
-			if(State != States.MoveShoot){
-				State = States.MoveShoot;	
-			}	
+			set_state(States.MoveShoot);
 		}
 	}else{
-		if(State != States.MoveShoot){
-			State = States.MoveShoot;	
-		}
+		set_state(States.MoveShoot);
 	}
 }
 

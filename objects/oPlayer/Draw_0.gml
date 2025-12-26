@@ -2,8 +2,9 @@ event_inherited();
 //draw_text(x, y - 70, network_id);
 //draw_text(x, y + 100, "should_handle_death" + string(should_handle_death));
 
-draw_text(x, y + 50, selected_bot);
-//draw_text(x, y + 100, "Reloadtime" + string(ReloadTime));
+//draw_set_color(c_black);
+//draw_text(x, y + 50, image_index);
+//draw_text(x, y + 100, "Flashed" + string(Flashed));
 if(Visible == true){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
 	if (IS_NET && !is_local) {
@@ -23,9 +24,9 @@ if(Visible == true){
 	    armour_sprite_index = 4;
 	} else if (image_index == player_textures.reload) {
 	    armour_sprite_index = 7;
-	} else if (image_index >= player_textures.prone && image_index < player_textures.knife) {
+	} else if (image_index >= player_textures.prone && image_index < player_textures.grenade_throw) {
 	    armour_sprite_index = 5;
-	} else if (image_index == player_textures.knife) {
+	} else if (image_index == player_textures.knife_attack) {
 	    armour_sprite_index = 9;
 	}
 
@@ -44,7 +45,7 @@ if(Visible == true){
 	}
 
 	if (image_index == player_textures.knife_prone 
-	    || image_index == player_textures.knife_prone_second 
+	    || image_index == player_textures.knife_prone_second
 	    || image_index == player_textures.knife_prone_third)
 	{
 	    armour_sprite_index = 8;
@@ -62,7 +63,7 @@ if(Visible == true){
 	
 	
 	var helmet_sprite_index = 0;
-	if((image_index >= player_textures.prone && image_index < player_textures.knife) || image_index == player_textures.death){
+	if((image_index >= player_textures.prone && image_index < player_textures.knife_attack) || image_index == player_textures.death){
 		helmet_sprite_index = 6;	
 	}
 	
@@ -90,11 +91,19 @@ if(Visible == true){
 		#region Draw usable item
 		if(is_local == true){
 			if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
-				var item_offset_x = 40;
-				var item_offset_y = -10;
+				var item_offset_x = 35;
+				var item_offset_y = 40;
+					if!(throwing_grenade()){
+						item_offset_x = 40;
+						item_offset_y = -10;
+					}
 				if(moving_state == states_player.prone_state){
-					item_offset_x = 100;
-					item_offset_y = -3;
+					item_offset_x = 110;
+					item_offset_y = 35;
+					if!(throwing_grenade()){
+						item_offset_x = 100;
+						item_offset_y = -3;
+					}
 				}
 				var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
 				var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);

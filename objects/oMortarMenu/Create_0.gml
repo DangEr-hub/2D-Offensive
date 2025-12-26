@@ -112,7 +112,7 @@ with(zui_create(zui_get_width() * .5, position_y + string_height("a")*3, objUIBu
 				Item_id: Item.base_explosion,
 				Damage: global.ItemIndex[#Item.base_explosion, ItemStat.Damage],
 				Object_index: global.local_player,
-				Object_name: instance_nearest(x, y, global.local_player).Name,
+				Owner_name: instance_nearest(x, y, global.local_player).Name,
 				Object: instance_nearest(x, y, global.local_player),
 				Health_points: 100
 			};

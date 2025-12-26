@@ -1,4 +1,10 @@
 /// @description Movement
+if(State == States.MoveCommand){
+    alarm[0] = random_range(15, 25) * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+    return;
+}
+
+
 function decide_movement() {
     if (hidden == false) {
         handle_basic_movement();
@@ -20,19 +26,13 @@ function handle_basic_movement() {
 	    }
 	}else{
 		if(percent_chance(10 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.Move){
-				State = States.Move;
-			}
+			set_state(States.Move);
 		}else if(percent_chance(10 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.MoveShoot){
-				State = States.MoveShoot;	
-			}
+			set_state(States.MoveShoot);
 		}else if(percent_chance(75 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			if(State != States.MoveToward){
-				State = States.MoveToward;	
-			}
-	    } else if(percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MovePredictive){
-			State = States.MovePredictive;
+			set_state(States.MoveToward);
+	    } else if(percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+			set_state(States.MovePredictive);
 		}else{
 			choose_offensive_action();
 		}
@@ -41,11 +41,11 @@ function handle_basic_movement() {
 
 function handle_smoke_movement() {
     if (percent_chance(75 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveInSmoke) {
-        State = States.MoveInSmoke;
+		set_state(States.MoveInSmoke);
     } else if (percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveAway) {
-        State = States.MoveAway;
-    } else if (State != States.MoveShoot) {
-        State = States.MoveShoot;
+			set_state(States.MoveAway);
+    } else {
+		set_state(States.MoveShoot);
     }
 }
 
@@ -185,102 +185,4 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 		}
 		
 	}
-}
-
-if(global.EnemyCanMove == true){
-	
-	var target_x = x;
-	var target_y = y;
-	
-	if(instance_exists(ChasingObject)){
-		target_x = ChasingObject.x;
-		target_y = ChasingObject.y;
-	}
-	
-	#region States
-	switch(State){
-		case States.MoveAway:
-			if(ReactionTimer <= 0){
-				MoveRunAway(target_x, target_y);
-			}
-		break;
-		
-		case States.MoveShoot:
-			if(ReactionTimer <= 0){
-				bot_move_shooting(target_x, target_y);
-			}
-		break;
-		
-		case States.Move:
-			if(ReactionTimer <= 0){
-				MoveRandom();
-			}
-		break;
-		
-		case States.Idle:
-			if(percent_chance(10 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-				MoveIdle();
-			}
-		break;
-		
-		case States.MoveToward:
-			if(ReactionTimer <= 0){
-				MoveTowards(target_x, target_y, Acceleration);
-			}
-		break;
-		
-		case States.MoveAwayFromGrenade:
-			if(ReactionTimer <= 0){
-				MoveRunAway(NearestDangerX, NearestDangerY);
-			}
-		break;
-		
-		case States.ThrowGrenade:
-			if(ReactionTimer <= 0){
-				EnemyThrowGrenade(target_x, target_y);	
-			}
-		break;
-	
-		case States.LayDownLandMine:
-			if(ReactionTimer <= 0){
-				EnemyLayDownLandMine();	
-			}
-		break;
-		
-		case States.Chase:
-			if(ReactionTimer <= 0){
-				MoveTowards(target_x, target_y, Acceleration*2);
-			}
-		break;
-		
-		case States.MoveFlashed:
-			if(ReactionTimer <= 0){
-				if(percent_chance(50 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
-			}
-		break;
-		
-		case States.MoveInSmoke:
-			if(ReactionTimer <= 0){
-				if(percent_chance(10 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-					MoveIdle();
-				}
-			}
-		break;
-		
-		case States.MoveHealing:
-			if(ReactionTimer <= 0){
-				MoveRunAway(target_x, target_y);
-			}
-		break;
-		
-		case States.MovePredictive:
-			if(ReactionTimer <= 0){
-				move_predictive(target_x, target_y);
-			}
-		break;
-	}
-	#endregion	
-
 }

@@ -7,7 +7,7 @@
 #macro RD_OFFSET 1.0 // stabilní hráč je považován s RD_ES = 1.0
 #macro RD_START 200
 #macro STEALTH_DMG_MOD 3
-#macro FLASHED_MUFFLE_VALUE 0.5
+#macro MUFFLE_VALUE 0.5
 #macro STAMINA_KNIFE_HEAVY 10
 #macro STAMINA_KNIFE_LIGHT 5
 #macro INVENTORY_SIZE 21

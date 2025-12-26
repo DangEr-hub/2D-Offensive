@@ -16,12 +16,12 @@ if(instance_exists(oPlayer)){
 	
 	var vignette_aimpunch = 0;
 	var vignette_explosion = 0;
-	if(global.local_player.near_explosion == true){
+	if(global.local_player.near_explosion_timer > -1){
 		aberration_level = 0.02;
 		vignette_explosion = 0.5;
 	}
 	
-	if(global.local_player.AimPunchTimer > -1 || global.local_player.near_explosion == true || global.local_player.in_water == true){
+	if(global.local_player.AimPunchTimer > -1 || global.local_player.near_explosion_timer > -1 || global.local_player.in_water == true){
 		vignette_aimpunch = 0.25;
 		blur_intensity = 0.05;
 	}

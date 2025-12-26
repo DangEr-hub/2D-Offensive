@@ -173,9 +173,10 @@ global.DefaultKeyBinds = ds_list_create();
 ds_list_copy(global.DefaultKeyBinds, global.KeyBinds);
 
 enum player_textures{
-	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, 
-	prone, prone_second, prone_third, flashed_prone, flashed_prone_second, flashed_prone_third, 
-	reload_prone, reload_prone_second, reload_prone_third, knife_prone, knife_prone_second, knife_prone_third, knife
+	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, //0-6
+	prone, prone_second, prone_third, flashed_prone, flashed_prone_second, flashed_prone_third, //7-12
+	reload_prone, reload_prone_second, reload_prone_third, knife_prone, knife_prone_second, knife_prone_third, //13-18
+	grenade_prone, grenade_prone_second, grenade_prone_third, grenade_throw, knife_attack //19-23
 }
 
 enum states_player{
@@ -205,6 +206,7 @@ enum HitBox{
 	LegProne_third,
 	ArmKnife,
 	ArmProneKnife,
+	ArmProneGrenade,
 }
 
 enum States{
@@ -221,8 +223,8 @@ enum States{
 	MoveInSmoke,
 	LayDownLandMine,
 	MoveHealing,
-	MoveTowardPoint,
 	MovePredictive,
+	MoveCommand,
 	NoMove
 }
 

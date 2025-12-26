@@ -4,8 +4,8 @@ tab_height = 512 * global.GUIMultiplier;
 draw_set_font(set_font("Menu_small"));
 zui_set_size(tab_width, tab_height);
 
-stat_x = zui_get_width() * .55;
-stat_y = zui_get_height() * .125;
+stat_x = zui_get_width() * .5;
+stat_y = zui_get_height() * .05;
 gap = 170 * global.GUIMultiplier;
 c_x = zui_get_width() * .5;
 c_y = zui_get_height() * .5;
@@ -18,8 +18,8 @@ wpn_sprite = noone;
 wpn_desc = noone;
 
 wpn_desc_txt = "";
-wpn_string = array_create(22, "");
-ui_objects = array_create(22, noone);
+wpn_string = array_create(28, "");
+ui_objects = array_create(28, noone);
 
 
 
@@ -37,29 +37,64 @@ refresh_weapon_ui = function(){
 			}
 		}
 		
+		var complex_recoil = "no";
+		if(global.ItemIndex[# wpn, ItemStat.HardRecoil] == true){
+			complex_recoil = "yes";
+		}
+		
+		var dmg_drop_txt_1 = "";
+		var dmg_drop_txt_2 = "";
+		var dist = array_create(4, 0);
+		var base_dmg = global.ItemIndex[# wpn, ItemStat.Damage];
+		var dmg_drop = global.ItemIndex[# wpn, ItemStat.DamageDrop];
+		var max_range = global.ItemIndex[# wpn, ItemStat.Range];
+		
+		for(var i = 0; i < array_length(dist); i++){
+		    dist[i] = round((i + 1) * max_range / array_length(dist));
+		}
+
+		for(var i = 0; i < array_length(dist); i++){
+			var dmg = base_dmg * power(1 - dmg_drop, dist[i]);
+			var part = string_format(dmg/base_dmg * 100, 0, 1) + "% (" + string(dist[i]) + " u)";
+
+			if(i < array_length(dist) div 2){
+				if(dmg_drop_txt_1 != ""){ dmg_drop_txt_1 += ", "; }
+				dmg_drop_txt_1 += part;
+			}else{
+				if(dmg_drop_txt_2 != ""){ dmg_drop_txt_2 += ", "; }
+				dmg_drop_txt_2 += part;
+			}
+		}
+		
 		wpn_string = [
 			global.ItemIndex[# wpn, ItemStat.Name],
-			"Ammo: " + string(global.ItemIndex[# wpn, ItemStat.Ammo]) + "/" + string(global.ItemIndex[# wpn, ItemStat.ClipAmmo]),
+			"Ammo: " + string(global.ItemIndex[# wpn, ItemStat.MaxAmmo]) + "/" + string(global.ItemIndex[# wpn, ItemStat.ClipAmmo]),
 			"Price: " + string(global.ItemIndex[# wpn, ItemStat.Cost]),
 			"RPM: " + string(round(3600 / global.ItemIndex[# wpn, ItemStat.ShootTimer])),
-			"Base damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage], 0, 1),
-			"Body damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * BODY_MULTIPLIER, 0, 1),
-			"Head damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * HEADSHOT_MULTIPLIER, 0, 1),
-			"Arm damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * ARM_MULTIPLIER, 0, 1),
-			"Leg damage: " + string_format(global.ItemIndex[# wpn, ItemStat.Damage] * LEG_MULTIPLIER, 0, 1),
+			"Base damage: " + string_format(base_dmg, 0, 1),
+			"Body damage: " + string_format(base_dmg * BODY_MULTIPLIER, 0, 1),
+			"Head damage: " + string_format(base_dmg * HEADSHOT_MULTIPLIER, 0, 1),
+			"Arm damage: " + string_format(base_dmg * ARM_MULTIPLIER, 0, 1),
+			"Leg damage: " + string_format(base_dmg * LEG_MULTIPLIER, 0, 1),
 			"Movement speed: " + string_format(MOVE_SPD * global.ItemIndex[# wpn, ItemStat.MovingSpdMul], 0, 1) + " units/s",
 			"Base Spread: " + string(global.ItemIndex[# wpn, ItemStat.Inaccuracy]) + " units",
 			"Penetration power: " + string_format(global.ItemIndex[# wpn, ItemStat.PenetrationPower] * 100, 0, 1) + "%",
 			"Reload time: " + string_format(global.ItemIndex[# wpn, ItemStat.ReloadSpeed] / 60, 0, 1) + "s",
 			"Kill reward: " + string(global.ItemIndex[# wpn, ItemStat.reward]),
-			"Damage drop: " + string_format(global.ItemIndex[# wpn, ItemStat.DamageDrop] * 10000 / (global.ItemIndex[# wpn, ItemStat.Damage]), 0, 3) + "% per 100 units",
-			"Spread increase: " + string_format(10000 * global.ItemIndex[# wpn, ItemStat.accuracy_drop], 0, 1) + "% per 100 units",
-			"Maximal range: " + string_format(global.ItemIndex[# wpn, ItemStat.Range], 0, 1) + " units",
+			"Damage progress (1): " + dmg_drop_txt_1,
+			"Damage progress (2): " + dmg_drop_txt_2,
+			"Range spread increase: " + string_format(10000 * global.ItemIndex[# wpn, ItemStat.accuracy_drop], 0, 1) + "% per 100 units",
+			"Maximal range: " + string_format(max_range, 0, 1) + " units",
 			"Fire modes: " + fire_modes,
-			"Type: " + string(global.ItemIndex[# wpn, ItemStat.WeaponTypeClass]),
-			"Usage: " + string(global.ItemIndex[# wpn, ItemStat.WeaponType]),
+			"Class: " + string(global.ItemIndex[# wpn, ItemStat.WeaponTypeClass]),
+			"Type: " + string(global.ItemIndex[# wpn, ItemStat.WeaponType]),
 			"Moving spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.MovingInaccuracyMultiplier] * 100, 0, 1) + "%",
-			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + "% per bullet"
+			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + "% per shot",
+			"Complex recoil: " + complex_recoil,
+			"Crosshair vertical recoil: " + string(global.ItemIndex[# wpn, ItemStat.RecoilY]) + " units per shot",
+			"Crosshair horizontal recoil: " + string(global.ItemIndex[# wpn, ItemStat.RecoilX]) + " units per shot",
+			"Bullet vertical offset: " + string(global.ItemIndex[# wpn, ItemStat.RecoilOffsetY]) + " units per shot",
+			"Bullet horizontal offset: " + string(global.ItemIndex[# wpn, ItemStat.RecoilOffsetX]) + " units per shot"
 		];
 	    var is_locked = global.ItemIndex[# wpn, ItemStat.is_locked];
 		
@@ -96,6 +131,15 @@ refresh_weapon_ui = function(){
 				
 			}
 		}
+		
+		var zui_width = 0;
+		with(oWeaponsTab){
+			zui_width = zui_get_width();
+		}
+		
+		with(ui_objects[0]){
+			__x = zui_width * .25 - string_width(oWeaponsTab.wpn_string[0])/2;
+		}
 
 	    if(instance_exists(img_lock)){
 	        with(img_lock){ drawable = is_locked; }
@@ -112,7 +156,9 @@ refresh_weapon_ui = function(){
 };
 
 draw_set_font(set_font("Console"));
-weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, Item.famas, Item.awm, Item.SSG08, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.Spas];
+weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
+			Item.famas, Item.awm, Item.SSG08, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.Spas,
+		  ];
 wpn = weapons[0];
 
 
@@ -120,9 +166,9 @@ wpn = weapons[0];
 img_lock = zui_create(c_x, c_y, objUIImage);
 img_lockbg = zui_create(c_x, c_y, objUIImage);
 wpn_sprite = zui_create(zui_get_width() * .25, zui_get_height() * .25, objUIImage);
-wpn_desc = zui_create(zui_get_width() * .05, zui_get_height() * .35, objUILabel);
+wpn_desc = zui_create(zui_get_width() * .025, zui_get_height() * .45, objUILabel);
 
-ui_objects[0] = zui_create(c_x - 24 * global.GUIMultiplier, zui_get_height() * .1, objUILabel);	
+ui_objects[0] = zui_create(zui_get_width() * .25, zui_get_height() * .07, objUILabel);	
 with(ui_objects[0]){
 	color = MAIN_COLOR;
 	font = set_font("Title");
@@ -143,7 +189,7 @@ with(wpn_desc){
 	font = set_font("Console");
 	caption = other.wpn_desc_txt;
 	item_id = other.wpn;
-	description = "Buy_menu";
+	description = "Inventory";
 	max_width = 350 * global.GUIMultiplier;
 }
 
@@ -151,7 +197,7 @@ with(wpn_sprite){
 	zui_set_size(sprite_get_width(spr_Items) * 2 * global.GUIMultiplier, sprite_get_height(spr_Items) * 2 * global.GUIMultiplier);
 	sprite = spr_Items;
 	clickable = false;
-	sprite_image_index = 0;//oWeaponsTab.wpn;
+	sprite_image_index = oWeaponsTab.wpn;
 	sprite_width_size = sprite_get_width(spr_Items) * 2 * global.GUIMultiplier;
 	sprite_height_size = sprite_get_height(spr_Items) * 2 * global.GUIMultiplier;
 }
@@ -183,7 +229,7 @@ refresh_weapon_ui();
 
 /* Arrows */
 var arrow_w = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5 + arrow_w/1.95, zui_get_height() * .9, objUIButton)){
+with(zui_create(zui_get_width() * .25 + arrow_w/1.95, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(arrow_w);
     zui_set_height(16 * global.GUIMultiplier);
@@ -200,7 +246,7 @@ with(zui_create(zui_get_width() * .5 + arrow_w/1.95, zui_get_height() * .9, objU
     };
 }
 
-with(zui_create(zui_get_width() * .5 - arrow_w/1.95, zui_get_height() * .9, objUIButton)){
+with(zui_create(zui_get_width() * .25 - arrow_w/1.95, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(arrow_w);
     zui_set_height(16 * global.GUIMultiplier);

@@ -4,7 +4,7 @@ stats = {
 	"Slot_barrel": Item.None,
 	"Slot_grip": Item.None,
 	"Slot_suppressor": Item.None,
-	"Ammo": global.ItemIndex[#Item.basic_machine_gun, ItemStat.Ammo],
+	"Ammo": global.ItemIndex[#Item.basic_machine_gun, ItemStat.MaxAmmo],
 	"Clip_ammo": global.ItemIndex[#Item.basic_machine_gun, ItemStat.ClipAmmo],
 	"Id": Item.basic_machine_gun,
 	"Object": noone

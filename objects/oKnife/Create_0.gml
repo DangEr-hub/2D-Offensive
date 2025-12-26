@@ -6,7 +6,7 @@ stats = {
 	"Item_id": Item.None,
 	"Penetration_damage": 0,
 	"obj_index": -1,
-	"Object_name": "",
+	"Owner_name": "",
 	"Hit_timer": -1,
 };
 image_speed = 0;

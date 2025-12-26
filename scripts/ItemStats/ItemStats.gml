@@ -18,7 +18,6 @@
 /// @param  P2
 /// @param  RX
 /// @param  RY
-/// @param  MKB
 /// @param  KBIM
 /// @param  MIM
 /// @param  KBP
@@ -56,25 +55,23 @@ function WeaponStats(){
 	global.ItemIndex[#ItemID, ItemStat.KBPhase2] = argument[16];
 	global.ItemIndex[#ItemID, ItemStat.RecoilX] = argument[17];
 	global.ItemIndex[#ItemID, ItemStat.RecoilY] = argument[18];
-	global.ItemIndex[#ItemID, ItemStat.MaxKickBack] = argument[19];
-	global.ItemIndex[#ItemID, ItemStat.KickBackInaccuracyMultiplier] = argument[20];
-	global.ItemIndex[#ItemID, ItemStat.MovingInaccuracyMultiplier] = argument[21];
-	global.ItemIndex[#ItemID, ItemStat.KickBackPower] = argument[22];
-	global.ItemIndex[#ItemID, ItemStat.accuracy_drop] = argument[23];
-	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetX] = argument[24];
-	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetY] = argument[25];
-	global.ItemIndex[#ItemID, ItemStat.ShootSpdMul] = argument[26];
-	global.ItemIndex[#ItemID, ItemStat.BulletCasingID] = argument[27];
-	global.ItemIndex[#ItemID, ItemStat.WeaponTypeClass] = argument[28];
-	global.ItemIndex[#ItemID, ItemStat.Ammo] = global.ItemIndex[#ItemID, ItemStat.MaxAmmo];
-	global.ItemIndex[#ItemID, ItemStat.MovingSpdMul] = argument[29];
-	global.ItemIndex[#ItemID, ItemStat.PenetrationPower] = argument[30];
-	global.ItemIndex[#ItemID, ItemStat.DamageDrop] = argument[31];
-	global.ItemIndex[#ItemID, ItemStat.EquipTime] = argument[32];
-	global.ItemIndex[#ItemID, ItemStat.ReloadSpdMul] = argument[33];
-	global.ItemIndex[#ItemID, ItemStat.Cost] = argument[34];
-	global.ItemIndex[#ItemID, ItemStat.KBResetMultiplier] = argument[35];
-	global.ItemIndex[#ItemID, ItemStat.reward] = argument[36];
+	global.ItemIndex[#ItemID, ItemStat.KickBackInaccuracyMultiplier] = argument[19];
+	global.ItemIndex[#ItemID, ItemStat.MovingInaccuracyMultiplier] = argument[20];
+	global.ItemIndex[#ItemID, ItemStat.KickBackPower] = argument[21];
+	global.ItemIndex[#ItemID, ItemStat.accuracy_drop] = argument[22];
+	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetX] = argument[23];
+	global.ItemIndex[#ItemID, ItemStat.RecoilOffsetY] = argument[24];
+	global.ItemIndex[#ItemID, ItemStat.ShootSpdMul] = argument[25];
+	global.ItemIndex[#ItemID, ItemStat.BulletCasingID] = argument[26];
+	global.ItemIndex[#ItemID, ItemStat.WeaponTypeClass] = argument[27];
+	global.ItemIndex[#ItemID, ItemStat.MovingSpdMul] = argument[28];
+	global.ItemIndex[#ItemID, ItemStat.PenetrationPower] = argument[29];
+	global.ItemIndex[#ItemID, ItemStat.DamageDrop] = argument[30];
+	global.ItemIndex[#ItemID, ItemStat.EquipTime] = argument[31];
+	global.ItemIndex[#ItemID, ItemStat.ReloadSpdMul] = argument[32];
+	global.ItemIndex[#ItemID, ItemStat.Cost] = argument[33];
+	global.ItemIndex[#ItemID, ItemStat.KBResetMultiplier] = argument[34];
+	global.ItemIndex[#ItemID, ItemStat.reward] = argument[35];
 }
 
 function ArmourStats(ID, Name, Weight, Defense){

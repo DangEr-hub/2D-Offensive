@@ -14,85 +14,143 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 	healing_time = -1;
 }
 #endregion
+
+#region States 
+
+if(State == States.MoveCommand){
+	MoveTowards(target_x, target_y, Acceleration*3, 0, 0);
+}
+
+if(global.EnemyCanMove == true && alarm[0] <= 2){
 	
-#region Shooting state
-if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
-	var shooting_chance = 0;
+	if(instance_exists(ChasingObject) && State != States.MoveCommand){
+		target_x = ChasingObject.x;
+		target_y = ChasingObject.y;
+	}
+	
+	#region States
 	switch(State){
 		case States.MoveAway:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				MoveRunAway(target_x, target_y);
 			}
 		break;
 		
 		case States.MoveShoot:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				bot_move_shooting(target_x, target_y);
 			}
 		break;
 		
 		case States.Move:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				MoveRandom();
+			}
+		break;
+		
+		case States.Idle:
+			if(percent_chance(10 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+				MoveIdle();
 			}
 		break;
 		
 		case States.MoveToward:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				MoveTowards(target_x, target_y, Acceleration);
 			}
 		break;
 		
 		case States.MoveAwayFromGrenade:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				MoveRunAway(NearestDangerX, NearestDangerY);
+			}
+		break;
+		
+		case States.ThrowGrenade:
+			if(ReactionTimer <= 0){
+				EnemyThrowGrenade(target_x, target_y);	
+			}
+		break;
+	
+		case States.LayDownLandMine:
+			if(ReactionTimer <= 0){
+				EnemyLayDownLandMine();	
 			}
 		break;
 		
 		case States.Chase:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
-				}
+				MoveTowards(target_x, target_y, Acceleration*2);
 			}
 		break;
 		
 		case States.MoveFlashed:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				if(percent_chance(50 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
 				}
 			}
 		break;
 		
 		case States.MoveInSmoke:
 			if(ReactionTimer <= 0){
-				shooting_chance = min(10 / (global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer]) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 100);
-				if(percent_chance(shooting_chance)){
-					EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+				if(percent_chance(10 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+					MoveIdle();
 				}
 			}
 		break;
+		
+		case States.MoveHealing:
+			if(ReactionTimer <= 0){
+				MoveRunAway(target_x, target_y);
+			}
+		break;
+		
+		case States.MovePredictive:
+			if(ReactionTimer <= 0){
+				move_predictive(target_x, target_y);
+			}
+		break;
 	}
+	#endregion	
+
 }
 #endregion
+
+#region Command state
+if(State == States.MoveCommand){
+    if(point_distance(x, y, target_x, target_y) < 16){
+        set_state(States.Idle);
+    }
+}
+#endregion
+	
+#region Shooting state
+if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
+    if(ReactionTimer <= 0){
+
+        switch(State){
+            case States.MoveAway:
+            case States.MoveShoot:
+            case States.Move:
+            case States.MoveToward:
+            case States.MoveAwayFromGrenade:
+                try_shoot(0.25);
+            break;
+
+            case States.Chase:
+            case States.MoveFlashed:
+                try_shoot(0.5);
+            break;
+
+            case States.MoveInSmoke:
+                try_shoot(0.1);
+            break;
+        }
+    }
+}
+#endregion
+
 	
 #region Timers
 enemy_aimpunch = lerp(enemy_aimpunch, 0, .5);

@@ -95,16 +95,17 @@ if(type == "Respawn menu"){
 		}
 	}
 	#endregion
+	
 	#endregion
 	
 }else if(type == "Weapon description"){
 	
 	#region Weapon description	
-	var rows = 5;
+	var rows = 3;
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
 	var statTitles = [
-		"Damage power: ", "Ammo: ", "Clip ammo: ", "Reload time: ", "Max. range: ", "Moving inaccuracy: ", "Base inaccuracy: ", "RPM: ", "Inaccuracy/shot: ", "Damage drop: ", "Range drop: ",
+		"Damage: ", "Ammo: ", "Reload time: ", "Max. range: ", "RPM: ",
 		"Class: ", "Moving speed: ", "Penetration: ", ""
 	];					
 					
@@ -125,24 +126,12 @@ if(type == "Respawn menu"){
 								
 				switch(statIndex){
 										
-					case ItemStat.Ammo:
-						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_ammo]);
-					break;
-										
-					case ItemStat.ClipAmmo:
-						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_clip_ammo]);
+					case ItemStat.MaxAmmo:
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_ammo]) + "/" + string(global.Inventory[#oDraw.var_slot, Index.slot_clip_ammo]);
 					break;
 									
 					case ItemStat.ReloadSpeed:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + "s";
-					break;
-									
-					case ItemStat.DamageDrop:
-						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 5) + "%/Unit";
-					break;
-									
-					case ItemStat.accuracy_drop:
-						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 4) + "%/Unit";
 					break;
 
 					case ItemStat.MovingSpdMul:
@@ -160,21 +149,9 @@ if(type == "Respawn menu"){
 					case ItemStat.Range:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
 					break;
-									
-					case ItemStat.Inaccuracy:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
-					break;
-									
-					case ItemStat.MovingInaccuracyMultiplier:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
-					break;
 										
 					case ItemStat.ShootingMode:
 						text = statTitles[statIndex] + get_shooting_modes_string(Id);
-					break;
-					
-					case ItemStat.KickBackInaccuracyMultiplier:
-						text = statTitles[statIndex] + string_format(global.ItemIndex[#Id, statIndex], 0, 3) + " Units";
 					break;
 									
 					default:

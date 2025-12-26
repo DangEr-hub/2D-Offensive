@@ -440,7 +440,8 @@ function rank_database(){
 	
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
-	
+
+	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", SILVERI_EP);	
 	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_EP);	
 	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_EP);
 	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_EP);

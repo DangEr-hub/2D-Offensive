@@ -135,13 +135,13 @@ function InventoryInit() {
 
 	enum ItemStat{
 		/* Draw weapon stats */
-	    Damage, Ammo, ClipAmmo, ReloadSpeed, Range, MovingInaccuracyMultiplier, Inaccuracy, ShootTimer, KickBackInaccuracyMultiplier, DamageDrop, accuracy_drop, 
-		WeaponTypeClass, MovingSpdMul, PenetrationPower, ShootingMode,
+	    Damage, MaxAmmo, ReloadSpeed, Range, ShootTimer, WeaponTypeClass, MovingSpdMul, PenetrationPower, ShootingMode, MovingInaccuracyMultiplier, Inaccuracy,
+		KickBackInaccuracyMultiplier, DamageDrop, accuracy_drop, ClipAmmo,
 		
 		/* Draw armour stats */
 		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, MaxKickBack, SniperScope, ShootSpdMul, has_barrel, EquipTime, has_suppressor,
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
-		EnemyInaccuracyCompensation, MaxAmmo, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
+		EnemyInaccuracyCompensation, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
 		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, Total
 	}
 	
@@ -185,7 +185,7 @@ function ItemDeclare(){
 	}
 	
 	if(Ammo <= -1){
-		Ammo = global.ItemIndex[#image_index, ItemStat.Ammo];
+		Ammo = global.ItemIndex[#image_index, ItemStat.MaxAmmo];
 		ClipAmmo = global.ItemIndex[#image_index, ItemStat.ClipAmmo];
 		MaxAmmo = Ammo;
 	}
@@ -211,7 +211,7 @@ function ItemDrop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClipAmmo = -1
     var drop_barrel = global.ItemIndex[#ID, ItemStat.has_barrel];
     var drop_grip = global.ItemIndex[#ID, ItemStat.has_grip];
     var drop_suppressor = global.ItemIndex[#ID, ItemStat.has_suppressor];
-    var drop_ammo = global.ItemIndex[#ID, ItemStat.Ammo];
+    var drop_ammo = global.ItemIndex[#ID, ItemStat.MaxAmmo];
     var drop_clip_ammo = global.ItemIndex[#ID, ItemStat.ClipAmmo];
     var drop_durability = ObjectDurability;
 
