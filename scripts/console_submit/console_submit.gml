@@ -293,6 +293,9 @@ function console_submit(Console) {
 						if(no == 1 && string_digits(c[1]) != ""){
 							if(!IS_NET || global.sv_cheats == true){
 								global.Weather = real(c[1]);
+								if(global.Weather != WEATHER.RAIN){
+									audio_stop_sound(snd_Rain);	
+								}
 								if(IS_NET){
 									send_weather_broadcast();
 								}

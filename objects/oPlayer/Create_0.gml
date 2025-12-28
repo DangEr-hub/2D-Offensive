@@ -1,5 +1,6 @@
 //haze_start(true, false);
 event_inherited();
+command = array_create(3, -1);
 anim_base = player_textures.prone;
 prev_anim_base = anim_base;
 near_explosion_timer = -1;
@@ -177,6 +178,10 @@ network_grip = Item.None;
 network_throw_grenade = false;
 
 #endregion
+
+if(global.ranked_game == true){
+	instance_create_layer(x, y, "OtherO", oRatingController);
+}
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 

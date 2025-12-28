@@ -731,12 +731,19 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCommandBot])){
 			    if(selected_bot != noone){
+					command[0] = oCrosshair.x;
+					command[1] = oCrosshair.y;
+					command[2] = 0.1;
 			        with(selected_bot){
 						set_state(States.MoveCommand);
 						target_x = oCrosshair.x;
 						target_y = oCrosshair.y;
 			        }
 			    }
+			}
+			
+			if(command[2] > 0){
+				command[2] = min(command[2] + .01, 1);	
 			}
 			#endregion
 	
@@ -1285,8 +1292,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 		
 				}
 
-				x = clamp(x,0,room_width-sprite_width);
-				y = clamp(y,0,room_height-sprite_height);
+				x = clamp(x,0,room_width);
+				y = clamp(y,0,room_height);
 			}
 
 			#endregion
@@ -1307,7 +1314,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					 if (collision_rectangle(min_x, min_y, max_x, max_y, wall_object, true, false)) {
 						var wall_sound = snd_BulletConcrete;
 						var wall_particles = irandom_range(global.ItemIndex[# wpn_id, ItemStat.Damage], global.ItemIndex[# wpn_id, ItemStat.Damage]*2);
-						if(wall_object.Type == "Metal"){
+						if(wall_object.Type == MATERIAL.METAL){
 							wall_sound = snd_BulletMetal;
 						}
 						if!(audio_is_playing(wall_sound)){
@@ -1352,11 +1359,21 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Object push player
-			if(place_meeting(x, y, oBot)) {
-			    var Enemy = instance_nearest(x, y, oBot);
-				var dir = point_direction(Enemy.x, Enemy.y, x, y);
-				AccelX = 5 * cos(degtorad(dir));
-				AccelY = -5 * sin(degtorad(dir));
+			var objects = [oBot, oBird];
+			
+			for(var i = 0;i < array_length(objects); i ++){
+				if(place_meeting(x, y, objects[i])) {
+				    var obj = instance_nearest(x, y, objects[i]);
+					var dir = point_direction(obj.x, obj.y, x, y);
+					
+					if(obj.object_index != oBird){
+						AccelX = 5 * cos(degtorad(dir));
+						AccelY = -5 * sin(degtorad(dir));
+					}else if(obj.state == 0){
+						AccelX = 1 * cos(degtorad(dir));
+						AccelY = -1 * sin(degtorad(dir));
+					}
+				}
 			}
 	
 			if(place_meeting(x, y, oMachineGunFloor)){

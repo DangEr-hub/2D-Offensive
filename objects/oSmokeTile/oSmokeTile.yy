@@ -28,8 +28,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_ParentTile",
-    "path": "sprites/spr_ParentTile/spr_ParentTile.yy",
+    "name": "spr_TileCollision",
+    "path": "sprites/spr_TileCollision/spr_TileCollision.yy",
   },
   "spriteMaskId": null,
   "visible": true,

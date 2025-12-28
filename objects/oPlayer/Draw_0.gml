@@ -1,6 +1,6 @@
 event_inherited();
-//draw_text(x, y - 70, network_id);
-//draw_text(x, y + 100, "should_handle_death" + string(should_handle_death));
+draw_text(x, y - 70, global.MapID);
+//draw_text(x, y + 100, command);
 
 //draw_set_color(c_black);
 //draw_text(x, y + 50, image_index);

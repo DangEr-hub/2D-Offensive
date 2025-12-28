@@ -26,6 +26,15 @@ Inaccuracy = 2;
 infra_vision_light = undefined;
 image_speed = 0;
 HitList = ds_list_create();
+wall_collision = -1;
+impact_wall = noone;
+impact_flag = false;
+impact_ex = -1;
+impact_ey = -1;
+xx = 0;
+yy = 0;
+impact_sx = -1;
+impact_sy = -1;
 
 owner_id = -1;
 bullet_network_id = -1;

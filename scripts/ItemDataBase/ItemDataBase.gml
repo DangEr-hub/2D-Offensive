@@ -291,8 +291,8 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.Javelin, ItemStat.Description] = "High-damage, armor-piercing powerhouse. Mastery requires skill due to its inaccuracy and limited magazine but in the hands of a skilled player, each shot spells devastation for your enemies.";
 
 	global.ItemIndex[#Item.Glock, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 590, 29, 240, 24, "Secondary", 1, 5, 9, snd_Glock, 3, 1, false,
-	24, 24, 5, 8, .1, 1.1, 1, .008, 0, 5, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps), .9, 20, .5, 9);
+	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 590, 29, 240, 24, "Secondary", 1, 3, 9, snd_Glock, 3, 1, false,
+	24, 24, 5, 8, .1, 1.1, 1, .007, 0, 5, .99, 0, "Pistol", .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps), .9, 20, .5, 9);
 	global.ItemIndex[#Item.Glock, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
 	global.ItemIndex[#Item.Glock, ItemStat.advantages] = "-Great mobility\n-High magazine capacity";
@@ -335,7 +335,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.usp, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 700, 35, 350, 15, "Secondary", 1, 3, 8, snd_usp, 2, 1, false,
-	9, 12, 1, 1, .175, 5.5, 1, .0125, 0, 13, .93, 0, "Pistol", .97, .44, .0002, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8);
+	9, 12, 1, 1, .175, 5.5, 1, .0055, 0, 13, .93, 0, "Pistol", .97, .44, .0002, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8);
 	global.ItemIndex[#Item.usp, ItemStat.KBStabilization] = 10;
 	global.ItemIndex[#Item.usp, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low penetration power";
@@ -347,7 +347,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.p250, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 700, 33, 105, 15, "Secondary", 1, 2, 7, snd_p250, 2, 1, false,
-	15, 15, 1, 4, .5, 3.75, 2, .005, 0, 5.9, .99, 0, "Pistol", .93, .5, .00029, ceil(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7);
+	15, 15, 1, 4, .5, 3.75, 2, .00525, 0, 5.9, .99, 0, "Pistol", .93, .5, .00029, ceil(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7);
 	global.ItemIndex[#Item.p250, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.p250, ItemStat.disadvantages] = "-Low penetration power";
 	global.ItemIndex[#Item.p250, ItemStat.advantages] = "+Great mobility\n+First shot accuracy";
@@ -357,7 +357,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.tec9, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 715, 27, 180, 18, "Secondary", 1, 5, 7, snd_Tec9, 2, 1.1, false,
-	7, 12, 1, 3, .025, 2.5, 3, .0055, 2, 10, .95, 0, "Pistol", .975, .71, .00037, ceil(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7);
+	7, 12, 1, 3, .025, 2.5, 3, .0045, 2, 10, .95, 0, "Pistol", .975, .71, .00037, ceil(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7);
 	global.ItemIndex[#Item.tec9, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.tec9, ItemStat.disadvantages] = "-Low damage\n";
 	global.ItemIndex[#Item.tec9, ItemStat.advantages] = "+Great mobility\n+Good penetration power";

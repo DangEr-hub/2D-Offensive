@@ -1,5 +1,5 @@
 /* oBird step event */
-var margin = 64;
+var margin = 32;
 if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin) || y <= (0 - margin)){
     if (IS_NET && oNetworkManager.is_server) {
         server_process_bird_death(id, 0, false);

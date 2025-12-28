@@ -60,6 +60,13 @@ enum TEAM{
 	ENEMIES
 }
 
+enum MATERIAL{
+	CONCRETE,
+	METAL,
+	WOOD,
+	GLASS
+}
+
 enum weapon_attachments{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total
 }
@@ -76,7 +83,7 @@ enum WEATHER{
 
 
 enum MapProperty{
-	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, SpawnAreas, MaxEnemies, Total
+	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, SpawnAreas, MaxEnemies, Tile, Total
 }
 
 enum MapIndex{
@@ -104,6 +111,7 @@ global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .7;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
 global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
+global.MapProperties[#MapIndex.Desert, MapProperty.Tile] = spr_Desert;
 
 var desert_spawn_areas = ds_map_create();
 ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]); //x1, y1, x2, y2, enemy number
@@ -114,7 +122,6 @@ ds_map_add(desert_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);
 global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_areas;
 
 
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = MAIN_COLOR;
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_color_rgb(229, 181, 45);
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = make_color_rgb(229, 199, 114);
@@ -123,6 +130,16 @@ global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.25;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.7;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MaxEnemies] = 100;
+global.MapProperties[#MapIndex.RainForest, MapProperty.Tile] = spr_RainForest;
+
+var rain_forest_spawn_areas = ds_map_create();
+ds_map_add(rain_forest_spawn_areas, "area1", [2700, 300, 3300, 600, 15]); //x1, y1, x2, y2, enemy number
+ds_map_add(rain_forest_spawn_areas, "area2", [900, 1200, 1500, 1800, 3]);
+/*ds_map_add(rain_forest_spawn_areas, "area3", [900, 100, 1900, 500, 5]);
+ds_map_add(rain_forest_spawn_areas, "area4", [2300, 400, 3000, 1000, 5]);
+ds_map_add(rain_forest_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);*/
+global.MapProperties[# MapIndex.RainForest, MapProperty.SpawnAreas] = rain_forest_spawn_areas;
 
 global.MapProperties[#MapIndex.City, MapProperty.MapStartColor] = c_white;
 global.MapProperties[#MapIndex.City, MapProperty.Name] = "City";

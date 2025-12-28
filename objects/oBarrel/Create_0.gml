@@ -1,7 +1,7 @@
 event_inherited();
 
 Visible = true;
-Type = "Metal";
+Type = MATERIAL.METAL;
 image_index = choose(0, 1);
 image_speed = 0;
 stats = {

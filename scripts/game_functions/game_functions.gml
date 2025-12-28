@@ -261,16 +261,16 @@ function process_bullet_collision(starting_x, starting_y, current_x, current_y, 
     var collision_info = find_collision_point(starting_x, starting_y, target_x, target_y, object_type);
     if (array_length(collision_info) > 0) {
         var collision_details = {
-            "x": collision_info[0],
-            "y": collision_info[1],
+            "xx": collision_info[0],
+            "yy": collision_info[1],
             "inst_id": collision_info[2]
         };
         
         var bullet_distance = point_distance(starting_x, starting_y, current_x, current_y);
-        var collision_distance = point_distance(starting_x, starting_y, collision_details.x, collision_details.y);
+        var collision_distance = point_distance(starting_x, starting_y, collision_details.xx, collision_details.yy);
         
         // Check collision based on single_hit flag
-        if ((single_hit && point_distance(current_x, current_y, collision_details.x, collision_details.y) <= speed) ||
+        if ((single_hit && point_distance(current_x, current_y, collision_details.xx, collision_details.yy) <= speed) ||
             (!single_hit && bullet_distance >= collision_distance)) {
             return collision_details;
         }
@@ -278,6 +278,7 @@ function process_bullet_collision(starting_x, starting_y, current_x, current_y, 
     
     return noone;
 }
+
 
 function find_collision_point(x1, y1, x2, y2, object) {
     var tolerance = 1;
@@ -293,22 +294,20 @@ function find_collision_point(x1, y1, x2, y2, object) {
     }
 
     // Binary search for the precise collision point
-    while (point_distance(startX, startY, endX, endY) > tolerance) {
-        var midX = (startX + endX) / 2;
-        var midY = (startY + endY) / 2;
-        var midCollision = collision_line(x1, y1, midX, midY, object, true, false);
+	while (point_distance(startX, startY, endX, endY) > tolerance) {
+	    var midX = (startX + endX) / 2;
+	    var midY = (startY + endY) / 2;
+	    var midCollision = collision_line(startX, startY, midX, midY, object, true, false);
 
-        if (midCollision != noone) {
-            // Collision detected; narrow down the search to the first half
-            endX = midX;
-            endY = midY;
-            collidedInstance = midCollision; // Update the collided instance
-        } else {
-            // No collision detected; narrow down the search to the second half
-            startX = midX;
-            startY = midY;
-        }
-    }
+	    if (midCollision != noone) {
+	        endX = midX;
+	        endY = midY;
+	        collidedInstance = midCollision;
+	    } else {
+	        startX = midX;
+	        startY = midY;
+	    }
+	}
 
     // Check if the collided instance still exists
     if (instance_exists(collidedInstance)) {

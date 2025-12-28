@@ -4,6 +4,8 @@ LightObject.x = x;
 LightObject.y = y;
 LightObject.angle = image_angle;
 
+
+
 #region Infra vision
 if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNightVision == true){
 	if(infra_vision_light == undefined){
@@ -21,7 +23,6 @@ if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNi
 	}
 }
 #endregion
-
 
 if(is_local){
 

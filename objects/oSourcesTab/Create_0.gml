@@ -36,11 +36,14 @@ source_names = [
 	"Metal hit sound: ",
 	"Hit no armour: ",
 	"Footsteps sound: ",
-	"Ear ring sound: "
+	"Ear ring sound: ",
+	"Wood hit: ",
+	"Concrete hit: ",
+	"Glass hit: ",
 ];
 
 sources = [
-	"https://pixabay.com/sound-effects/086230-headshotwav-40654/",
+	"https://pixabay.com/sound-effects/bulletimpact1-442717/",
 	"https://pixabay.com/sound-effects/bullethit-449809/",
 	"https://pixabay.com/sound-effects/sniper-rifle-5989/",
 	"https://pixabay.com/sound-effects/shotgun-firing-4-6746/",
@@ -60,7 +63,10 @@ sources = [
 	"https://pixabay.com/sound-effects/metal-hit-12-193278/",
 	"https://pixabay.com/sound-effects/bullethit-449809/",
 	"https://pixabay.com/sound-effects/concrete-footsteps-6752/",
-	"https://pixabay.com/sound-effects/ear-ring-104945/"
+	"https://pixabay.com/sound-effects/ear-ring-104945/",
+	"https://pixabay.com/sound-effects/hitting-wood-6791/",
+	"https://pixabay.com/sound-effects/bullet-gunshot-impact-390253/",
+	"https://pixabay.com/sound-effects/glass-breaking-386153/"
 	
 	
 	

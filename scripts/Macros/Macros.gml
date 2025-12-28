@@ -1,8 +1,9 @@
 #macro IS_NET instance_exists(oNetworkManager)
 #macro INTERPOLATION_SPD 0.3
+#macro PENETRATION_VALUE 0.1
 #macro BOT_SELECT_RADIUS 512
 #macro MOVE_SPD 700
-#macro BULLET_SPEED 75
+#macro BULLET_SPEED 50
 #macro SHADOW_DIST 24
 #macro RD_OFFSET 1.0 // stabilní hráč je považován s RD_ES = 1.0
 #macro RD_START 200

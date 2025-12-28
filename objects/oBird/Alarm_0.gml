@@ -8,7 +8,7 @@ if(is_local){
 			speed = 0;
 			image_speed = 0.25;
 			alarm[0] = random_range(5 * game_get_speed(gamespeed_fps), 7 * game_get_speed(gamespeed_fps));
-			depth = 100;
+			depth = layer_get_depth("LivingO") + 1;
 		}else{
 			sprite_index = spr_BirdFlying;
 			image_index = 0;
@@ -17,7 +17,7 @@ if(is_local){
 			image_angle = direction;
 			speed = random_range(1, 2);
 			image_speed = 0.75;
-			depth = -100;
+			depth = -1000;
 		}
 	}
 

@@ -120,6 +120,7 @@ if(global.EnemyCanMove == true && alarm[0] <= 2){
 #region Command state
 if(State == States.MoveCommand){
     if(point_distance(x, y, target_x, target_y) < 16){
+		global.local_player.command = array_create(array_length(global.local_player.command), -1);
         set_state(States.Idle);
     }
 }

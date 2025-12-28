@@ -28,4 +28,6 @@ else
     if (!position_meeting(x, y + 32, oParentTile)) occluder.AddEdge(_r, _b,   _l, _b); //Bottom
     if (!position_meeting(x - 32, y, oParentTile)) occluder.AddEdge(_l, _b,   _l, _t); //Left
 }
-Type = "Concrete";
+Type = MATERIAL.CONCRETE;
+visible = true;
+impact_lines = ds_list_create();

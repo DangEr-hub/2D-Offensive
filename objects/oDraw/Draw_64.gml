@@ -459,9 +459,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		with(oPlayer){
 			var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 			var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+			
 			draw_set_font(set_font("Console"));
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
+			
+			if(command[0] != -1){
+				var cx = (command[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+				var cy = (command[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+				draw_sprite_ext(spr_CommandPoint, 0, cx, cy, 0.5 * global.GUIMultiplier, 0.5 * global.GUIMultiplier, 0, c_white, command[2]);	
+			}
 			
 			if(Reloading == true){
 				draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);

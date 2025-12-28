@@ -129,3 +129,25 @@ function draw_blur_2d(sprite, subimg, position_x, position_y, xscale, yscale, ro
     surface_free(surf_horizontal);
     surface_free(surf_vertical);
 }
+	
+function draw_impact_trace(x1, y1, x2, y2){
+    var segments = 6; // kolik „zlomů“
+    var last_x = x1;
+    var last_y = y1;
+
+    for(var i = 1; i <= segments; i++){
+        var t = i / segments;
+
+        var nx = lerp(x1, x2, t);
+        var ny = lerp(y1, y2, t);
+
+        // náhodné vychýlení
+        nx += random_range(-2, 2);
+        ny += random_range(-2, 2);
+
+        draw_line_width(last_x, last_y, nx, ny, 1);
+
+        last_x = nx;
+        last_y = ny;
+    }
+}
