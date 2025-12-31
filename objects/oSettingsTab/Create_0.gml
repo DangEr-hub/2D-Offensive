@@ -262,7 +262,7 @@ with(zui_create(position_x + gap*.75, position_y + text_height*4 - text_height/3
 	g_str = string_repeat("0", 3 - string_length(g_str)) + g_str;
 	b_str = string_repeat("0", 3 - string_length(b_str)) + b_str;
 
-	text = r_str + g_str + b_str;
+	init_text = r_str + g_str + b_str;
 	max_string_length = string_length("255255255");
 	callback = other.crosshair_color_text_input_callback;
 }
@@ -296,8 +296,8 @@ with(zui_create(position_x, position_y + text_height*6, objUILabel)){
 
 with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3, objUITextInput)){
 	zui_set_anchor(0, 0);
-	text = global.player_stats_struct.Name;
-	max_string_length = 32;
+	init_text = global.player_stats_struct.Name;
+	max_string_length = 16;
 	callback = function(InputText){
 		global.player_stats_struct.Name = InputText;
 	};

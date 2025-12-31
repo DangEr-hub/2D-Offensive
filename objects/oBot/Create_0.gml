@@ -83,8 +83,6 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Movement engine
-show_debug_message(global.rating_struct.Current_game);
-show_debug_message(global.rating_struct.Enemy_ep);
 Acceleration = min(.55 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), .9);
 Friction = .75;
 MaxSpeed = min(2.5 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 5);

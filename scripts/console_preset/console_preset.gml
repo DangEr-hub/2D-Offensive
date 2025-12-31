@@ -41,7 +41,8 @@ function console_preset(argument0) {
 	console_add(c, "set_chromatic_aberration_level " + string(global.aberration_level));
 	console_add(c, "set_clear_particles_timer " + string(global.clear_particles_timer));
 	console_add(c, "set_player_money " + string(global.player_stats_struct.Money));
-	console_add(c, "get_ping ");
+	console_add(c, "get_latency ");
+	console_add(c, "unlock_all_items {0,1} ");
 	c[? "preset"] = true;
 
 

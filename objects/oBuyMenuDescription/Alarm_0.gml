@@ -37,38 +37,6 @@ with(zui_create(start_x, start_y + text_gap*4, objUILabel)){
 }
 
 if(global.ItemIndex[#other.item_variable, ItemStat.Type] == "Weapon"){
-	
-	#region Damage drop
-	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
-	var damage_drop = calculate_star_rating(base_damage_drop);
-	with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
-		zui_set_anchor(0, 0);
-		font = set_font("GUI_grid");
-		color = c_white;
-		caption = "Damage dropoff: ";
-	}
-	
-	if(global.ItemIndex[#item_variable, ItemStat.Damage] > 0){
-		for(var i=0;i<damage_drop;i++){
-			with(zui_create(start_x + string_width("Damage dropoff:")*1.25 + (i*32), start_y + text_gap*3, objUIImage)){
-				zui_set_size(64, 64);
-				sprite = spr_difficulty_star;
-				sprite_image_index = 0
-				sprite_width_size = 64;
-				sprite_height_size = 64;
-			}
-		}
-	}
-	#endregion
-
-	#region Type
-	with(zui_create(start_x, start_y + text_gap*4, objUILabel)){
-		zui_set_anchor(0, 0);
-		font = set_font("GUI_grid");
-		color = c_white;
-		caption = "Type: " + string(global.ItemIndex[#other.item_variable, ItemStat.WeaponTypeClass]);
-	}
-	#endregion
 
 	#region Difficulty
 	with(zui_create(start_x, start_y, objUILabel)){
@@ -129,17 +97,78 @@ if(global.ItemIndex[#other.item_variable, ItemStat.Type] == "Weapon"){
 			sprite_height_size = 64;
 		}
 	}
+	#endregion	
+	
+	#region Damage drop
+	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
+	var damage_drop = calculate_star_rating(base_damage_drop);
+	with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
+		zui_set_anchor(0, 0);
+		font = set_font("GUI_grid");
+		color = c_white;
+		caption = "Damage dropoff: ";
+	}
+	
+	if(global.ItemIndex[#item_variable, ItemStat.Damage] > 0){
+		for(var i=0;i<damage_drop;i++){
+			with(zui_create(start_x + string_width("Damage dropoff:")*1.25 + (i*32), start_y + text_gap*3, objUIImage)){
+				zui_set_size(64, 64);
+				sprite = spr_difficulty_star;
+				sprite_image_index = 0
+				sprite_width_size = 64;
+				sprite_height_size = 64;
+			}
+		}
+	}
+	#endregion
+	
+	#region Range
+	function range_to_stars(_range){
+	    if(_range >= 950){return 5;}
+	    if(_range >= 850){return 4;}
+	    if(_range >= 750){return 3;}
+	    if(_range >= 650){return 2;}
+	    return 1;
+	}
+	
+	var base_range = global.ItemIndex[#item_variable, ItemStat.Range];
+	var range = range_to_stars(base_range);
+	with(zui_create(start_x, start_y + text_gap*4, objUILabel)){
+		zui_set_anchor(0, 0);
+		font = set_font("GUI_grid");
+		color = c_white;
+		caption = "Range: ";
+	}
+
+	for(var i=0;i<range;i++){
+		with(zui_create(start_x + string_width("Range:")*1.25 + (i*32), start_y + text_gap*4, objUIImage)){
+			zui_set_size(64, 64);
+			sprite = spr_difficulty_star;
+			sprite_image_index = 0
+			sprite_width_size = 64;
+			sprite_height_size = 64;
+		}
+	}
+	#endregion
+	
+	#region Type
+	with(zui_create(start_x, start_y + text_gap*5, objUILabel)){
+		zui_set_anchor(0, 0);
+		font = set_font("GUI_grid");
+		color = c_white;
+		caption = "Type: " + string(global.ItemIndex[#other.item_variable, ItemStat.WeaponTypeClass]);
+	}
 	#endregion
 
 	#region Price
-	with(zui_create(start_x, start_y + text_gap*5, objUILabel)){
+	with(zui_create(start_x, start_y + text_gap*6, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
 		color = c_white;
 		caption = "Price: " + string(global.ItemIndex[#other.item_variable, ItemStat.Cost]);
 	}
 
-	with(zui_create(start_x + string_width( "Price: " + string(global.ItemIndex[#other.item_variable, ItemStat.Cost]))*1.25+8, start_y + text_gap*5.79, objUIImage)){
+	with(zui_create(start_x + string_width( "Price: " + string(global.ItemIndex[#other.item_variable, ItemStat.Cost]))*1.25+8, start_y + text_gap*6.79, objUIImage)){
 		zui_set_size(64, 64);
 		sprite = spr_Coin;
 		sprite_image_index = 0

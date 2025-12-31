@@ -171,12 +171,23 @@ if(wall_collision != noone){
 	}
 }
 
-if(instance_exists(impact_wall) && !place_meeting(x, y, impact_wall)){
+if!(instance_exists(impact_wall)){
+	exit;	
+}
+
+
+var shot_inside_wall = position_meeting(stats.Shot_x, stats.Shot_y, impact_wall);
+if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
     if(impact_flag == true){
 		
-        impact_ex = x + lengthdir_x(20, image_angle);
-        impact_ey = y + lengthdir_y(20, image_angle);
-        impact_flag = false;
+		if(shot_inside_wall){
+		    impact_ex = stats.Shot_x;
+		    impact_ey = stats.Shot_y;
+		}else{
+		    impact_ex = x + lengthdir_x(20, image_angle);
+		    impact_ey = y + lengthdir_y(20, image_angle);
+		}
+		impact_flag = false;
 
         var base_col = c_black;
         var width = 2;

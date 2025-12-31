@@ -5,7 +5,7 @@ draw_set_font(set_font("Menu_small"));
 zui_set_size(tab_width, tab_height);
 
 stat_x = zui_get_width() * .5;
-stat_y = zui_get_height() * .05;
+stat_y = zui_get_height() * .0175;
 gap = 170 * global.GUIMultiplier;
 c_x = zui_get_width() * .5;
 c_y = zui_get_height() * .5;
@@ -18,8 +18,8 @@ wpn_sprite = noone;
 wpn_desc = noone;
 
 wpn_desc_txt = "";
-wpn_string = array_create(28, "");
-ui_objects = array_create(28, noone);
+wpn_string = array_create(29, "");
+ui_objects = array_create(29, noone);
 
 
 
@@ -66,6 +66,17 @@ refresh_weapon_ui = function(){
 			}
 		}
 		
+		var caliber_type = "Low";
+		if(global.ItemIndex[# wpn, ItemStat.caliber_type] == CALIBER.GAUGES){
+			caliber_type = "Gauges";
+		}else if(global.ItemIndex[# wpn, ItemStat.caliber_type] == CALIBER.HIGH){
+			caliber_type = "High";
+		}else if(global.ItemIndex[# wpn, ItemStat.caliber_type] == CALIBER.MEDIUM){
+			caliber_type = "Medium";
+		}else if(global.ItemIndex[# wpn, ItemStat.caliber_type] == CALIBER.ROCKET){
+			caliber_type = "Rocket";
+		}
+		
 		wpn_string = [
 			global.ItemIndex[# wpn, ItemStat.Name],
 			"Ammo: " + string(global.ItemIndex[# wpn, ItemStat.MaxAmmo]) + "/" + string(global.ItemIndex[# wpn, ItemStat.ClipAmmo]),
@@ -91,6 +102,7 @@ refresh_weapon_ui = function(){
 			"Moving spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.MovingInaccuracyMultiplier] * 100, 0, 1) + "%",
 			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + "% per shot",
 			"Complex recoil: " + complex_recoil,
+			"Caliber: " + string(global.ItemIndex[# wpn, ItemStat.caliber]) + " (" + string(caliber_type) + ")",
 			"Crosshair vertical recoil: " + string(global.ItemIndex[# wpn, ItemStat.RecoilY]) + " units per shot",
 			"Crosshair horizontal recoil: " + string(global.ItemIndex[# wpn, ItemStat.RecoilX]) + " units per shot",
 			"Bullet vertical offset: " + string(global.ItemIndex[# wpn, ItemStat.RecoilOffsetY]) + " units per shot",
@@ -145,7 +157,13 @@ refresh_weapon_ui = function(){
 	        with(img_lock){ drawable = is_locked; }
 	    }
 		
+		with(search_bar){
+			chars = [];
+			init_text = oWeaponsTab.wpn_string[0]; alarm[0] = 1;
+		}
+		
 		with(wpn_sprite){ sprite_image_index = oWeaponsTab.wpn; }
+		
 		
 		with(wpn_desc){ caption = oWeaponsTab.wpn_desc_txt; item_id = oWeaponsTab.wpn; }
 
@@ -158,6 +176,7 @@ refresh_weapon_ui = function(){
 draw_set_font(set_font("Console"));
 weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
 			Item.famas, Item.awm, Item.SSG08, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.Spas,
+			Item.Javelin
 		  ];
 wpn = weapons[0];
 
@@ -167,6 +186,8 @@ img_lock = zui_create(c_x, c_y, objUIImage);
 img_lockbg = zui_create(c_x, c_y, objUIImage);
 wpn_sprite = zui_create(zui_get_width() * .25, zui_get_height() * .25, objUIImage);
 wpn_desc = zui_create(zui_get_width() * .025, zui_get_height() * .45, objUILabel);
+search_bar = zui_create(zui_get_width() * .675 + string_width("Search weapon: "), zui_get_height() * .075 - string_height("a")/2, objUITextInput);
+search_txt = zui_create(zui_get_width() * .675, zui_get_height() * .075, objUILabel);
 
 ui_objects[0] = zui_create(zui_get_width() * .25, zui_get_height() * .07, objUILabel);	
 with(ui_objects[0]){
@@ -263,6 +284,35 @@ with(zui_create(zui_get_width() * .25 - arrow_w/1.95, zui_get_height() * .9, obj
     };
 }
 /***************************************************/
+
+with(search_bar){
+	zui_set_anchor(0, 0);
+	zui_set_depth(-1001);
+	init_text = other.wpn_string[0];
+	max_string_length = 10;
+	callback = function(){	
+		var search_id = 0;
+		for(var i = 0;i < array_length(oWeaponsTab.weapons); i++){
+			if(string_pos(text, global.ItemIndex[# oWeaponsTab.weapons[i], ItemStat.Name]) > 0){
+				search_id = i;
+			}
+		}
+		
+		oWeaponsTab.wpn_index = search_id;
+		show_debug_message(oWeaponsTab.wpn_index);
+			
+		with(oWeaponsTab){
+			refresh_weapon_ui();
+		}
+	}
+}
+
+with(search_txt){
+	zui_set_depth(-1001);
+	color = c_white;
+	font = set_font("Console");
+	caption = "Search weapon: ";
+}
 
 
 with (zui_create(0, 0, objUIWindowCaption)) {

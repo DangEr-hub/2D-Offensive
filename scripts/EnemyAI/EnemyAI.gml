@@ -240,7 +240,7 @@ function EnemyShooting(DangerX, DangerY){
 		if(Visible == true){
 		
 			#region Create smoke effect
-			if(instance_number(oFog) < 10){
+			if(instance_number(oFog) < MAX_FOG){
 				Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
 				Fog.moving = true;
 				Fog.moving_x = lengthdir_x(5, RotationAngle - 180);

@@ -1,6 +1,7 @@
 #macro IS_NET instance_exists(oNetworkManager)
 #macro INTERPOLATION_SPD 0.3
-#macro PENETRATION_VALUE 0.1
+#macro PENETRATION_VALUE 0.25
+#macro MAX_FOG 20
 #macro BOT_SELECT_RADIUS 512
 #macro MOVE_SPD 700
 #macro BULLET_SPEED 50

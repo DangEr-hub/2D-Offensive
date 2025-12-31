@@ -66,7 +66,7 @@ function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_t
 }
 
 function buy_item(ItemID){
-	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID)){
+	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ItemStat.is_locked] == false){
 		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
 		GainItem(
 			ItemID,
@@ -85,27 +85,25 @@ function buy_item(ItemID){
 
 function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1]){
 	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
+	var bullet_x = shot_pos[0];
+	var bullet_y = shot_pos[1];
 	if(remote == false){
 		var random_x = 0;
 		var random_y = 0;
-		var bullet_x = shot_pos[0];
-		var bullet_y = shot_pos[1];
-		if(point_distance(shot_pos[0], shot_pos[1], pos[0], pos[1]) <= item_dir_spd_dist[3]){
-			if(distance_to_point(pos[0], pos[1]) >= item_dir_spd_dist[3]){
-				random_x = random_range(
-					shot_pos[0] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
-					shot_pos[0] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
-				);
+		if(point_distance(pos[0], pos[1], shot_pos[0], shot_pos[1]) > item_dir_spd_dist[3]){
+			random_x = random_range(
+				shot_pos[0] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
+				shot_pos[0] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+			);
 			
-				random_y = random_range(
-					shot_pos[1] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
-					shot_pos[1] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
-				);
-				bullet_x = pos[0] +
-				lengthdir_x(global.ItemIndex[# item_dir_spd_dist[0], ItemStat.Range], point_direction(pos[0], pos[1], random_x, random_y));
-				bullet_y = pos[1] + 
-				lengthdir_y(global.ItemIndex[# item_dir_spd_dist[0], ItemStat.Range], point_direction(pos[0], pos[1], random_x, random_y));	
-			}
+			random_y = random_range(
+				shot_pos[1] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
+				shot_pos[1] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+			);
+			bullet_x = pos[0] +
+			lengthdir_x(item_dir_spd_dist[3], point_direction(pos[0], pos[1], random_x, random_y));
+			bullet_y = pos[1] + 
+			lengthdir_y(item_dir_spd_dist[3], point_direction(pos[0], pos[1], random_x, random_y));	
 		}
 	   var proj_id = send_projectile_spawn(
 		   [pos[0], pos[1]], 
@@ -123,8 +121,8 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	    bullet_tracer.stats.Owner_id = proj_own[1];
 	}
 	bullet_tracer.stats.Speed = item_dir_spd_dist[2];
-	bullet_tracer.stats.Shot_x = shot_pos[0];
-	bullet_tracer.stats.Shot_y = shot_pos[1];
+	bullet_tracer.stats.Shot_x = bullet_x;
+	bullet_tracer.stats.Shot_y = bullet_y;
 	bullet_tracer.stats.Damage = BulletDamage;
 	bullet_tracer.stats.Starting_x = pos[0];
 	bullet_tracer.stats.Starting_y = pos[1];
@@ -239,7 +237,7 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	Bullet.stats.Object_index = ObjectIndex;
 	Bullet.stats.Owner_name = ObjectName;
 	Bullet.stats.Owner_id = owner_id;
-	if(instance_number(oFog) < 10){
+	if(instance_number(oFog) < MAX_FOG){
 		Fog = instance_create_layer(BulletX, BulletY, "OtherO", oFog);
 		with(Fog){
 			smoke_effect_create(
@@ -469,7 +467,7 @@ function create_shooting_effects(object){
 	with(object){
 		
 		#region Create smoke effect
-		if(instance_number(oFog) < 10){
+		if(instance_number(oFog) < MAX_FOG){
 			Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
 			Fog.moving = true;
 			Fog.moving_x = lengthdir_x(5, RotationAngle - 180);

@@ -7,8 +7,8 @@ global.local_player = get_local_player();
 if(instance_exists(oPlayer)){
 	
 	#region Bird spawning
-	if((!IS_NET || oNetworkManager.is_server) && percent_chance(0.5) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
-		var birds = random_range(1, 3);
+	if((!IS_NET || oNetworkManager.is_server) && percent_chance(0.25) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
+		var birds = random_range(1, 2);
 		var offset = 8;
 		var areas = {
 		    top:    [ViewX - offset, ViewY - offset * 2, ViewX + global.CameraWidth, ViewY - offset],

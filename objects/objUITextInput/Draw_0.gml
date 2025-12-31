@@ -16,10 +16,13 @@ if (active) {
     draw_set_color(c_white);
     var cursor_offset_x = 7;
     var cursor_offset_y = 7;
-    var cursor_x = x + cursor_offset_x + string_width(text);
+	var prefix = string_copy(text, 1, cursor_pos);
+    var cursor_x = x + cursor_offset_x + string_width(prefix) - 1;
 	var blink_rate = 500;
     var time = current_time;
     if (floor(time / blink_rate) % 2 == 0) {
-        draw_line(cursor_x, y + cursor_offset_y, cursor_x, y - cursor_offset_y - 3 + zui_get_height());
+        draw_line_width(cursor_x, y + cursor_offset_y - 1, cursor_x, y - cursor_offset_y - 2 + zui_get_height(), 2);
     }
 }
+
+//draw_text(x + 100, y, cursor_pos);

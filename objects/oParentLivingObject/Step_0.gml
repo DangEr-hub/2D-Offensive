@@ -52,7 +52,7 @@ if (id == observer || team == TEAM.FRIENDLY) {
 	        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
 	        point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
 
-        var force_visible = stats.Health_points <= 0 || ((object_index == oBot) && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
+        var force_visible = stats.Health_points <= 0 || (object_index == oBot && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
 
         if (in_fov || force_visible) {
 
@@ -60,15 +60,13 @@ if (id == observer || team == TEAM.FRIENDLY) {
                    || collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
 
             if (col) {
-                if (!(observer.moving_state == states_player.machine_gun_state
-                   && col.object_index == oMachineGunFloor)) {
+               if (observer.moving_state == states_player.machine_gun_state && col.object_index == oMachineGunFloor){
+					Visible = true;   
+			   }else{
+	                if (Visible && VisibilityTimer == -1)
+	                    VisibilityTimer = VisibilityTime;
+			   }
 
-                    if (Visible && VisibilityTimer == -1)
-                        VisibilityTimer = VisibilityTime;
-
-                } else {
-                    Visible = true;
-                }
             } else {
                 Visible = true;
             }

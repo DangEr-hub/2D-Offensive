@@ -1362,7 +1362,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			var objects = [oBot, oBird];
 			
 			for(var i = 0;i < array_length(objects); i ++){
-				if(place_meeting(x, y, objects[i])) {
+				if(place_meeting(x, y, objects[i]) && moving_state != states_player.machine_gun_state) {
 				    var obj = instance_nearest(x, y, objects[i]);
 					var dir = point_direction(obj.x, obj.y, x, y);
 					
@@ -1459,6 +1459,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 								global.ItemIndex[# global.Inventory[# OtherSlot.Primary, Index.slot_id], ItemStat.MaxAmmo] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.MaxAmmo];
 								#endregion
 						
+								Moving = false;
 								x = machine_gun.x;
 								y = machine_gun.y;
 								machine_gun.stats.Object = id;
@@ -1718,7 +1719,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 
 				#region Item use
-				if(input_check(global.KeyBinds[| KeyBind.KeyUseItem], true, false) && !instance_exists(oInventory)){
+				if(input_check(global.KeyBinds[| KeyBind.KeyUseItem], true, false) && !instance_exists(oInventory) && moving_state != states_player.machine_gun_state){
 					var Id = global.Inventory[# item_use_position, Index.slot_id];
 			
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" && !instance_exists(oWeaponAttachments)){
@@ -1756,7 +1757,39 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 									Healing = true;
 									ItemAmountSubstract(item_use_position, 1);
 								}
-							break;		
+							break;	
+							
+							case Item.low_cal_box:
+								if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.LOW){
+									global.Inventory[# WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
+									damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), x, y, c_white, spr_Icons, icons.ammo);
+									ItemAmountSubstract(item_use_position, 1);
+								}
+							break;
+							
+							case Item.med_cal_box:
+								if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.MEDIUM){
+									global.Inventory[# WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
+									damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), x, y, c_white, spr_Icons, icons.ammo);
+									ItemAmountSubstract(item_use_position, 1);
+								}
+							break;
+							
+							case Item.high_cal_box:
+								if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.HIGH){
+									global.Inventory[# WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
+									damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), x, y, c_white, spr_Icons, icons.ammo);
+									ItemAmountSubstract(item_use_position, 1);
+								}
+							break;
+							
+							case Item.gauge_box:
+								if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.GAUGES){
+									global.Inventory[# WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
+									damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), x, y, c_white, spr_Icons, icons.ammo);
+									ItemAmountSubstract(item_use_position, 1);
+								}
+							break;
 					
 							case Item.red_dot_scope:
 								item_equip_timer = item_equip_time;
@@ -1798,7 +1831,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							item_equip_timer = item_equip_time;
 							item_swap("item_use_position", OtherSlot.Primary);
 							primary_slot_id = Item.None;
-							show_debug_message(global.Inventory[# WeaponID, Index.slot_ammo]);
 							with(id){ weapon_network_propagate(); }
 						} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
 							item_equip_timer = item_equip_time;

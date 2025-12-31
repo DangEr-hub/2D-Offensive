@@ -186,3 +186,9 @@ if(global.ranked_game == true){
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 
 global.local_player = get_local_player();
+
+if(global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.basic_machine_gun){
+	for(var i=0;i<Index.Total;i++){
+		global.Inventory[# OtherSlot.Primary, i] = 0;
+	}
+}

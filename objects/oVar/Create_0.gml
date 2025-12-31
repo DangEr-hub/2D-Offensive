@@ -52,12 +52,21 @@ global.player_stats_struct = {
 global.rating_struct = ini_player_struct_create();
 
 enum icons{
-	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, total
+	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, 
+	ammo, total
 }
 
 enum TEAM{
 	FRIENDLY,
 	ENEMIES
+}
+
+enum CALIBER{
+	GAUGES,
+	LOW,
+	MEDIUM,
+	HIGH,
+	ROCKET
 }
 
 enum MATERIAL{

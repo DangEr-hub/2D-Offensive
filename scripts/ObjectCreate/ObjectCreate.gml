@@ -54,8 +54,8 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 		create_bullet_tracer(
 			[random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower), 
 			random_range(PositionY - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, PositionY + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower)],
-			[x + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
-			y + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber))],
+			[PositionX + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
+			PositionY + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber))],
 			2,
 			[
 				Id,
@@ -68,11 +68,11 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 			stats.Object_index,
 			[stats.Owner_name, false],
 			noone,
-			[id.x, id.y],
+			[PositionX, PositionY],
 			false
 		);	
 	}
-	Fog = instance_create_layer(x, y, "OtherO", oFog);
+	Fog = instance_create_layer(PositionX, PositionY, "OtherO", oFog);
 	with(Fog){
 		smoke_effect_create(
 			clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75),

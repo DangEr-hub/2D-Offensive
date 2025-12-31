@@ -80,7 +80,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			#endregion
 			
 		}else if(global.local_player.player_has_scope == 1){
-			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)), 0.15);
+			var ScopeBlurValue = min((.0025 + (global.local_player.ViewShake / 250)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)), 0.15);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
@@ -137,33 +137,60 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		
 		#region Draw mortar GUI
 		if (global.local_player.moving_state == states_player.mortar_state) {
-		    var mortar_object = instance_nearest(global.local_player.x, global.local_player.y, oMortar);
-		    var camera_width = camera_get_view_width(view_camera[0]) * 3;
-		    var camera_height = camera_get_view_height(view_camera[0]) * 3;
-		    var xx = (mortar_object.x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-		    var yy = (mortar_object.y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+		    var mortar_object = instance_nearest(global.local_player.x, global.local_player.y, oMortar);	
+			var xx = (mortar_object.x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+			var yy = (mortar_object.y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 
-		    // Draw the vertical line
-		    draw_line(xx, yy - camera_height, xx, yy + camera_height);
-    
-		    // Draw numbers on the vertical line starting from zero
-		    for (var i = 0; i <= camera_height; i += 100) {
-		        if (i != 0) {
-		            draw_text(xx + 10, yy - i, string(i)); // Positive numbers on top
-		            draw_text(xx + 10, yy + i, string(-i)); // Negative numbers on bottom
-		        }
-		    }
+			// hranice GUI
+			var left   = 0;
+			var right  = global.GuiW;
+			var top    = 0;
+			var bottom = global.GuiH;
+			// osy
+			draw_set_color(c_white);
+			draw_line_width(left,  yy, right, yy, 2);   // X osa
+			draw_line_width(xx, top,  xx, bottom, 2);   // Y osa
+			
+			
+			var range_left   = mortar_object.x - camera_get_view_x(CAMERA);
+			var range_right  = camera_get_view_x(CAMERA) + oDraw.ViewW - mortar_object.x;
+			var range_top    = mortar_object.y - camera_get_view_y(CAMERA);
+			var range_bottom = camera_get_view_y(CAMERA) + oDraw.ViewH - mortar_object.y;
+			var step = 50;
 
-		    // Draw the horizontal line
-		    draw_line(xx - camera_width, yy, xx + camera_width, yy);
-    
-		    // Draw numbers on the horizontal line starting from zero
-		    for (var j = 0; j <= camera_width; j += 100) {
-		        if (j != 0) {
-		            draw_text(xx + j, yy + 10, string(j)); // Positive numbers on right
-		            draw_text(xx - j, yy + 10, string(-j)); // Negative numbers on left
-		        }
-		    }
+			// scale ROOM -> GUI
+			var sx = global.GuiW / oDraw.ViewW;
+			var sy = global.GuiH / oDraw.ViewH;
+
+			// ===== Y osa =====
+
+			// nahoru (+Y)
+			for(var d = step; d <= range_top; d += step){
+			    draw_text(xx + string_height("a"), yy - d * sy, string(d));
+				draw_line_width(xx - 4, yy - d * sy, xx + 4, yy - d * sy, 2);
+			}
+
+			// dolů (-Y)
+			for(var d = step; d <= range_bottom; d += step){
+			    draw_text(xx + string_height("a"), yy + d * sy, string(-d));
+				draw_line_width(xx - 4, yy + d * sy, xx + 4, yy + d * sy, 2);
+			}
+
+			// ===== X osa =====
+
+			// doprava (+X)
+			for(var d = step; d <= range_right; d += step){
+			    draw_text(xx + d * sx, yy + string_height("a"), string(d));
+				draw_line_width(xx + d * sx + string_width(string(-d))/4, yy - 4, xx + d * sx + string_width(string(-d))/4, yy + 4, 2);
+			}
+
+			// doleva (-X)
+			for(var d = step; d <= range_left; d += step){
+			    draw_text(xx - d * sx, yy + string_height("a"), string(-d));
+				draw_line_width(xx - d * sx + string_width(string(-d))/2, yy - 4, xx - d * sx + string_width(string(-d))/2, yy + 4, 2);
+			}
+
+
 		}
 		#endregion
 		

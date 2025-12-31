@@ -1,3 +1,6 @@
 ds_list_destroy(impact_lines);
-occluder.Destroy();
+
+if!(is_undefined(occluder)){
+	occluder.Destroy();
+}
 

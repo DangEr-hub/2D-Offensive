@@ -11,162 +11,81 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	draggable = 1;
 }
 
-items = [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.MK18];
-item_number = 7;
-position_x = zui_get_width() * .1;
-position_y = zui_get_height() * .1;
+function create_buy_item(_x, _y, _item, _clickable){
+    with(zui_create(_x, _y, objUIButton)){
+        zui_set_size(other.button_width, other.button_height);
+        zui_set_anchor(0.5, 0);
+        caption_color = MAIN_COLOR;
+        caption_offset_y = -other.button_height/4 - 8;
+        caption = string(global.ItemIndex[#_item, ItemStat.Name]);
+    }
+
+    with(zui_create(_x, _y, objUIImage)){
+        zui_set_size(other.button_width, other.button_height);
+        zui_set_anchor(0.5, 0);
+        item_variable = _item;
+        buy_menu = true;
+        clickable = _clickable;
+        sprite = spr_Items;
+        sprite_image_index = _item;
+        sprite_width_size = other.button_width;
+        sprite_height_size = other.button_height;
+        callback = function(){
+            buy_item(item_variable);
+        };
+    }
+
+    if(global.ItemIndex[#_item, ItemStat.is_locked]){
+        with(zui_create(_x, _y + oBuyMenu.button_height/2, objUIImage)){
+            zui_set_size(45 * global.GUIMultiplier, 45 * global.GUIMultiplier);
+            zui_set_depth(-1000);
+            sprite = spr_Lock;
+            clickable = false;
+            alpha = .9;
+			sprite_width_size = 45 * global.GUIMultiplier;
+			sprite_height_size = 45 * global.GUIMultiplier;
+        }
+		with(zui_create(_x, _y + oBuyMenu.button_height/2, objUIImage)){
+			zui_set_size(other.button_width, other.button_height);
+			zui_set_depth(-1000);
+			sprite = spr_lockbg;
+			clickable = false;
+			sprite_image_index = 0;
+			sprite_width_size = other.button_width;
+			sprite_height_size = other.button_height;
+		}
+    }
+}
+
 button_width = min(128 * global.GUIMultiplier, 192);
 button_height = min(64 * global.GUIMultiplier, 96);
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -other.button_height/4 - 8;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = true;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);
-		};
-	}
-}
+buy_items = [
+    [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.MK18],
+    [Item.MAC11, Item.famas, Item.Spas, Item.None, Item.None, Item.None, Item.None],
+    [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.None, Item.None],
+    [Item.Javelin, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None],
+    [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.None, Item.None, Item.None],
+    [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None]
+];
 
-items = [Item.MAC11, Item.famas, Item.Spas, Item.None, Item.None, Item.None, Item.None];
-position_x = zui_get_width() * .1 + button_width*1.1;
-position_y = zui_get_height() * .1;
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);
-		};
-	}
-}
+var start_x = zui_get_width() * .1;
+var start_y = zui_get_height() * .1;
+var col_spacing = button_width * 1.1;
+var row_spacing = button_height * 1.1;
 
-items = [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.None, Item.None];
-item_number = 7;
-position_x = zui_get_width() * .1 + button_width*1.1*2;
-position_y = zui_get_height() * .1;
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);	
-		};
-	}
-}
+var cols = array_length(buy_items);
+var rows = array_length(buy_items[0]);
 
-items = [Item.Javelin, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None];
-position_x = zui_get_width() * .1 + button_width*1.1*3;
-position_y = zui_get_height() * .1;
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);	
-		};
-	}
-}
-
-items = [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.None, Item.None, Item.None];
-position_x = zui_get_width() * .1 + button_width*1.1*4;
-position_y = zui_get_height() * .1;
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);	
-		};
-	}
-}
-
-items = [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None];
-position_x = zui_get_width() * .1 + button_width*1.1*5;
-position_y = zui_get_height() * .1;
-for(i=0;i<item_number;i++){
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIButton)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		caption_color = MAIN_COLOR;
-		caption_offset_y = -32;
-		caption = string(global.ItemIndex[#other.items[other.i], ItemStat.Name]);
-	}
-	with(zui_create(position_x, position_y + i*button_height*1.1, objUIImage)){
-		zui_set_size(other.button_width, other.button_height);
-		zui_set_anchor(0.5, 0);
-		item_variable = other.items[other.i]; buy_menu = true;
-		clickable = false;
-		sprite_image_index = other.items[other.i];
-		sprite = spr_Items;
-		sprite_width_size = other.button_width;
-		sprite_height_size = other.button_height;
-		callback = function(){
-			buy_item(item_variable);	
-		};
-	}
+for(var xx = 0; xx < cols; xx++){
+    for(var yy = 0; yy < rows; yy++){
+        var item = buy_items[xx][yy];
+        if(item != Item.None){
+            create_buy_item(
+                start_x + xx * col_spacing,
+                start_y + yy * row_spacing,
+                item,
+                true
+            );
+        }
+    }
 }

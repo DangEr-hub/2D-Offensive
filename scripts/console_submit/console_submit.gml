@@ -402,6 +402,30 @@ function console_submit(Console) {
 							console_write_debug("[LATENCY] " + string(oNetworkManager.ping_ms) + " ms");	
 						}
 					break;
+					
+					case "unlock_all_items":
+						if(no == 1 && string_digits(c[1]) != ""){
+							if(!IS_NET || global.sv_cheats == true){
+								
+								for(var w = 0; w < Item.Total; w ++){
+									if(global.ItemIndex[# w, ItemStat.Type] != "Weapon" && global.ItemIndex[# w, ItemStat.Type] != "Grenade" &&
+									global.ItemIndex[# w, ItemStat.Type] != "Armour" && global.ItemIndex[# w, ItemStat.Type] != "Helmet" &&
+									global.ItemIndex[# w, ItemStat.Type] != "Shield"){
+										continue;
+									}
+									
+									if(global.ItemIndex[# w, ItemStat.is_locked] == true){
+										global.ItemIndex[# w, ItemStat.is_locked] = false;
+									}
+								}		
+								if(instance_exists(oBuyMenu)){
+									with(oBuyMenu){ zui_destroy(); }
+									with(oBuyMenuDescription){ zui_destroy(); }
+									with (zui_main()) zui_create(zui_get_width()*.5, zui_get_height()*.5, oBuyMenu);
+								}
+							}
+						}
+					break;
 	            } 
 	        }
 	        global.console[? "string"] = "";

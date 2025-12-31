@@ -1,5 +1,5 @@
 event_inherited();
-draw_text(x, y - 70, global.MapID);
+//draw_text(x, y - 70, Moving);
 //draw_text(x, y + 100, command);
 
 //draw_set_color(c_black);

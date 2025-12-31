@@ -8,7 +8,7 @@ part_type_size(leaf_particle, 0.5, 1.5, 0.01, 0);
 part_type_direction(leaf_particle, 80, 100, 0, 0.05);
 part_type_speed(leaf_particle, 0.1, 0.2, 0.01, 0.01);
 part_type_life(leaf_particle, 30, 50);
-part_type_orientation(leaf_particle, 0, 359, 0.5, 0.5, 1);
+part_type_orientation(leaf_particle, 0, 359, 0.5, 0.1, 1);
 part_type_alpha3(leaf_particle, 0.2, 0.8, 0.4);
 part_type_gravity(leaf_particle, 0.1, 270);
 
@@ -23,6 +23,18 @@ part_type_speed(headshot_particle, 10, 20, 0, 0);
 part_type_direction(headshot_particle,0,359,0,0);
 part_type_blend(headshot_particle, 1);
 part_type_life(headshot_particle, 5, 5);
+
+///Fire
+fire_particle = part_type_create();
+part_type_sprite(fire_particle,spr_Fire,0,0,1);
+part_type_size(fire_particle,.25,.75,-.05,0);
+part_type_orientation(fire_particle,0,360,2,0,0);
+part_type_colour1(fire_particle,c_orange);
+part_type_alpha3(fire_particle,1,1,0);
+part_type_blend(fire_particle,1);
+part_type_direction(fire_particle,0,360,0,0);
+part_type_speed(fire_particle,1,5,-.1,0);
+part_type_life(fire_particle,10,15);
 
 
 //Flame

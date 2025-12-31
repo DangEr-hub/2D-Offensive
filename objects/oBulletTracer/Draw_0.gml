@@ -1,11 +1,11 @@
 /// @description Insert description here
 // You can write your code in this editor
-//draw_text(x, y - 50, HitList);
-draw_text(x, y + 150, impact_sx);
-draw_text(x, y - 150, impact_sy);
+//draw_text(x, y - 50, stats.Penetration_damage);
+//draw_text(x, y + 150, impact_sx);
+//draw_text(x, y - 150, impact_sy);
 
-draw_set_color(c_red);
-draw_circle(xx, yy, 5, false);
+//draw_set_color(c_red);
+//draw_circle(xx, yy, 5, false);
 
 if(global.local_player.ToggleInfraVision == true){
 	shader_set(shd_InfraVision);
