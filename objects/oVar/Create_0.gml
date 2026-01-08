@@ -1,5 +1,6 @@
 randomize();
 global.my_console = console_create();
+global.unlocked_items = ds_list_create();
 global.local_player = oPlayer;
 global.sv_cheats = false;
 global.InventoryEquipLeftTopCorner = [-1, -1];
@@ -76,6 +77,17 @@ enum MATERIAL{
 	GLASS
 }
 
+enum WEAPON_CLASS {
+	PISTOL = 1,
+	ASSAULT_RIFLE,
+	SHOTGUN,
+	SNIPER_RIFLE,
+	SUBMACHINE_GUN,
+	MISSILE,
+	MACHINE_GUN,
+	KNIFE
+}
+
 enum weapon_attachments{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total
 }
@@ -132,11 +144,11 @@ global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_a
 
 
 global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_color_rgb(229, 181, 45);
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor] = make_color_rgb(229, 199, 114);
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.5;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0.25;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.7;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_color_rgb(180, 142, 35);
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor]   = make_color_rgb(180, 156, 90);
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.25;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0;
+global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.5;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
 global.MapProperties[#MapIndex.RainForest, MapProperty.MaxEnemies] = 100;

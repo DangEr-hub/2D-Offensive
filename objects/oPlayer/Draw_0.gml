@@ -1,10 +1,7 @@
 event_inherited();
-//draw_text(x, y - 70, Moving);
-//draw_text(x, y + 100, command);
+draw_text(x, y - 70, equip_time);
 
-//draw_set_color(c_black);
-//draw_text(x, y + 50, image_index);
-//draw_text(x, y + 100, "Flashed" + string(Flashed));
+
 if(Visible == true){
 	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
 	if (IS_NET && !is_local) {

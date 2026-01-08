@@ -87,10 +87,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	#region Player texture
 	
 	if(global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote && stats.Health_points > 0){
-		switch(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass]){
+		switch(global.ItemIndex[# wpn_id, ItemStat.WeaponTypeClass]){
 			
 			#region Assault rifle texture
-			case "Assault rifle":
+			case WEAPON_CLASS.ASSAULT_RIFLE:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					if(Flashed == false){
@@ -149,7 +149,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Pistol texture
-			case "Pistol":
+			case WEAPON_CLASS.PISTOL:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					if(Flashed == false){
@@ -209,7 +209,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Submachine gun texture
-			case "Submachine gun":
+			case WEAPON_CLASS.SUBMACHINE_GUN:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					if(Flashed == false){
@@ -268,7 +268,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Sniper rifle texture
-			case "Sniper rifle":
+			case WEAPON_CLASS.SNIPER_RIFLE:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					if(Flashed == false){
@@ -327,7 +327,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Shotgun texture
-			case "Shotgun":
+			case WEAPON_CLASS.SHOTGUN:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
@@ -386,7 +386,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Anti-tank missile texture
-			case "Anti-tank missile":
+			case WEAPON_CLASS.MISSILE:
 				if(moving_state != states_player.prone_state){
 					HeadHitBox.image_index = HitBox.Head;
 					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
@@ -445,7 +445,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Machine gun texture
-			case "Machine gun":
+			case WEAPON_CLASS.MACHINE_GUN:
 				HeadHitBox.image_index = HitBox.Head;
 				BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 				if(Flashed == false){
@@ -466,7 +466,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 				
 			#region Knife texture
-			case "Knife":
+			case WEAPON_CLASS.KNIFE:
 				HeadHitBox.image_index = HitBox.Head;
 				BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
 				if(Flashed == false){
@@ -612,7 +612,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			stats.Damage_health_points = clamp(stats.Damage_health_points, 1, global.player_stats_struct.Max_health);
 			stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
 			stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);
-			headshot_x = x + 3; headshot_y = y - 17;
 			audio_listener_position(x, y, 0);
 			
 			if(HPTimer > 0){HPTimer --;}	
@@ -621,7 +620,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(StaminaHealingTimer > -1){StaminaHealingTimer --;}
 			if(knife_attack_timer > -1){knife_attack_timer --;}
 			if (player_can_shoot == false) { RelativeSpeedX = 0;  RelativeSpeedY = 0; XSpeed = 0; YSpeed = 0; Moving = false; Legs.image_speed = 0; }
-			if (moving_state == states_player.prone_state) { headshot_x = x + 67; headshot_y = y - 12; }
 			if (global.Inventory[# item_use_position, Index.slot_id] != Item.None && Reloading) { Reloading = false; ReloadTime = 0; }
 			if (item_equip_timer > -1) item_equip_timer--;
 			if (FootStepTimer > -1) FootStepTimer--;
@@ -750,9 +748,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Hidden flag
 			var hidden_in_smoke = false;
 			var hidden_in_grass = place_meeting(x, y, oGrass);
+			var fog = instance_nearest(x, y, oFog);
 
-			if (instance_exists(oFog)) {
-			    if (distance_to_object(instance_nearest(x, y, oFog)) <= instance_nearest(x, y, oFog).radius && instance_nearest(x, y, oFog).alarm[0] > 1) {
+			if (fog) {
+			    if (fog.radius > 100 && distance_to_object(fog) <= fog.radius && fog.alarm[0] > 1) {
 			        hidden_in_smoke = true;
 			    }
 			}
@@ -771,7 +770,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Drop weapon
 			if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != states_player.machine_gun_state){
 				player_has_scope = -1; ScopeIn = false;	
-				GainItem(
+				gain_item(
 					wpn_id, 1, global.Inventory[# WeaponID, Index.slot_ammo], global.Inventory[# WeaponID, Index.slot_clip_ammo], 
 					global.Inventory[# WeaponID, Index.slot_durability], global.Inventory[# WeaponID, Index.slot_scope], global.Inventory[# WeaponID, Index.slot_barrel],
 					global.Inventory[# WeaponID, Index.slot_grip], global.Inventory[# WeaponID, Index.slot_suppressor], false
@@ -949,8 +948,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 				CrosshairShake = GunCrossShake + AimPunchCrossShake + ExplosionCrossShake + LowHPCrossShake;
 				ViewAngle = ViewAngleCurrent;
-				camera_set_view_angle(CAMERA, ViewAngle);
-				camera_set_view_pos(CAMERA, camera_get_view_x(CAMERA) + ViewShakeValuePower, camera_get_view_y(CAMERA) + ViewShakeValuePower); 
+				camera_set_view_angle(CAM, ViewAngle);
+				camera_set_view_pos(CAM, camera_get_view_x(CAM) + ViewShakeValuePower, camera_get_view_y(CAM) + ViewShakeValuePower); 
 				#endregion
 		
 				#region Moving camera shake (different approach)
@@ -1116,7 +1115,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						if(input_check(global.KeyBinds[| KeyBind.KeyShootMouse], true, false) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
 							play_sound(x, y, snd_empty_magazine);
 						}
-					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[#wpn_id, ItemStat.Defense] == 1))){
+					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[# wpn_id, ItemStat.Defense] == 1))){
 				
 							if(global.Inventory[# WeaponID, Index.slot_ammo] > 0){
 								shooting = true;
@@ -1145,7 +1144,12 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 									}else{
 						
 										#region Normal fire
-										ShootTimer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer]);					
+										var adaptive = 
+										has_attachment(Item.adaptive_chambering, Index.slot_barrel) 
+										? global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_barrel], ItemStat.ShootTimer] 
+										: 1;
+										
+										ShootTimer = global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * adaptive;					
 										player_shooting();
 										Weapon.KickBackEffect = global.ItemIndex[#wpn_id, ItemStat.KickBackPower];
 										KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
@@ -1157,7 +1161,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 									}
 					
 									#region Scope in logic
-									if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == "Sniper rifle"){
+									if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
 										if(ScopeIn == true){
 											ScopeIn = false;
 										}
@@ -1185,7 +1189,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 
 			#region Movement
-			if(player_can_shoot == true && !global.my_console[? "active"] && can_player_shoot()){
+			if(player_can_shoot == true && !global.my_console[? "active"] && moving_state < states_player.machine_gun_state){
 				var Up = keyboard_check(global.KeyBinds[| KeyBind.KeyUp]);
 				var Right = keyboard_check(global.KeyBinds[| KeyBind.KeyRight]);
 				var Left = keyboard_check(global.KeyBinds[| KeyBind.KeyLeft]);
@@ -1361,17 +1365,19 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Object push player
 			var objects = [oBot, oBird];
 			
-			for(var i = 0;i < array_length(objects); i ++){
-				if(place_meeting(x, y, objects[i]) && moving_state != states_player.machine_gun_state) {
-				    var obj = instance_nearest(x, y, objects[i]);
-					var dir = point_direction(obj.x, obj.y, x, y);
+			if(player_can_shoot == true){
+				for(var i = 0;i < array_length(objects); i ++){
+					if(place_meeting(x, y, objects[i]) && moving_state != states_player.machine_gun_state) {
+					    var obj = instance_nearest(x, y, objects[i]);
+						var dir = point_direction(obj.x, obj.y, x, y);
 					
-					if(obj.object_index != oBird){
-						AccelX = 5 * cos(degtorad(dir));
-						AccelY = -5 * sin(degtorad(dir));
-					}else if(obj.state == 0){
-						AccelX = 1 * cos(degtorad(dir));
-						AccelY = -1 * sin(degtorad(dir));
+						if(obj.object_index != oBird){
+							AccelX = 5 * cos(degtorad(dir));
+							AccelY = -5 * sin(degtorad(dir));
+						}else if(obj.state == 0){
+							AccelX = 1 * cos(degtorad(dir));
+							AccelY = -1 * sin(degtorad(dir));
+						}
 					}
 				}
 			}
@@ -1460,8 +1466,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 								#endregion
 						
 								Moving = false;
-								x = machine_gun.x;
-								y = machine_gun.y;
+								var m_pos = local_to_world(0, 96, machine_gun.image_angle, machine_gun);
+								x = m_pos[0];
+								y = m_pos[1];
 								machine_gun.stats.Object = id;
 								moving_state = states_player.machine_gun_state;	
 							}else if(moving_state == states_player.machine_gun_state){
@@ -1515,6 +1522,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
 					Weapon.y = y + lengthdir_y(WY, RotationAngle) - lengthdir_y(Weapon.KickBackEffect, RotationAngle);
 					RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 45);
+					RotationAngle = (RotationAngle % 360 + 360) % 360;
 					Weapon.image_angle = RotationAngle + KickBackAngle * .5;
 					Knife.image_angle = RotationAngle;
 					Weapon.RotationAngle = Weapon.image_angle;
@@ -1593,11 +1601,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Level
 			if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
 				damage_indicator("Level up!", x - string_width("Level up!")/2, y, MAIN_COLOR, spr_Icons, 0, set_font("Title"));
-				if(instance_exists(oParticleSystem)){
-					var particle_x = random_range(x - sprite_width/2, x + sprite_width/2);
-					var particle_y = random_range(y - sprite_height/2, y + sprite_height/2);
-					part_particles_create(global.ParticleSystem, particle_x, particle_y, oParticleSystem.level_up_particle, 50);
-				}
 				global.player_stats_struct.Xp = 0;
 				global.player_stats_struct.Lvl ++;
 				global.player_stats_struct.Max_stamina *= power(STATS_LVL_UP, ln(global.player_stats_struct.Lvl));
@@ -1633,7 +1636,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				    if(distance_to_object(Items) <= PickUpDistance){   
 				        if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPickUp])){
 				            with(Items){
-				                GainItem(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
+				                gain_item(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
 								destroy_pickup_instance(id);
 				            }
 				        }
@@ -1641,88 +1644,37 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 				#endregion
 
-				if(instance_exists(oInventory)){
-		
-					#region Item cycling in inventory
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvRight])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						item_use_position ++;
-						if(item_use_position > INVENTORY_SIZE - 1){
-						    item_use_position = 0;
-						}
-					}
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvUp])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						if(item_use_position <= INVENTORY_ROW_SIZE - 1){
-							item_use_position = item_use_position + (INVENTORY_SIZE - INVENTORY_ROW_SIZE);
-						}else{
-							item_use_position = item_use_position - INVENTORY_ROW_SIZE;
-						}
-					}
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvDown])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						if(item_use_position >= 2*INVENTORY_ROW_SIZE){
-							item_use_position = item_use_position - (INVENTORY_SIZE - INVENTORY_ROW_SIZE);
-						}else{
-							item_use_position = item_use_position + INVENTORY_ROW_SIZE;
-						}
-					}
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleInvLeft])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						if(item_use_position == 0){ 
-						    item_use_position = INVENTORY_SIZE - 1;
-						}else{
-						    item_use_position --;
-						}
-					}
-
-				#endregion
-		
-				}else{
 				
-					#region Item cycling outside inventory
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleRight])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						item_use_position ++;
-						if(item_use_position > INVENTORY_SIZE - 1){
-						    item_use_position = 0;
-						}
-					}			
-					if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
-						if(Healing == true){
-							HealingTime = 0;
-							Healing = false;
-						}
-						if(item_use_position == 0){ 
-							item_use_position = INVENTORY_SIZE - 1;
-						}else{
-							item_use_position --;
-						}
+				#region Item cycling outside inventory
+				if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleRight])){
+					if(Healing == true){
+						HealingTime = 0;
+						Healing = false;
 					}
-					#endregion
-		
+					item_use_position ++;
+					if(item_use_position > HOTBAR_SIZE - 1){
+						item_use_position = 0;
+					}
+				}			
+				if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyCycleLeft])){
+					if(Healing == true){
+						HealingTime = 0;
+						Healing = false;
+					}
+					if(item_use_position == 0){ 
+						item_use_position = HOTBAR_SIZE - 1;
+					}else{
+						item_use_position --;
+					}
 				}
+				#endregion
 
 				#region Item use
-				if(input_check(global.KeyBinds[| KeyBind.KeyUseItem], true, false) && !instance_exists(oInventory) && moving_state != states_player.machine_gun_state){
+				if(input_check(global.KeyBinds[| KeyBind.KeyUseItem], true, false) && !instance_exists(oInventory) && moving_state != states_player.machine_gun_state
+				 && !instance_exists(oWeaponAttachments) ){
 					var Id = global.Inventory[# item_use_position, Index.slot_id];
 			
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" && !instance_exists(oWeaponAttachments)){
+					if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade") {
 				
 						#region Grenade use
 						if(EquippedGrenadeTimer == -1){
@@ -1730,19 +1682,14 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							global.ItemIndex[#Id, ItemStat.BulletCasingID], global.ItemIndex[#Id, ItemStat.ReloadSpeed], oCrosshair.x, oCrosshair.y, Id);						
 							ItemAmountSubstract(item_use_position, 1);
 							EquippedGrenadeTimer = EquippedGrenadeTime;
-					
 							grenade_angle = random(360);
 						}
 						#endregion
 				
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Landmine" && !instance_exists(oWeaponAttachments)){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
 				
 						#region Landmine use
-						landmine_create(
-							x, 
-							y, 
-							Id
-						);
+						landmine_create(x, y, Id);
 						ItemAmountSubstract(item_use_position, 1);
 						#endregion
 				
@@ -1751,7 +1698,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						#region Item use
 						switch(Id){
 							case Item.HealingKit:
-								if(Healing == false && stats.Health_points < global.player_stats_struct.Max_health && !instance_exists(oWeaponAttachments)){
+								if(Healing == false && stats.Health_points < global.player_stats_struct.Max_health){
 									item_equip_timer = item_equip_time;
 									HealingItemId = Item.HealingKit;
 									Healing = true;
@@ -1791,39 +1738,17 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 								}
 							break;
 					
-							case Item.red_dot_scope:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_scope);
-							break;
-						
-							case Item.two_scope:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_scope);
-							break;
-						
-							case Item.adaptive_chambering:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_barrel);
-							break;
-						
-							case Item.vertical_grip:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_grip);
-							break;
-						
-							case Item.horizontal_grip:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_grip);
-							break;
-						
-							case Item.military_suppressor:
-								item_equip_timer = item_equip_time;
-								weapon_attachment_equip(Id, Index.slot_suppressor);
-							break;						
+							case Item.red_dot_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
+							case Item.two_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
+							case Item.adaptive_chambering: weapon_attachment_equip(Id, Index.slot_barrel); break;	
+							case Item.vertical_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
+							case Item.horizontal_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
+							case Item.advanced_suppressor: weapon_attachment_equip(Id, Index.slot_suppressor); break;	
+							case Item.range_finder: weapon_attachment_equip(Id, Index.slot_barrel); break;
 						}
 						#endregion
 				
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon" && !instance_exists(oWeaponAttachments)){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
 								
 						#region Primary equip and dequip
 						var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
@@ -1868,7 +1793,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						#endregion
 						
 				
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" && !instance_exists(oWeaponAttachments)){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour"){
 				
 						#region Armour equip and dequip
 						var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
@@ -1886,7 +1811,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						}
 						#endregion
 				
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Helmet" && !instance_exists(oWeaponAttachments)){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
 				
 						#region Helmet equip and dequip
 						var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
@@ -1904,7 +1829,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						}
 						#endregion
 				
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Shield" && !instance_exists(oWeaponAttachments)){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
 				
 						#region Shield use
 						item_equip_timer = item_equip_time;
@@ -1940,29 +1865,27 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Weapon cycling
 			if(equip_timer > -1){equip_time ++; equip_timer --;}
-			if(equip_timer == 0){ equip_time = 0; switch_weapon_number();	}
+			if(equip_timer == 0){ switch_weapon_number();	}
 	
 			// Handle weapon switching logic
 			if (equip_timer == -1 && player_can_shoot == true && shooting == false) {
 			    var changeDetected = false;
 
-			    if (mouse_wheel_up()) {
+			    if (mouse_wheel_down()) {
 			        WeaponNumber = (WeaponNumber < WeaponNumberMax) ? WeaponNumber + 1 : 0;
 			        changeDetected = true;
-			    } else if (mouse_wheel_down()) {
+			    } else if (mouse_wheel_up()) {
 			        WeaponNumber = (WeaponNumber != 0) ? WeaponNumber - 1 : WeaponNumberMax;
 			        changeDetected = true;
 			    }
 
 			    // If there was a change in the weapon number
 			    if (changeDetected) {
-			        if (WeaponNumber != 2) {
-						var equipTime = global.ItemIndex[#wpn_id, ItemStat.EquipTime];
-			            if (equipTime > 0) {
-			                equip_timer = equipTime;
-			            } else {
-			                switch_weapon_number();
-			            }
+					var equipTime = global.ItemIndex[# global.Inventory[# WeaponNumber + OtherSlot.Primary, Index.slot_id], ItemStat.EquipTime];
+			        if (equipTime > 0) {
+						equip_time = 0;
+						equip_timer = equipTime;
+						equip_time_max = equip_timer;
 			        } else {
 			            switch_weapon_number();
 			        }
@@ -1973,7 +1896,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Range 
 			if(instance_exists(oCrosshair)){
-				Range = point_distance(x, y, oCrosshair.x, oCrosshair.y);
+				Range = point_distance(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), oCrosshair.x, oCrosshair.y);
 			}
 			#endregion
 
@@ -2046,10 +1969,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Deactivate out of view
-			var deactivateLeft = camera_get_view_x(CAMERA) - DEACTIVATE_MARGIN;
-			var deactivateTop = camera_get_view_y(CAMERA) - DEACTIVATE_MARGIN;
-			var deactivateRight = deactivateLeft + camera_get_view_width(CAMERA) + 2 * DEACTIVATE_MARGIN;
-			var deactivateBottom = deactivateTop + camera_get_view_height(CAMERA) + 2 * DEACTIVATE_MARGIN;
+			var deactivateLeft = camera_get_view_x(CAM) - DEACTIVATE_MARGIN;
+			var deactivateTop = camera_get_view_y(CAM) - DEACTIVATE_MARGIN;
+			var deactivateRight = deactivateLeft + camera_get_view_width(CAM) + 2 * DEACTIVATE_MARGIN;
+			var deactivateBottom = deactivateTop + camera_get_view_height(CAM) + 2 * DEACTIVATE_MARGIN;
 
 			with (oBot) {
 			    if (x < deactivateLeft || x > deactivateRight || y < deactivateTop || y > deactivateBottom) {
@@ -2063,10 +1986,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			// Activate instances within view ACTIVATE_MARGIN
 			instance_activate_region(
-				camera_get_view_x(CAMERA) - ACTIVATE_MARGIN,
-				camera_get_view_y(CAMERA) - ACTIVATE_MARGIN,
-				camera_get_view_width(CAMERA) + 2 * ACTIVATE_MARGIN,
-				camera_get_view_height(CAMERA) + 2 * ACTIVATE_MARGIN,
+				camera_get_view_x(CAM) - ACTIVATE_MARGIN,
+				camera_get_view_y(CAM) - ACTIVATE_MARGIN,
+				camera_get_view_width(CAM) + 2 * ACTIVATE_MARGIN,
+				camera_get_view_height(CAM) + 2 * ACTIVATE_MARGIN,
 				true
 			);
 			instance_activate_object(oNetworkManager);
@@ -2102,6 +2025,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oInventory);
 			instance_activate_object(oGrenade);
 			instance_activate_object(oExplosion);
+			instance_activate_object(oAirPlane);
+			instance_activate_object(oMissile);
 			#endregion
 		
 		}
@@ -2132,7 +2057,7 @@ if (should_handle_death) {
 	depth = 101;
 	if(is_local || !IS_NET){
 	    round_end("Loss");
-	    camera_set_view_angle(CAMERA, 0);
+	    camera_set_view_angle(CAM, 0);
 	}
 
     play_sound(x, y, choose(snd_Death1, snd_Death2));

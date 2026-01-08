@@ -29,7 +29,7 @@ if(place_meeting(x, y, oPlayer)){
 }
 
 if(LightObject != undefined){
-	var camera = CAMERA;
+	var camera = CAM;
 	LightObject.visible = true;
 	if!(LightObject.__IsOnScreen(camera_get_view_x(camera), camera_get_view_y(camera), camera_get_view_x(camera) + camera_get_view_width(camera), camera_get_view_y(camera) + camera_get_view_height(camera))){
 		LightObject.visible = false;

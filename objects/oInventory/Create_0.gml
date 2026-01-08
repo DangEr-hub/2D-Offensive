@@ -1,2 +1,2 @@
-InventoryCreate();
+inventory_create();
 

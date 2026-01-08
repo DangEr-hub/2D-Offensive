@@ -1,5 +1,5 @@
 occluder = undefined;
-if(object_index != oMachineGunFloor){
+if(object_index != oMachineGunFloor && object_index != oTankTrap){
 	occluder        = new BulbStaticOccluder(oLightRenderer.lighting);
 	occluder.x      = x;
 	occluder.y      = y;

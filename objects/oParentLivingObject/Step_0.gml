@@ -1,5 +1,14 @@
-headshot_x = x + 3;
-headshot_y = y - 17;
+var hs_x = 73;
+var hs_y = 33;
+
+if (moving_state == states_player.prone_state) { 
+	hs_x = 137;
+	hs_y = 38;
+}
+
+var hs_pos = local_to_world(hs_x, hs_y, RotationAngle);
+headshot_x = hs_pos[0];
+headshot_y = hs_pos[1];
 
 if(hit_timer > -1){
 	hit_timer --;
@@ -60,7 +69,7 @@ if (id == observer || team == TEAM.FRIENDLY) {
                    || collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
 
             if (col) {
-               if (observer.moving_state == states_player.machine_gun_state && col.object_index == oMachineGunFloor){
+               if (instance_exists(col) && observer.moving_state == states_player.machine_gun_state && col.object_index == oMachineGunFloor){
 					Visible = true;   
 			   }else{
 	                if (Visible && VisibilityTimer == -1)

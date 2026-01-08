@@ -2,6 +2,7 @@
 event_inherited();
 command = array_create(3, -1);
 anim_base = player_textures.prone;
+equip_time_max = -1;
 prev_anim_base = anim_base;
 near_explosion_timer = -1;
 WeaponDistance = 0;
@@ -74,7 +75,6 @@ Reloading = false;
 ReloadTime = 0;
 image_speed = 0;
 moving_timer = -1;
-moving_state = states_player.none_state;
 equip_time = 0;
 equip_timer = -1;
 player_has_scope = -1;

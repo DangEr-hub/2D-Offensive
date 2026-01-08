@@ -68,10 +68,10 @@ with(launch_button){
 		if(mortar.shoot_timer == -1){
 			mortar.shoot_timer = mortar.shoot_time;
 			oMortarMenu.launch_button.alpha = 0.25;
-			oMortarMenu.alarm[0] = audio_sound_length(snd_FallingBomb) * game_get_speed(gamespeed_fps) - game_get_speed(gamespeed_fps)*.5;
-			if!(audio_is_playing(snd_FallingBomb)){
-				play_sound(mortar.x, mortar.y, snd_FallingBomb, instance_nearest(mortar.x, mortar.y, oParentLivingObject));
-			}
+			var bomb_x = mortar.x + global.local_player.mortar_coordinates[0];
+			var bomb_y = mortar.y - global.local_player.mortar_coordinates[1];
+			var missile = instance_create_layer(bomb_x, bomb_y, "OtherO", oMissile);
+			missile.stats = mortar.stats;
 		}
 	}
 }

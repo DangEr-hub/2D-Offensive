@@ -11,7 +11,7 @@ function console_preset(argument0) {
 	console_add(c, "set_crosshair_alpha <0;1> " + string(global.CrosshairAlpha));
 	console_add(c, "give_id");
 	console_add(c, "draw_bullet_impact {0,1} " + string(global.DrawBulletImpact));
-	console_add(c, "draw_admin_hud {0,1} " + string(global.AdminHUD));
+	console_add(c, "draw_advanced_hud {0,1} " + string(global.draw_advanced_hud));
 	console_add(c, "set_hitbox_alpha <0;1> " + string(global.HitBoxAlpha));
 	console_add(c,"op_room_restart");
 	console_add(c, "op_godmode {0,1} " + string(global.GodMode));
@@ -32,6 +32,7 @@ function console_preset(argument0) {
 	console_add(c, "set_weather {0,1,2} ");
 	console_add(c, "set_crosshair_color " + string(r) + string(g) + string(b));
 	console_add(c, "draw_other_models {0,1} " + string(global.draw_other_models));
+	console_add(c, "draw_damage {0,1} " + string(global.draw_damage));
 	console_add(c, "set_window_size " + string(global.window_width) + " " + string(global.window_height));
 	console_add(c, "set_player_eggy_points (ES) " + string(global.rating_struct.Player_ep));
 	console_add(c, "set_enemy_visibility {0,1} " + string(global.enemy_visibility));
@@ -43,6 +44,7 @@ function console_preset(argument0) {
 	console_add(c, "set_player_money " + string(global.player_stats_struct.Money));
 	console_add(c, "get_latency ");
 	console_add(c, "unlock_all_items {0,1} ");
+	console_add(c, "set_crosshair_scale " + string(global.crosshair_scale));
 	c[? "preset"] = true;
 
 

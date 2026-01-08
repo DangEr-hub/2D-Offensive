@@ -1,8 +1,4 @@
-
-
-draw_self();
-
-var shrink = 0.525;
+var shrink = 0.5;
 
 var cx = (bbox_left + bbox_right) * 0.5;
 var cy = (bbox_top + bbox_bottom) * 0.5;

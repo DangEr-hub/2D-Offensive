@@ -18,7 +18,7 @@ function mouse_to_gui(xpos1, ypos1, xpos2, ypos2){
 function window_resize(){
     window_set_size(global.window_width, global.window_height);
     surface_resize(application_surface, global.CameraWidth, global.CameraHeight);
-    camera_set_view_size(CAMERA, global.CameraWidth, global.CameraHeight);
+    camera_set_view_size(CAM, global.CameraWidth, global.CameraHeight);
 }
 
 function pause(ObjectType){
@@ -44,7 +44,7 @@ function pause(ObjectType){
 			window_id = id;
 		}
 	}
-	camera_set_view_angle(CAMERA, 0);
+	camera_set_view_angle(CAM, 0);
 	ObjectType.alarm[0] = 1;
 }
 
@@ -169,6 +169,11 @@ function reset_gui(){
 }
 	
 function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
+	
+	if(global.draw_damage == false && DamageIndicatorSpriteID == icons.health){
+		return;
+	}
+	
 	if(object_index == oBot){
 		if(Visible == true){
 			Indicator = instance_create_depth(PositionX, PositionY, -100, oDamageIndicator);

@@ -68,7 +68,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 						weapon_attachment_equip(Id, Index.slot_grip);
 					break;
 						
-					case Item.military_suppressor:
+					case Item.advanced_suppressor:
 						weapon_attachment_equip(Id, Index.slot_suppressor);
 					break;						
 				}

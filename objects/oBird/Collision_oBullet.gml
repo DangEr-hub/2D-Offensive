@@ -1,4 +1,4 @@
-var damage = other.stats.Damage * power(1 - global.ItemIndex[#other.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, other.stats.Starting_x, other.stats.Starting_y));
+var damage = other.stats.Damage;
 
 if(!IS_NET){
 	var BloodSplashNumber = ceil(damage / 5);

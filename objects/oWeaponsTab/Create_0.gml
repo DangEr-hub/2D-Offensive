@@ -97,7 +97,7 @@ refresh_weapon_ui = function(){
 			"Range spread increase: " + string_format(10000 * global.ItemIndex[# wpn, ItemStat.accuracy_drop], 0, 1) + "% per 100 units",
 			"Maximal range: " + string_format(max_range, 0, 1) + " units",
 			"Fire modes: " + fire_modes,
-			"Class: " + string(global.ItemIndex[# wpn, ItemStat.WeaponTypeClass]),
+			"Class: " + string(get_wpn_type(wpn)),
 			"Type: " + string(global.ItemIndex[# wpn, ItemStat.WeaponType]),
 			"Moving spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.MovingInaccuracyMultiplier] * 100, 0, 1) + "%",
 			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + "% per shot",

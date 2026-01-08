@@ -152,10 +152,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			draw_line_width(xx, top,  xx, bottom, 2);   // Y osa
 			
 			
-			var range_left   = mortar_object.x - camera_get_view_x(CAMERA);
-			var range_right  = camera_get_view_x(CAMERA) + oDraw.ViewW - mortar_object.x;
-			var range_top    = mortar_object.y - camera_get_view_y(CAMERA);
-			var range_bottom = camera_get_view_y(CAMERA) + oDraw.ViewH - mortar_object.y;
+			var range_left   = mortar_object.x - camera_get_view_x(CAM);
+			var range_right  = camera_get_view_x(CAM) + oDraw.ViewW - mortar_object.x;
+			var range_top    = mortar_object.y - camera_get_view_y(CAM);
+			var range_bottom = camera_get_view_y(CAM) + oDraw.ViewH - mortar_object.y;
 			var step = 50;
 
 			// scale ROOM -> GUI
@@ -210,23 +210,42 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 		}
 		#endregion
+		
+		#region Draw airplane health
+		with(oAirPlane){
+			if(global.draw_damage == true){
+				var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+				draw_set_font(set_font("Console"));
+				draw_set_color(c_black);
+				draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+				draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+			}
+		}
+		#endregion
 
 		#region Draw enemy health
 		with(oBot){
 			if(stats.Health_points > 0 && Visible == true){
 				var HealthX = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+				var select_x = (headshot_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+				var select_y = (headshot_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				var default_xx = HealthX - sprite_width/2;
 				var default_yy = HealthY - sprite_height*.75 - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
 				var bar_spacing = sprite_get_height(spr_ranks)*.5 * global.GUIMultiplier;
 				draw_set_font(set_font("Console"));
 				draw_set_color(c_black);
-				draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-				draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-				draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				
+				if(global.draw_damage == true){
+					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				}
 				
 				if(id == global.local_player.selected_bot){
-					draw_sprite_ext(spr_BotSelect, 0, HealthX, HealthY, 1.5, 1.5, false, c_white, 1);
+					draw_sprite_ext(spr_BotSelect, 0, select_x, select_y, 0.5 * global.GUIMultiplier, 0.5 * global.GUIMultiplier, false, c_white, 1);
 				}
 
 				if(healing == true){
@@ -395,7 +414,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			#endregion
 			
 			#region Draw HUD weapon, armour and helmet
-			with(get_local_player()){
+			with(global.local_player){
 		
 				var HotBarOffsetX = sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 				var HotBarOffsetY = sprite_get_height(spr_Items) * global.GUIMultiplier;
@@ -515,7 +534,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				if(equip_timer > -1){
 				    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 				    draw_sprite_ext(spr_HealthBar, 7, xx - sprite_width/2, default_yy,
-				    (equip_time/global.ItemIndex[# global.Inventory[# min(max(OtherSlot.Secondary - WeaponID, OtherSlot.Primary), OtherSlot.Knife), Index.slot_id], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					(equip_time/equip_time_max) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+				    //(equip_time/global.ItemIndex[# global.Inventory[# min(max(OtherSlot.Secondary - WeaponID, OtherSlot.Primary), OtherSlot.Knife), Index.slot_id], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 					default_yy -= bar_spacing;
 				}
 			
@@ -570,7 +590,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		#endregion
 	
 		#region Draw admin HUD
-		if(global.AdminHUD == true){
+		if(global.draw_advanced_hud == true){
 				
 			var AdminHUDX = global.GuiW - HUDShift;
 			var AdminHUDY = HUDShift;
@@ -814,15 +834,15 @@ if(RespawnMenu == false){
 
 #region Crosshair
 with(oCrosshair){
-	var x_scale = image_xscale * .5;
-	var y_scale = image_yscale * .5;
+	var x_scale = image_xscale * .5 * global.crosshair_scale;
+	var y_scale = image_yscale * .5 * global.crosshair_scale;
 	crosshair_x = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 	crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 	if(instance_exists(global.local_player)){
 		if(HitMarker > -1){
 			draw_sprite_ext(spr_HitMarker, HitMarker, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	
 		}
-		if(global.local_player.player_can_shoot == true && !global.my_console[? "active"] && global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != "Sniper rifle" && global.local_player.ScopeIn == false){
+		if(global.local_player.player_can_shoot == true && !global.my_console[? "active"] && global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != WEAPON_CLASS.SNIPER_RIFLE && global.local_player.ScopeIn == false){
 			draw_sprite_ext(spr_StaticCrosshair, 0, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
 			if(global.DynamicCrosshair == true){
 				Gap = 25;
@@ -881,6 +901,17 @@ with(oCrosshair){
 			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y - Gap - 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Top
 			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y + Gap + 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Down
 		}
+	}
+	
+	if(has_attachment(Item.range_finder, Index.slot_barrel) && global.local_player.player_can_shoot == true){
+		var text = "?";
+		var col = c_red;
+		if(global.local_player.Range <= global.ItemIndex[# global.local_player.wpn_id, ItemStat.Range]){
+			text = string_format(global.local_player.Range, 0, 1) + " u";	
+			col = c_green;
+		}
+			
+		draw_text_outlined(crosshair_x + max(64 * x_scale, 64), crosshair_y, text, col, c_black, 1);	
 	}
 }
 #endregion

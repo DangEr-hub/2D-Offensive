@@ -77,7 +77,7 @@ main_menu_callback = function(){
 if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
 	if(get_rank(global.rating_struct.Previous_ep) < get_rank(global.rating_struct.Player_ep)){
 		rank_string_color = MAIN_COLOR;
-		var px = random_range(camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2, camera_get_view_x(CAMERA) + camera_get_view_width(CAMERA)/2);
+		var px = random_range(camera_get_view_x(CAM) + camera_get_view_width(CAM)/2, camera_get_view_x(CAM) + camera_get_view_width(CAM)/2);
 		var py = zui_get_height() * .2;
 		part_type_direction(oParticleSystem.level_up_particle, 180, 360, 0, 30);
 		part_type_life(oParticleSystem.level_up_particle, 5 * game_get_speed(gamespeed_fps), 15 * game_get_speed(gamespeed_fps));

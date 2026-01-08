@@ -165,8 +165,8 @@ function console_submit(Console) {
 	        {
 	            switch(c[0]) 
 	            {
-	                case "op_game_restart": game_restart(); break;
-	                case "op_game_end": game_end(); break;
+	                case "op_game_restart": if(!IS_NET || global.sv_cheats == true) then game_restart(); break;
+	                case "op_game_end": if(!IS_NET || global.sv_cheats == true) then game_end(); break;
 					case "set_dynamic_crosshair": 
 						if(no == 1 && string_digits(c[1]) != ""){
 							global.DynamicCrosshair = return_logical_value(real(c[1]));
@@ -183,14 +183,14 @@ function console_submit(Console) {
 						}
 					break;
 					case "give_id":
-						if(no == 1){
+						if(no == 1 && (!IS_NET || global.sv_cheats == true)){
 							GiveItem = instance_create_layer(global.local_player.x, global.local_player.y, "ItemsO", oItems);
 							GiveItem.image_index = real(c[1]);
 						}
 					break;
-					case "draw_admin_hud": 
+					case "draw_advanced_hud": 
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.AdminHUD = return_logical_value(real(c[1]));
+							global.draw_advanced_hud = return_logical_value(real(c[1]));
 						}
 					break;
 					case "set_hitbox_alpha":
@@ -198,24 +198,22 @@ function console_submit(Console) {
 							global.HitBoxAlpha = clamp(real(c[1]), 0, 1);
 						}
 					break;
-	                case "op_room_restart": room_restart(); break;
+	                case "op_room_restart": if(!IS_NET || global.sv_cheats == true) then room_restart(); break;
 					case "op_godmode":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							global.GodMode = return_logical_value(real(c[1]));
 						}
 					break;
 	                case "set_window_fullscreen": 
 	                    if(no == 1 && string_digits(c[1]) != ""){
 							window_set_fullscreen(real(c[1])); 
-							//window_resize();
-							//oConsole.alarm[0] = 10; //Proč to musí byt tolik? Nikdo neví
 						}
 					break;
 					case "hostage":
 						if(no == 1 && string_digits(c[1]) != "") then global.Hostage = return_logical_value(real(c[1]));
 					break;
 					case "enemy_can_move":
-						if(no == 1 && string_digits(c[1]) != "") then global.EnemyCanMove = return_logical_value(real(c[1]));
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.EnemyCanMove = return_logical_value(real(c[1]));
 					break;
 					case "set_console_height":
 						if(no == 1 && string_digits(c[1]) != "") then global.ConsoleHeight = clamp(real(c[1]), 128, display_get_height());
@@ -228,18 +226,17 @@ function console_submit(Console) {
 							if(real(c[1]) != global.GUIMultiplier){
 								global.GUIMultiplier = clamp(real(c[1]), 1, 2);
 								reset_gui();
-								//window_resize();
 							}
 						}
 					break;
 					case "set_fov_angle":
-						if(no == 1 && string_digits(c[1]) != "") then global.FieldOfView = real(c[1]) % 360;
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.FieldOfView = real(c[1]) % 360;
 					break;
 					case "toggle_bloom_shader":
 						if(no == 1 && string_digits(c[1]) != "") then global.BloomShader = return_logical_value(real(c[1]));
 					break;
 					case "set_time":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							if(instance_exists(oLightRenderer)){
 								oLightRenderer.CurrentHour = floor(real(c[1])/60);
 								oLightRenderer.CurrentMinute = real(c[1]) % 60;
@@ -247,13 +244,13 @@ function console_submit(Console) {
 						}
 					break;			
 					case "set_time_speed":
-						if(no == 1 && string_digits(c[1]) != "") then global.TimeSpeed = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.TimeSpeed = real(c[1]);
 					break;	
 					case "toggle_camera_crosshair_shake":
-						if(no == 1 && string_digits(c[1]) != "") then global.ViewShake = return_logical_value(real(c[1]));
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.ViewShake = return_logical_value(real(c[1]));
 					break;	
 					case "set_player_inaccuracy":
-						if(no == 1 && string_digits(c[1]) != "") then global.PlayerInaccuracy = real(c[1]);
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.PlayerInaccuracy = real(c[1]);
 					break;	
 					
 					case "clear_particles":
@@ -290,15 +287,13 @@ function console_submit(Console) {
 					break;	
 					
 					case "set_weather":
-						if(no == 1 && string_digits(c[1]) != ""){
-							if(!IS_NET || global.sv_cheats == true){
-								global.Weather = real(c[1]);
-								if(global.Weather != WEATHER.RAIN){
-									audio_stop_sound(snd_Rain);	
-								}
-								if(IS_NET){
-									send_weather_broadcast();
-								}
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
+							global.Weather = real(c[1]);
+							if(global.Weather != WEATHER.RAIN){
+								audio_stop_sound(snd_Rain);	
+							}
+							if(IS_NET){
+								send_weather_broadcast();
 							}
 						}
 					break;
@@ -329,7 +324,11 @@ function console_submit(Console) {
 					break;
 					
 					case "draw_other_models":
-						if(no == 1 && string_digits(c[1]) != "") then global.draw_other_models = return_logical_value(real(c[1]));
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats)) then global.draw_other_models = return_logical_value(real(c[1]));
+					break;
+					
+					case "draw_damage":
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats)) then global.draw_damage = return_logical_value(real(c[1]));
 					break;
 					
 					case "set_window_size":
@@ -344,13 +343,13 @@ function console_submit(Console) {
 					break;
 					
 					case "set_player_eggy_points":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							global.rating_struct.Player_ep = real(c[1]);	
 						}
 					break;
 					
 					case "set_enemy_visibility":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							if(!IS_NET || global.sv_cheats == true){
 								global.enemy_visibility = return_logical_value(real(c[1]));
 							}
@@ -358,13 +357,13 @@ function console_submit(Console) {
 					break;
 					
 					case "set_enemy_eggy_points":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							global.rating_struct.Enemy_ep[global.rating_struct.Current_game] = convert_to_eggy_scale(real(c[1]));
 						}
 					break;
 					
 					case "set_player_played_games":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							global.rating_struct.Played_games = real(c[1]);
 						}
 					break;
@@ -392,7 +391,7 @@ function console_submit(Console) {
 					break;
 					
 					case "set_player_money":
-						if(no == 1 && string_digits(c[1]) != ""){
+						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)){
 							global.player_stats_struct.Money = real(c[1]);
 						}
 					break;
@@ -400,6 +399,12 @@ function console_submit(Console) {
 					case "get_latency":
 						if(no == 1){
 							console_write_debug("[LATENCY] " + string(oNetworkManager.ping_ms) + " ms");	
+						}
+					break;
+					
+					case "set_crosshair_scale": 
+						if(no == 1 && string_digits(c[1]) != ""){
+							global.crosshair_scale = real(c[1]);
 						}
 					break;
 					
@@ -416,7 +421,11 @@ function console_submit(Console) {
 									
 									if(global.ItemIndex[# w, ItemStat.is_locked] == true){
 										global.ItemIndex[# w, ItemStat.is_locked] = false;
+										if(ds_list_find_index(global.unlocked_items, w) == -1){
+											ds_list_add(global.unlocked_items, w);
+										}
 									}
+		
 								}		
 								if(instance_exists(oBuyMenu)){
 									with(oBuyMenu){ zui_destroy(); }

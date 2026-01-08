@@ -1,3 +1,34 @@
+function local_to_world(_lx, _ly, _ang = image_angle, obj = id){
+    with(obj){
+        var ox = (_lx - sprite_xoffset) * image_xscale;
+        var oy = (_ly - sprite_yoffset) * image_yscale;
+
+        var c = dcos(_ang);
+        var s = dsin(_ang);
+
+        // GML rotace (CW, Y dolů)
+        return [
+            x + ox * c + oy * s,
+            y - ox * s + oy * c
+        ];
+    }
+}
+
+function get_wpn_type(item_id){
+	var wpn_type = "Pistol";
+	switch(global.ItemIndex[# item_id, ItemStat.WeaponTypeClass]){
+		case WEAPON_CLASS.ASSAULT_RIFLE: wpn_type = "Assault rifle"; break;
+		case WEAPON_CLASS.SHOTGUN: wpn_type = "Shotgun"; break;
+		case WEAPON_CLASS.SNIPER_RIFLE: wpn_type = "Sniper rifle"; break;
+		case WEAPON_CLASS.MACHINE_GUN: wpn_type = "Machine gun"; break;
+		case WEAPON_CLASS.SUBMACHINE_GUN: wpn_type = "Submachine gun"; break;
+		case WEAPON_CLASS.KNIFE: wpn_type = "Knife"; break;
+		case WEAPON_CLASS.MISSILE: wpn_type = "Missile"; break;
+	}
+	return wpn_type;
+}
+
+
 function array_min(arr) {
     var min_value = arr[0];
     for (var i = 1; i < array_length(arr); i++) {
@@ -68,7 +99,7 @@ function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_t
 function buy_item(ItemID){
 	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ItemStat.is_locked] == false){
 		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
-		GainItem(
+		gain_item(
 			ItemID,
 			1,
 			global.ItemIndex[#ItemID, ItemStat.MaxAmmo], 
@@ -83,10 +114,27 @@ function buy_item(ItemID){
 	}
 }
 
+function has_attachment(item_id, slot, object = global.local_player, which_slot = 0){
+	if!(instance_exists(object)){
+		return;
+	}	
+	var item = Item.None;
+	if(object == global.local_player){
+		item = global.Inventory[# global.local_player.WeaponID, slot];
+	}else{
+		item = object.attachments[which_slot][slot];	
+	}
+	
+	with(object){
+		return (item == item_id);	
+	}
+}
+
 function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1]){
 	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
 	var bullet_x = shot_pos[0];
 	var bullet_y = shot_pos[1];
+	
 	if(remote == false){
 		var random_x = 0;
 		var random_y = 0;
@@ -156,26 +204,31 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	}
 
 	if(instance_exists(instance_emitter)){
-		if(IS_NET){
-		    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
-		    if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
-		        instance_emitter = global.local_player;
-		    }
-		    if(instance_emitter.is_local){
-		        has_suppressor =
-		            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
-		    }else{
-		        has_suppressor =
-		            instance_emitter.network_suppressor == Item.military_suppressor;
-		    }
-		}else{
-		    if(bullet_tracer.stats.Object_index == oPlayer){
-		        has_suppressor =
-		            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.military_suppressor;
-		    }else{
-		        has_suppressor =
-		            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
-		    }
+		if(instance_emitter.object_index == oPlayer){
+			if(IS_NET){
+			    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
+			    if(bullet_tracer.stats.Owner_id == oNetworkManager.my_pid){
+			        instance_emitter = global.local_player;
+			    }
+			    if(instance_emitter.is_local){
+			        has_suppressor =
+			            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.advanced_suppressor;
+			    }else{
+			        has_suppressor =
+			            instance_emitter.network_suppressor == Item.advanced_suppressor;
+			    }
+			}else{
+			    if(bullet_tracer.stats.Object_index == oPlayer){
+			        has_suppressor =
+			            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.advanced_suppressor;
+			    }else if(bullet_tracer.stats.Object_index != -1){
+			        has_suppressor =
+			            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
+			    }
+			}
+		
+		}else if(instance_emitter.object_index == oBot){
+			has_suppressor = instance_emitter.has_suppressor;	
 		}
 
 		if(has_suppressor){
@@ -193,7 +246,9 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
-	var particles_number = global.ItemIndex[#BulletItemID, ItemStat.Damage]/5;
+	var damage = BulletDamage * power(1 - global.ItemIndex[# BulletItemID, ItemStat.DamageDrop], point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
+	
+	var particles_number = damage/5;
 	if(BulletItemID == Item.base_explosion || BulletItemID == Item.HEGrenade || BulletItemID == Item.StickyGrenade
 	|| BulletItemID == Item.CELandMine || BulletItemID == Item.HELandMine
 	|| BulletItemID == Item.LELandMine || BulletItemID == Item.nuclear_explosion){
@@ -227,7 +282,7 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		}
 	}
 	Bullet.direction = BulletDirection;
-	Bullet.stats.Damage = BulletDamage;
+	Bullet.stats.Damage = damage;
 	Bullet.stats.Starting_x = BulletStartingX;
 	Bullet.stats.Starting_y = BulletStartingY;
 	Bullet.stats.Object = BulletObject;
@@ -237,21 +292,11 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	Bullet.stats.Object_index = ObjectIndex;
 	Bullet.stats.Owner_name = ObjectName;
 	Bullet.stats.Owner_id = owner_id;
-	if(instance_number(oFog) < MAX_FOG){
-		Fog = instance_create_layer(BulletX, BulletY, "OtherO", oFog);
-		with(Fog){
-			smoke_effect_create(
-				BulletDamage/10,
-				random(360),
-				0.1,
-				random_range(.1, .5),
-				clamp(ceil(BulletDamage/10), 5, 7.5),
-				clamp(BulletDamage/50, .5, .9),
-				clamp(BulletDamage/50, .1, .75),
-				2 * game_get_speed(gamespeed_fps)
-			);	
-		}
-	}
+	
+	create_fog(BulletX, BulletY, damage/10, random(360), 0.1, random_range(.1, .5), 
+		clamp(ceil(damage/10), 5, 7.5), clamp(damage/50, .5, .9), 
+		clamp(damage/50, .1, .75), 2 * game_get_speed(gamespeed_fps)
+	);
 	
 	return Bullet;
 }
@@ -467,24 +512,10 @@ function create_shooting_effects(object){
 	with(object){
 		
 		#region Create smoke effect
-		if(instance_number(oFog) < MAX_FOG){
-			Fog = instance_create_layer(FlashLightX, FlashLightY, "OtherO", oFog);
-			Fog.moving = true;
-			Fog.moving_x = lengthdir_x(5, RotationAngle - 180);
-			Fog.moving_y = lengthdir_y(5, RotationAngle - 180);
-			with(Fog){
-				smoke_effect_create(
-					20,
-					other.RotationAngle - 180,
-					5,
-					5,
-					10,
-					.1,
-					.75,
-					clamp(global.ItemIndex[#other.wpn_id, ItemStat.ShootTimer], 10, 30)
-				);	
-			}
-		}
+		create_fog(FlashLightX, FlashLightY, 20, other.RotationAngle - 180, 5, 5, 10, .1, .75, 
+			clamp(global.ItemIndex[#other.wpn_id, ItemStat.ShootTimer], 10, 30),
+			[lengthdir_x(5, RotationAngle - 180), lengthdir_y(5, RotationAngle - 180), true]
+		);
 		#endregion
 						
 		#region Create bullet casing
@@ -574,7 +605,7 @@ function player_shooting(){
 		}
 		#endregion
 			
-		if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == "Anti-tank missile"){
+		if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.MISSILE){
 			create_bullet_tracer(
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
@@ -683,10 +714,9 @@ function inaccuracy_formula(WID, ObjectType){
 				return inaccuracy_value;
 
 			}
-		}else{
-			return 0;	
 		}
-	}
+	}	
+	return 0;
 }
 
 function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
@@ -700,7 +730,7 @@ function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist 
 	}
 }
 	
-function smoke_effect_create(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time, move = false){
+function smoke_setup(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time, move = false){
 	if(Radius >= 96){
 		smoke_tile = instance_create_layer(x, y, "OtherO", oSmokeTile);
 		smoke_tile.image_xscale = Radius/smoke_tile.sprite_width*2;

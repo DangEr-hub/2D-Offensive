@@ -30,7 +30,7 @@ if(drawable == true){
 			var statistics_string = "";
 			var statistics_x = x;
 			var statistics_y = y + offset_y;
-			if (Id == Item.military_suppressor) {
+			if (Id == Item.advanced_suppressor) {
 				var accuracy = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
 				var spotted_chance = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
 				var attack_power = (1 - global.ItemIndex[#Id, ItemStat.Defense]) * 100;

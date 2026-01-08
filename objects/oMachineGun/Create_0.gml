@@ -1,3 +1,5 @@
+
+
 Floor = instance_create_layer(x, y, "ItemsO", oMachineGunFloor);
 stats = {
 	"Slot_scope": Item.None,

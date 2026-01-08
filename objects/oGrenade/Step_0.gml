@@ -61,15 +61,14 @@ if(ExplosionTimer > -1){
 	ExplosionTimer --;
 }
 
-if(ExplosionTimer == -1){
+if(ExplosionTimer == -1 || ExplodeTimer == -1){
 	if(stats.Speed < .1){
 		if(stats.Item_id == Item.HEGrenade){
 			
 			#region Create explosion effect
 			explosion_create(
 				30, 
-				x, 
-				y, 
+				[x, y],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
 				true, 
 				stats.Object, 
@@ -80,8 +79,7 @@ if(ExplosionTimer == -1){
 		}else if(stats.Item_id == Item.FlashBangGrenade){
 			explosion_create(
 				5, 
-				x, 
-				y, 
+				[x, y],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
 				true, 
 				stats.Object, 
@@ -111,38 +109,29 @@ if(ExplosionTimer == -1){
 					if (point_distance(x, y, oBot.x, oBot.y) < global.FlashBangMaxDistance) {
 						
 						#region Flash enemy
-						if(instance_exists(oBot)){
-							var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
-							if (angular_diff > 180){
-								angular_diff = 360 - angular_diff;
-							}
-							oBot.Reloading = false;
-							oBot.Flashed = true;
-							oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
+						var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
+						if (angular_diff > 180){
+							angular_diff = 360 - angular_diff;
 						}
+						oBot.Reloading = false;
+						oBot.Flashed = true;
+						oBot.trigger_texture_timer = oBot.trigger_texture_time;
+						oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
 						#endregion
 						
 					}
 					
-				}	
+				}
 			}
 		}else if(stats.Item_id == Item.SmokeGrenade){
 				
 			#region Create smoke effect
-				instance_destroy(id);
-				var Fog = instance_create_layer(x, y, "OtherO", oFog);
-				with(Fog){
-					smoke_effect_create(
-						random_range(100, 150),
-						random(360),
-						0.1,
-						random_range(.1, .5),
-						11,
-						.9,
-						.75,
-						5 * game_get_speed(gamespeed_fps)
-					);
-				}
+			instance_destroy(id);
+			create_fog(x, y, random_range(100, 150), random(360), 0.1, random_range(.1, .5), 
+				11, 
+				.9, 
+				.75, SMOKE_TIME
+			);
 			#endregion
 				
 		}else if(stats.Item_id == Item.StickyGrenade){
@@ -150,8 +139,7 @@ if(ExplosionTimer == -1){
 			#region Create explosion effect
 			explosion_create(
 				30,
-				x, 
-				y, 
+				[x, y],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
 				true, 
 				stats.Object, 
@@ -159,102 +147,6 @@ if(ExplosionTimer == -1){
 			);
 			#endregion
 		}
-	}
-}
-
-if(ExplodeTimer == -1){
-	if(stats.Item_id == Item.HEGrenade){
-		explosion_create(
-			30, 
-			x, 
-			y, 
-			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
-			true, 
-			stats.Object, 
-			stats.Item_id
-		);
-	}else if(stats.Item_id == Item.FlashBangGrenade){
-		explosion_create(
-			5, 
-			x, 
-			y, 
-			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
-			true, 
-			stats.Object, 
-			stats.Item_id
-		);
-		if!(collision_line(x, y, global.local_player.x, global.local_player.y, oParentTile, true, false)){
-			if (point_distance(x, y, global.local_player.x, global.local_player.y) < global.FlashBangMaxDistance) {
-				
-				#region Flash player
-				if(global.GodMode == false){
-					var angular_diff = abs(point_direction(global.local_player.x, global.local_player.y, x, y) - global.local_player.RotationAngle);
-					if (angular_diff > 180){
-						angular_diff = 360 - angular_diff;
-					}
-					global.local_player.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
-					global.local_player.Flashed = true;
-					global.local_player.Reloading = false;
-					global.local_player.ReloadTimer = -1;
-					global.local_player.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, global.local_player.x, global.local_player.y) / global.FlashBangMaxDistance)*.1);
-					global.local_player.FlashedAlpha = clamp(global.local_player.FlashedAlpha, 0, 1);
-				}
-				#endregion
-				
-			}
-		}
-		if(instance_exists(oBot)){
-			if!(collision_line(x, y, oBot.x, oBot.y, oParentTile, true, false)){
-				if (point_distance(x, y, oBot.x, oBot.y) < global.FlashBangMaxDistance) {
-						
-					#region Flash enemy
-					if(instance_exists(oBot)){
-						var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
-						if (angular_diff > 180){
-							angular_diff = 360 - angular_diff;
-						}
-						oBot.Reloading = false;
-						oBot.Flashed = true;
-						oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
-					}
-					#endregion
-						
-				}
-					
-			}	
-		}
-	}else if(stats.Item_id == Item.SmokeGrenade){
-				
-		#region Create smoke effect
-			instance_destroy(id);
-			var Fog = instance_create_layer(x, y, "OtherO", oFog);
-			with(Fog){
-				smoke_effect_create(
-					random_range(100, 150),
-					random(360),
-					0.1,
-					random_range(.1, .5),
-					11,
-					.9,
-					.75,
-					5 * game_get_speed(gamespeed_fps)
-				);
-			}
-		#endregion
-			
-	}else if(stats.Item_id == Item.StickyGrenade){
-			
-		#region Create explosion effect
-		explosion_create(
-			30,
-			x, 
-			y, 
-			global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
-			true, 
-			stats.Object, 
-			stats.Item_id
-		);
-		#endregion
 	}
 }
 	

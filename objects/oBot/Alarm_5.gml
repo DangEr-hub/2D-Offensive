@@ -1,5 +1,9 @@
 /// @description Check other enemies
-var share_range = 256 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+if(stats.Health_points <= 0){
+	exit;
+}
+alarm[5] = check_other_enemies_time;
+var share_range = 256 * rank_boost;
 var bot_count = instance_number(oBot);
 
 for (var i = 0; i < bot_count; i++){
@@ -19,18 +23,10 @@ for (var i = 0; i < bot_count; i++){
     // bot v okolí má cíl, já ne
     if (instance_exists(other_bot.ChasingObject) && !instance_exists(ChasingObject)){
         ChasingObject = other_bot.ChasingObject;
-        ChasingObjectSpot(
-            ceil(
-                5 * game_get_speed(gamespeed_fps)
-                * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])
-            )
-        );
-
+        ChasingObjectSpot(chasing_timer);
         break; // stačí jeden bot z okolí
     }
 }
-
-alarm[5] = check_other_enemies_time;
 
 
 

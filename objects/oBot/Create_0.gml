@@ -1,12 +1,18 @@
-/// @description Insert description here
-// You can write your code in this editor
+/* Create event */
 event_inherited();
+predictive_side = choose(-1, 1);
 shoot_accumulator = 0;
+chasing_available = false;
+trigger_texture_timer = 1;
+trigger_texture_time = 1 * game_get_speed(gamespeed_fps);
+check_danger_timer = -1;
+check_danger_time = .25 * game_get_speed(gamespeed_fps);
 target_x = x;
 target_y = y;
-refresh_target_timer = 4 * game_get_speed(gamespeed_fps);
+has_suppressor = false;
+refresh_target_timer = 5 * game_get_speed(gamespeed_fps);
 alarm[1] = 1;
-team = percent_chance(25) ? TEAM.FRIENDLY : TEAM.ENEMIES;
+team = TEAM.ENEMIES;//percent_chance(25) ? TEAM.FRIENDLY : TEAM.ENEMIES;
 NearestDangerObject = noone;
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
@@ -68,6 +74,8 @@ LandMines = [3, 3, 3];
 AccelX = 0;AccelY = 0;VelocityX = 0;VelocityY = 0;
 Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, SmokeGrenades, MolotovGrenades
 GrenadeObject = noone;
+check_chasing_timer = 1 * game_get_speed(gamespeed_fps);
+alarm[6] = 1;
 sprite_index = choose(spr_EnemyBasic, spr_EnemyBasicTwo, spr_EnemyBasicThree, spr_EnemyBasicFour);
 alarm[0] = 5;
 
@@ -76,6 +84,10 @@ FlashedTimer = -1;
 FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
+rank_boost = get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+rank_less = get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+chasing_timer = ceil(5 * game_get_speed(gamespeed_fps) * rank_boost);
+
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
 HelmetID = Item.None;//choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
@@ -83,16 +95,16 @@ ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global
 #endregion
 
 #region Movement engine
-Acceleration = min(.55 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), .9);
+Acceleration = min(.55 * rank_boost, .9);
 Friction = .75;
-MaxSpeed = min(2.5 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 5);
+MaxSpeed = min(2.5 * rank_boost, 5);
 MoveDirection  = 0;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
-ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), .25 * game_get_speed(gamespeed_fps), .75 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(768 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 1200);
+ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * rank_less, .25 * game_get_speed(gamespeed_fps), 1 * game_get_speed(gamespeed_fps));
+ChasingDistance = min(768 * rank_boost, 1200);
 #endregion
 
 #region Legs
@@ -101,6 +113,10 @@ FootSteps = 0;
 Legs = instance_create_depth(x,y,depth + 2,oObjectLegs);
 Legs.Object = id;
 #endregion
+
+enum ATTACHMENTS {
+	slot_scope, slot_barrel, slot_grip, slot_suppressor	
+};
 
 #region Weapon equip
 WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.MK18, Item.famas);
@@ -111,6 +127,13 @@ MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
 Ammo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
 ClipAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.ClipAmmo];
 MaxAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
+
+attachments = array_create(2);
+for(var i = 0; i < 2; i++){
+	attachments[i] = array_create(4, Item.None);
+}
+
+weapon_attachment_equip(Item.advanced_suppressor, ATTACHMENTS.slot_suppressor, id, 0);
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 

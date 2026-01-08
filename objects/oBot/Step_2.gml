@@ -1,107 +1,131 @@
 /// @description Movement
-	// YSpeed
-	for (var i = 0; i < abs(YSpeed); ++i) {
-	    // UP slope
-	    if (place_meeting(x, y + sign(YSpeed), oParentTile) && !place_meeting(x - 1, y + sign(YSpeed), oParentTile)){
-	        --x;
-			--HeadHitBox.x;
-			--BodyHitBox.x;
-			--ArmHitBox.x;
-			--Weapon.x;
-		}
-		
-		if(instance_exists(Legs)){
-			Legs.image_speed = 1;
-		}
-    
-	    if (place_meeting(x, y + sign(YSpeed), oParentTile) && !place_meeting(x + 1, y + sign(YSpeed), oParentTile)){
-	        ++x;
-			++HeadHitBox.x;
-			++BodyHitBox.x;
-			++ArmHitBox.x;
-			++Weapon.x;
-		}
-		
-		if(instance_exists(Legs)){
-			Legs.image_speed = 1;
-		}
+/* End step */
+if(stats.Health_points <= 0){
+	exit;
+}
 
-		if (!place_meeting(x, y + sign(YSpeed), oParentTile)){
-		    y += sign(YSpeed);
-			HeadHitBox.y += sign(YSpeed);
-			BodyHitBox.y += sign(YSpeed);
-			ArmHitBox.y += sign(YSpeed);
-			Weapon.y += sign(YSpeed);
-		}
-		else {
-		    YSpeed = 0;
-			if(instance_exists(Legs)){
-				Legs.image_speed = 0;
+var hasLegs = instance_exists(Legs);
+if(XSpeed == 0 && YSpeed == 0){
+	if(hasLegs){
+		Legs.image_speed = 0;
+	}
+	exit;
+}
+if(hasLegs){
+	Legs.image_speed = 1;
+}
+
+// --------------------
+// Y AXIS (hybrid move)
+// --------------------
+var ys = YSpeed;
+if(ys != 0){
+	var ystep = sign(ys);
+	// try full move
+	if(!place_meeting(x, y + ys, oParentTile)){
+		y += ys;
+		HeadHitBox.y += ys;
+		BodyHitBox.y += ys;
+		ArmHitBox.y += ys;
+		Weapon.y += ys;
+	}else{
+		repeat(abs(ys)){
+			// slopes only if blocked
+			if(place_meeting(x, y + ystep, oParentTile)){
+				if(!place_meeting(x - 1, y + ystep, oParentTile)){
+					x -= 1;
+					HeadHitBox.x -= 1;
+					BodyHitBox.x -= 1;
+					ArmHitBox.x -= 1;
+					Weapon.x -= 1;
+				}else if(!place_meeting(x + 1, y + ystep, oParentTile)){
+					x += 1;
+					HeadHitBox.x += 1;
+					BodyHitBox.x += 1;
+					ArmHitBox.x += 1;
+					Weapon.x += 1;
+				}
 			}
-		    break;
+
+			if(!place_meeting(x, y + ystep, oParentTile)){
+				y += ystep;
+				HeadHitBox.y += ystep;
+				BodyHitBox.y += ystep;
+				ArmHitBox.y += ystep;
+				Weapon.y += ystep;
+			}else{
+				YSpeed = 0;
+				break;
+			}
 		}
 	}
+}
 
-	// XSpeed
-	for (var i = 0; i < abs(XSpeed); ++i) { 
-	    // Slopes
-	    if (place_meeting(x + sign(XSpeed), y, oParentTile) && !place_meeting(x + sign(XSpeed), y - 1, oParentTile)){
-	        --y;
-			--HeadHitBox.y;
-			--BodyHitBox.y;
-			--ArmHitBox.y;
-			--Weapon.y;
-		}
-		
-		if(instance_exists(Legs)){
-			Legs.image_speed = 1;
-		}
-    
-	    if (place_meeting(x + sign(XSpeed), y, oParentTile) && !place_meeting(x + sign(XSpeed), y + 1, oParentTile)){
-	        ++y;
-			++HeadHitBox.y;
-			++BodyHitBox.y;
-			++ArmHitBox.y;
-			++Weapon.y;
-		}
-		
-		if(instance_exists(Legs)){
-			Legs.image_speed = 1;
-		}
-         
-		if (!place_meeting(x + sign(XSpeed), y, oParentTile)){
-		    x += sign(XSpeed); 
-			HeadHitBox.x += sign(XSpeed);
-			BodyHitBox.x += sign(XSpeed);
-			ArmHitBox.x += sign(XSpeed);
-			Weapon.x += sign(XSpeed);
-		}
-		else {
-		    XSpeed = 0;
-			if(instance_exists(Legs)){
-				Legs.image_speed = 0;
+// --------------------
+// X AXIS (hybrid move)
+// --------------------
+var xs = XSpeed;
+if(xs != 0){
+	var xstep = sign(xs);
+
+	// try full move
+	if(!place_meeting(x + xs, y, oParentTile)){
+		x += xs;
+		HeadHitBox.x += xs;
+		BodyHitBox.x += xs;
+		ArmHitBox.x += xs;
+		Weapon.x += xs;
+	}else{
+		repeat(abs(xs)){
+			// slopes only if blocked
+			if(place_meeting(x + xstep, y, oParentTile)){
+				if(!place_meeting(x + xstep, y - 1, oParentTile)){
+					y -= 1;
+					HeadHitBox.y -= 1;
+					BodyHitBox.y -= 1;
+					ArmHitBox.y -= 1;
+					Weapon.y -= 1;
+				}else if(!place_meeting(x + xstep, y + 1, oParentTile)){
+					y += 1;
+					HeadHitBox.y += 1;
+					BodyHitBox.y += 1;
+					ArmHitBox.y += 1;
+					Weapon.y += 1;
+				}
 			}
-		    break;
+
+			if(!place_meeting(x + xstep, y, oParentTile)){
+				x += xstep;
+				HeadHitBox.x += xstep;
+				BodyHitBox.x += xstep;
+				ArmHitBox.x += xstep;
+				Weapon.x += xstep;
+			}else{
+				XSpeed = 0;
+				break;
+			}
 		}
 	}
-	
+}
+
+// stop legs if fully blocked
+if(hasLegs && XSpeed == 0 && YSpeed == 0){
+	Legs.image_speed = 0;
+}
+
+// --------------------
 // Stay away from walls
-if (place_meeting(x + 1, y, oParentTile)) {
+// --------------------
+if(place_meeting(x + 1, y, oParentTile)){
 	MoveTime = random_range(9, 18);
-	MoveDirection  = 180 + random_range(-45, 45);
-}
-
-if (place_meeting(x - 1, y, oParentTile)) {
+	MoveDirection = 180 + random_range(-45, 45);
+}else if(place_meeting(x - 1, y, oParentTile)){
 	MoveTime = random_range(9, 18);
-	MoveDirection  = 0 + random_range(-45, 45);
-}
-
-if (place_meeting(x, y - 1, oParentTile)) {
+	MoveDirection = 0 + random_range(-45, 45);
+}else if(place_meeting(x, y - 1, oParentTile)){
 	MoveTime = random_range(9, 18);
-	MoveDirection  = 270 + random_range(-45, 45);
-}
-
-if (place_meeting(x, y + 1, oParentTile)) {
+	MoveDirection = 270 + random_range(-45, 45);
+}else if(place_meeting(x, y + 1, oParentTile)){
 	MoveTime = random_range(9, 18);
-	MoveDirection  = 90 + random_range(-45, 45);
+	MoveDirection = 90 + random_range(-45, 45);
 }

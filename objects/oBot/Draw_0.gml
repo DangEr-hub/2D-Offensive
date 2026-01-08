@@ -1,18 +1,13 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-draw_text(x, y - 150, team);
-//draw_text(x, y - 50, State);
-
-//if(instance_exists(ChasingObject)){
-	//draw_text(x, y - 100, ChasingObject);
-//}
-
-//draw_text(x, y - 200, ChasingObjectSpotted);
-	
-
-//draw_text(x, y - 50, global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
-//draw_text(x, y + 50, convert_back(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]));
+//draw_text(x, y - 50, "alarm2 " + string(alarm[2]));
+//draw_text(x, y - 100, "rot " + string(check_enemy_rotation(id, ChasingObject)));
+//draw_text(x, y - 150, "obj " + string(ChasingObject));
+//draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
+if(stats.Health_points <= 0){
+	exit;
+}
 if(Visible == true){
 	var armour_sprite_index = 0;
 	if(image_index == player_textures.no_weapon){
@@ -65,12 +60,12 @@ if(Visible == true){
 		draw_sprite_ext(spr_Helmet, 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 	
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor] != Item.None && EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
+	if(has_suppressor && EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		draw_sprite_ext(
 			spr_Items,
-			global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.has_suppressor],
-			Weapon.x + lengthdir_x(WeaponDistance*.95, RotationAngle),
-			Weapon.y + lengthdir_y(WeaponDistance*.95, RotationAngle),
+			attachments[WeaponPositionID, ATTACHMENTS.slot_suppressor],
+			Weapon.x + lengthdir_x(WeaponDistance*.975, RotationAngle),
+			Weapon.y + lengthdir_y(WeaponDistance*.975, RotationAngle),
 			.5,
 			.5,
 			RotationAngle,

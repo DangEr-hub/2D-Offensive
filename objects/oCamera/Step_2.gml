@@ -1,4 +1,4 @@
-var view = CAMERA;
+var view = CAM;
 var current_view_x = camera_get_view_x(view);
 var current_view_y = camera_get_view_y(view);
 var view_x = round(clamp(x, 0, room_width - global.CameraWidth));

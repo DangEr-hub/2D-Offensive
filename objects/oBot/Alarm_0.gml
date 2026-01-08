@@ -1,70 +1,17 @@
 /// @description Movement
+/* Alarm 0 */
+if(stats.Health_points <= 0){
+	exit;
+}
+
 if(State == States.MoveCommand){
-    alarm[0] = random_range(15, 25) * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+    alarm[0] = random_range(15, 25) * rank_less;
     return;
 }
 
 
-function decide_movement() {
-    if (hidden == false) {
-        handle_basic_movement();
-    } else {
-        handle_smoke_movement();
-    }
-}
-
-function handle_basic_movement() {
-	if(stats.Health_points <= stats.Max_health_points / 3){
-	    if (percent_chance(25 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveAway) {
-	        State = States.MoveAway;
-	    } else if (percent_chance(40 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveShoot) {
-	        State = States.MoveShoot;
-	    } else if(percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MovePredictive){
-			State = States.MovePredictive;
-		} else {
-	        choose_offensive_action();
-	    }
-	}else{
-		if(percent_chance(10 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			set_state(States.Move);
-		}else if(percent_chance(10 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			set_state(States.MoveShoot);
-		}else if(percent_chance(75 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			set_state(States.MoveToward);
-	    } else if(percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
-			set_state(States.MovePredictive);
-		}else{
-			choose_offensive_action();
-		}
-	}
-}
-
-function handle_smoke_movement() {
-    if (percent_chance(75 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveInSmoke) {
-		set_state(States.MoveInSmoke);
-    } else if (percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])) && State != States.MoveAway) {
-			set_state(States.MoveAway);
-    } else {
-		set_state(States.MoveShoot);
-    }
-}
-
-function choose_offensive_action() {
-    if (percent_chance(50)) {
-        ThrowGrenadeAI();
-    } else {
-        LayDownLandMineAI();
-    }
-}
-
-    
-alarm[0] = random_range(15, 25) * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
-	
-if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || ChasingObjectSpotted == true)){
-	if(ChasingObjectSpotted == false){
-		ReactionTimer = ReactionTime;
-		ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
-	}
+var rng = random(100);    
+if(instance_exists(ChasingObject) && ChasingObjectSpotted == true){
 	if(ReactionTimer <= 0){
 		if(State != States.Chase){	
 				
@@ -75,7 +22,7 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 					if (stats.Health_points <= stats.Max_health_points / 3) {
 						if (Ammo[WeaponPositionID] <= 0 && Reloading == false) {
 							reload_ai();
-						} else if (healing == false && percent_chance(50 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))) {
+						} else if (healing == false && rng < (50 * rank_boost)) {
 							if (health_packs > 0) {
 								healing_ai();
 							    healing = true;
@@ -104,7 +51,7 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 				
 				}else{
 					
-					#region Move away from grenade or landmine
+					#region Move away from grenade or landmine or bomb
 						if(Ammo[WeaponPositionID] <= 0){
 							if(Reloading == true){
 								reload_ai();
@@ -113,20 +60,23 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 							
 							#region Basic movement
 							if(NearestDangerObject != id){
-								if(percent_chance(50 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+								var t1 = 50 * rank_boost;
+								var t2 = t1 + (50 * rank_less);
+								var t3 = t2 + 25; // grenade
+								// zbytek = landmine
+
+								if(rng < t1){
 									if(State != States.MoveAwayFromGrenade){
 										State = States.MoveAwayFromGrenade;
 									}
-								}else if (percent_chance(50 * get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]))){
+								}else if(rng < t2){
 									if(State != States.MoveShoot){
-										State = States.MoveShoot;	
+										State = States.MoveShoot;
 									}
+								}else if(rng < t3){
+									ThrowGrenadeAI();
 								}else{
-									if(percent_chance(50)){
-										ThrowGrenadeAI();
-									}else{
-										LayDownLandMineAI();
-									}
+									LayDownLandMineAI();
 								}
 							}else{
 								if(State != States.MoveAwayFromGrenade){
@@ -169,7 +119,6 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 			
 			#region Move idle
 			if(State != States.Idle){
-				//ChasingObjectSpotted = false;
 				State = States.Idle;
 			}
 			#endregion
@@ -186,3 +135,5 @@ if(instance_exists(ChasingObject) && (check_if_available(ChasingObject) || Chasi
 		
 	}
 }
+
+alarm[0] = random_range(15, 25) * rank_less;

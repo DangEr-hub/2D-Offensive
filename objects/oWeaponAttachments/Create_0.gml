@@ -55,7 +55,7 @@ with(zui_create(scope_drop_x, scope_drop_y, objUIButton)){
 	caption = other.scope_caption;
 	callback = function(){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_scope] != Item.None){
-			GainItem(
+			gain_item(
 				global.Inventory[# global.local_player.WeaponID, Index.slot_scope],
 				1,
 				0,
@@ -111,7 +111,7 @@ with(zui_create(barrel_drop_x, barrel_drop_y, objUIButton)){
 	caption = other.barrel_caption;
 	callback = function(){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_barrel] != Item.None){
-			GainItem(
+			gain_item(
 				global.Inventory[# global.local_player.WeaponID, Index.slot_barrel],
 				1,
 				0,
@@ -167,7 +167,7 @@ with(zui_create(grip_drop_x, grip_drop_y, objUIButton)){
 	caption = other.grip_caption;
 	callback = function(){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_grip] != Item.None){
-			GainItem(
+			gain_item(
 				global.Inventory[# global.local_player.WeaponID, Index.slot_grip],
 				1,
 				0,
@@ -223,7 +223,7 @@ with(zui_create(suppressor_drop_x, suppressor_drop_y, objUIButton)){
 	caption = other.suppressor_caption;
 	callback = function(){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor] != Item.None){
-			GainItem(
+			gain_item(
 				global.Inventory[# global.local_player.WeaponID, Index.slot_suppressor],
 				1,
 				0,

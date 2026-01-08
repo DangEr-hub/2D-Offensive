@@ -118,8 +118,7 @@ if(is_local){
 		if(position_meeting(NearestTargetX, NearestTargetY, self) || distance_to_point(NearestTargetX, NearestTargetY) <= 64){	
 			explosion_create(
 				10, 
-				NearestTargetX, 
-				NearestTargetY, 
+				[NearestTargetX, NearestTargetY],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage] * power(1 - global.ItemIndex[#other.stats.Item_id, ItemStat.DamageDrop], PointDistance), 
 				false, 
 				stats.Object, 

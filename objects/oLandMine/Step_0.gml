@@ -18,8 +18,7 @@ if(explode == true){
 	    image_index = ImageIndex + 3;
 		explosion_create(
 			global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID],
-			x,
-			y,
+			[x, y],
 			global.ItemIndex[#stats.Item_id, ItemStat.Damage],
 			true,
 			stats.Object,

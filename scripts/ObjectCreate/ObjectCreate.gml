@@ -1,3 +1,20 @@
+function create_fog(xx, yy, radius, dir, spd, rot_spd, num, alpha, fade, time, moving = [0, 0, false]){
+	if(instance_number(oFog) < MAX_FOG){
+		var Fog = instance_create_layer(xx, yy, "OtherO", oFog);
+		Fog.moving = moving[2];
+		Fog.moving_x = moving[0];
+		Fog.moving_y = moving[1];
+		with(Fog){
+			smoke_setup(radius, dir, spd, rot_spd, num, alpha, fade, time);	
+		}
+		
+		return Fog;
+	}
+	
+	return noone;
+}
+
+
 function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
 	ObjectSpeed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
 	MoveDirX = dcos(MoveDirection) * ObjectSpeed;
@@ -37,25 +54,25 @@ function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness
 	}
 }
 
-function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
+function explosion_create(ShrapnelNumber, pos, ExplosionDamage, Destroy, ObjectType, Id, ShrapnelInaccuracy = 2, ExplosionDistance = max(power(ExplosionDamage / 10, 2), 256)){
 	
-	Explosion = instance_create_depth(PositionX, PositionY, -99, oExplosion);
+	Explosion = instance_create_depth(pos[0], pos[1], -99, oExplosion);
 	Explosion.ExplosionPower = min(ExplosionDamage / 10, 2);
 	Explosion.Angle = random(360);	
 	Explosion.ExplosionWidth = bbox_right - bbox_left;
 	Explosion.ExplosionHeight = bbox_bottom - bbox_top;
-	Explosion.LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, PositionX, PositionY);
+	Explosion.LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, pos[0], pos[1]);
 	Explosion.LightObject.xscale = ExplosionDamage/10;
 	Explosion.LightObject.yscale = ExplosionDamage/10;
 	if!(audio_is_playing(snd_Explosion)){
-		play_sound(PositionX, PositionY, snd_Explosion, Explosion, 100, 2500, .75);
+		play_sound(pos[0], pos[1], snd_Explosion, Explosion, 100, 2500, .75);
 	}
 	for(i=0;i<ShrapnelNumber;i++){
 		create_bullet_tracer(
-			[random_range(PositionX - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, PositionX + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower), 
-			random_range(PositionY - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, PositionY + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower)],
-			[PositionX + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
-			PositionY + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber))],
+			[random_range(pos[0] - Explosion.ExplosionWidth/2 * Explosion.ExplosionPower, pos[0] + Explosion.ExplosionWidth/2 * Explosion.ExplosionPower), 
+			random_range(pos[1] - Explosion.ExplosionHeight/2 * Explosion.ExplosionPower, pos[1] + Explosion.ExplosionHeight/2 * Explosion.ExplosionPower)],
+			[pos[0] + lengthdir_x(ExplosionDistance, i * (360/ShrapnelNumber)),
+			pos[1] + lengthdir_y(ExplosionDistance, i * (360/ShrapnelNumber))],
 			2,
 			[
 				Id,
@@ -68,23 +85,15 @@ function explosion_create(ShrapnelNumber, PositionX, PositionY, ExplosionDamage,
 			stats.Object_index,
 			[stats.Owner_name, false],
 			noone,
-			[PositionX, PositionY],
+			[pos[0], pos[1]],
 			false
 		);	
 	}
-	Fog = instance_create_layer(PositionX, PositionY, "OtherO", oFog);
-	with(Fog){
-		smoke_effect_create(
-			clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75),
-			random(360),
-			0.1,
-			random_range(.1, .5),
-			clamp(ceil(ExplosionDamage/10), 5, 7.5),
-			clamp(ExplosionDamage/250, .5, .9),
-			clamp(ExplosionDamage/250, .1, .75),
-			2 * game_get_speed(gamespeed_fps)
-		);
-	}
+	create_fog(pos[0], pos[1], clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75), random(360), 0.1, random_range(.1, .5), 
+		clamp(ceil(ExplosionDamage/10), 5, 7.5), 
+		clamp(ExplosionDamage/250, .5, .9), 
+		clamp(ExplosionDamage/250, .1, .75), 2 * game_get_speed(gamespeed_fps)
+	);
 	
 	
 	

@@ -15,7 +15,7 @@ if(wall_collision == noone && instance_exists(stats.Object)){
 
 var bullet_damage = 0;
 if(wall_collision != noone){
-	bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.inst_id.x, wall_collision.inst_id.y));
+	bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
 	if(impact_flag == true){
 		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 	}
@@ -147,8 +147,7 @@ if(wall_collision != noone){
 			random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
 			explosion_create(
 				10, 
-				x, 
-				y, 
+				[x, y],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
 				false, 
 				stats.Object, 
@@ -175,6 +174,9 @@ if!(instance_exists(impact_wall)){
 	exit;	
 }
 
+if(impact_wall.object_index == oMachineGun){
+	exit;
+}
 
 var shot_inside_wall = position_meeting(stats.Shot_x, stats.Shot_y, impact_wall);
 if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
@@ -234,7 +236,7 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
 			);
 			impact_col = make_color_rgb(clr[0], clr[1], clr[2]);
 		}else{
-			var arr = sprite_getpixel(impact_wall.sprite_index, impact_wall.image_index, sprite_width/2, sprite_height/2);
+			var arr = sprite_getpixel(impact_wall.sprite_index, impact_wall.image_index, impact_wall.sprite_width/2, impact_wall.sprite_height/2);
 			impact_col = make_color_rgb(arr[0], arr[1], arr[2]);
 		}
 
@@ -251,7 +253,7 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
         }
 
         // ===== ULOŽENÍ IMPACT LINE =====
-		if(ds_list_size(impact_wall.impact_lines) < 8){
+		if(ds_list_size(impact_wall.impact_lines) < impact_wall.max_lines){
 	        ds_list_add(
 	            impact_wall.impact_lines,
 	            [
@@ -259,7 +261,7 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
 	                impact_sy,
 	                impact_ex,
 	                impact_ey,
-	                global.clear_particles_timer * (1 + bullet_damage/50),
+	                global.clear_particles_timer,
 	                impact_col,
 	                width,
 	                offsets

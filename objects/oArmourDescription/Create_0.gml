@@ -66,7 +66,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				}else{
 				
 					#region Helmet dequip
-					GainItem(
+					gain_item(
 						Id,
 						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
 						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
@@ -105,7 +105,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				}else{
 				
 					#region Armour dequip
-					GainItem(
+					gain_item(
 						Id,
 						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
 						global.Inventory[# oDraw.var_slot, Index.slot_ammo],

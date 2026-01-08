@@ -18,7 +18,7 @@ function save_game(){
 	ini_write_real("Vars", "enemy_can_move", global.EnemyCanMove);
 	ini_write_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
 	ini_write_real("Vars", "camera_crosshair_shake", global.ViewShake);
-	ini_write_real("Vars", "admin_hud", global.AdminHUD);
+	ini_write_real("Vars", "admin_hud", global.draw_advanced_hud);
 	ini_write_real("Vars", "draw_particles", global.DrawParticles);
 	ini_write_real("Vars", "crosshair_color", global.crosshair_color);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
@@ -31,6 +31,7 @@ function save_game(){
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	ini_write_real("Vars", "anti_aliasing", global.anti_aliasing);
+	ini_write_real("Vars", "crosshair_scale", global.crosshair_scale);
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -58,8 +59,9 @@ function save_game(){
 		file_delete("save_inventory.ini");
 	}
 	ini_open("save_inventory.ini");
-	ini_write_string("Inventory", "0", ds_grid_write(global.Inventory));
-	ini_write_string("Inventory", "2", ds_grid_write(global.MouseSlot));
+	ini_write_string("Inventory", "Inventory", ds_grid_write(global.Inventory));
+	ini_write_string("Inventory", "Mouse", ds_grid_write(global.MouseSlot));
+	ini_write_string("Inventory", "UnlockedItems", ds_list_write(global.unlocked_items));
 	ini_close();
 	#endregion
 	
@@ -86,6 +88,7 @@ function save_game(){
 
 function load_game(){
 	
+	global.draw_damage = true;
 	global.aberration_level = 0;
 	global.saturation_level = 1.8;
 	global.TimeSpeed = 15;
@@ -97,7 +100,8 @@ function load_game(){
 	global.EnemyCanMove = 1;
 	global.DrawBulletImpact = 0;
 	global.ViewShake = 1;
-	global.AdminHUD = 0;
+	global.draw_advanced_hud = 0;
+	global.crosshair_scale = 1;
 	global.DrawParticles = 1;
 	global.crosshair_color = c_white;
 	global.draw_other_models = 0;
@@ -124,7 +128,7 @@ function load_game(){
 		global.EnemyCanMove = ini_read_real("Vars", "enemy_can_move", global.EnemyCanMove);
 		global.DrawBulletImpact = ini_read_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
 		global.ViewShake = ini_read_real("Vars", "camera_crosshair_shake", global.ViewShake);
-		global.AdminHUD = ini_read_real("Vars", "admin_hud", global.AdminHUD);
+		global.draw_advanced_hud = ini_read_real("Vars", "admin_hud", global.draw_advanced_hud);
 		global.DrawParticles = ini_read_real("Vars", "draw_particles", global.DrawParticles);
 		global.crosshair_color = ini_read_real("Vars", "crosshair_color", global.crosshair_color);
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
@@ -136,6 +140,7 @@ function load_game(){
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		global.anti_aliasing = ini_read_real("Vars", "anti_aliasing", global.anti_aliasing);
+		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
 		global.map_rounds = array_create(MapIndex.Total);
@@ -169,6 +174,15 @@ function load_game(){
 	    ini_open("save_inventory.ini");
 	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "0", "None"));
 	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "2", "None"));
+		var unlocked = ds_list_create();
+		ds_list_read(unlocked, ini_read_string("Inventory", "UnlockedItems", ""));
+
+		for(var i = 0; i < ds_list_size(unlocked); i++){
+			var item_id = unlocked[| i];
+			global.ItemIndex[# item_id, ItemStat.is_locked] = false;
+		}
+
+		ds_list_destroy(unlocked);
 	    ini_close();	
 	}
 	#endregion

@@ -1,5 +1,5 @@
-ViewX = camera_get_view_x(CAMERA);
-ViewY = camera_get_view_y(CAMERA);
+ViewX = camera_get_view_x(CAM);
+ViewY = camera_get_view_y(CAM);
 global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
@@ -11,10 +11,10 @@ if(instance_exists(oPlayer)){
 		var birds = random_range(1, 2);
 		var offset = 8;
 		var areas = {
-		    top:    [ViewX - offset, ViewY - offset * 2, ViewX + global.CameraWidth, ViewY - offset],
+		    top:    [ViewX, ViewY - offset * 2, ViewX + global.CameraWidth, ViewY - offset],
 		    left:   [ViewX - offset * 2, ViewY, ViewX - offset, ViewY + global.CameraHeight],
-		    bottom: [ViewX - offset, ViewY + global.CameraHeight - offset * 2, ViewX + global.CameraWidth, ViewY + global.CameraHeight - offset],
-		    right:  [ViewX + global.CameraWidth - offset * 2, ViewY, ViewX + global.CameraWidth - offset, ViewY + global.CameraHeight]
+		    bottom: [ViewX, ViewY + global.CameraHeight + offset, ViewX + global.CameraWidth, ViewY + global.CameraHeight + offset * 2],
+		    right:  [ViewX + global.CameraWidth + offset, ViewY, ViewX + global.CameraWidth + offset * 2, ViewY + global.CameraHeight]
 		};
 	
 
@@ -28,6 +28,33 @@ if(instance_exists(oPlayer)){
                     server_process_bird_change(bird, 0);
             }
 		}
+	}
+	#endregion
+	
+	#region Airplane spawn
+	var chance = .05;
+	if((!IS_NET || oNetworkManager.is_server) && percent_chance(chance) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
+		var offset = sprite_get_width(spr_AirPlane) * .5;
+		var ao = 45;
+		var areas = {
+		    top:    [ViewX, ViewY - offset * 2, ViewX + global.CameraWidth, ViewY - offset, random_range(270 - ao, 270 + ao)],
+		    left:   [ViewX - offset * 2, ViewY, ViewX - offset, ViewY + global.CameraHeight, random_range(-ao, +ao)],
+		    bottom: [ViewX, ViewY + global.CameraHeight + offset, ViewX + global.CameraWidth, ViewY + global.CameraHeight + offset * 2, random_range(90 - ao, 90 + ao)],
+		    right:  [ViewX + global.CameraWidth + offset, ViewY, ViewX + global.CameraWidth + offset * 2, ViewY + global.CameraHeight, random_range(180 - ao, 180 + ao)]
+		};
+	
+
+	
+		var area_key = choose("top", "left", "bottom", "right");
+		var area = areas[$ area_key];
+		
+		var airplane = instance_create_depth(random_range(area[0], area[2]), random_range(area[1], area[3]), -1500, oAirPlane);	
+		airplane.direction = area[4];
+		airplane.image_angle = area[4];
+
+        if (IS_NET && oNetworkManager.is_server) {
+                //process airplane spawn
+        }
 	}
 	#endregion
 

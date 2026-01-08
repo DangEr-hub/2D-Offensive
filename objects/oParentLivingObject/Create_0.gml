@@ -19,6 +19,7 @@ flash_effect_timer = -1;
 MuzzleFlashLight = undefined;
 RotationAngle = 0;
 FlashLight = noone;
+moving_state = states_player.none_state;
 if(instance_exists(oLightRenderer)){
 	FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
 	FlashLight.alpha = FLASHLIGHT_ALPHA;
@@ -28,8 +29,8 @@ if(instance_exists(oLightRenderer)){
 	FlashLight.blend = c_white;
 }
 InfraVisionIntensity = 2;
-headshot_x = x + 3;
-headshot_y = y - 17;
+headshot_x = -1;
+headshot_y = -1;
 Visible = false;
 infra_vision_light = undefined;
 hidden = false;

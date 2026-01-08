@@ -147,14 +147,14 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	/**************/
 
 	if(hp > 0 && has_godmode == false){
-		var Damage = attacking_item.stats.Damage * power(1 - global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.DamageDrop], point_distance(x, y, attacking_item.stats.Starting_x, attacking_item.stats.Starting_y));
+		var Damage = attacking_item.stats.Damage;
 		hit_object.aimpunch_speed_multiplier = min(1, (1 - (global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1))) / global.ItemIndex[#armour_id, ItemStat.Defense]);
 		hit_object.attack_damage = Damage;
 		hit_object.AimPunchTimer = hit_object.AimPunchTime;
 		hit_object.AimPunchMultiplier = global.ItemIndex[#attacking_item.stats.Item_id, ItemStat.PenetrationPower] / (attacking_item.stats.Penetration_damage + 1);
 		
 		/* Stealth damage with knife */
-		if(global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.WeaponTypeClass] == "Knife"){
+		if(global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.KNIFE){
 			if(apply_stealth_damage(hit_object)){
 				Damage *= STEALTH_DMG_MOD;
 			}
@@ -164,7 +164,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		if(hit_object.object_index == oBot){
 			with(hit_object){
 				if(ChasingObjectSpotted == false){
-					ChasingObjectSpot(ceil(5 * game_get_speed(gamespeed_fps) * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game])));
+					ChasingObjectSpot(chasing_timer);
 				}
 			}
 		}
@@ -195,8 +195,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			}
 		}
 		
-		hit_object.attack_damage *= DamageMultiplier / (attacking_item.stats.Penetration_damage + 1);
-		hit_object.attack_damage = ceil(hit_object.attack_damage);
+		hit_object.attack_damage = ceil(hit_object.attack_damage * DamageMultiplier);
 		
 		if(hit_object.object_index == oBot){
 			hit_object.enemy_aimpunch = hit_object.attack_damage;

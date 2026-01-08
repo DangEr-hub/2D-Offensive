@@ -55,10 +55,6 @@ switch(VarSlot){
 	case OtherSlot.Shield:
 		image_index = 7;
 	break;
-	
-	default:
-		image_index = 0;
-	break;
 }
 
 if(global.Inventory[#VarSlot, Index.slot_id] == Item.None){

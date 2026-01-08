@@ -1,5 +1,7 @@
 #macro IS_NET instance_exists(oNetworkManager)
+#macro SMOKE_TIME 5 * game_get_speed(gamespeed_fps)
 #macro INTERPOLATION_SPD 0.3
+#macro HOTBAR_SIZE 4
 #macro PENETRATION_VALUE 0.25
 #macro MAX_FOG 20
 #macro BOT_SELECT_RADIUS 512
@@ -24,7 +26,7 @@
 #macro ARM_MULTIPLIER 0.9
 #macro BODY_MULTIPLIER 1.1
 #macro HEADSHOT_MULTIPLIER 4.1
-#macro CAMERA view_camera[0]
+#macro CAM view_camera[0]
 #macro AMBIENT_OFFSET 1.25
 #macro MAIN_COLOR make_color_rgb(255, 215, 0)
 #macro FLASHLIGHT_ALPHA 0.1

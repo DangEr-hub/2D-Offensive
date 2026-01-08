@@ -1,22 +1,15 @@
-function calculate_star_rating(DamageDrop) {
-	var weapon_drops = [];
-	for(var i=0;i<Item.Total;i++){
-		if(global.ItemIndex[# i, ItemStat.Type] == "Weapon" && global.ItemIndex[# i, ItemStat.DamageDrop] > -1){
-			weapon_drops[i] = global.ItemIndex[# i, ItemStat.DamageDrop]; 
-		}
-	}
-    var min_drop = array_min(weapon_drops);
-    var max_drop = array_max(weapon_drops);
+function calculate_damage_drop_stars(dmg_drop){
+    var best  = global.ItemIndex[# Item.awm, ItemStat.DamageDrop];
+    var worst = global.ItemIndex[# Item.Spas, ItemStat.DamageDrop];
 
-    if (DamageDrop <= min_drop) return 5;
-    if (DamageDrop >= max_drop) return 1;
+    // logaritmická normalizace (lepší rozlišení low-endu)
+    var t = (log10(worst) - log10(dmg_drop)) / (log10(worst) - log10(best));
+    t = clamp(t, 0, 1);
+    t = power(t, 0.8);
 
-    var normalized_drop = (DamageDrop - min_drop) / (max_drop - min_drop);
-    var scaled_drop = power(normalized_drop, 0.5); // Square root scaling for better differentiation
-    var star_rating = 5 - 4 * scaled_drop;
-
-    return clamp(round(star_rating), 1, 5);
+    return clamp(1 + floor(t * 4), 1, 5);
 }
+
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	caption = global.ItemIndex[#other.item_variable, ItemStat.Name];
@@ -101,7 +94,7 @@ if(global.ItemIndex[#other.item_variable, ItemStat.Type] == "Weapon"){
 	
 	#region Damage drop
 	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
-	var damage_drop = calculate_star_rating(base_damage_drop);
+	var damage_drop = calculate_damage_drop_stars(base_damage_drop);
 	with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
@@ -124,10 +117,10 @@ if(global.ItemIndex[#other.item_variable, ItemStat.Type] == "Weapon"){
 	
 	#region Range
 	function range_to_stars(_range){
-	    if(_range >= 950){return 5;}
-	    if(_range >= 850){return 4;}
-	    if(_range >= 750){return 3;}
-	    if(_range >= 650){return 2;}
+	    if(_range >= 850){return 5;}
+	    if(_range >= 770){return 4;}
+	    if(_range >= 600){return 3;}
+	    if(_range >= 550){return 2;}
 	    return 1;
 	}
 	
@@ -156,7 +149,10 @@ if(global.ItemIndex[#other.item_variable, ItemStat.Type] == "Weapon"){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
 		color = c_white;
-		caption = "Type: " + string(global.ItemIndex[#other.item_variable, ItemStat.WeaponTypeClass]);
+		
+		var type = get_wpn_type(other.item_variable);
+		
+		caption = "Class: " + type;
 	}
 	#endregion
 
@@ -224,7 +220,7 @@ global.ItemIndex[#other.item_variable, ItemStat.Type] == "Shield"){
 	
 	#region Damage drop
 	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
-	var damage_drop = calculate_star_rating(base_damage_drop);
+	var damage_drop = calculate_damage_drop_stars(base_damage_drop);
 	with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");

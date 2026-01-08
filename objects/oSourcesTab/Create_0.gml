@@ -7,11 +7,18 @@ zui_set_size(tab_width, tab_height);
 pos_x = zui_get_width() * .01;
 pos_y = zui_get_height() * .1;
 gap = 170 * global.GUIMultiplier;
+gap_x = 210 * global.GUIMultiplier;
 text_height = string_height("a")*2;
+max_i = 17;
 
 with (zui_create(0, 0, objUIWindowCaption)) {
 	caption = "Sources";
 	draggable = 1;
+}
+
+with (zui_create(zui_get_width() * .75, pos_y, objUILabel)) {
+	color = c_white;
+	caption = "Inspired by Counter-Strike, \nUnturned and CS2D.";
 }
 
 
@@ -40,6 +47,8 @@ source_names = [
 	"Wood hit: ",
 	"Concrete hit: ",
 	"Glass hit: ",
+	"Airplane sound: ",
+	"Falling bomb sound: "
 ];
 
 sources = [
@@ -66,7 +75,9 @@ sources = [
 	"https://pixabay.com/sound-effects/ear-ring-104945/",
 	"https://pixabay.com/sound-effects/hitting-wood-6791/",
 	"https://pixabay.com/sound-effects/bullet-gunshot-impact-390253/",
-	"https://pixabay.com/sound-effects/glass-breaking-386153/"
+	"https://pixabay.com/sound-effects/glass-breaking-386153/",
+	"https://pixabay.com/sound-effects/fighter-jet-overhead-355468/",
+	"https://pixabay.com/sound-effects/falling-bomb-41038/"
 	
 	
 	
@@ -74,7 +85,17 @@ sources = [
 
 
 for(i = 0; i < array_length(sources); i++){
-	src_but = zui_create(pos_x + gap, pos_y - text_height/4 + text_height*i, objUIButton);
+    
+    var col_i = i div max_i;
+    var row_i = i mod max_i;
+
+    var extra_x = col_i * gap_x;
+
+    src_but = zui_create(
+        pos_x + gap + extra_x,
+        pos_y - text_height/4 + text_height * row_i,
+        objUIButton
+    );
     with(src_but){
         zui_set_anchor(0.5, 0);
         zui_set_width(64 * global.GUIMultiplier);
@@ -88,10 +109,14 @@ for(i = 0; i < array_length(sources); i++){
         };
     }
 	
-	with(zui_create(pos_x, pos_y + text_height*i, objUILabel)){
+	with(zui_create(
+        pos_x + extra_x,
+        pos_y + text_height * row_i,
+        objUILabel
+    )){
 		color = c_white;
 		caption = other.source_names[other.i];
 	}
-
 }
+
 

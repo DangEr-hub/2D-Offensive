@@ -1,10 +1,10 @@
 /// @description Insert description here
 // You can write your code in this editor
 
-var cam_x = camera_get_view_x(CAMERA);
-var cam_y = camera_get_view_y(CAMERA);
-var cam_width = camera_get_view_width(CAMERA);
-var cam_height = camera_get_view_height(CAMERA);
+var cam_x = camera_get_view_x(CAM);
+var cam_y = camera_get_view_y(CAM);
+var cam_width = camera_get_view_width(CAM);
+var cam_height = camera_get_view_height(CAM);
 if(global.Weather == 1){
 	if!(audio_is_playing(snd_Rain)){
 		audio_play_sound(snd_Rain, 0, true);
@@ -37,24 +37,6 @@ if(global.Weather == 1){
 		else if (s == 1) { xx = cam_x + cam_width + m; yy = random_range(cam_y, cam_y + cam_height); }
 		else if (s == 2) { xx = random_range(cam_x, cam_x + cam_width); yy = cam_y - m; }
 		else { xx = random_range(cam_x, cam_x + cam_width); yy = cam_y + cam_height + m; }
-
-		var Fog = instance_create_layer(xx, yy, "OtherO", oFog);
-
-		with(Fog){
-			moving_x = .5;
-			moving_y = .5;
-			smoke_effect_create(
-				random_range(75, 125),
-				random(360),
-				.5,
-				random_range(.1, .5),
-				random_range(5, 7.5),
-				random_range(.5, .9),
-				random_range(.1, .75),
-				5 * game_get_speed(gamespeed_fps),
-				true
-			);
-		}
 	}
 }else if(global.Weather == 2){
 	if(percent_chance(100)){

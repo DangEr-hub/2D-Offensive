@@ -1,3 +1,7 @@
+/* Begin step */
+if(stats.Health_points <= 0){
+	exit;
+}
 var ReloadingSpeedMultiplier = 1;
 var ShootingSpeedMultiplier = 1;
 var MovingSpeedMultiplier = 1;
@@ -13,5 +17,5 @@ if(CanShoot == false){
 if(XSpeed != 0 || YSpeed != 0){
 	MovingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.MovingSpdMul];
 }
-MaxSpeed = min(2.5 * get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), 5.75) * ShootingSpeedMultiplier * MovingSpeedMultiplier;
+MaxSpeed = min(2.5 * rank_boost, 5.75) * ShootingSpeedMultiplier * MovingSpeedMultiplier;
 

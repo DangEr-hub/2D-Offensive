@@ -85,7 +85,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				
 				#region Primary dequip
 				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary"){
-					GainItem(
+					gain_item(
 						Id,
 						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
 						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
@@ -103,7 +103,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				
 				#region Secondary dequip
 				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary"){
-					GainItem(
+					gain_item(
 						Id,
 						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
 						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
@@ -121,7 +121,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				
 				#region Knife dequip
 				if(global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary"){
-					GainItem(
+					gain_item(
 						Id,
 						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
 						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
