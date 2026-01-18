@@ -35,41 +35,41 @@ if(is_local){
 
     
 	if (instance_exists(Enemy)) {
-		if (instance_exists(Enemy.HeadHitBox) && instance_exists(Enemy.BodyHitBox) && instance_exists(Enemy.ArmHitBox)) {
-			var head_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.HeadHitBox, false);
-			var body_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.BodyHitBox, false);
-			var arm_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.ArmHitBox, false);
-			var leg_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.LegHitBox, false);
+		if (instance_exists(Enemy.HeadHB) && instance_exists(Enemy.BodyHB) && instance_exists(Enemy.ArmHB)) {
+			var head_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.HeadHB, false);
+			var body_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.BodyHB, false);
+			var arm_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.ArmHB, false);
+			var leg_collision = process_bullet_collision(stats.Starting_x, stats.Starting_y, x, y, stats.Shot_x, stats.Shot_y, Enemy.LegHB, false);
 		    if (head_collision != noone) {
-				if(ds_list_find_index(HitList, Enemy.HeadHitBox.MainObject) == -1){
+				if(ds_list_find_index(HitList, Enemy.HeadHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
 		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-		            ds_list_add(HitList, Enemy.HeadHitBox.MainObject);
+		            ds_list_add(HitList, Enemy.HeadHB.MainObject);
 		        }
 			}
 		    if (body_collision != noone) {
-				if(ds_list_find_index(HitList, Enemy.BodyHitBox.MainObject) == -1){
+				if(ds_list_find_index(HitList, Enemy.BodyHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
 		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-		            ds_list_add(HitList, Enemy.BodyHitBox.MainObject);
+		            ds_list_add(HitList, Enemy.BodyHB.MainObject);
 		        }
 			}
 		    if (arm_collision != noone) {
-				if(ds_list_find_index(HitList, Enemy.ArmHitBox.MainObject) == -1){
+				if(ds_list_find_index(HitList, Enemy.ArmHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
 		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-		            ds_list_add(HitList, Enemy.ArmHitBox.MainObject);
+		            ds_list_add(HitList, Enemy.ArmHB.MainObject);
 		        }
 		    }
 		    if (leg_collision != noone) {
-				if(ds_list_find_index(HitList, Enemy.LegHitBox.MainObject) == -1){
+				if(ds_list_find_index(HitList, Enemy.LegHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
 		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
 		            }
-		            ds_list_add(HitList, Enemy.LegHitBox.MainObject);
+		            ds_list_add(HitList, Enemy.LegHB.MainObject);
 		        }
 		    }
 		}
@@ -117,7 +117,7 @@ if(is_local){
 			
 		if(position_meeting(NearestTargetX, NearestTargetY, self) || distance_to_point(NearestTargetX, NearestTargetY) <= 64){	
 			explosion_create(
-				10, 
+				20, 
 				[NearestTargetX, NearestTargetY],
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage] * power(1 - global.ItemIndex[#other.stats.Item_id, ItemStat.DamageDrop], PointDistance), 
 				false, 
@@ -150,7 +150,7 @@ if(is_local){
 		    var bullet_x = lengthdir_x(next_bullet_distance, angle) + stats.Starting_x;
 		    var bullet_y = lengthdir_y(next_bullet_distance, angle) + stats.Starting_y;
 
-			create_bullet(
+			var b = create_bullet(
 				bullet_x,
 				bullet_y,
 				stats.Damage,
@@ -158,7 +158,7 @@ if(is_local){
 				stats.Starting_y,
 				stats.Object,
 				stats.Item_id,
-				stats.Penetration_damage*10,
+				stats.Penetration_damage,
 				image_index,
 				stats.Object_index,
 				stats.Owner_name,
@@ -187,7 +187,7 @@ if(image_index == 0){
 			stats.Starting_y,
 			stats.Object,
 			stats.Item_id,
-			stats.Penetration_damage*10,
+			stats.Penetration_damage,
 			image_index,
 			stats.Object_index,
 			stats.Owner_name,

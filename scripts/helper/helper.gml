@@ -24,12 +24,12 @@ function compute_bird_network_id() {
 function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid){
 	
 	var blood_color = c_red;
-	if(BodyPart <= HitBox.HeadProne){
+	if(BodyPart <= HITBOX.HeadProne){
 		blood_color = c_maroon;
 	}
 	
-	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, icons.health);
-	create_blood_particle(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
+	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, ICON.health);
+	create_blood(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
 	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
 	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);

@@ -52,15 +52,19 @@ global.player_stats_struct = {
 };
 global.rating_struct = ini_player_struct_create();
 
-enum icons{
+enum ICON{
 	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, 
 	ammo, total
 }
 
 enum TEAM{
-	FRIENDLY,
-	ENEMIES
+	POLICE,
+	TERRORIST
 }
+
+enum ATTACHMENTS {
+	slot_scope, slot_barrel, slot_grip, slot_suppressor	
+};
 
 enum CALIBER{
 	GAUGES,
@@ -88,12 +92,12 @@ enum WEAPON_CLASS {
 	KNIFE
 }
 
-enum weapon_attachments{
+enum WPN_ATTACHMENTS{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total
 }
 
 for (var i = 0; i < 3; i++) {
-    global.weapon_attachments[i] = array_create(weapon_attachments.Total, Item.None);
+    global.weapon_attachments[i] = array_create(WPN_ATTACHMENTS.Total, Item.None);
 }
 
 enum WEATHER{
@@ -103,16 +107,17 @@ enum WEATHER{
 }
 
 
-enum MapProperty{
+
+enum MAP_STAT{
 	MapStartColor, MapEndColor, MapStartIntensity, MapEndIntensity, MapPeakIntensity, MapStartHours, MapEndHours, Name, SpawnAreas, MaxEnemies, Tile, Total
 }
 
-enum MapIndex{
+enum MAP{
 	Desert, RainForest, City, Nuclear, Total
 }
 
 global.map_rounds = [];
-for (var i = 0; i < MapIndex.Total; i++) {
+for (var i = 0; i < MAP.Total; i++) {
     global.map_rounds[i] = [];
     
     for (var j = 0; j < 3; j++) {
@@ -121,18 +126,18 @@ for (var i = 0; i < MapIndex.Total; i++) {
 }
 
 
-global.MapID = MapIndex.Desert;//-1;
-global.MapProperties = ds_grid_create(MapIndex.Total, MapProperty.Total);
-global.MapProperties[#MapIndex.Desert, MapProperty.Name] = "Desert";
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartColor] = make_color_rgb(208, 141, 35);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndColor] = make_color_rgb(249, 151, 25);
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartIntensity] = .25;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndIntensity] = 0;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapPeakIntensity] = .7;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapStartHours] = 7 * 60;
-global.MapProperties[#MapIndex.Desert, MapProperty.MapEndHours] = 22 * 60;
-global.MapProperties[#MapIndex.Desert, MapProperty.MaxEnemies] = 100;
-global.MapProperties[#MapIndex.Desert, MapProperty.Tile] = spr_Desert;
+global.MapID = MAP.Desert;//-1;
+global.MapProperties = ds_grid_create(MAP.Total, MAP_STAT.Total);
+global.MapProperties[#MAP.Desert, MAP_STAT.Name] = "Desert";
+global.MapProperties[#MAP.Desert, MAP_STAT.MapStartColor] = make_color_rgb(208, 141, 35);
+global.MapProperties[#MAP.Desert, MAP_STAT.MapEndColor] = make_color_rgb(249, 151, 25);
+global.MapProperties[#MAP.Desert, MAP_STAT.MapStartIntensity] = .25;
+global.MapProperties[#MAP.Desert, MAP_STAT.MapEndIntensity] = 0;
+global.MapProperties[#MAP.Desert, MAP_STAT.MapPeakIntensity] = .7;
+global.MapProperties[#MAP.Desert, MAP_STAT.MapStartHours] = 7 * 60;
+global.MapProperties[#MAP.Desert, MAP_STAT.MapEndHours] = 22 * 60;
+global.MapProperties[#MAP.Desert, MAP_STAT.MaxEnemies] = 100;
+global.MapProperties[#MAP.Desert, MAP_STAT.Tile] = spr_Desert;
 
 var desert_spawn_areas = ds_map_create();
 ds_map_add(desert_spawn_areas, "area1", [800, 800, 1300, 1000, 2]); //x1, y1, x2, y2, enemy number
@@ -140,56 +145,55 @@ ds_map_add(desert_spawn_areas, "area2", [900, 1200, 1500, 1800, 3]);
 ds_map_add(desert_spawn_areas, "area3", [900, 100, 1900, 500, 5]);
 ds_map_add(desert_spawn_areas, "area4", [2300, 400, 3000, 1000, 5]);
 ds_map_add(desert_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);
-global.MapProperties[# MapIndex.Desert, MapProperty.SpawnAreas] = desert_spawn_areas;
+global.MapProperties[# MAP.Desert, MAP_STAT.SpawnAreas] = desert_spawn_areas;
 
 
-global.MapProperties[#MapIndex.RainForest, MapProperty.Name] = "Rain forest";
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartColor] = make_color_rgb(180, 142, 35);
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndColor]   = make_color_rgb(180, 156, 90);
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartIntensity] = 0.25;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndIntensity] = 0;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapPeakIntensity] = 0.5;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapStartHours] = 10 * 60;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MapEndHours] = 20 * 60;
-global.MapProperties[#MapIndex.RainForest, MapProperty.MaxEnemies] = 100;
-global.MapProperties[#MapIndex.RainForest, MapProperty.Tile] = spr_RainForest;
+global.MapProperties[#MAP.RainForest, MAP_STAT.Name] = "Rain forest";
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapStartColor] = make_color_rgb(180, 142, 35);
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapEndColor]   = make_color_rgb(180, 156, 90);
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapStartIntensity] = 0.4;
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapEndIntensity] = 0;
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapPeakIntensity] = 0.7;
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapStartHours] = 10 * 60;
+global.MapProperties[#MAP.RainForest, MAP_STAT.MapEndHours] = 20 * 60;
+global.MapProperties[#MAP.RainForest, MAP_STAT.MaxEnemies] = 100;
+global.MapProperties[#MAP.RainForest, MAP_STAT.Tile] = spr_RainForest;
 
 var rain_forest_spawn_areas = ds_map_create();
-ds_map_add(rain_forest_spawn_areas, "area1", [2700, 300, 3300, 600, 15]); //x1, y1, x2, y2, enemy number
+ds_map_add(rain_forest_spawn_areas, "area1", [2700, 300, 3300, 600, 5]); //x1, y1, x2, y2, enemy number
 ds_map_add(rain_forest_spawn_areas, "area2", [900, 1200, 1500, 1800, 3]);
 /*ds_map_add(rain_forest_spawn_areas, "area3", [900, 100, 1900, 500, 5]);
 ds_map_add(rain_forest_spawn_areas, "area4", [2300, 400, 3000, 1000, 5]);
 ds_map_add(rain_forest_spawn_areas, "area5", [2000, 1000, 2900, 1500, 5]);*/
-global.MapProperties[# MapIndex.RainForest, MapProperty.SpawnAreas] = rain_forest_spawn_areas;
+global.MapProperties[# MAP.RainForest, MAP_STAT.SpawnAreas] = rain_forest_spawn_areas;
 
-global.MapProperties[#MapIndex.City, MapProperty.MapStartColor] = c_white;
-global.MapProperties[#MapIndex.City, MapProperty.Name] = "City";
-global.MapProperties[#MapIndex.City, MapProperty.MapEndColor] = c_orange;
-global.MapProperties[#MapIndex.City, MapProperty.MapStartIntensity] = 0.75;
-global.MapProperties[#MapIndex.City, MapProperty.MapEndIntensity] = 0.5;
-global.MapProperties[#MapIndex.City, MapProperty.MapPeakIntensity] = 1.5;
-global.MapProperties[#MapIndex.City, MapProperty.MapStartHours] = 10 * 60;
-global.MapProperties[#MapIndex.City, MapProperty.MapEndHours] = 20 * 60;
+global.MapProperties[#MAP.City, MAP_STAT.MapStartColor] = c_white;
+global.MapProperties[#MAP.City, MAP_STAT.Name] = "City";
+global.MapProperties[#MAP.City, MAP_STAT.MapEndColor] = c_orange;
+global.MapProperties[#MAP.City, MAP_STAT.MapStartIntensity] = 0.75;
+global.MapProperties[#MAP.City, MAP_STAT.MapEndIntensity] = 0.5;
+global.MapProperties[#MAP.City, MAP_STAT.MapPeakIntensity] = 1.5;
+global.MapProperties[#MAP.City, MAP_STAT.MapStartHours] = 10 * 60;
+global.MapProperties[#MAP.City, MAP_STAT.MapEndHours] = 20 * 60;
 
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartColor] = c_white;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.Name] = "Nuclear";
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndColor] = c_orange;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartIntensity] = 0.75;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndIntensity] = 0.5;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapPeakIntensity] = 1.5;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapStartHours] = 10 * 60;
-global.MapProperties[#MapIndex.Nuclear, MapProperty.MapEndHours] = 20 * 60;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapStartColor] = c_white;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.Name] = "Nuclear";
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapEndColor] = c_orange;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapStartIntensity] = 0.75;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapEndIntensity] = 0.5;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapPeakIntensity] = 1.5;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapStartHours] = 10 * 60;
+global.MapProperties[#MAP.Nuclear, MAP_STAT.MapEndHours] = 20 * 60;
 
 
 
-enum KeyBind{
+enum KEY{
 	KeyUp, KeyLeft, KeyDown, KeyRight,
 	KeyInventory, KeyPickUp, KeyCycleLeft,
 	KeyCycleRight, KeyShootMouse, KeyReload,
 	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
 	KeyProne, KeyWeaponAttachments, KeySelectBot, KeyCommandBot, 
-	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyCycleInvLeft,
-	KeyCycleInvRight, KeyCycleInvUp, KeyCycleInvDown, KeyConsole,
+	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyConsole,
 	KeyKnifeLight, KeyKnifeHeavy, KeyUseItem, KeyScope,
 	Total
 }
@@ -202,52 +206,57 @@ ds_list_add(
 	ord("E"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
 	ord("Y"), ord("T"), ord("X"), ord("C"),
-	ord("B"), vk_shift, ord("G"), ord("A"), 
-	ord("D"), ord("W"), ord("S"), 192,
+	ord("B"), vk_shift, ord("G"), 192,
 	mb_left, mb_right, mb_left, mb_right
 );
 
 global.DefaultKeyBinds = ds_list_create();
 ds_list_copy(global.DefaultKeyBinds, global.KeyBinds);
 
-enum player_textures{
+enum TEXTURES{
 	no_weapon, pistol, assault_rifle, death, flashed_weapon, flashed_no_weapon, reload, //0-6
 	prone, prone_second, prone_third, flashed_prone, flashed_prone_second, flashed_prone_third, //7-12
 	reload_prone, reload_prone_second, reload_prone_third, knife_prone, knife_prone_second, knife_prone_third, //13-18
 	grenade_prone, grenade_prone_second, grenade_prone_third, grenade_throw, knife_attack //19-23
 }
 
-enum states_player{
+
+enum STATES_PLAYER{
 	none_state,
 	prone_state,
 	machine_gun_state,
 	mortar_state
 }
 
-enum HitBox{
+enum HITBOX{
 	Head,
+	HeadFlashed,
 	HeadProne,
-	BodyWithoutWeapon,
-	BodyReloading,
+	BodyNoWeapon,
+	BodyPistol,
+	BodyAR,
+	BodyThrowReload,
+	BodyFlashedWeapon,
+	BodyFlashedNoWeapon,
 	BodyProne,
-	ArmWithoutWeapon,
-	ArmWithPistol,
-	ArmWithAssaultRifle,
-	ArmWithWeaponFlashed,
-	ArmWithoutWeaponFlashed,
-	ArmReloading,
+	ArmNoWeapon,
+	ArmPistol,
+	ArmAR,
+	ArmThrowReload,
+	ArmFlashedWeapon,
+	ArmFlashedNoWeapon,
 	ArmProne,
 	ArmProneFlashed,
 	ArmProneReloading,
-	LegProne,
-	LegProne_second,
-	LegProne_third,
 	ArmKnife,
 	ArmProneKnife,
 	ArmProneGrenade,
+	LegProne,
+	LegProne_second,
+	LegProne_third,
 }
 
-enum States{
+enum STATES{
 	Idle,
 	MoveShoot,
 	Move,
@@ -264,10 +273,6 @@ enum States{
 	MovePredictive,
 	MoveCommand,
 	NoMove
-}
-
-enum Hit{
-	Hits, Damage, Total
 }
 
 rank_database();

@@ -1,40 +1,40 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-//draw_text(x, y - 50, "alarm2 " + string(alarm[2]));
-//draw_text(x, y - 100, "rot " + string(check_enemy_rotation(id, ChasingObject)));
-//draw_text(x, y - 150, "obj " + string(ChasingObject));
+//draw_set_font(fnt_ConsoleSmall);
+//draw_text(x, y - 50, "state " + string(State));
+//draw_text(x, y - 75, "alarm0 " + string(alarm[0]));
 //draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
 if(stats.Health_points <= 0){
 	exit;
 }
 if(Visible == true){
 	var armour_sprite_index = 0;
-	if(image_index == player_textures.no_weapon){
+	if(image_index == TEXTURES.no_weapon){
 		armour_sprite_index = 0;	
-	}else if(image_index == player_textures.pistol){
+	}else if(image_index == TEXTURES.pistol){
 		armour_sprite_index = 1;
-	}else if(image_index == player_textures.assault_rifle){
+	}else if(image_index == TEXTURES.assault_rifle){
 		armour_sprite_index = 2;
-	}else if(image_index == player_textures.flashed_weapon){
+	}else if(image_index == TEXTURES.flashed_weapon){
 		armour_sprite_index = 3;
-	}else if(image_index == player_textures.flashed_no_weapon){
+	}else if(image_index == TEXTURES.flashed_no_weapon){
 		armour_sprite_index = 4;
-	}else if(image_index == player_textures.reload || image_index == player_textures.knife_attack){
+	}else if(image_index == TEXTURES.reload || image_index == TEXTURES.knife_attack){
 		armour_sprite_index = 7;
-	}else if(image_index >= player_textures.prone){
+	}else if(image_index >= TEXTURES.prone){
 		armour_sprite_index = 5;
 	}
 	
-	if(image_index == player_textures.flashed_prone || image_index == player_textures.flashed_prone_second || image_index == player_textures.flashed_prone_third){
+	if(image_index == TEXTURES.flashed_prone || image_index == TEXTURES.flashed_prone_second || image_index == TEXTURES.flashed_prone_third){
 		armour_sprite_index = 6;
 	}
 	
-	if(image_index == player_textures.reload_prone || image_index == player_textures.reload_prone_second || image_index == player_textures.reload_prone_third){
+	if(image_index == TEXTURES.reload_prone || image_index == TEXTURES.reload_prone_second || image_index == TEXTURES.reload_prone_third){
 		armour_sprite_index = 8;
 	}
 	
-	if(image_index == player_textures.knife_prone || image_index == player_textures.knife_prone_second || image_index == player_textures.knife_prone_third){
+	if(image_index == TEXTURES.knife_prone || image_index == TEXTURES.knife_prone_second || image_index == TEXTURES.knife_prone_third){
 		armour_sprite_index = 8;
 	}
 

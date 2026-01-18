@@ -335,9 +335,9 @@ function get_performance_ratio(player_stat, average_stat) {
 /// @desc Get average kills based on the map
 function get_average_kills(map) {
     var average_kills;
-    if (map == MapIndex.Desert) {
+    if (map == MAP.Desert) {
         average_kills = 10 * MAX_ROUNDS;
-    } else if (map == MapIndex.RainForest) {
+    } else if (map == MAP.RainForest) {
         average_kills = 17 * MAX_ROUNDS;
     } else {
         average_kills = 10 * MAX_ROUNDS;

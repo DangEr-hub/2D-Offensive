@@ -48,12 +48,12 @@ if(global.Weather == 1){
 }
 
 
-if(global.MapID == MapIndex.Desert){
+if(global.MapID == MAP.Desert){
 	if(instance_exists(oParticleSystem)){
 		part_particles_create(global.ParticleSystem, cam_x + random(cam_width), cam_y + random(cam_height), oParticleSystem.dust_particle, 1);
 	}
-}else if(global.MapID == MapIndex.RainForest){
-	if(percent_chance(10)){
+}else if(global.MapID == MAP.RainForest){
+	if(percent_chance(5)){
 		if(instance_exists(oParticleSystem)){
 			part_particles_create(global.ParticleSystem, cam_x + random(cam_width), cam_y + random(cam_height), oParticleSystem.leaf_particle, 1);
 		}

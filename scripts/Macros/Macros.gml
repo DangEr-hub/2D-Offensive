@@ -2,7 +2,8 @@
 #macro SMOKE_TIME 5 * game_get_speed(gamespeed_fps)
 #macro INTERPOLATION_SPD 0.3
 #macro HOTBAR_SIZE 4
-#macro PENETRATION_VALUE 0.25
+#macro PENETRATION_VALUE 2
+#macro FLASH_LERP 0.0075
 #macro MAX_FOG 20
 #macro BOT_SELECT_RADIUS 512
 #macro MOVE_SPD 700

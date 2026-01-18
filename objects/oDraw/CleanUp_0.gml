@@ -1,6 +1,6 @@
 
 if(player_has_machine_gun()){
-	for(var i = 0;i<weapon_attachments.Total;i++){
+	for(var i = 0;i<WPN_ATTACHMENTS.Total;i++){
 		global.weapon_attachments[0][i] = Item.None;
 	}
 	global.Inventory[# OtherSlot.Primary, Index.slot_id] = Item.None;

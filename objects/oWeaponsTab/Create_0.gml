@@ -175,8 +175,8 @@ refresh_weapon_ui = function(){
 
 draw_set_font(set_font("Console"));
 weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
-			Item.famas, Item.awm, Item.SSG08, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.Spas,
-			Item.Javelin
+			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, 
+			Item.Spas, Item.Javelin
 		  ];
 wpn = weapons[0];
 

@@ -86,7 +86,10 @@ function explosion_create(ShrapnelNumber, pos, ExplosionDamage, Destroy, ObjectT
 			[stats.Owner_name, false],
 			noone,
 			[pos[0], pos[1]],
-			false
+			false,
+			[true, false],
+			[-1, -1],
+			true
 		);	
 	}
 	create_fog(pos[0], pos[1], clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75), random(360), 0.1, random_range(.1, .5), 

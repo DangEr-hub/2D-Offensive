@@ -7,13 +7,19 @@ KilledByWeapon = "Nothing";
 KilledByName = "No one";
 var_slot = 0;
 item_description = "";
-Pick = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyPickUp])) + "]";
+Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyPickUp])) + "]";
 HUDShift = 16;
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;
 zoomSurface = -1;
 ZoomValue = 1;
+
+wind = {
+	time_modifier: random_range(150.0, 250.0),
+	amplitude: random_range(0.5, 1.5),
+	strength: random_range(1.5, 2.5)
+};
 
 draw_set_font(set_font("Console"));
 
@@ -30,6 +36,8 @@ for (var i = 0; i < numParticles; i++) {
     bokehProperties[i, 2] = random_range(0.5, 2);
     bokehProperties[i, 3] = random_range(0.05, 0.1);
 }
+rain_flares = [];
+rain_timer = -1;
 #endregion
 
 #region Item description

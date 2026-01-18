@@ -48,7 +48,12 @@ source_names = [
 	"Concrete hit: ",
 	"Glass hit: ",
 	"Airplane sound: ",
-	"Falling bomb sound: "
+	"Falling bomb sound: ",
+	"Few textures: ",
+	"Snow flake: ",
+	"Weapons (1): ",
+	"Weapons (2): ",
+	"Weapons (3): ",
 ];
 
 sources = [
@@ -77,7 +82,12 @@ sources = [
 	"https://pixabay.com/sound-effects/bullet-gunshot-impact-390253/",
 	"https://pixabay.com/sound-effects/glass-breaking-386153/",
 	"https://pixabay.com/sound-effects/fighter-jet-overhead-355468/",
-	"https://pixabay.com/sound-effects/falling-bomb-41038/"
+	"https://pixabay.com/sound-effects/falling-bomb-41038/",
+	"https://free-game-assets.itch.io/tds-pixel-art-2d-kit",
+	"https://opengameart.org/content/snow-flake",
+	"https://arlantr.itch.io/free-guns-pixelart",
+	"https://munstudios.itch.io/2d-pixel-guns-pack",
+	"https://datdev.itch.io/pixel-guns-2d-weapon-pack"
 	
 	
 	

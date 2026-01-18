@@ -9,7 +9,7 @@ if(drawable == true){
 			if(icon_after == false){
 				draw_sprite_ext(icon_sprite_index, icon_image_index, 0 - sprite_get_width(icon_sprite_index) - string_width(" "), 0, sprite_scale, sprite_scale, 0, c_white, alpha * alpha_value);
 			}else{
-				draw_sprite_ext(icon_sprite_index, icon_image_index, 0 + string_width(caption) + sprite_get_width(icon_sprite_index), 0, sprite_scale, sprite_scale, 0, c_white, alpha * alpha_value);
+				draw_sprite_ext(icon_sprite_index, icon_image_index, 0 + string_width(caption) + sprite_get_width(icon_sprite_index)*.1, 0, sprite_scale, sprite_scale, 0, c_white, alpha * alpha_value);
 			}
 		}
 	}else if(description == "Inventory"){
@@ -57,7 +57,7 @@ if(drawable == true){
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 		
-			var offset_y = DescriptionStringHeight * 2;
+			var offset_y = DescriptionStringHeight * 2.25;
 			var disadvantages_string = global.ItemIndex[#Id, ItemStat.disadvantages];
 			var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
 			var advantages_string = global.ItemIndex[#Id, ItemStat.advantages];

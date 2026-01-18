@@ -12,9 +12,9 @@ if(stats.Health_points <= 0){
 	XSpeed = 0;
 	YSpeed = 0;	
 	instance_destroy(Weapon);
-	instance_destroy(HeadHitBox);
-	instance_destroy(BodyHitBox);
-	instance_destroy(ArmHitBox);
+	instance_destroy(HeadHB);
+	instance_destroy(BodyHB);
+	instance_destroy(ArmHB);
 	instance_destroy(Legs);
 	drop_experience(1, xp_value, x, y, sprite_width/4);
 	if(percent_chance(100)){
@@ -58,7 +58,7 @@ if(stats.Health_points <= 0){
 		}
 	}
 	var EnemyDead = instance_create_depth(x, y, depth, oEnemyDead);
-	EnemyDead.mask_index = spr_EnemyBasicDead;
+	EnemyDead.mask_index = spr_BotDead;
 	EnemyDead.sprite_index = sprite_index;
 	EnemyDead.image_index = 3;
 	EnemyDead.image_angle = RotationAngle % 360;
@@ -82,146 +82,49 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1 && trigger_texture_
 	#region Enemy texture
 	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass]){
 		case WEAPON_CLASS.ASSAULT_RIFLE:
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 2;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
+		case WEAPON_CLASS.SUBMACHINE_GUN:
+		case WEAPON_CLASS.SNIPER_RIFLE:
+		case WEAPON_CLASS.SHOTGUN:
+		case WEAPON_CLASS.MISSILE:
+			apply_weapon_texture(TEXTURES.assault_rifle, HITBOX.BodyAR, HITBOX.ArmAR);
 			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 		break;
 	
 		case WEAPON_CLASS.PISTOL:
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 1;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithPistol;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
-		break;
-			
-		case WEAPON_CLASS.SUBMACHINE_GUN:
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 1;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
-		break;
-	
-		case WEAPON_CLASS.SNIPER_RIFLE:
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 2;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .95;
-		break;
-			
-		case WEAPON_CLASS.SHOTGUN:
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 2;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
-		break;
-			
-		case WEAPON_CLASS.MISSILE:
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-			if(FlashedTimer <= FlashedTime * .25){
-				if!(ReloadTime >= global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]*.95){
-					image_index = 2;
-					BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-					ArmHitBox.image_index = HitBox.ArmWithAssaultRifle;
-				}else{
-					image_index = 6;
-					BodyHitBox.image_index = HitBox.BodyReloading;
-					ArmHitBox.image_index = HitBox.ArmReloading;
-				}
-			}else{
-				image_index = 4;
-				ArmHitBox.image_index = HitBox.ArmWithWeaponFlashed;
-			}
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
+			apply_weapon_texture(TEXTURES.pistol, HITBOX.BodyPistol, HITBOX.ArmPistol);
+			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .775;
 		break;
 
 		default:
-			BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
+			BodyHB.image_index = HITBOX.BodyNoWeapon;
 			if(FlashedTimer <= FlashedTime * .25){
-				image_index = 0;
-				ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
+				image_index = TEXTURES.no_weapon;
+				ArmHB.image_index = HITBOX.ArmNoWeapon;
 			}else{
-				image_index = 5;
-				ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
+				image_index = TEXTURES.flashed_no_weapon;
+				ArmHB.image_index = HITBOX.ArmFlashedNoWeapon;
 			}
 			WeaponDistance = sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon) * .85;
 		break;
 	}
 	#endregion
 }
-if!(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
+if!(EquippedGrenadeTimer == -1){
 	
-	#region Default texture (landmine and grenade)
-	BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-	Weapon.image_index = 0;
-	if(FlashedTimer <= FlashedTime * .25){
-		image_index = 0;
-		ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
-	}else{
-		image_index = 5;
-		ArmHitBox.image_index = HitBox.ArmWithoutWeaponFlashed;
-	}
+	#region Grenade texture
+	image_index = TEXTURES.reload;
+	BodyHB.image_index = HITBOX.BodyThrowReload;
+	ArmHB.image_index = HITBOX.ArmThrowReload;
 	WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
 	#endregion
 	
+}else if!(EquippedLandMineTimer == -1){
+	#region Landmine texture
+	image_index = TEXTURES.no_weapon;
+	BodyHB.image_index = HITBOX.BodyNoWeapon;
+	ArmHB.image_index = HITBOX.ArmNoWeapon;
+	WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .85;
+	#endregion
 }
 #endregion
 	
@@ -231,7 +134,7 @@ if(healing == true){
 	healing_time ++;
 }
 if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
-	damage_indicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, icons.health);
+	damage_indicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, ICON.health);
 	healing = false;
 	CanShoot = true;
 	stats.Health_points += global.ItemIndex[#Item.HealingKit, ItemStat.Damage];
@@ -242,74 +145,74 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 
 #region States 
 
-if(State == States.MoveCommand){
+if(State == STATES.MoveCommand){
 	MoveTowards(target_x, target_y, Acceleration*3, 0, 0);
 }
 
 if(global.EnemyCanMove == true && alarm[0] <= 1){
 	
-	if(instance_exists(ChasingObject) && State != States.MoveCommand){
+	if(instance_exists(ChasingObject) && State != STATES.MoveCommand){
 		target_x = ChasingObject.x;
 		target_y = ChasingObject.y;
 	}
 	
 	#region States
 	switch(State){
-		case States.MoveAway:
+		case STATES.MoveAway:
 			if(ReactionTimer <= 0){
 				MoveRunAway(target_x, target_y);
 			}
 		break;
 		
-		case States.MoveShoot:
+		case STATES.MoveShoot:
 			if(ReactionTimer <= 0){
 				bot_move_shooting(target_x, target_y);
 			}
 		break;
 		
-		case States.Move:
+		case STATES.Move:
 			if(ReactionTimer <= 0){
 				MoveRandom();
 			}
 		break;
 		
-		case States.Idle:
+		case STATES.Idle:
 			if(percent_chance(10 * rank_boost)){
 				MoveIdle();
 			}
 		break;
 		
-		case States.MoveToward:
+		case STATES.MoveToward:
 			if(ReactionTimer <= 0){
 				MoveTowards(target_x, target_y, Acceleration);
 			}
 		break;
 		
-		case States.MoveAwayFromGrenade:
+		case STATES.MoveAwayFromGrenade:
 			if(ReactionTimer <= 0){
 				MoveRunAway(NearestDangerX, NearestDangerY);
 			}
 		break;
 		
-		case States.ThrowGrenade:
+		case STATES.ThrowGrenade:
 			if(ReactionTimer <= 0){
 				EnemyThrowGrenade(target_x, target_y);	
 			}
 		break;
 	
-		case States.LayDownLandMine:
+		case STATES.LayDownLandMine:
 			if(ReactionTimer <= 0){
 				EnemyLayDownLandMine();	
 			}
 		break;
 		
-		case States.Chase:
+		case STATES.Chase:
 			if(ReactionTimer <= 0){
 				MoveTowards(target_x, target_y, Acceleration*2);
 			}
 		break;
 		
-		case States.MoveFlashed:
+		case STATES.MoveFlashed:
 			if(ReactionTimer <= 0){
 				if(percent_chance(50 * rank_boost)){
 					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
@@ -317,7 +220,7 @@ if(global.EnemyCanMove == true && alarm[0] <= 1){
 			}
 		break;
 		
-		case States.MoveInSmoke:
+		case STATES.MoveInSmoke:
 			if(ReactionTimer <= 0){
 				if(percent_chance(10 * rank_less)){
 					MoveIdle();
@@ -325,13 +228,13 @@ if(global.EnemyCanMove == true && alarm[0] <= 1){
 			}
 		break;
 		
-		case States.MoveHealing:
+		case STATES.MoveHealing:
 			if(ReactionTimer <= 0){
 				MoveRunAway(target_x, target_y);
 			}
 		break;
 		
-		case States.MovePredictive:
+		case STATES.MovePredictive:
 			if(ReactionTimer <= 0){
 				move_predictive(target_x, target_y);
 			}
@@ -343,10 +246,10 @@ if(global.EnemyCanMove == true && alarm[0] <= 1){
 #endregion
 
 #region Command state
-if(State == States.MoveCommand){
+if(State == STATES.MoveCommand){
     if(point_distance(x, y, target_x, target_y) < 16){
 		global.local_player.command = array_create(array_length(global.local_player.command), -1);
-        set_state(States.Idle);
+        set_state(STATES.Idle);
     }
 }
 #endregion
@@ -358,22 +261,22 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
 		if(chasing_available == true){ shoot_chance = 1; }
 
         switch(State){
-            case States.MoveAway:
-            case States.MoveShoot:
-            case States.Move:
-            case States.MoveToward:
-            case States.MoveAwayFromGrenade:
-			case States.MovePredictive:
+            case STATES.MoveAway:
+            case STATES.MoveShoot:
+            case STATES.Move:
+            case STATES.MoveToward:
+            case STATES.MoveAwayFromGrenade:
+			case STATES.MovePredictive:
+                try_shoot(0.15 * shoot_chance);
+            break;
+
+            case STATES.Chase:
+            case STATES.MoveFlashed:
                 try_shoot(0.25 * shoot_chance);
             break;
 
-            case States.Chase:
-            case States.MoveFlashed:
-                try_shoot(0.5 * shoot_chance);
-            break;
-
-            case States.MoveInSmoke:
-                try_shoot(0.1 * shoot_chance);
+            case STATES.MoveInSmoke:
+                try_shoot(0.075 * shoot_chance);
             break;
         }
     }
@@ -482,23 +385,21 @@ if(ArmourDurability[1] <= 0){
 #endregion
 	
 #region Smoke
-if(instance_exists(oFog)){
-	var NearestFog = instance_nearest(x, y, oFog);
-	if(instance_exists(NearestFog)){
-		if(distance_to_object(NearestFog) <= NearestFog.radius){
-			if(NearestFog.alarm[0] > 1){
-				if(hidden == false){
-					hidden = true;	
-				}
-			}else{
-				if(hidden == true){
-					hidden = false;
-				}
+var fog = instance_nearest(x, y, oFog);
+if(instance_exists(fog)){
+	if(distance_to_object(fog) <= fog.radius && fog.radius >= 100){
+		if(fog.alarm[0] > 1){
+			if(hidden == false){
+				hidden = true;	
 			}
 		}else{
 			if(hidden == true){
-				hidden = false;	
+				hidden = false;
 			}
+		}
+	}else{
+		if(hidden == true){
+			hidden = false;	
 		}
 	}
 }
@@ -604,17 +505,26 @@ if(FlashLight != undefined){
 #endregion
 
 #region Spot a chasing object
-
 if!(instance_exists(ChasingObject)){
 	alarm[1] = 1; /// pokud chasingObject neexistuje, zkus okamžitě hledat
-}else if(ChasingObjectSpotted == true && chasing_available || chasing_available){
+}else if(chasing_available){
 	ChasingObjectSpot(chasing_timer);
+}else if(ChasingObjectSpotted == false){
+	if(Flashed == false){
+		set_state(STATES.Idle);			
+	}else{
+		set_state(STATES.MoveFlashed);	
+	}
+}
+
+if(Flashed == true){
+	set_state(STATES.MoveFlashed);
 }
 
 var ChasingObjectBulletTracer = instance_nearest(x, y, oBulletTracer);
 if(instance_exists(ChasingObjectBulletTracer) && instance_exists(ChasingObjectBulletTracer.stats.Object)){
 	if(distance_to_object(ChasingObjectBulletTracer) <= 256 && ChasingObjectBulletTracer.stats.Object_index == ChasingObject){
-		if(percent_chance(100 * global.ItemIndex[# global.weapon_attachments[min(ChasingObjectBulletTracer.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+		if(percent_chance(100 * global.ItemIndex[# global.weapon_attachments[min(ChasingObjectBulletTracer.stats.Object.WeaponID, 1)][WPN_ATTACHMENTS.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 			if(ChasingObjectSpotted == false){
 				ChasingObjectSpot(chasing_timer);
 			}
@@ -625,7 +535,7 @@ if(instance_exists(ChasingObjectBulletTracer) && instance_exists(ChasingObjectBu
 var ChasingObjectBullet = instance_nearest(x, y, oBullet);
 if(instance_exists(ChasingObjectBullet) && instance_exists(ChasingObjectBullet.stats.Object)){
 	if(distance_to_object(ChasingObjectBullet) <= 256 && ChasingObjectBullet.stats.Object_index == ChasingObject){
-		if(percent_chance(100 * global.ItemIndex[# global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][weapon_attachments.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
+		if(percent_chance(100 * global.ItemIndex[# global.weapon_attachments[min(ChasingObjectBullet.stats.Object.WeaponID, 1)][WPN_ATTACHMENTS.weapon_suppressor], ItemStat.KickBackInaccuracyMultiplier])){
 			if(ChasingObjectSpotted == false){
 				ChasingObjectSpot(chasing_timer);
 			}
@@ -646,7 +556,7 @@ if(instance_exists(ChasingObject) && ChasingObject.team != team && distance_to_o
 
 #region Throw grenade or lay land mine
 if(global.EnemyCanMove == true){
-	if(State == States.ThrowGrenade && EquippedGrenadeTimer == -1){
+	if(State == STATES.ThrowGrenade && EquippedGrenadeTimer == -1){
 		var Target_x, Target_y, GrenadeSpd;
 		switch(EquippedGrenadeID){
 			case Item.HEGrenade:
@@ -671,20 +581,20 @@ if(global.EnemyCanMove == true){
 		create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
 		EquippedGrenade, GrenadeSpd, Target_x, Target_y, EquippedGrenadeID);
 		trigger_texture_timer = trigger_texture_time;
-		State = States.MoveShoot;
+		alarm[0] = 1;
 		grenade_angle = random(360);
 		Grenades[EquippedGrenade] --;
 		EquippedGrenadeTimer = EquippedGrenadeTime;
 		trigger_texture_timer = trigger_texture_time;
 	}
 	
-	if(State == States.LayDownLandMine && EquippedLandMineTimer == -1){
+	if(State == STATES.LayDownLandMine && EquippedLandMineTimer == -1){
 		landmine_create(
 			x,
 			y,
 			EquippedLandMineID
 		);
-		State = States.MoveShoot;
+		State = STATES.MoveShoot;
 		LandMineAngle = random(360);
 		LandMines[floor(EquippedLandMine/4)] --;
 		EquippedLandMineTimer = EquippedLandMineTime;

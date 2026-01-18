@@ -11,9 +11,9 @@ if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin
 
 
 #region Knife hit
-if(instance_exists(global.local_player) && instance_exists(oKnife)){
+if(instance_exists(global.local_player)){
 	var knife_object = instance_nearest(x, y, oKnife);
-	if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer && state == 0) {
+	if (instance_exists(knife_object) && instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer && state == 0) {
 		if (knife_object.stats.Object.knife_attack_timer >= 5) {
 			var hitbox_corners = get_hitbox_corners(knife_object, 25, 50, 20, knife_object.stats.Object.RotationAngle);
 
@@ -27,15 +27,7 @@ if(instance_exists(global.local_player) && instance_exists(oKnife)){
 				var damage = knife_object.stats.Damage;
 				var BloodSplashNumber = ceil(damage / 5);
 				var BloodParticleNumber = ceil(damage / 2);
-
-				repeat(BloodSplashNumber){
-					var BloodSplash = instance_create_layer(x, y, "ItemsO", oBloodSplash);
-					BloodSplash.image_blend = c_red;
-				}
-				if(instance_exists(oParticleSystem)){
-					part_type_color1(oParticleSystem.BloodParticle, c_red);
-					part_particles_create(global.ParticleSystem, x, y, oParticleSystem.BloodParticle, BloodParticleNumber);
-				}
+				create_blood(BloodSplashNumber, x, y, c_red, BloodParticleNumber);
 
 				play_sound(x, y, snd_BirdDeath, global.local_player);
 				instance_destroy(id);

@@ -45,3 +45,41 @@ if (IS_NET && !oNetworkManager.is_server) {
    x = lerp(x, target_x, INTERPOLATION_SPD);
    y = lerp(y, target_y, INTERPOLATION_SPD);
 }
+
+#region push items
+var inst = instance_place(x, y, oItems);
+
+if(inst != noone){
+	var dir = random(360);
+    if(point_distance(x, y, inst.x, inst.y) > 4){
+        dir = point_direction(inst.x, inst.y, x, y);
+    }
+    // Jemné postrčení
+    AccelX += lengthdir_x(0.1, dir);
+    AccelY += lengthdir_y(0.1, dir);
+}
+// Aplikace fyziky
+VelocityX += AccelX;
+VelocityY += AccelY;
+
+// Kontrola kolizí se stěnami
+var FutureX = x + VelocityX;
+var FutureY = y + VelocityY;
+
+if(place_meeting(FutureX, y, oParentTile)){
+    VelocityX = -VelocityX * 0.5;
+}
+
+if(place_meeting(x, FutureY, oParentTile)){
+    VelocityY = -VelocityY * 0.5;
+}
+
+x += VelocityX;
+y += VelocityY;
+
+// Tření a reset akcelerace
+VelocityX *= 0.8;
+VelocityY *= 0.8;
+AccelX = 0;
+AccelY = 0;
+#endregion

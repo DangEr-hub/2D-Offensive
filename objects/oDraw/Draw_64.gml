@@ -119,24 +119,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	
 	if(global.local_player.player_has_scope != 0 || (global.local_player.player_has_scope == 0 && global.local_player.ScopeIn == false)){
 		
-		#region Draw item switching inside an inventory
-		if(instance_exists(oInventory)){
-			draw_set_font(set_font("Console"));
-			var CycleUpString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvUp])) + "] - Cycle up";
-			var CycleDownString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvDown])) + "] - Cycle down";
-			var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvLeft])) + "] - Cycle left";
-			var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleInvRight])) + "] - Cycle right";
-			var position_y = oDraw.HUDShift*2;
-			var position_x = global.GuiW/2 - string_width(CycleRightString)/2; 
-			draw_text_outlined(position_x, position_y, CycleUpString, c_white, c_black, 1);
-			draw_text_outlined(position_x, position_y + string_height("A"), CycleLeftString, c_white, c_black, 1);
-			draw_text_outlined(position_x, position_y + string_height("A")*2, CycleDownString, c_white, c_black, 1);
-			draw_text_outlined(position_x, position_y + string_height("A")*3, CycleRightString, c_white, c_black, 1);
-		}
-		#endregion
 		
 		#region Draw mortar GUI
-		if (global.local_player.moving_state == states_player.mortar_state) {
+		if (global.local_player.moving_state == STATES_PLAYER.mortar_state) {
 		    var mortar_object = instance_nearest(global.local_player.x, global.local_player.y, oMortar);	
 			var xx = (mortar_object.x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 			var yy = (mortar_object.y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
@@ -224,6 +209,73 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 		}
 		#endregion
+		
+		#region Draw rain lens flare
+		rain_timer--;
+		var max_n = 50;
+    
+		if(rain_timer <= 0){
+			var rain_time = irandom_range(game_get_speed(gamespeed_fps) * 0.5, game_get_speed(gamespeed_fps) * 2);	
+			if(global.Weather == WEATHER.RAIN || global.Weather == WEATHER.SNOW){
+				rain_time = irandom_range(game_get_speed(gamespeed_fps) * 0.05, game_get_speed(gamespeed_fps) * 0.1);
+			}			
+			if(global.local_player.in_water){
+				rain_time = irandom_range(1, 5);
+			}
+			if(array_length(rain_flares) < max_n){
+			    var flare = {
+			        xx: random(global.GuiW),
+			        yy: random(global.GuiH),
+			        size: global.Weather == WEATHER.SNOW ? random_range(0.25, 0.5) : random_range(0.5, 1),
+			        alpha: random_range(0.1, 0.15),
+			        life: irandom_range(game_get_speed(gamespeed_fps) * 3, game_get_speed(gamespeed_fps) * 5),
+			        drift_x: random_range(-0.1, 0.1),
+			        drift_y: random_range(-0.05, 0.05),
+					angle: random(360),
+					spr: (global.Weather == WEATHER.RAIN || global.local_player.in_water || global.Weather == WEATHER.SUN) ? spr_FlareEffect : spr_SnowFlake,
+					col: global.Weather == WEATHER.SUN  ? c_orange : (global.Weather == WEATHER.RAIN ? c_aqua : c_white)
+			    };
+			    array_push(rain_flares, flare);
+			}
+			rain_timer = rain_time;
+		}
+		for(var i = array_length(rain_flares) - 1; i >= 0; i--){
+			var f = rain_flares[i];
+    
+			f.life--;
+			f.alpha -= 0.0005;
+			f.xx += f.drift_x;
+			f.yy += f.drift_y;
+			f.xx = clamp(f.xx, 0, global.GuiW);
+			f.yy = clamp(f.yy, 0, global.GuiH);
+
+			if(irandom(100) == 0){
+				f.alpha += 0.1;
+			}
+    
+			if(f.life <= 0 || f.alpha <= 0){
+				array_delete(rain_flares, i, 1);
+			}else{
+				rain_flares[i] = f;
+			}
+		}
+		for(var i = 0; i < array_length(rain_flares); i++){
+			var f = rain_flares[i];
+    
+			draw_sprite_ext(
+				f.spr,
+				0,
+				f.xx,
+				f.yy,
+				f.size,
+				f.size,
+				f.angle,
+				f.col,
+				f.alpha
+			);
+		}
+
+		#endregion
 
 		#region Draw enemy health
 		with(oBot){
@@ -294,12 +346,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 					var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 					var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				    if(distance_to_object(global.local_player) <= global.local_player.PickUpDistance){   
+						draw_text_outlined(round(xx) - string_width(global.ItemIndex[# image_index, ItemStat.Name])/4, round(yy) - string_height("a"), global.ItemIndex[# image_index, ItemStat.Name], c_white, c_black, 1);
 						draw_text_outlined(round(xx), round(yy), oDraw.Pick, c_white, c_black, 1);
 				    }
 				}
 			}
 			
-			if(global.local_player.moving_state == states_player.none_state){
+			if(global.local_player.moving_state == STATES_PLAYER.none_state){
 				if(instance_exists(oMachineGun)){
 					with(oMachineGun){
 						var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
@@ -336,9 +389,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		if!(instance_exists(oInventory)){
 			
 			#region Draw shooting mode
-			if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None){ 
+			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
+			if(global.ItemIndex[# weapon, ItemStat.Type] == "Weapon" && global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
 				var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootingMode], global.local_player.weapon_shooting_mode) + 
-											"[" + keycode_to_string(global.KeyBinds[| KeyBind.KeyChangeMode]) + "]";
+											"[" + keycode_to_string(global.KeyBinds[| KEY.KeyChangeMode]) + "]";
 				var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
 				var shooting_mode_y = display_get_gui_height() - HUDShift*2;
 				draw_text_outlined(shooting_mode_x, shooting_mode_y, shooting_mode_string, c_white, c_black, 1);
@@ -347,8 +401,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			
 			#region Draw item switching outside of inventory
 			if(global.Inventory[#global.local_player.item_use_position, Index.slot_id] != Item.None){
-				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleLeft])) + "] - Left ";
-				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KeyBind.KeyCycleRight])) + "] - Right";
+				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyCycleLeft])) + "] - Left ";
+				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyCycleRight])) + "] - Right";
 				var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 			    var Id = global.Inventory[#global.local_player.item_use_position, Index.slot_id];        
 			    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1);  
@@ -368,17 +422,17 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var xp_y = StaminaY - bar_gap*2;
 			var MagX = HealthX + sprite_get_width(spr_HealthBar) * 2 * global.GUIMultiplier + HUDShift;
 			var MagY = StaminaY;
-			var AmmoSpriteWidth = sprite_get_width(spr_AmmoType)/1.5*global.GUIMultiplier;
+			var AmmoSpriteWidth = (sprite_get_bbox_right(spr_AmmoType) - sprite_get_bbox_left(spr_AmmoType))*global.GUIMultiplier;
 			var AmmoDrawValue = min(ceil(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]), 10);
 			var AmmoRemain = ceil(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]) - AmmoDrawValue;
 			var Value = 0;
 			var money_string = "Money: " + string(global.player_stats_struct.Money);
 			var money_x = HUDShift;
 			var money_y = StaminaY - bar_gap*4.5;
-		
-			if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None){
+			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
+			if(global.ItemIndex[# weapon, ItemStat.Type] == "Weapon" && global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
 				for(var i=0;i<AmmoDrawValue;i++){
-					draw_sprite_ext(spr_AmmoType, global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.AmmoSpriteID], MagX + (i*AmmoSpriteWidth), MagY, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_AmmoType, global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.AmmoSpriteID], MagX + (i*AmmoSpriteWidth), MagY, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, global.GUIHUDAlpha * 2);
 					Value ++;
 				}
 		
@@ -665,7 +719,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 
 #region Slot
 with(oSlot){
-	var scale = min(1 * global.GUIMultiplier, 1.5 * global.GUIMultiplier);
+	var scale = min(1 * global.GUIMultiplier, 2 * global.GUIMultiplier);
 	var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 	var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 	var Id = global.Inventory[# VarSlot, Index.slot_id];
@@ -681,13 +735,35 @@ with(oSlot){
 
 	draw_sprite_ext(sprite_index, image_index, xx, yy, scale, scale, 0, image_blend, slot_alpha);
 	if (Id != Item.None){ 
-	    draw_sprite_ext(spr_Items, Id, xx + sprite_get_width(spr_Slot)/2*scale, yy + sprite_get_height(spr_Slot)/2*scale, scale, scale, 0, c_white, slot_alpha);
+		var c_x = xx + sprite_get_width(spr_Slot) * 0.5 * scale;
+		var c_y = yy + sprite_get_height(spr_Slot) * 0.5 * scale;
+		draw_sprite_ext(spr_Items, Id, c_x, c_y, scale, scale, 0, c_white, slot_alpha);
+		var sockets = global.ItemIndex[# Id, ItemStat.attach_sockets];
+		var slot_keys = [
+			"scope",
+			"barrel",
+			"grip",
+			"suppressor"
+		];
+		var inv_slots = [
+			Index.slot_scope,
+			Index.slot_barrel,
+			Index.slot_grip,
+			Index.slot_suppressor
+		];
+
+		for(var i = 0; i < (ATTACHMENTS.slot_suppressor + 1); i++){
+			var att = global.Inventory[# VarSlot, inv_slots[i]];
+			if(att != Item.None && sockets[$ slot_keys[i]] != undefined){
+			    var off = sockets[$ slot_keys[i]];
+			    draw_sprite_ext(spr_Items, att, c_x + off[0] * scale, c_y + off[1] * scale, scale * 0.5, scale * 0.5, 0, c_white, slot_alpha);
+			}
+		}
+
 		draw_set_alpha(slot_alpha);
-		
-		if(VarSlot < OtherSlot.Primary){
+		if(VarSlot < OtherSlot.Primary && (global.ItemIndex[# Id, ItemStat.Type] == "Item" || global.ItemIndex[# Id, ItemStat.Type] == "Grenade")){
 			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
 		}
-		
 		draw_set_alpha(1);
 	}
 	

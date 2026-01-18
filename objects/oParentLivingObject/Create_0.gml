@@ -1,5 +1,9 @@
 event_inherited();
 ChasingObject = noone;
+check_vis_time = 10;
+check_vis_timer = irandom_range(1, check_vis_time);
+col_time = game_get_speed(gamespeed_fps) * .5;
+col_timer = irandom_range(1, col_time);
 stats = {};
 VisibilityTimer = -1;
 Visible = true;
@@ -19,7 +23,7 @@ flash_effect_timer = -1;
 MuzzleFlashLight = undefined;
 RotationAngle = 0;
 FlashLight = noone;
-moving_state = states_player.none_state;
+moving_state = STATES_PLAYER.none_state;
 if(instance_exists(oLightRenderer)){
 	FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
 	FlashLight.alpha = FLASHLIGHT_ALPHA;

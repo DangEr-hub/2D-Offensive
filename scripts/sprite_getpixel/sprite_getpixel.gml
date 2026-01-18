@@ -16,6 +16,9 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	var sprH = sprite_get_height(_sprite);
 	var sprX = sprite_get_xoffset(_sprite);
 	var sprY = sprite_get_yoffset(_sprite);
+	_x = clamp(floor(_x), 0, sprW - 1);
+	_y = clamp(floor(_y), 0, sprH - 1);
+
 
 	//Check if buffer already exists
 	var exists = 0;
@@ -88,8 +91,8 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	    clr[1] = buffer_read(buff, buffer_u8);
 	    clr[2] = buffer_read(buff, buffer_u8);
 	    clr[3] = buffer_read(buff, buffer_u8);
-    
-	    return clr;
+
+		return clr;
 	}
 
 

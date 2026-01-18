@@ -170,7 +170,7 @@ function reset_gui(){
 	
 function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
 	
-	if(global.draw_damage == false && DamageIndicatorSpriteID == icons.health){
+	if(global.draw_damage == false && DamageIndicatorSpriteID == ICON.health){
 		return;
 	}
 	

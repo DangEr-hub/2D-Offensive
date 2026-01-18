@@ -1,12 +1,14 @@
 //haze_start(true, false);
 event_inherited();
+current_building_id = -1;
+door_cooldown = -1;
 command = array_create(3, -1);
-anim_base = player_textures.prone;
+anim_base = TEXTURES.prone;
 equip_time_max = -1;
 prev_anim_base = anim_base;
 near_explosion_timer = -1;
 WeaponDistance = 0;
-team = TEAM.FRIENDLY;
+team = TEAM.POLICE;
 selected_bot = noone;
 bot_select_index = -1;
 bot_select_list = ds_list_create();
@@ -43,7 +45,7 @@ VelocityY = 0;
 game_set_speed(60, gamespeed_fps);
 shooting = false;
 item_use_position = 0;
-PickUpDistance = 8;
+PickUpDistance = 4;
 WeaponNumber = 0;
 WeaponNumberMax = 2;
 CanShoot = true;
@@ -134,18 +136,18 @@ Legs.Object = id;
 #endregion
 
 #region Hitbox
-HeadHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-HeadHitBox.image_index = HitBox.Head;
-HeadHitBox.MainObject = id;
-BodyHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-BodyHitBox.MainObject = id;
-ArmHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
-ArmHitBox.MainObject = id;
-LegHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-LegHitBox.image_index = HitBox.LegProne;
-LegHitBox.MainObject = id;
+HeadHB = instance_create_depth(x, y, depth - 1, oHitBox);
+HeadHB.image_index = HITBOX.Head;
+HeadHB.MainObject = id;
+BodyHB = instance_create_depth(x, y, depth - 1, oHitBox);
+BodyHB.image_index = HITBOX.BodyNoWeapon;
+BodyHB.MainObject = id;
+ArmHB = instance_create_depth(x, y, depth - 1, oHitBox);
+ArmHB.image_index = HITBOX.ArmNoWeapon;
+ArmHB.MainObject = id;
+LegHB = instance_create_depth(x, y, depth - 1, oHitBox);
+LegHB.image_index = HITBOX.LegProne;
+LegHB.MainObject = id;
 #endregion
 
 #region Networking

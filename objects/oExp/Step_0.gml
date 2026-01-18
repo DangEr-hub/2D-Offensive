@@ -23,7 +23,7 @@ if(distance_to_object(oPlayer) <= 96){
 if(place_meeting(x, y, oPlayer)){
 	var player = instance_nearest(x, y, oPlayer);
 	global.player_stats_struct.Xp += value;
-	damage_indicator("+" + string_format(value, 0, 1), x, y - z, c_olive, spr_Icons, icons.xp);
+	damage_indicator("+" + string_format(value, 0, 1), x, y - z, c_olive, spr_Icons, ICON.xp);
 	play_sound(x, y, snd_exp_pick_up, player);
 	instance_destroy(id);
 }

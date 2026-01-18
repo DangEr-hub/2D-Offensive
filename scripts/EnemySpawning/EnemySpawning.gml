@@ -37,12 +37,12 @@ function is_place_free(xx, yy) {
 }
 
 function spawn_enemies(map_index) {
-    var spawn_areas = global.MapProperties[# map_index, MapProperty.SpawnAreas];
+    var spawn_areas = global.MapProperties[# map_index, MAP_STAT.SpawnAreas];
     var area_keys = ds_map_keys_to_array(spawn_areas);
     var num_areas = array_length(area_keys);
 
     // Get the maximum number of enemies for this map
-    var max_enemies = global.MapProperties[# map_index, MapProperty.MaxEnemies];
+    var max_enemies = global.MapProperties[# map_index, MAP_STAT.MaxEnemies];
     var enemies_to_spawn = max_enemies;
 
     for (var j = 0; j < num_areas; j += 1) {
@@ -89,7 +89,7 @@ function spawn_enemies(map_index) {
 }
 
 function draw_spawn_areas(map_index) {
-    var spawn_areas = global.MapProperties[# map_index, MapProperty.SpawnAreas];
+    var spawn_areas = global.MapProperties[# map_index, MAP_STAT.SpawnAreas];
     var area_keys = ds_map_keys_to_array(spawn_areas);
     var num_areas = array_length(area_keys);
 

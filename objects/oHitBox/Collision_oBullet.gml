@@ -16,7 +16,7 @@ if(other.is_remote == false){
 				}
 			}
 		}
-		hit_living_object(MainObject, image_index, other, ObjectArmourID, ObjectHelmetID);
+		hit_living_object(MainObject, image_index, other, ObjectArmourID, ObjectHelmetID, other.x, other.y);
 		instance_destroy(other);
 	}
 }

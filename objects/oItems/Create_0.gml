@@ -25,4 +25,8 @@ last_y = y;
 network_id = -1;
 creating_network_item = false;
 needs_sync = false;
+VelocityX = 0;
+VelocityY = 0;
+AccelX = 0;
+AccelY = 0;
 

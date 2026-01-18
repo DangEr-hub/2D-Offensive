@@ -12,7 +12,7 @@ target_y = y;
 has_suppressor = false;
 refresh_target_timer = 5 * game_get_speed(gamespeed_fps);
 alarm[1] = 1;
-team = TEAM.ENEMIES;//percent_chance(25) ? TEAM.FRIENDLY : TEAM.ENEMIES;
+team = TEAM.TERRORIST;//percent_chance(25) ? TEAM.POLICE : TEAM.TERRORIST;
 NearestDangerObject = noone;
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
@@ -43,7 +43,7 @@ WeaponNumber = 0;
 WeaponNumberMax = 2;
 HPTimer = -1;
 ChasingObjectSpotted = false;
-State = States.Idle;
+State = STATES.Idle;
 CanShoot = true;
 ShootTimer = -1;
 Inaccuracy = 0;
@@ -76,7 +76,7 @@ Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, SmokeGrenades, MolotovGren
 GrenadeObject = noone;
 check_chasing_timer = 1 * game_get_speed(gamespeed_fps);
 alarm[6] = 1;
-sprite_index = choose(spr_EnemyBasic, spr_EnemyBasicTwo, spr_EnemyBasicThree, spr_EnemyBasicFour);
+sprite_index = team == TEAM.TERRORIST ? choose(spr_TerroristBot, spr_TerroristBot3, spr_TerroristBot2) : choose(spr_PoliceBot, spr_PoliceBot2);
 alarm[0] = 5;
 
 #region Flashed
@@ -90,7 +90,7 @@ chasing_timer = ceil(5 * game_get_speed(gamespeed_fps) * rank_boost);
 
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
-HelmetID = Item.None;//choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
+HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
 ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
 #endregion
 
@@ -112,11 +112,9 @@ FootStepTimer = -1;
 FootSteps = 0;
 Legs = instance_create_depth(x,y,depth + 2,oObjectLegs);
 Legs.Object = id;
+Legs.Visible = false;
 #endregion
 
-enum ATTACHMENTS {
-	slot_scope, slot_barrel, slot_grip, slot_suppressor	
-};
 
 #region Weapon equip
 WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.MK18, Item.famas);
@@ -133,9 +131,30 @@ for(var i = 0; i < 2; i++){
 	attachments[i] = array_create(4, Item.None);
 }
 
-weapon_attachment_equip(Item.advanced_suppressor, ATTACHMENTS.slot_suppressor, id, 0);
+#region Attachments
+if(percent_chance(10 * rank_boost)){
+	weapon_attachment_equip(Item.advanced_suppressor, ATTACHMENTS.slot_suppressor, id, choose(0, 1));
+}
+
+if(percent_chance(10 * rank_boost)){
+	var item = choose(Item.adaptive_chambering, Item.range_finder);
+	weapon_attachment_equip(item, ATTACHMENTS.slot_barrel, id, choose(0, 1));
+}
+
+if(percent_chance(10 * rank_boost)){
+	var item = choose(Item.vertical_grip, Item.horizontal_grip);
+	weapon_attachment_equip(item, ATTACHMENTS.slot_grip, id, choose(0, 1));
+}
+
+if(percent_chance(10 * rank_boost)){
+	var item = choose(Item.red_dot_scope, Item.two_scope);
+	weapon_attachment_equip(item, ATTACHMENTS.slot_scope, id, 0);
+}
+
+#endregion
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
+Weapon.Visible = false;
 
 #endregion
 
@@ -145,16 +164,16 @@ FlashLightY = y;
 #endregion
 
 #region Hitbox
-HeadHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-HeadHitBox.image_index = HitBox.Head;
-HeadHitBox.MainObject = id;
-BodyHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-BodyHitBox.image_index = HitBox.BodyWithoutWeapon;
-BodyHitBox.MainObject = id;
-ArmHitBox = instance_create_depth(x, y, depth - 1, oHitBox);
-ArmHitBox.image_index = HitBox.ArmWithoutWeapon;
-ArmHitBox.MainObject = id;
-LegHitBox = noone;
+HeadHB = instance_create_depth(x, y, depth - 1, oHitBox);
+HeadHB.image_index = HITBOX.Head;
+HeadHB.MainObject = id;
+BodyHB = instance_create_depth(x, y, depth - 1, oHitBox);
+BodyHB.image_index = HITBOX.BodyNoWeapon;
+BodyHB.MainObject = id;
+ArmHB = instance_create_depth(x, y, depth - 1, oHitBox);
+ArmHB.image_index = HITBOX.ArmNoWeapon;
+ArmHB.MainObject = id;
+LegHB = noone;
 #endregion
 
 

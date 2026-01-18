@@ -19,10 +19,10 @@ if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
 			global.MouseSlot[# 0, Index.slot_clip_ammo],
 			global.MouseSlot[# 0, Index.slot_durability],
 			global.MouseSlot[# 0, Index.SlotAmount],
-			-1,
-			-1,
-			-1,
-			-1,
+			global.MouseSlot[# 0, Index.slot_scope],
+			global.MouseSlot[# 0, Index.slot_barrel],
+			global.MouseSlot[# 0, Index.slot_grip],
+			global.MouseSlot[# 0, Index.slot_suppressor],
 		);	
 		
 		for(var i=0;i<ds_grid_height(global.MouseSlot);i++){

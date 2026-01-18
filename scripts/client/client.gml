@@ -122,15 +122,7 @@ function handle_bird_sync_client() {
 				var BloodParticleNumber = ceil(damage / 2);
 				if (instance_exists(inst_destroy)) {
 					if(make_snd == true){
-						repeat(BloodSplashNumber){
-							var BloodSplash = instance_create_layer(inst_destroy.x, inst_destroy.y, "ItemsO", oBloodSplash);
-							BloodSplash.image_blend = c_red;
-						}
-						if(instance_exists(oParticleSystem)){
-							part_type_color1(oParticleSystem.BloodParticle, c_red);
-							part_particles_create(global.ParticleSystem, inst_destroy.x, inst_destroy.y, oParticleSystem.BloodParticle, BloodParticleNumber);
-						}
-				
+						create_blood(BloodSplashNumber, inst_destroy.x, inst_destroy.y, c_red, BloodParticleNumber);		
 						play_sound(x, y, snd_BirdDeath, find_instance_by_network_id(oPlayer, oNetworkManager.my_pid));
 					}
                     instance_destroy(inst_destroy);

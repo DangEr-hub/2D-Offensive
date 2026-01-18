@@ -13,7 +13,7 @@ function is_inventory_full(Item = Item.None){
 }
 
 function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, Destroy = true) {
-	Slot = 0;
+	Slot = 4;
 	while(Slot < INVENTORY_SIZE){
 	    if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
 	        if (global.Inventory[# Slot, 0] == Item.None){
@@ -41,7 +41,7 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
 
 	///Item
 	if!(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-	    var yy = 0;
+	    var yy = 4;
 		var PickedUp = false;
 	    repeat(INVENTORY_SIZE){
 	        if(global.Inventory[#yy, 0] == ID){
@@ -58,7 +58,7 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
     
 	    ///All items
 	    if(!PickedUp){
-	        yy = 0;
+	        yy = 4;
 	        repeat(INVENTORY_SIZE){
 	            if(global.Inventory[#yy, 0] == Item.None){
 	                global.Inventory[# yy, 0] = ID;
@@ -131,7 +131,7 @@ function InventoryInit() {
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Total
+		range_finder, Dragunov, Total
 	}
 
 	enum ItemStat{
@@ -144,7 +144,7 @@ function InventoryInit() {
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
 		EnemyInaccuracyCompensation, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
 		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, caliber,
-		caliber_type, Total
+		caliber_type, attach_sockets, attachments, Total
 	}
 	
 	enum OtherSlot{

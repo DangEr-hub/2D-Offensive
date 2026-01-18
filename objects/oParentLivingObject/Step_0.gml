@@ -1,7 +1,7 @@
 var hs_x = 73;
 var hs_y = 33;
 
-if (moving_state == states_player.prone_state) { 
+if (moving_state == STATES_PLAYER.prone_state) { 
 	hs_x = 137;
 	hs_y = 38;
 }
@@ -14,14 +14,19 @@ if(hit_timer > -1){
 	hit_timer --;
 }
 
-if(object_index == oBot){
+if(col_timer > -1){ col_timer --; }
+if(object_index == oBot && col_timer == -1){
 	
 	#region Wall collision
+	col_timer = col_time;
 	var tile = instance_place(x, y, oParentTile);
 
 	if (tile != noone) {
-	    var player = instance_nearest(x, y, oPlayer);
-	    var dir = point_direction(x, y, player.x, player.y);
+		var dir = MoveDirection + 180;
+		if(instance_exists(ChasingObject)){
+			dir = point_direction(x, y, ChasingObject.x, ChasingObject.y);
+		}
+		
 	    var pushSpeed = 5;
     
 	    var escapeSpeed = pushSpeed - 2; // Just under the pushSpeed to check for being more than 1 pixel in
@@ -41,64 +46,72 @@ if(object_index == oBot){
 
 if (VisibilityTimer > -1) VisibilityTimer--;
 if (VisibilityTimer == 0) Visible = false;
+if(check_vis_timer > -1){ check_vis_timer --; }
 
-// kdo je pozorovatel
-var observer = global.local_player;
+if(check_vis_timer == -1){
+	check_vis_timer = check_vis_time;
+	var observer = global.local_player;
+	var is_target = (object_index == oBot) || (object_index == oPlayer && is_remote);
 
-// jestli tenhle objekt má být skrýván
-var is_target = (object_index == oBot) || (object_index == oPlayer && is_remote);
+	// lokální hráč je vždy viditelný
+	if (id == observer || team == observer.team) {
+	    Visible = true;
+	}else if (is_target) {
 
-// lokální hráč je vždy viditelný
-if (id == observer || team == TEAM.FRIENDLY) {
-    Visible = true;
-}else if (is_target) {
+	    if (!global.enemy_visibility) {
 
-    if (!global.enemy_visibility) {
+			var in_fov =
+		        point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+		        point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+		        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
+		        point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
 
-		var in_fov =
-	        point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-	        point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-	        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-	        point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
+	        var force_visible = stats.Health_points <= 0 || (object_index == oBot && (State == STATES.ThrowGrenade || State == STATES.LayDownLandMine || HPTimer != -1));
+	        if (in_fov || force_visible) {
+				var col_tile  = collision_line(x, y, observer.x, observer.y, oParentTile, true, false);
+				var col_smoke = collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
+				var col = noone;
 
-        var force_visible = stats.Health_points <= 0 || (object_index == oBot && (State == States.ThrowGrenade || State == States.LayDownLandMine || HPTimer != -1));
+				if(col_tile != noone){
+					col = col_tile;
+				}else if(col_smoke != noone){
+					col = col_smoke;
+				}
 
-        if (in_fov || force_visible) {
+				show_debug_message(col);
+	            if (col != noone) {
+					if (instance_exists(col) && (observer.moving_state == STATES_PLAYER.machine_gun_state && col.object_index == oMachineGunFloor) || col.transparent == true){
+						Visible = true;   
+					}else{
+		            if (Visible && VisibilityTimer == -1)
+		                VisibilityTimer = VisibilityTime;
+					}
+				}else{
+					Visible = true;
+				}
 
-            var col = collision_line(x, y, observer.x, observer.y, oParentTile, true, false)
-                   || collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
 
-            if (col) {
-               if (instance_exists(col) && observer.moving_state == states_player.machine_gun_state && col.object_index == oMachineGunFloor){
-					Visible = true;   
-			   }else{
-	                if (Visible && VisibilityTimer == -1)
-	                    VisibilityTimer = VisibilityTime;
-			   }
+	        } else {
+	            if (Visible && VisibilityTimer == -1)
+	                VisibilityTimer = VisibilityTime;
+	        }
 
-            } else {
-                Visible = true;
-            }
+	    } else {
+	        Visible = true;
+	    }
+	}
 
-        } else {
-            if (Visible && VisibilityTimer == -1)
-                VisibilityTimer = VisibilityTime;
-        }
 
-    } else {
-        Visible = true;
-    }
+	if(FlashLight != undefined){
+		FlashLight.visible = Visible;
+	}
+	HeadHB.Visible  = Visible;
+	BodyHB.Visible  = Visible;
+	ArmHB.Visible   = Visible;
+	Weapon.Visible      = Visible;
+	Legs.Visible        = Visible;
+
 }
-
-
-if(FlashLight != undefined){
-	FlashLight.visible = Visible;
-}
-HeadHitBox.Visible  = Visible;
-BodyHitBox.Visible  = Visible;
-ArmHitBox.Visible   = Visible;
-Weapon.Visible      = Visible;
-Legs.Visible        = Visible;
 
 #endregion
 
@@ -113,7 +126,7 @@ if(flash_effect_timer > -1){
 }
 
 if(MuzzleFlashLight != undefined){
-	MuzzleFlashLight.alpha -= ALPHA_SPEED;
+	MuzzleFlashLight.alpha -= ALPHA_SPEED*5;
 	MuzzleFlashLight.x = FlashLightX;
 	MuzzleFlashLight.y = FlashLightY;
 	if(flash_effect_timer <= -1){

@@ -10,15 +10,15 @@ if (!IS_NET || oNetworkManager.is_server) {
 }
 
 
-var endIntensity = global.MapProperties[#global.MapID, MapProperty.MapEndIntensity];
-var startIntensity = global.MapProperties[#global.MapID, MapProperty.MapStartIntensity];
-var peakIntensity = global.MapProperties[#global.MapID, MapProperty.MapPeakIntensity];
-var endHours = global.MapProperties[#global.MapID, MapProperty.MapEndHours]/60;
-var startHours = global.MapProperties[#global.MapID, MapProperty.MapStartHours]/60;
+var endIntensity = global.MapProperties[#global.MapID, MAP_STAT.MapEndIntensity];
+var startIntensity = global.MapProperties[#global.MapID, MAP_STAT.MapStartIntensity];
+var peakIntensity = global.MapProperties[#global.MapID, MAP_STAT.MapPeakIntensity];
+var endHours = global.MapProperties[#global.MapID, MAP_STAT.MapEndHours]/60;
+var startHours = global.MapProperties[#global.MapID, MAP_STAT.MapStartHours]/60;
 var currentTime = CurrentHour;
 var Value = (CurrentHour - startHours) / (endHours - startHours);
-var startColor = [color_get_red(global.MapProperties[#global.MapID, MapProperty.MapStartColor]), color_get_green(global.MapProperties[#global.MapID, MapProperty.MapStartColor]), color_get_blue(global.MapProperties[#global.MapID, MapProperty.MapStartColor])];
-var endColor = [color_get_red(global.MapProperties[#global.MapID, MapProperty.MapEndColor]), color_get_green(global.MapProperties[#global.MapID, MapProperty.MapEndColor]), color_get_blue(global.MapProperties[#global.MapID, MapProperty.MapEndColor])];
+var startColor = [color_get_red(global.MapProperties[#global.MapID, MAP_STAT.MapStartColor]), color_get_green(global.MapProperties[#global.MapID, MAP_STAT.MapStartColor]), color_get_blue(global.MapProperties[#global.MapID, MAP_STAT.MapStartColor])];
+var endColor = [color_get_red(global.MapProperties[#global.MapID, MAP_STAT.MapEndColor]), color_get_green(global.MapProperties[#global.MapID, MAP_STAT.MapEndColor]), color_get_blue(global.MapProperties[#global.MapID, MAP_STAT.MapEndColor])];
 var startColorTime = startHours;
 var endColorTime = endHours - 5 * 60;
 var colorInterval = (currentTime - startColorTime) / (endColorTime - startColorTime);

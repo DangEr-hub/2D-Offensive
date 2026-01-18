@@ -4,7 +4,7 @@ global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
 
-if(instance_exists(oPlayer)){
+if(instance_exists(global.local_player)){
 	
 	#region Bird spawning
 	if((!IS_NET || oNetworkManager.is_server) && percent_chance(0.25) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
@@ -71,7 +71,7 @@ if(instance_exists(oPlayer)){
 		bloom_threshold = .35;
 	}
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
+	if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
 		if(PauseMenu == false){
 
 			pause(id);
@@ -91,7 +91,7 @@ if(instance_exists(oPlayer)){
 			with(oMortarMenu){
 				zui_destroy();
 			}
-			global.local_player.moving_state = states_player.none_state;
+			global.local_player.moving_state = STATES_PLAYER.none_state;
 		}
 		
 		if(instance_exists(oBuyMenu)){
@@ -123,7 +123,7 @@ if(instance_exists(oPlayer)){
 		window_set_cursor(cr_none);	
 	}
 
-	if(keyboard_check_pressed(global.KeyBinds[| KeyBind.KeyWeaponAttachments])){
+	if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyWeaponAttachments])){
 		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false){
 			if(show_weapon_attachments == false){
 				with(zui_main()){

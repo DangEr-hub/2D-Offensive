@@ -24,9 +24,9 @@ if(ys != 0){
 	// try full move
 	if(!place_meeting(x, y + ys, oParentTile)){
 		y += ys;
-		HeadHitBox.y += ys;
-		BodyHitBox.y += ys;
-		ArmHitBox.y += ys;
+		HeadHB.y += ys;
+		BodyHB.y += ys;
+		ArmHB.y += ys;
 		Weapon.y += ys;
 	}else{
 		repeat(abs(ys)){
@@ -34,24 +34,24 @@ if(ys != 0){
 			if(place_meeting(x, y + ystep, oParentTile)){
 				if(!place_meeting(x - 1, y + ystep, oParentTile)){
 					x -= 1;
-					HeadHitBox.x -= 1;
-					BodyHitBox.x -= 1;
-					ArmHitBox.x -= 1;
+					HeadHB.x -= 1;
+					BodyHB.x -= 1;
+					ArmHB.x -= 1;
 					Weapon.x -= 1;
 				}else if(!place_meeting(x + 1, y + ystep, oParentTile)){
 					x += 1;
-					HeadHitBox.x += 1;
-					BodyHitBox.x += 1;
-					ArmHitBox.x += 1;
+					HeadHB.x += 1;
+					BodyHB.x += 1;
+					ArmHB.x += 1;
 					Weapon.x += 1;
 				}
 			}
 
 			if(!place_meeting(x, y + ystep, oParentTile)){
 				y += ystep;
-				HeadHitBox.y += ystep;
-				BodyHitBox.y += ystep;
-				ArmHitBox.y += ystep;
+				HeadHB.y += ystep;
+				BodyHB.y += ystep;
+				ArmHB.y += ystep;
 				Weapon.y += ystep;
 			}else{
 				YSpeed = 0;
@@ -71,9 +71,9 @@ if(xs != 0){
 	// try full move
 	if(!place_meeting(x + xs, y, oParentTile)){
 		x += xs;
-		HeadHitBox.x += xs;
-		BodyHitBox.x += xs;
-		ArmHitBox.x += xs;
+		HeadHB.x += xs;
+		BodyHB.x += xs;
+		ArmHB.x += xs;
 		Weapon.x += xs;
 	}else{
 		repeat(abs(xs)){
@@ -81,24 +81,24 @@ if(xs != 0){
 			if(place_meeting(x + xstep, y, oParentTile)){
 				if(!place_meeting(x + xstep, y - 1, oParentTile)){
 					y -= 1;
-					HeadHitBox.y -= 1;
-					BodyHitBox.y -= 1;
-					ArmHitBox.y -= 1;
+					HeadHB.y -= 1;
+					BodyHB.y -= 1;
+					ArmHB.y -= 1;
 					Weapon.y -= 1;
 				}else if(!place_meeting(x + xstep, y + 1, oParentTile)){
 					y += 1;
-					HeadHitBox.y += 1;
-					BodyHitBox.y += 1;
-					ArmHitBox.y += 1;
+					HeadHB.y += 1;
+					BodyHB.y += 1;
+					ArmHB.y += 1;
 					Weapon.y += 1;
 				}
 			}
 
 			if(!place_meeting(x + xstep, y, oParentTile)){
 				x += xstep;
-				HeadHitBox.x += xstep;
-				BodyHitBox.x += xstep;
-				ArmHitBox.x += xstep;
+				HeadHB.x += xstep;
+				BodyHB.x += xstep;
+				ArmHB.x += xstep;
 				Weapon.x += xstep;
 			}else{
 				XSpeed = 0;

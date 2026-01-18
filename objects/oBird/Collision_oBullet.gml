@@ -4,14 +4,7 @@ if(!IS_NET){
 	var BloodSplashNumber = ceil(damage / 5);
 	var BloodParticleNumber = ceil(damage / 2);
 
-	repeat(BloodSplashNumber){
-		var BloodSplash = instance_create_layer(x, y, "ItemsO", oBloodSplash);
-		BloodSplash.image_blend = c_red;
-	}
-	if(instance_exists(oParticleSystem)){
-		part_type_color1(oParticleSystem.BloodParticle, c_red);
-		part_particles_create(global.ParticleSystem, x, y, oParticleSystem.BloodParticle, BloodParticleNumber);
-	}
+	create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
 }
 
 if (IS_NET) {

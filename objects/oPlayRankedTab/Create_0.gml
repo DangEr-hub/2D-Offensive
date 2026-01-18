@@ -25,18 +25,18 @@ if(global.MapID != -1){
 	global.rating_struct.Rounds_lost = 0;	
 }
 
-for(var j=0;j<MapIndex.Total;j++){
-	map_name_array[j] = global.MapProperties[#j, MapProperty.Name];	
+for(var j=0;j<MAP.Total;j++){
+	map_name_array[j] = global.MapProperties[#j, MAP_STAT.Name];	
 }
 
 
 map_callbacks = [
     function() { 
-		set_map_rounds(MapIndex.Desert);
+		set_map_rounds(MAP.Desert);
 		room_goto(rm_Desert);
 	},
     function() { 
-		set_map_rounds(MapIndex.RainForest);
+		set_map_rounds(MAP.RainForest);
 		room_goto(rm_RainForest); 
 	}
 ];

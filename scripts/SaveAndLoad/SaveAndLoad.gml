@@ -93,7 +93,7 @@ function load_game(){
 	global.saturation_level = 1.8;
 	global.TimeSpeed = 15;
 	global.GodMode = 0;
-	global.MapID = MapIndex.Desert;
+	global.MapID = MAP.Desert;
 	global.CrosshairAlpha = 1;
 	global.DynamicCrosshair = 0;
 	global.PlayerInaccuracy = 1;
@@ -143,8 +143,8 @@ function load_game(){
 		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
-		global.map_rounds = array_create(MapIndex.Total);
-		for (var i = 0; i < MapIndex.Total; i++) {
+		global.map_rounds = array_create(MAP.Total);
+		for (var i = 0; i < MAP.Total; i++) {
 		    global.map_rounds[i] = array_create(3);
 		    for (var j = 0; j < 3; j++) {
 		        var key = "map_rounds_" + string(i) + "_" + string(j);
@@ -172,10 +172,10 @@ function load_game(){
 	#region Load inventory
 	if(file_exists("save_inventory.ini")){
 	    ini_open("save_inventory.ini");
-	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "0", "None"));
-	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "2", "None"));
+	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "Inventory", Item.None));
+	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "Mouse", Item.None));
 		var unlocked = ds_list_create();
-		ds_list_read(unlocked, ini_read_string("Inventory", "UnlockedItems", ""));
+		ds_list_read(unlocked, ini_read_string("Inventory", "UnlockedItems", Item.None));
 
 		for(var i = 0; i < ds_list_size(unlocked); i++){
 			var item_id = unlocked[| i];

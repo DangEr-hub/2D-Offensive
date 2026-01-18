@@ -1,6 +1,6 @@
 event_inherited();
-buy_menu_width = min(1152 * global.GUIMultiplier, 1856);
-buy_menu_height = min(768 * global.GUIMultiplier, 896);
+buy_menu_width = clamp(1182 * global.GUIMultiplier, ceil(global.GuiW * .75), ceil(global.GuiW * .975));
+buy_menu_height = clamp(798 * global.GUIMultiplier, ceil(global.GuiH * .75), ceil(global.GuiH * .975));
 
 draw_set_font(set_font("Menu_small"));
 zui_set_size(buy_menu_width, buy_menu_height);
@@ -63,15 +63,15 @@ buy_items = [
     [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.MK18],
     [Item.MAC11, Item.famas, Item.Spas, Item.None, Item.None, Item.None, Item.None],
     [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.None, Item.None],
-    [Item.Javelin, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None],
-    [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.None, Item.None, Item.None],
+    [Item.Javelin, Item.Dragunov, Item.None, Item.None, Item.None, Item.None, Item.None],
+    [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.HealingKit, Item.None, Item.None],
     [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None]
 ];
 
-var start_x = zui_get_width() * .1;
-var start_y = zui_get_height() * .1;
-var col_spacing = button_width * 1.1;
-var row_spacing = button_height * 1.1;
+var start_x = zui_get_width() * .055;
+var start_y = zui_get_height() * .05;
+var col_spacing = button_width * 1.05;
+var row_spacing = button_height * 1.05;
 
 var cols = array_length(buy_items);
 var rows = array_length(buy_items[0]);

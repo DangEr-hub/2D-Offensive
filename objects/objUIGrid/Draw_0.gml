@@ -153,6 +153,10 @@ if(type == "Respawn menu"){
 					case ItemStat.ShootingMode:
 						text = statTitles[statIndex] + get_shooting_modes_string(Id);
 					break;
+					
+					case ItemStat.WeaponTypeClass:
+						text = get_wpn_type(Id);
+					break;
 									
 					default:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]);

@@ -20,40 +20,40 @@ total_headshots = sum(global.rating_struct.Headshots_per_round);
 total_kills = sum(global.rating_struct.Kills_per_round);
 with (zui_create(statistics_x, statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.kills;
+	icon_image_index = ICON.kills;
 	color = c_white;
 	caption = "Kills: " + string(oRatingController.kills);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.headshot_percentage;
+	icon_image_index = ICON.headshot_percentage;
 	color = c_white;
 	caption = "Headshots: " + string(oRatingController.headshots);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.time;
+	icon_image_index = ICON.time;
 	color = c_white;
 	caption = "Time alive: " + string(oRatingController.playing_time/game_get_speed(gamespeed_fps)) + " s";
 }
 with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.kills;
+	icon_image_index = ICON.kills;
 	color = c_white;
 	caption = "Total kills: " + string(other.total_kills);
 }
 
 with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.headshot_percentage;
+	icon_image_index = ICON.headshot_percentage;
 	color = c_white;
 	caption = "Total headshots: " + string(other.total_headshots);
 }
 with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y + text_gap*2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
-	icon_image_index = icons.time;
+	icon_image_index = ICON.time;
 	color = c_white;
 	caption = "Average playing time: " + string(other.average_playing_time) + "s";
 }

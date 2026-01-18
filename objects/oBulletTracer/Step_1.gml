@@ -8,8 +8,13 @@ var wall_collision = process_bullet_collision(xx, yy, x, y, stats.Shot_x, stats.
 
 // Pokud je zeď příliš tenká, je potřeba to řešit přes pozici a ne přes kolizi
 if(wall_collision == noone && instance_exists(stats.Object)){
-	if(collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false) && stats.Item_id != Item.basic_machine_gun){
-		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+	var col = collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false)
+	if(col != noone && stats.Item_id != Item.basic_machine_gun){
+		var glass_modifier = 1;
+		if(col.transparent){
+			glass_modifier = 50;
+		}		
+		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower] / glass_modifier;
 	}
 }
 
@@ -17,11 +22,15 @@ var bullet_damage = 0;
 if(wall_collision != noone){
 	bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
 	if(impact_flag == true){
-		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		var glass_modifier = 1;
+		if(wall_collision.inst_id.transparent){
+			glass_modifier = 50;
+		}		
+		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower] / glass_modifier;
 	}
 	
 		
-	if(ds_exists(HitList, ds_type_list) && ds_list_find_index(HitList, wall_collision.inst_id) == -1){
+	if(!is_undefined(HitList) && ds_exists(HitList, ds_type_list) && ds_list_find_index(HitList, wall_collision.inst_id) == -1){
 		impact_sx = wall_collision.xx + lengthdir_x(10, image_angle);
 		impact_sy = wall_collision.yy + lengthdir_y(10, image_angle);
 		impact_flag = true;
@@ -228,7 +237,7 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
 		if(impact_wall.sprite_index == spr_TileCollision){
 			var clr = tilemap_get_pixel(
 			    layer_tilemap_get_id(layer_get_id("WallTiles")),
-			    global.MapProperties[# global.MapID, MapProperty.Tile],
+			    global.MapProperties[# global.MapID, MAP_STAT.Tile],
 			    32,
 			    32,
 			    impact_wall.x,
@@ -236,7 +245,7 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
 			);
 			impact_col = make_color_rgb(clr[0], clr[1], clr[2]);
 		}else{
-			var arr = sprite_getpixel(impact_wall.sprite_index, impact_wall.image_index, impact_wall.sprite_width/2, impact_wall.sprite_height/2);
+			var arr = sprite_getpixel(impact_wall.sprite_index, impact_wall.image_index, floor(impact_wall.sprite_width/2), floor(impact_wall.sprite_height/2));
 			impact_col = make_color_rgb(arr[0], arr[1], arr[2]);
 		}
 

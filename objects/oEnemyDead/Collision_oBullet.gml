@@ -13,16 +13,7 @@ if(other.stats.Tracer_image == 2){
 	BloodParticleNumber = 1;
 }
 
-repeat(BloodSplashNumber){
-	var BloodSplash = instance_create_layer(other.x, other.y, "ItemsO", oBloodSplash);
-	BloodSplash.image_blend = c_red;
-}
-
-if(instance_exists(oParticleSystem)){
-	part_type_color1(oParticleSystem.BloodParticle, c_red);
-	part_particles_create(global.ParticleSystem, other.x, other.y, oParticleSystem.BloodParticle, BloodParticleNumber);
-}
-
+create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
 if!(audio_is_playing(bullet_hit)){
 	play_sound(other.x, other.y, bullet_hit, other.stats.Object);	
 }

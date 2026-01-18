@@ -23,8 +23,8 @@ if(instance_exists(MainObject)){
 		            var max_y = max(hitbox_corners[0][1], hitbox_corners[1][1], hitbox_corners[2][1], hitbox_corners[3][1]);
 
 		            if (collision_rectangle(min_x, min_y, max_x, max_y, id, true, false)) {
-						// Znemožnění dát hlavu s nožem - max(image_index, HitBox.BodyWithoutWeapon)
-						hit_living_object(MainObject, max(image_index, HitBox.BodyWithoutWeapon), knife_object, MainObject.ArmourID, MainObject.HelmetID);
+						// Znemožnění dát hlavu s nožem - max(image_index, HITBOX.BodyNoWeapon)
+						hit_living_object(MainObject, max(image_index, HITBOX.BodyNoWeapon), knife_object, MainObject.ArmourID, MainObject.HelmetID, knife_object.x, knife_object.y);
 						
 						MainObject.hit_timer = knife_object.stats.Hit_timer;
 		            }

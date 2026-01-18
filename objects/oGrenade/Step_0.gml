@@ -97,6 +97,7 @@ if(ExplosionTimer == -1 || ExplodeTimer == -1){
 						global.local_player.FlashedBackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
 						global.local_player.Flashed = true;
 						global.local_player.Reloading = false;
+						global.local_player.knife_attack_timer = -1;
 						global.local_player.ReloadTimer = -1;
 						global.local_player.FlashedAlpha = (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, global.local_player.x, global.local_player.y) / global.FlashBangMaxDistance)*.1);
 						global.local_player.FlashedAlpha = clamp(global.local_player.FlashedAlpha, 0, 1);

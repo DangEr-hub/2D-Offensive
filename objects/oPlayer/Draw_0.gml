@@ -1,5 +1,9 @@
 event_inherited();
-draw_text(x, y - 70, equip_time);
+//draw_text(x, y - 20, "current_building_id " + string(current_building_id));
+//draw_text(x, y - 40, "door_cooldown " + string(door_cooldown));
+//draw_text(x, y - 60, "shooting_reset_timer " + string(shooting_reset_timer));
+//draw_text(x, y - 110, "CanShoot " + string(CanShoot));
+
 
 
 if(Visible == true){
@@ -9,41 +13,41 @@ if(Visible == true){
 	}
 
 	var armour_sprite_index = 0;
-	if (image_index == player_textures.no_weapon) {
+	if (image_index == TEXTURES.no_weapon) {
 	    armour_sprite_index = 0;
-	} else if (image_index == player_textures.pistol) {
+	} else if (image_index == TEXTURES.pistol) {
 	    armour_sprite_index = 1;
-	} else if (image_index == player_textures.assault_rifle) {
+	} else if (image_index == TEXTURES.assault_rifle) {
 	    armour_sprite_index = 2;
-	} else if (image_index == player_textures.flashed_weapon) {
+	} else if (image_index == TEXTURES.flashed_weapon) {
 	    armour_sprite_index = 3;
-	} else if (image_index == player_textures.flashed_no_weapon) {
+	} else if (image_index == TEXTURES.flashed_no_weapon) {
 	    armour_sprite_index = 4;
-	} else if (image_index == player_textures.reload) {
+	} else if (image_index == TEXTURES.reload) {
 	    armour_sprite_index = 7;
-	} else if (image_index >= player_textures.prone && image_index < player_textures.grenade_throw) {
+	} else if (image_index >= TEXTURES.prone && image_index < TEXTURES.grenade_throw) {
 	    armour_sprite_index = 5;
-	} else if (image_index == player_textures.knife_attack) {
+	} else if (image_index == TEXTURES.knife_attack) {
 	    armour_sprite_index = 9;
 	}
 
-	if (image_index == player_textures.flashed_prone 
-	    || image_index == player_textures.flashed_prone_second 
-	    || image_index == player_textures.flashed_prone_third)
+	if (image_index == TEXTURES.flashed_prone 
+	    || image_index == TEXTURES.flashed_prone_second 
+	    || image_index == TEXTURES.flashed_prone_third)
 	{
 	    armour_sprite_index = 6;
 	}
 
-	if (image_index == player_textures.reload_prone 
-	    || image_index == player_textures.reload_prone_second 
-	    || image_index == player_textures.reload_prone_third)
+	if (image_index == TEXTURES.reload_prone 
+	    || image_index == TEXTURES.reload_prone_second 
+	    || image_index == TEXTURES.reload_prone_third)
 	{
 	    armour_sprite_index = 8;
 	}
 
-	if (image_index == player_textures.knife_prone 
-	    || image_index == player_textures.knife_prone_second
-	    || image_index == player_textures.knife_prone_third)
+	if (image_index == TEXTURES.knife_prone 
+	    || image_index == TEXTURES.knife_prone_second
+	    || image_index == TEXTURES.knife_prone_third)
 	{
 	    armour_sprite_index = 8;
 	}
@@ -60,7 +64,7 @@ if(Visible == true){
 	
 	
 	var helmet_sprite_index = 0;
-	if((image_index >= player_textures.prone && image_index < player_textures.knife_attack) || image_index == player_textures.death){
+	if((image_index >= TEXTURES.prone && image_index < TEXTURES.knife_attack) || image_index == TEXTURES.death){
 		helmet_sprite_index = 6;	
 	}
 	
@@ -94,7 +98,7 @@ if(Visible == true){
 						item_offset_x = 40;
 						item_offset_y = -10;
 					}
-				if(moving_state == states_player.prone_state){
+				if(moving_state == STATES_PLAYER.prone_state){
 					item_offset_x = 110;
 					item_offset_y = 35;
 					if!(throwing_grenade()){

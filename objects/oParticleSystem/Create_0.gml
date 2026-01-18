@@ -2,16 +2,6 @@ global.ParticleSystem = part_system_create();
 part_system_depth(global.ParticleSystem, -10000);
 
 leaf_emitter = part_emitter_create(global.ParticleSystem);
-leaf_particle = part_type_create();
-part_type_sprite(leaf_particle, spr_Leaf, false, false, 1);
-part_type_size(leaf_particle, 0.5, 1.5, 0.01, 0);
-part_type_direction(leaf_particle, 80, 100, 0, 0.05);
-part_type_speed(leaf_particle, 0.1, 0.2, 0.01, 0.01);
-part_type_life(leaf_particle, 30, 50);
-part_type_orientation(leaf_particle, 0, 359, 0.5, 0.1, 1);
-part_type_alpha3(leaf_particle, 0.2, 0.8, 0.4);
-part_type_gravity(leaf_particle, 0.1, 270);
-
 
 //Headshot
 headshot_particle = part_type_create();
@@ -51,7 +41,7 @@ part_type_life(FlameParticle,10,20);
 
 //Blood
 BloodParticle = part_type_create();
-part_type_size(BloodParticle,.1,1,0,.05);
+part_type_size(BloodParticle,.25,1.25,0,.05);
 part_type_speed(BloodParticle,1,5,0,0);
 part_type_direction(BloodParticle,0,359,0,0);
 part_type_life(BloodParticle,22,22);
@@ -105,23 +95,22 @@ part_type_life(rain_particle, 5, 7);
 //Leaf
 leaf_particle = part_type_create();
 part_type_sprite(leaf_particle, spr_Leaf, false, false, 1);
-part_type_size(leaf_particle, 1, 1.5, 0.001, 0);
+part_type_size(leaf_particle, 0.25, 0.75, 0.001, 0);
 part_type_direction(leaf_particle, 0, 359, 0, 15);
 part_type_speed(leaf_particle, 0.5, 1, 0, .05);
 part_type_life(leaf_particle, 2 * game_get_speed(gamespeed_fps), 3 * game_get_speed(gamespeed_fps));
-part_type_orientation(leaf_particle, 0, 359, 0.1, 15, 0);
+part_type_orientation(leaf_particle, 0, 359, 0.1, 1, 1);
 part_type_alpha3(leaf_particle, 0.5, 1, 0.02);
 
 //snow_particle
 weather_emitter = part_emitter_create(global.ParticleSystem);
 snow_particle = part_type_create();
-part_type_blend(snow_particle, 1);
-part_type_shape(snow_particle, pt_shape_pixel);
+part_type_sprite(snow_particle, spr_SnowFlake, 0, 0, 0);
 part_type_direction(snow_particle, 230, 330, 0, 1);
 part_type_orientation(snow_particle,0,359,0,0,1);
 part_type_life(snow_particle,180,360);
 part_type_speed(snow_particle, 1, 5, 0, 0);
-part_type_size(snow_particle, 1, 2, 0, 0);
+part_type_size(snow_particle, 0.05, 0.1, 0, 0);
 part_type_color2(snow_particle, c_white, c_white);
 
 //Level up particle
