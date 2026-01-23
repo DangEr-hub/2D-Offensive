@@ -60,7 +60,7 @@ if(z_bouncing == false && z <= 1){
 	if(particle_timer == -1){
 		particle_timer = 30;
 		create_fog(draw_x, draw_y, other.stats.Damage/5, random(360), 0.1, random_range(.1, .5), 
-			clamp(ceil(other.stats.Damage/10), 5, 7.5), 
+			clamp(round(other.stats.Damage/10), 5, 7.5), 
 			clamp(other.stats.Damage/50, .5, .9), 
 			clamp(other.stats.Damage/50, .1, .75), 2 * game_get_speed(gamespeed_fps)
 		);

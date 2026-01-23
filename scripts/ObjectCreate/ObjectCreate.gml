@@ -93,7 +93,7 @@ function explosion_create(ShrapnelNumber, pos, ExplosionDamage, Destroy, ObjectT
 		);	
 	}
 	create_fog(pos[0], pos[1], clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75), random(360), 0.1, random_range(.1, .5), 
-		clamp(ceil(ExplosionDamage/10), 5, 7.5), 
+		clamp(round(ExplosionDamage/10), 5, 7.5), 
 		clamp(ExplosionDamage/250, .5, .9), 
 		clamp(ExplosionDamage/250, .1, .75), 2 * game_get_speed(gamespeed_fps)
 	);

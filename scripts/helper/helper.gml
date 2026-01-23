@@ -29,7 +29,7 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	}
 	
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, ICON.health);
-	create_blood(ceil(damage / 5), impact_pos[0], impact_pos[1], blood_color, ceil(damage / 2));	
+	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2));	
 	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
 	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);

@@ -121,7 +121,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.SSG08, ItemStat.attach_sockets] = { scope: [-21, -11], barrel: [10, -5], grip: [-3, 5], suppressor: [42, -6] };
 	global.ItemIndex[# Item.m4a1, ItemStat.attach_sockets] = { scope: [-7, -14], barrel: [14, -7], grip: [16, 2], suppressor: [32, -6] };
 	global.ItemIndex[# Item.awm, ItemStat.attach_sockets] = { scope: [-17, -10], barrel: [3, -3], grip: [1, 7], suppressor: [47, -5] };
-	global.ItemIndex[# Item.Dragunov, ItemStat.attach_sockets] = { scope: [-17, -7], barrel: [3, -3], grip: [1, 7], suppressor: [42, -5] };
+	global.ItemIndex[# Item.Dragunov, ItemStat.attach_sockets] = { scope: [-17, -7], barrel: [3, -3], grip: [1, 7], suppressor: [50, 0] };
 	global.ItemIndex[# Item.famas, ItemStat.attach_sockets] = { scope: [0, -14], barrel: [10, -2], grip: [12, 7], suppressor: [34, -1] };
 	global.ItemIndex[# Item.galil, ItemStat.attach_sockets] = { scope: [-7, -14], barrel: [14, -6], grip: [14, 2], suppressor: [47, -7] };
 	global.ItemIndex[# Item.MK18, ItemStat.attach_sockets] = { scope: [0, -14], barrel: [20, -8], grip: [20, 2], suppressor: [37, -8] };
@@ -209,7 +209,7 @@ function ItemDataBase(){
 	WeaponStats(Item.SSG08, "SSG 08", 3 * game_get_speed(gamespeed_fps), 850, 110, 100, 10, "Primary", 2, 30, snd_SSG08, 15, 2, false,
 	0, 0, 10, 20, 50, 10, 10, .001, 0, 0, .25, 1, WEAPON_CLASS.SNIPER_RIFLE, .87, .85, .00013, 1 * game_get_speed(gamespeed_fps), .5, 170, 2, 7, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[#Item.SSG08, ItemStat.difficulty] = 5;
-	global.ItemIndex[#Item.SSG08, ItemStat.has_scope] = Item.two_scope;
+	global.ItemIndex[# Item.SSG08, ItemStat.preattached] = { scope: Item.two_scope };
 	global.ItemIndex[#Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
 	global.ItemIndex[#Item.SSG08, ItemStat.advantages] = "\n+High damage\n+High range";
 	global.ItemIndex[#Item.SSG08, ItemStat.ItemColor] = c_gray;
@@ -231,7 +231,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.HEGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[#Item.HEGrenade, ItemStat.Name] = "HE grenade";
 	global.ItemIndex[#Item.HEGrenade, ItemStat.Cost] = 25;
-	global.ItemIndex[#Item.HEGrenade, ItemStat.usable] = true;
 	global.ItemIndex[#Item.HEGrenade, ItemStat.ReloadSpeed] = 2.5;
 	global.ItemIndex[#Item.HEGrenade, ItemStat.Damage] = 98;
 	global.ItemIndex[#Item.HEGrenade, ItemStat.PenetrationPower] = .5;
@@ -243,7 +242,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Name] = "Flashbang";
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Cost] = 25;
-	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.usable] = true;
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.ReloadSpeed] = 2.5;
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.Damage] = 11;
 	global.ItemIndex[#Item.FlashBangGrenade, ItemStat.PenetrationPower] = .5;
@@ -256,12 +254,11 @@ function ItemDataBase(){
 	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 790, 43, 300, 30, "Primary", 10, 7, snd_SG550, 2, 1.75, true,
 	10, 17, -7, 7, 0.01, 9, 3.5, .0025, 3, 8, .15, 1, WEAPON_CLASS.ASSAULT_RIFLE, .82, .97, .00014, .75 * game_get_speed(gamespeed_fps), .83, 300, 1, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[#Item.SG550, ItemStat.difficulty] = 3;
-	global.ItemIndex[#Item.SG550, ItemStat.has_scope] = Item.red_dot_scope;
+	global.ItemIndex[# Item.SG550, ItemStat.preattached] = { scope: Item.red_dot_scope };
 	global.ItemIndex[#Item.SG550, ItemStat.disadvantages] = "-Lower rate of fire\n-High recoil\n-Moderate mobility\n-High bullet spread";
 	global.ItemIndex[#Item.SG550, ItemStat.advantages] = "+High range\n+High damage\n+High penetration power";
 	global.ItemIndex[#Item.SG550, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.SG550, ItemStat.AmmoSpriteID] = 4;
-	global.ItemIndex[#Item.SG550, ItemStat.SniperScope] = true;
 	global.ItemIndex[#Item.SG550, ItemStat.Description] = "The SIG 550 comes equipped with a preattached scope, offering exceptional range and damage. However, its high recoil and slower rate of fire demand precision shooting, while its bulkier build limits movement speed. Ideal for those who excel in calculated, long-range engagements.";
 
 	global.ItemIndex[#Item.SpecOpsHelm, ItemStat.Type] = "Helmet";
@@ -294,7 +291,6 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.HealingKit, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.HealingKit, ItemStat.Name] = "Healing kit";
-	global.ItemIndex[#Item.HealingKit, ItemStat.usable] = true;
 	global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed] = 3 * game_get_speed(gamespeed_fps);
 	global.ItemIndex[#Item.HealingKit, ItemStat.Damage] = 100;
 	global.ItemIndex[#Item.HealingKit, ItemStat.Cost] = 25;
@@ -312,7 +308,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.Damage] = 0;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.PenetrationPower] = 0;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.Cost] = 25;
-	global.ItemIndex[#Item.SmokeGrenade, ItemStat.usable] = true;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ReloadSpeed] = 2.5;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.BulletCasingID] = 2;
 	global.ItemIndex[#Item.SmokeGrenade, ItemStat.ItemColor] = c_gray;
@@ -354,7 +349,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.m4a1, ItemStat.difficulty] = 2;
 	global.ItemIndex[#Item.m4a1, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[#Item.m4a1, ItemStat.advantages] = "+Good mobility\n+Low bullet spread\n+Low recoil";
-	global.ItemIndex[#Item.m4a1, ItemStat.has_suppressor] = Item.advanced_suppressor; ///Military suppressor
+	global.ItemIndex[# Item.m4a1, ItemStat.preattached] = { suppressor: Item.advanced_suppressor };
 	global.ItemIndex[#Item.m4a1, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.m4a1, ItemStat.AmmoSpriteID] = 8;
 	global.ItemIndex[#Item.m4a1, ItemStat.Description] = "The M4A1 rifle is a great choice with a preattached silencer, offering reduced recoil for improved accuracy, altough at the cost of lower armor penetration. While it may struggle against heavily armored opponents, its stealthy profile and manageable recoil make it a favored option for precise engagements.";
@@ -363,7 +358,7 @@ function ItemDataBase(){
 	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 1000, 118, 50, 5, "Primary", 1, 30, snd_awm, 30, 2, false,
 	0, 0, 25, 50, 50, 25, 7.5, .0005, 0, 0, .05, 1, WEAPON_CLASS.SNIPER_RIFLE, .77, .99, .000075, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2, 5, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[#Item.awm, ItemStat.difficulty] = 3;
-	global.ItemIndex[#Item.awm, ItemStat.has_scope] = Item.two_scope;
+	global.ItemIndex[# Item.awm, ItemStat.preattached] = { scope: Item.two_scope };
 	global.ItemIndex[#Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Long equip time";
 	global.ItemIndex[#Item.awm, ItemStat.advantages] = "\n+High damage\n+High range\n+Neglidible damage drop";
 	global.ItemIndex[#Item.awm, ItemStat.ItemColor] = c_green;
@@ -375,7 +370,8 @@ function ItemDataBase(){
 	WeaponStats(Item.Dragunov, "Dragunov", 3.75 * game_get_speed(gamespeed_fps), 950, 94, 45, 15, "Primary", 2, 20, snd_Dragunov, 20, 1.5, false,
 	0, 0, 15, 25, 5, 25, 5, .00075, 0, 0, .15, 1, WEAPON_CLASS.SNIPER_RIFLE, .815, .975, .00075, 1 * game_get_speed(gamespeed_fps), .25, 500, 2, 5, false, "7.62x54 mm", CALIBER.HIGH);
 	global.ItemIndex[#Item.Dragunov, ItemStat.difficulty] = 2;
-	global.ItemIndex[#Item.Dragunov, ItemStat.has_scope] = Item.two_scope;
+	global.ItemIndex[#Item.Dragunov, ItemStat.random_bullet_spread] = true;
+	global.ItemIndex[# Item.Dragunov, ItemStat.preattached] = { scope: Item.two_scope };
 	global.ItemIndex[#Item.Dragunov, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-High damage drop";
 	global.ItemIndex[#Item.Dragunov, ItemStat.advantages] = "\n+Semi-automatic\n+High range";
 	global.ItemIndex[#Item.Dragunov, ItemStat.ItemColor] = c_gray;
@@ -391,14 +387,14 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.usp, ItemStat.difficulty] = 4;
 	global.ItemIndex[#Item.usp, ItemStat.disadvantages] = "-Low penetration power";
 	global.ItemIndex[#Item.usp, ItemStat.advantages] = "+Great mobility\n+High magazine capacity";
-	global.ItemIndex[#Item.usp, ItemStat.has_suppressor] = Item.advanced_suppressor;
+	global.ItemIndex[# Item.usp, ItemStat.preattached] = { suppressor: Item.advanced_suppressor };
 	global.ItemIndex[#Item.usp, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.usp, ItemStat.AmmoSpriteID] = 7;
 	global.ItemIndex[#Item.usp, ItemStat.Description] = "Is a precision weapon, excelling in accuracy with its first shot and boasting considerable damage, yet its lackluster armor penetration. Enhanced with a preattached silencer, offering skilled players a tactical advantage despite its limitations against heavily protected foes.";
 	
 	global.ItemIndex[#Item.p250, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 600, 33, 105, 15, "Secondary", 4, 7, snd_p250, 2, 1, false,
-	15, 15, 1, 4, .5, 3.75, 2, .0075, 0, 5.9, .99, 0, WEAPON_CLASS.PISTOL, .93, .5, .00029, ceil(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7, false, "9x19 mm", CALIBER.LOW);
+	15, 15, 1, 4, .5, 3.75, 2, .0075, 0, 5.9, .99, 0, WEAPON_CLASS.PISTOL, .93, .5, .00029, round(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[#Item.p250, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.p250, ItemStat.disadvantages] = "-Low penetration power";
 	global.ItemIndex[#Item.p250, ItemStat.advantages] = "+Great mobility\n+First shot accuracy";
@@ -408,18 +404,17 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.tec9, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 615, 27, 180, 18, "Secondary", 5, 7, snd_Tec9, 2, 1.1, false,
-	7, 12, 1, 3, .025, 2.5, 3, .00725, 2, 10, .95, 0, WEAPON_CLASS.PISTOL, .975, .71, .00037, ceil(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7, false, "9x19 mm", CALIBER.LOW);
+	7, 12, 1, 3, .025, 2.5, 3, .00725, 2, 10, .95, 0, WEAPON_CLASS.PISTOL, .975, .71, .00037, round(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[#Item.tec9, ItemStat.difficulty] = 2;
-	global.ItemIndex[#Item.tec9, ItemStat.disadvantages] = "-Low damage\n";
+	global.ItemIndex[#Item.tec9, ItemStat.disadvantages] = "-Low damage\n-Long equip time";
 	global.ItemIndex[#Item.tec9, ItemStat.advantages] = "+Great mobility\n+Good penetration power";
 	global.ItemIndex[#Item.tec9, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.tec9, ItemStat.AmmoSpriteID] = 15;
-	global.ItemIndex[#Item.tec9, ItemStat.Description] = "Fast and unforgiving, the TEC-9 thrives in constant motion. Its mobility and surprising accuracy while moving make it a dangerous tool in close-quarters combats. With higher penetration than most pistols, it rewards bold plays and relentless pressure. When money is low but determination is high, the TEC-9 turns reckless rushes into calculated strikes.";
+	global.ItemIndex[#Item.tec9, ItemStat.Description] = "Fast and unforgiving, the TEC-9 thrives in constant motion. Its mobility and accuracy while moving make it a dangerous tool. With higher penetration than most pistols, it rewards bold plays and relentless pressure. The TEC-9 turns reckless rushes into calculated strikes.";
 
 	global.ItemIndex[#Item.HELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Name] = "HE landmine";
 	global.ItemIndex[#Item.HELandMine, ItemStat.Cost] = 100;
-	global.ItemIndex[#Item.HELandMine, ItemStat.usable] = true;
 	global.ItemIndex[#Item.HELandMine, ItemStat.BulletCasingID] = 0;
 	global.ItemIndex[#Item.HELandMine, ItemStat.Damage] = 98;
 	global.ItemIndex[#Item.HELandMine, ItemStat.PenetrationPower] = .5;
@@ -431,7 +426,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.CELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.CELandMine, ItemStat.Name] = "Cluster-explosion landmine";
 	global.ItemIndex[#Item.CELandMine, ItemStat.Cost] = 100;
-	global.ItemIndex[#Item.CELandMine, ItemStat.usable] = true;
 	global.ItemIndex[#Item.CELandMine, ItemStat.BulletCasingID] = 4;
 	global.ItemIndex[#Item.CELandMine, ItemStat.Damage] = 75;
 	global.ItemIndex[#Item.CELandMine, ItemStat.PenetrationPower] = .99;
@@ -443,7 +437,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.LELandMine, ItemStat.Type] = "Landmine";
 	global.ItemIndex[#Item.LELandMine, ItemStat.Name] = "Low-explosive landmine";
 	global.ItemIndex[#Item.LELandMine, ItemStat.Cost] = 50;
-	global.ItemIndex[#Item.LELandMine, ItemStat.usable] = true;
 	global.ItemIndex[#Item.LELandMine, ItemStat.BulletCasingID] = 8;
 	global.ItemIndex[#Item.LELandMine, ItemStat.Damage] = 46;
 	global.ItemIndex[#Item.LELandMine, ItemStat.PenetrationPower] = .95;
@@ -455,7 +448,6 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Name] = "Sticky grenade";
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Cost] = 50;
-	global.ItemIndex[#Item.StickyGrenade, ItemStat.usable] = true;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.ReloadSpeed] = 5;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.Damage] = 49;
 	global.ItemIndex[#Item.StickyGrenade, ItemStat.PenetrationPower] = .89;
@@ -466,22 +458,26 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Name] = "Red dot sight";
+	global.ItemIndex[#Item.red_dot_scope, ItemStat.slot] = Index.slot_scope;
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.ItemColor] = c_red;
 	global.ItemIndex[#Item.red_dot_scope, ItemStat.Description] = "The red dot sight offers improved aiming, but is lacking magnification.";
 
 	global.ItemIndex[#Item.two_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.two_scope, ItemStat.Name] = "Sniper scope";
+	global.ItemIndex[#Item.two_scope, ItemStat.slot] = Index.slot_scope;
 	global.ItemIndex[#Item.two_scope, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.two_scope, ItemStat.Description] = "This item provides double magnification for a high-range engagements.";
 	
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.Name] = "Adaptive chambering";
+	global.ItemIndex[#Item.adaptive_chambering, ItemStat.slot] = Index.slot_barrel;
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.ShootTimer] = .75;
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.adaptive_chambering, ItemStat.Description] = "This item enhances a weapons fire rate when attached, improving its overall combat efficiency.";
 	
 	global.ItemIndex[#Item.vertical_grip, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.vertical_grip, ItemStat.Name] = "Vertical grip";
+	global.ItemIndex[#Item.vertical_grip, ItemStat.slot] = Index.slot_grip;
 	global.ItemIndex[#Item.vertical_grip, ItemStat.KickBackPower] = 1;
 	global.ItemIndex[#Item.vertical_grip, ItemStat.KickBackInaccuracyMultiplier] = .75;
 	global.ItemIndex[#Item.vertical_grip, ItemStat.ItemColor] = c_gray;
@@ -491,13 +487,14 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Name] = "Horizontal grip";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "Reduces horizontal recoil when shooting with firearms.";
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackInaccuracyMultiplier] = 1;
+	global.ItemIndex[#Item.horizontal_grip, ItemStat.slot] = Index.slot_grip;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.KickBackPower] = .75;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[#Item.horizontal_grip, ItemStat.Description] = "The horizontal grip improves weapon horizontal recoil control, ideal for players who prefer spraying over burst fire tactics.";
 	
 	global.ItemIndex[#Item.advanced_suppressor, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.advanced_suppressor, ItemStat.Name] = "Military suppressor";
-	global.ItemIndex[#Item.advanced_suppressor, ItemStat.usable] = true;
+	global.ItemIndex[#Item.advanced_suppressor, ItemStat.slot] = Index.slot_suppressor;
 	global.ItemIndex[#Item.advanced_suppressor, ItemStat.Description] = "A muzzle device functions to dampen the noise generated upon firing a firearm, thus diminishing the sound level produced by the discharge.";
 	global.ItemIndex[#Item.advanced_suppressor, ItemStat.Defense] = .75; ///Damage reduction multiplier
 	global.ItemIndex[#Item.advanced_suppressor, ItemStat.KickBackPower] = .75; ///Inaccuracy multiplier
@@ -524,7 +521,7 @@ function ItemDataBase(){
 	global.ItemIndex[#Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
 	
 	global.ItemIndex[#Item.famas, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.famas, "FAMAS", ceil(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, "Primary", 5, 7, snd_Famas, 2, 1, true,
+	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, "Primary", 5, 7, snd_Famas, 2, 1, true,
 	5, 10, 10, 4, .03, 7, 3.5, .00175, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .00035, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[#Item.famas, ItemStat.difficulty] = 3;
 	global.ItemIndex[#Item.famas, ItemStat.disadvantages] = "-Low magazine capacity\n-Low penetration power\n-High damage dropoff";
@@ -577,7 +574,34 @@ function ItemDataBase(){
 	
 	global.ItemIndex[#Item.range_finder, ItemStat.Type] = "Item";
 	global.ItemIndex[#Item.range_finder, ItemStat.Name] = "Range indicator";
-	global.ItemIndex[#Item.range_finder, ItemStat.usable] = true;
+	global.ItemIndex[#Item.range_finder, ItemStat.slot] = Index.slot_barrel;
 	global.ItemIndex[#Item.range_finder, ItemStat.Description] = "A barrel attachment designed to display a visual indication of a firearm’s effective range based on crosshair alignment, assisting the user in judging distance and projectile reach during combat.";
 	global.ItemIndex[#Item.range_finder, ItemStat.ItemColor] = c_gray;
+	
+	for (var i = 0; i < Item.Total; i++) {
+	    if (global.ItemIndex[# i, ItemStat.Type] == "Weapon") {
+	        global.ItemIndex[# i, ItemStat.BaseMaxAmmo] = global.ItemIndex[# i, ItemStat.MaxAmmo];
+	        global.ItemIndex[# i, ItemStat.BaseReloadSpeed] = global.ItemIndex[# i, ItemStat.ReloadSpeed];
+	        global.ItemIndex[# i, ItemStat.BaseEquipTime]  = global.ItemIndex[# i, ItemStat.EquipTime];
+	        global.ItemIndex[# i, ItemStat.BaseMovingSpdMul]   = global.ItemIndex[# i, ItemStat.MovingSpdMul];
+	        global.ItemIndex[# i, ItemStat.BasePenetrationPower] = global.ItemIndex[# i, ItemStat.PenetrationPower];
+	        global.ItemIndex[# i, ItemStat.BaseDamage] = global.ItemIndex[# i, ItemStat.Damage];
+	    }
+	}
+	
+	global.built_upgrades = {};
+
+	// Projdeme celý ItemIndex a pro každou zbraň vytvoříme záznam
+	for (var i = 0; i < Item.Total; i++) {
+	    if (global.ItemIndex[# i, ItemStat.Type] == "Weapon") { 
+	        global.built_upgrades[$ string(i)] = {
+	            ammo: false,
+	            reload: false,
+				equip: false,
+				movement: false,
+	            penetration: false,
+				damage: false
+	        };
+	    }
+	}
 }

@@ -62,7 +62,7 @@ ReloadTimer = -1;
 FlashedAlpha = 0;
 FlashedBackGround = -1;
 ToggleNightVision = false;
-BaseHealingPower = ceil(global.player_stats_struct.Max_health/50);
+BaseHealingPower = round(global.player_stats_struct.Max_health/50);
 HealingTime = -1;
 HealingItemId = Item.None;
 Healing = false;
@@ -123,7 +123,7 @@ SpeedMul = 1;
 RelativeSpeedValue = MOVE_SPD * 0.1;
 RelativeSpeedX = 0;
 RelativeSpeedY = 0;
-MovingStabilizationTime = ceil(.025 * game_get_speed(gamespeed_fps));
+MovingStabilizationTime = round(.025 * game_get_speed(gamespeed_fps));
 MovingStabilizationTimer = -1;
 
 #endregion

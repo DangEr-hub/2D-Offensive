@@ -3,16 +3,16 @@ global.ranked_game = true;
 play_unranked_tab_width = 720 * global.GUIMultiplier;
 play_unranked_tab_height = 405 * global.GUIMultiplier;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(play_unranked_tab_width, play_unranked_tab_height);
 
 unranked_description_string = "Commit to a full scale match\nwhich affects your eggy points.\nEnemies have eggy points in\ncorrelation with your eggy points.";
 checkbox_gap = 8 * global.GUIMultiplier;
 hard_mode_checkbox_width = 16 * global.GUIMultiplier;
 hard_mode_checkbox_height = 16 * global.GUIMultiplier;
-map_play_button_width = 64 * global.GUIMultiplier;
+map_play_button_width = 72 * global.GUIMultiplier;
 map_play_button_height = 16 * global.GUIMultiplier;
-map_image_sprite_height = 64 * global.GUIMultiplier;
+map_image_sprite_height = 72 * global.GUIMultiplier;
 map_image_sprite_width = 128 * global.GUIMultiplier;
 map_image_position_x = 32;
 map_image_position_y = 64;

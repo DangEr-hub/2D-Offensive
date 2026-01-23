@@ -1,5 +1,5 @@
-var dmg = ceil(other.stats.Damage * global.ItemIndex[# other.stats.Item_id, ItemStat.PenetrationPower]);
-var p_number = ceil(dmg/10);
+var dmg = round(other.stats.Damage * global.ItemIndex[# other.stats.Item_id, ItemStat.PenetrationPower]);
+var p_number = round(dmg/10);
 
 
 play_sound(other.x, other.y, snd_BulletMetal);

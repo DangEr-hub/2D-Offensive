@@ -25,8 +25,8 @@ if(instance_exists(global.local_player)){
 
 			if (collision_rectangle(min_x, min_y, max_x, max_y, id, true, false)) {
 				var damage = knife_object.stats.Damage;
-				var BloodSplashNumber = ceil(damage / 5);
-				var BloodParticleNumber = ceil(damage / 2);
+				var BloodSplashNumber = round(damage / 5);
+				var BloodParticleNumber = round(damage / 2);
 				create_blood(BloodSplashNumber, x, y, c_red, BloodParticleNumber);
 
 				play_sound(x, y, snd_BirdDeath, global.local_player);

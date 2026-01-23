@@ -27,7 +27,7 @@ function set_font(Font){
 			}
 		break;
 		
-		case "Menu_small":
+		case "GUI_small":
 			if(global.GUIMultiplier >= 2){
 				draw_font = fnt_MenuSmallMedium;
 			}else if(global.GUIMultiplier < 2){

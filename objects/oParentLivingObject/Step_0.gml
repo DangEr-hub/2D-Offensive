@@ -78,7 +78,6 @@ if(check_vis_timer == -1){
 					col = col_smoke;
 				}
 
-				show_debug_message(col);
 	            if (col != noone) {
 					if (instance_exists(col) && (observer.moving_state == STATES_PLAYER.machine_gun_state && col.object_index == oMachineGunFloor) || col.transparent == true){
 						Visible = true;   

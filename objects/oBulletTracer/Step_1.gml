@@ -77,7 +77,7 @@ if(wall_collision != noone){
 			
 			#region Particles
 			if(instance_exists(oParticleSystem)){
-				var spark_number = ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5);
+				var spark_number = round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5);
 				if(image_index == 2){
 					spark_number = 1;	
 				}
@@ -113,7 +113,7 @@ if(wall_collision != noone){
 				wall_collision.yy
 			);
 			particle_create(
-				ceil(WallParticles/2), 
+				round(WallParticles/2), 
 				0.8, 
 				random(360), 
 				ParticleTexture, 
@@ -152,7 +152,7 @@ if(wall_collision != noone){
 			var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
 			particle_create(WallParticles, 0.8, random(360), ParticleTexture, 
 			random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, false, false, 0, x, y);
-			particle_create(ceil(WallParticles/2), 0.8, random(360), ParticleTexture, 
+			particle_create(round(WallParticles/2), 0.8, random(360), ParticleTexture, 
 			random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
 			explosion_create(
 				10, 
@@ -166,7 +166,7 @@ if(wall_collision != noone){
 			);	
 		
 			if(instance_exists(oParticleSystem)){
-				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, ceil(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
+				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
 			}
 		
 			if!(audio_is_playing(wall_sound)){play_sound(x, y, wall_sound, stats.Object);}

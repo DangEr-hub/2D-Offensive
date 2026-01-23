@@ -3,7 +3,7 @@ global.ranked_game = false;
 play_unranked_tab_width = 720 * global.GUIMultiplier;
 play_unranked_tab_height = 405 * global.GUIMultiplier;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(play_unranked_tab_width, play_unranked_tab_height);
 
 unranked_description_string = "Commit to a full scale match\nwithout worrying to loose any eggy points.\nEnemies have randomized eggy points.";

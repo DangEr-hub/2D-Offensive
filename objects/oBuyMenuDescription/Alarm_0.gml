@@ -17,9 +17,9 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 
 draw_set_font(set_font("GUI_grid"));
 var text_gap = string_height("a")*1.19;
-var start_x = zui_get_width() * .055;
-var start_y = zui_get_height() * .15;
-var offset_y = text_gap*4;
+var start_x = zui_get_width() * .02;
+var start_y = zui_get_height() * .185;
+var offset_y = text_gap*3.5;
 
 if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 
@@ -32,7 +32,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	}
 
 	for(var i=0;i<global.ItemIndex[#item_variable, ItemStat.difficulty];i++){
-		with(zui_create(start_x + string_width("Difficulty:")*1.15 + (i*32), start_y, objUIImage)){
+		with(zui_create(start_x + string_width("Difficulty: ")*1.15 + (i*32), start_y, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0
@@ -44,7 +44,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 
 	#region Damage
 	var base_damage = global.ItemIndex[#item_variable, ItemStat.Damage];
-	var damage_rating = min(ceil(.07 * (base_damage - 1)), 5);
+	var damage_rating = min(round(.07 * (base_damage - 1)), 5);
 	with(zui_create(start_x, start_y + text_gap, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
@@ -65,7 +65,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 
 	#region Penetration power
 	var base_penetration_power = global.ItemIndex[#item_variable, ItemStat.PenetrationPower];
-	var penetration_power = ceil(clamp(((base_penetration_power - 0.5) / 0.5) * 4 + 1, 0, 5));
+	var penetration_power = round(clamp(((base_penetration_power - 0.5) / 0.5) * 4 + 1, 0, 5));
 	with(zui_create(start_x, start_y + text_gap*2, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
@@ -74,7 +74,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	}
 
 	for(var i=0;i<penetration_power;i++){
-		with(zui_create(start_x + string_width("Penetration:")*1.15 + (i*32), start_y + text_gap*2, objUIImage)){
+		with(zui_create(start_x + string_width("Penetration: ")*1.15 + (i*32), start_y + text_gap*2, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0
@@ -96,7 +96,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	
 	if(global.ItemIndex[#item_variable, ItemStat.Damage] > 0){
 		for(var i=0;i<damage_drop;i++){
-			with(zui_create(start_x + string_width("Damage dropoff:")*1.15 + (i*32), start_y + text_gap*3, objUIImage)){
+			with(zui_create(start_x + string_width("Damage dropoff: ")*1.15 + (i*32), start_y + text_gap*3, objUIImage)){
 				zui_set_size(64, 64);
 				sprite = spr_difficulty_star;
 				sprite_image_index = 0
@@ -126,7 +126,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	}
 
 	for(var i=0;i<range;i++){
-		with(zui_create(start_x + string_width("Range:")*1.15 + (i*32), start_y + text_gap*4, objUIImage)){
+		with(zui_create(start_x + string_width("Range: ")*1.15 + (i*32), start_y + text_gap*4, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0
@@ -168,7 +168,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 }else if(global.ItemIndex[# item_variable, ItemStat.Type] == "Armour" || 
 global.ItemIndex[# item_variable, ItemStat.Type] == "Helmet" ||
 global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
-	offset_y = -text_gap;	
+	offset_y = -text_gap*1.5;	
 	
 	function armour_to_stars(_armour){
 	    if(_armour >= .925){return 1;}
@@ -215,11 +215,11 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	#endregion
 	
 }else if(global.ItemIndex[# item_variable, ItemStat.Type] == "Grenade"){
-	offset_y = text_gap;
+	offset_y = text_gap*1.5;
 
 	#region Damage
 	var base_damage = global.ItemIndex[#item_variable, ItemStat.Damage];
-	var damage_rating = min(ceil(.07 * (base_damage - 1)), 5);
+	var damage_rating = min(round(.07 * (base_damage - 1)), 5);
 	with(zui_create(start_x, start_y, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
@@ -249,7 +249,7 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	}
 	
 	for(var i=0;i<damage_drop;i++){
-		with(zui_create(start_x + string_width("Damage dropoff:")*1.15 + (i*32), start_y + text_gap, objUIImage)){
+		with(zui_create(start_x + string_width("Damage dropoff: ")*1.15 + (i*32), start_y + text_gap, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0
@@ -261,7 +261,7 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 
 	#region Penetration power
 	var base_penetration_power = global.ItemIndex[#item_variable, ItemStat.PenetrationPower];
-	var penetration_power = ceil(clamp(((base_penetration_power - 0.5) / 0.5) * 4 + 1, 0, 5));
+	var penetration_power = round(clamp(((base_penetration_power - 0.5) / 0.5) * 4 + 1, 0, 5));
 	with(zui_create(start_x, start_y + text_gap*2, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
@@ -270,7 +270,7 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	}
 
 	for(var i=0;i<penetration_power;i++){
-		with(zui_create(start_x + string_width("Penetration:")*1.15 + (i*32), start_y + text_gap*2, objUIImage)){
+		with(zui_create(start_x + string_width("Penetration: ")*1.15 + (i*32), start_y + text_gap*2, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0
@@ -298,7 +298,7 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	#endregion
 	
 }else if(item_variable == Item.HealingKit){
-	offset_y = -text_gap;	
+	offset_y = -text_gap*1.5;	
 	
 	#region Health
 	healing_amount = global.ItemIndex[# item_variable, ItemStat.Damage];

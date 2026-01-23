@@ -4,7 +4,7 @@ damage_table_height_tab = max(128 * global.GUIMultiplier + ((ds_map_size(global.
 alpha = 1;
 black = -1;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(damage_table_width_tab, damage_table_height_tab);
 
 killed_by_y = max(zui_get_height() * .1, 64);

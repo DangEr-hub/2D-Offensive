@@ -1,5 +1,5 @@
 event_inherited();
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 round_end_width_tab = 512 * global.GUIMultiplier;
 round_end_height_tab = max(512 * global.GUIMultiplier, 704);
 
@@ -103,7 +103,7 @@ with (zui_create(title_position_x - string_width(other.title_string)/2, title_po
 	color = other.title_color;
 	caption = other.title_string;
 }
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 
 #region Current player rank
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;

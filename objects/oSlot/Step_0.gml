@@ -10,6 +10,7 @@ var xx22 = (global.InventoryEquipRightBottomCorner[0] - oDraw.ViewX) * (global.G
 var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 
 if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
+	
 	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[# 0, Index.slot_id] != Item.None){
 		request_item_drop(
 			global.MouseSlot[# 0, Index.slot_id],

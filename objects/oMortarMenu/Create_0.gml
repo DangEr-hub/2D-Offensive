@@ -2,7 +2,7 @@ event_inherited();
 texture_width = 384 * global.GUIMultiplier;
 texture_height = 128 * global.GUIMultiplier;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(texture_width, texture_height);
 
 

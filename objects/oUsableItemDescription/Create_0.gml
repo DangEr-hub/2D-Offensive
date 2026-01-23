@@ -2,7 +2,7 @@ event_inherited();
 description_width = max(896 * global.GUIMultiplier, 1080);
 description_height = max(192 * global.GUIMultiplier, 256);
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(description_width, description_height);
 
 cell_width = min(192 * global.GUIMultiplier, 256);

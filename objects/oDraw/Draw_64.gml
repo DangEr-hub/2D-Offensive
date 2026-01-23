@@ -119,7 +119,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	
 	if(global.local_player.player_has_scope != 0 || (global.local_player.player_has_scope == 0 && global.local_player.ScopeIn == false)){
 		
-		
+		#region Draw inventory controls
+		if(instance_exists(oInventory)){
+			var str = "Quick equip: [" + keycode_to_string(vk_control) + "] + [" + keycode_to_string(mb_right) + "]";
+			var tx = display_get_gui_width() * .5 - string_width(str)/2;
+			var ty = 15;
+			draw_set_font(set_font("GUI_small"));
+			draw_text_outlined(tx, ty, str, c_white, c_black, 1);
+		}
+		#endregion
+				
 		#region Draw mortar GUI
 		if (global.local_player.moving_state == STATES_PLAYER.mortar_state) {
 		    var mortar_object = instance_nearest(global.local_player.x, global.local_player.y, oMortar);	
@@ -203,9 +212,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				draw_set_font(set_font("Console"));
 				draw_set_color(c_black);
-				draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-				draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-				draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				draw_sprite_ext(spr_HealthBar, 0, HealthX - round(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+				draw_sprite_ext(spr_HealthBar, 3, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+				draw_sprite_ext(spr_HealthBar, 2, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 			}
 		}
 		#endregion
@@ -291,9 +300,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				draw_set_color(c_black);
 				
 				if(global.draw_damage == true){
-					draw_sprite_ext(spr_HealthBar, 0, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 3, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-					draw_sprite_ext(spr_HealthBar, 2, HealthX - ceil(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 0, HealthX - round(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+					draw_sprite_ext(spr_HealthBar, 3, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					draw_sprite_ext(spr_HealthBar, 2, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
 				}
 				
 				if(id == global.local_player.selected_bot){
@@ -338,6 +347,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			draw_set_font(set_font("Console"));
 		}
 		#endregion
+		
+		
 	
 		#region Draw use button
 		if!(instance_exists(oInventory)){
@@ -392,7 +403,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
 			if(global.ItemIndex[# weapon, ItemStat.Type] == "Weapon" && global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
 				var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootingMode], global.local_player.weapon_shooting_mode) + 
-											"[" + keycode_to_string(global.KeyBinds[| KEY.KeyChangeMode]) + "]";
+											"[" + keycode_to_string(global.KeyBinds[| KEY.ChangeMode]) + "]";
 				var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
 				var shooting_mode_y = display_get_gui_height() - HUDShift*2;
 				draw_text_outlined(shooting_mode_x, shooting_mode_y, shooting_mode_string, c_white, c_black, 1);
@@ -401,8 +412,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			
 			#region Draw item switching outside of inventory
 			if(global.Inventory[#global.local_player.item_use_position, Index.slot_id] != Item.None){
-				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyCycleLeft])) + "] - Left ";
-				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyCycleRight])) + "] - Right";
+				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleLeft])) + "] - Left ";
+				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleRight])) + "] - Right";
 				var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.GUIMultiplier;
 			    var Id = global.Inventory[#global.local_player.item_use_position, Index.slot_id];        
 			    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.GUIMultiplier, 1 * global.GUIMultiplier, 0, c_white, 1);  
@@ -423,8 +434,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var MagX = HealthX + sprite_get_width(spr_HealthBar) * 2 * global.GUIMultiplier + HUDShift;
 			var MagY = StaminaY;
 			var AmmoSpriteWidth = (sprite_get_bbox_right(spr_AmmoType) - sprite_get_bbox_left(spr_AmmoType))*global.GUIMultiplier;
-			var AmmoDrawValue = min(ceil(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]), 10);
-			var AmmoRemain = ceil(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]) - AmmoDrawValue;
+			var AmmoDrawValue = min(round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]), 10);
+			var AmmoRemain = round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]) - AmmoDrawValue;
 			var Value = 0;
 			var money_string = "Money: " + string(global.player_stats_struct.Money);
 			var money_x = HUDShift;
@@ -671,7 +682,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 				//Ep
 				var player_r = global.rating_struct.Player_ep;
 				var player_rd = global.rating_struct.Player_rd;
-				var r_string = "R: " + string(ceil(convert_back(player_r)));
+				var r_string = "R: " + string(round(convert_back(player_r)));
 				var r_string_es = "R (ES): " + string_format(player_r, 0, 1);
 				var rd_string = "RD: " + string_format(convert_back(player_rd, true), 0, 1);
 				var rd_string_es = "RD (ES): " + string_format(player_rd, 0, 1);
@@ -699,7 +710,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 				for (var i = 0; i < array_length(global.rating_struct.Enemy_ep); i++) {
 				    var converted_elo = convert_back(global.rating_struct.Enemy_ep[i]);
 					var converted_rd = convert_back(global.rating_struct.Enemy_rd[i], true);
-				    enemy_elos_string += string(ceil(converted_elo)) + (i < array_length(global.rating_struct.Enemy_ep) - 1 ? "," : "");
+				    enemy_elos_string += string(round(converted_elo)) + (i < array_length(global.rating_struct.Enemy_ep) - 1 ? "," : "");
 					enemy_rd_string += string(converted_rd) + (i < array_length(global.rating_struct.Enemy_rd) - 1 ? "," : "");
 				}
 				enemy_elos_string += " ]";
@@ -781,7 +792,43 @@ with(oSlot){
 	if(mouse_to_gui(xx, yy, xx + sprite_get_width(spr_Slot)*scale, yy + sprite_get_height(spr_Slot)*scale)){
 		image_blend = MAIN_COLOR;
 		
-		if(mouse_check_button_pressed(mb_left) && MouseID == Item.None){
+		if(mouse_check_button_pressed(mb_right) && keyboard_check(vk_control)){
+			if(VarSlot < OtherSlot.Primary){
+	
+				#region Primary equip
+				var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+					item_swap("varslot", OtherSlot.Primary);
+					primary_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+					item_swap("varslot", OtherSlot.Primary);
+				}
+				#endregion
+				
+				#region Secondary equip
+				var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
+				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+					item_swap("varslot", OtherSlot.Secondary);
+					secondary_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+					item_swap("varslot", OtherSlot.Secondary);
+				}
+				#endregion
+				
+				#region Knife equip
+				var knife_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
+				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
+					item_swap("varslot", OtherSlot.Knife);
+					knife_slot_id = Item.None;
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
+					item_swap("varslot", OtherSlot.Knife);
+				}
+				#endregion
+			}
+		}
+	
+		
+		if(mouse_check_button_pressed(mb_left) && MouseID == Item.None && !keyboard_check(vk_control)){
 			item_description_destroy();
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;
@@ -795,7 +842,7 @@ with(oSlot){
 			DrawItemInfo = true;	
 		}
 		
-		if(mouse_check_button_pressed(mb_right)){
+		if(mouse_check_button_pressed(mb_right) && !keyboard_check(vk_control)){
 			item_description_destroy();
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;

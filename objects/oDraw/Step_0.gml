@@ -71,7 +71,7 @@ if(instance_exists(global.local_player)){
 		bloom_threshold = .35;
 	}
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyPause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
+	if(keyboard_check_pressed(global.KeyBinds[| KEY.Pause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
 		if(PauseMenu == false){
 
 			pause(id);
@@ -123,8 +123,9 @@ if(instance_exists(global.local_player)){
 		window_set_cursor(cr_none);	
 	}
 
-	if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyWeaponAttachments])){
-		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false){
+	if(keyboard_check_pressed(global.KeyBinds[| KEY.WeaponAttachments])){
+		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false &&
+		!instance_exists(oBuyMenu)){
 			if(show_weapon_attachments == false){
 				with(zui_main()){
 					with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
@@ -150,6 +151,21 @@ if(instance_exists(global.local_player)){
 			}
 		}
 	}
+	
+	#region Buy menu
+	if (!global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state && 
+	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
+		if (instance_exists(oBuyMenu)) {
+			global.local_player.player_can_shoot = true;
+			with (oBuyMenuDescription) zui_destroy();
+			with (oBuyMenu) zui_destroy();
+		} else {
+			global.local_player.player_can_shoot = false;
+			with(oWeaponAttachments) zui_destroy();
+			with (zui_main()) zui_create(zui_get_width()*.5, zui_get_height()*.5, oBuyMenu);
+		}
+	}
+	#endregion
 
 
 	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0){

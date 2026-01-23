@@ -16,19 +16,19 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
 	Slot = 4;
 	while(Slot < INVENTORY_SIZE){
 	    if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-	        if (global.Inventory[# Slot, 0] == Item.None){
-	            global.Inventory[# Slot, 0] = ID;
-	            global.Inventory[# Slot, 1] += Amount;
+	        if (global.Inventory[# Slot, Index.slot_id] == Item.None){
+	            global.Inventory[# Slot, Index.slot_id] = ID;
+	            global.Inventory[# Slot, Index.SlotAmount] += Amount;
 				global.Inventory[# Slot, Index.slot_durability] = ItemDurability;
 	            if(global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
 	                ///Weapon
-	                Id = global.Inventory[# Slot, 0];
-	                global.Inventory[# Slot, 2] = ItemAmmo;
-	                global.Inventory[# Slot, 3] = ItemClipAmmo;
-					global.Inventory[# Slot, Index.slot_scope] = (ItemScope != -1) ? ItemScope : global.Inventory[# Slot, Index.slot_scope];
-					global.Inventory[# Slot, Index.slot_barrel] = (ItemBarrel != -1) ? ItemBarrel : global.Inventory[# Slot, Index.slot_barrel];
-					global.Inventory[# Slot, Index.slot_grip] = (ItemGrip != -1) ? ItemGrip : global.Inventory[# Slot, Index.slot_grip];
-					global.Inventory[# Slot, Index.slot_suppressor] = (Itemsuppressor != -1) ? Itemsuppressor : global.Inventory[# Slot, Index.slot_suppressor];
+	                Id = global.Inventory[# Slot, Index.slot_id];
+	                global.Inventory[# Slot, Index.slot_ammo] = ItemAmmo;
+	                global.Inventory[# Slot, Index.slot_clip_ammo] = ItemClipAmmo;
+					global.Inventory[# Slot, Index.slot_scope] = (ItemScope != Item.None) ? ItemScope : global.Inventory[# Slot, Index.slot_scope];
+					global.Inventory[# Slot, Index.slot_barrel] = (ItemBarrel != Item.None) ? ItemBarrel : global.Inventory[# Slot, Index.slot_barrel];
+					global.Inventory[# Slot, Index.slot_grip] = (ItemGrip != Item.None) ? ItemGrip : global.Inventory[# Slot, Index.slot_grip];
+					global.Inventory[# Slot, Index.slot_suppressor] = (Itemsuppressor != Item.None) ? Itemsuppressor : global.Inventory[# Slot, Index.slot_suppressor];
 	            }
 				if(Destroy == true){
 					destroy_pickup_instance(id);
@@ -44,8 +44,8 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
 	    var yy = 4;
 		var PickedUp = false;
 	    repeat(INVENTORY_SIZE){
-	        if(global.Inventory[#yy, 0] == ID){
-	            global.Inventory[# yy, 1] += Amount;
+	        if(global.Inventory[#yy, Index.slot_id] == ID){
+	            global.Inventory[# yy, Index.SlotAmount] += Amount;
 	            PickedUp = true;
 				if(Destroy == true){
 					destroy_pickup_instance(id);
@@ -60,9 +60,9 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
 	    if(!PickedUp){
 	        yy = 4;
 	        repeat(INVENTORY_SIZE){
-	            if(global.Inventory[#yy, 0] == Item.None){
-	                global.Inventory[# yy, 0] = ID;
-	                global.Inventory[# yy, 1] += Amount;
+	            if(global.Inventory[#yy, Index.slot_id] == Item.None){
+	                global.Inventory[# yy, Index.slot_id] = ID;
+	                global.Inventory[# yy, Index.SlotAmount] += Amount;
 					if(Destroy == true){
 						destroy_pickup_instance(id);
 					}
@@ -124,6 +124,12 @@ function inventory_create() {
 	}
 }
 
+function wpn_has_preattached(weapon_id, socket, item) {
+	if(global.ItemIndex[# weapon_id, ItemStat.preattached][$ socket] != undefined){
+		return global.ItemIndex[# weapon_id, ItemStat.preattached][$ socket] == item;	
+	}
+}
+
 function InventoryInit() {
 
 	enum Item{
@@ -140,11 +146,12 @@ function InventoryInit() {
 		KickBackInaccuracyMultiplier, DamageDrop, accuracy_drop, ClipAmmo,
 		
 		/* Draw armour stats */
-		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, MaxKickBack, SniperScope, ShootSpdMul, has_barrel, EquipTime, has_suppressor,
-		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID, has_scope, has_grip,
-		EnemyInaccuracyCompensation, Type, Name, ID, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
-		advantages, disadvantages, usable, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, caliber,
-		caliber_type, attach_sockets, attachments, Total
+		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, ShootSpdMul, EquipTime,
+		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID,
+		EnemyInaccuracyCompensation, Type, Name, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
+		advantages, disadvantages, slot, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, caliber,
+		caliber_type, attach_sockets, attachments, preattached, BaseMaxAmmo, BaseReloadSpeed, BaseEquipTime, BaseMovingSpdMul, BasePenetrationPower, BaseDamage,
+		Total
 	}
 	
 	enum OtherSlot{
@@ -209,10 +216,10 @@ function ItemAddWeight(ID, OtherID){
 }
 
 function ItemDrop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClipAmmo = -1, ObjectDurability = -1, ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
-    var drop_scope = global.ItemIndex[#ID, ItemStat.has_scope];
-    var drop_barrel = global.ItemIndex[#ID, ItemStat.has_barrel];
-    var drop_grip = global.ItemIndex[#ID, ItemStat.has_grip];
-    var drop_suppressor = global.ItemIndex[#ID, ItemStat.has_suppressor];
+    var drop_scope = global.ItemIndex[#ID, ItemStat.preattached][$ "scope"] ?? Item.None;
+    var drop_barrel = global.ItemIndex[#ID, ItemStat.preattached][$ "barrel"] ?? Item.None;
+    var drop_grip = global.ItemIndex[#ID, ItemStat.preattached][$ "grip"] ?? Item.None;
+    var drop_suppressor = global.ItemIndex[#ID, ItemStat.preattached][$ "suppressor"] ?? Item.None;
     var drop_ammo = global.ItemIndex[#ID, ItemStat.MaxAmmo];
     var drop_clip_ammo = global.ItemIndex[#ID, ItemStat.ClipAmmo];
     var drop_durability = ObjectDurability;
@@ -420,6 +427,29 @@ function item_swap(type, slot_type){
 			global.Inventory[# slot_type, i] = 0;
 		}
 		
+	}else if(type == "varslot"){
+		// Uvnitř objektu oSlot jenom - VarSlot proměnná
+		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# VarSlot, Index.slot_id];
+		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# VarSlot, Index.SlotAmount];
+		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# VarSlot, Index.slot_ammo];
+		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# VarSlot, Index.slot_clip_ammo];
+		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# VarSlot, Index.slot_durability];
+		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# VarSlot, Index.SlotShootingType];
+		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# VarSlot, Index.slot_barrel];
+		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# VarSlot, Index.slot_grip];
+		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# VarSlot, Index.slot_suppressor];
+		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# VarSlot, Index.slot_scope];	
+	
+		global.Inventory[# VarSlot, Index.slot_id] = TempArray[Index.slot_id];
+		global.Inventory[# VarSlot, Index.SlotAmount] = TempArray[Index.SlotAmount];
+		global.Inventory[# VarSlot, Index.slot_ammo] = TempArray[Index.slot_ammo];
+		global.Inventory[# VarSlot, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
+		global.Inventory[# VarSlot, Index.slot_durability] = TempArray[Index.slot_durability];
+		global.Inventory[# VarSlot, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
+		global.Inventory[# VarSlot, Index.slot_barrel] = TempArray[Index.slot_barrel];
+		global.Inventory[# VarSlot, Index.slot_grip] = TempArray[Index.slot_grip];
+		global.Inventory[# VarSlot, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
+		global.Inventory[# VarSlot, Index.slot_scope] = TempArray[Index.slot_scope];
 	}
 	
 	if(IS_NET){

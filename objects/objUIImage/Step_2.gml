@@ -3,9 +3,9 @@ if(buy_menu == true){
 		if(!instance_exists(oBuyMenuDescription)){
 			with(zui_main()){
 				if(global.GUIMultiplier > 1){
-					other.buy_menu_description = zui_create(zui_get_width() * .9, zui_get_height() * .75, oBuyMenuDescription);
+					other.buy_menu_description = zui_create(zui_get_width() * .825, zui_get_height() * .82, oBuyMenuDescription);
 				}else{
-					other.buy_menu_description = zui_create(zui_get_width() * .73, zui_get_height() * .75, oBuyMenuDescription);
+					other.buy_menu_description = zui_create(zui_get_width() * .775, zui_get_height() * .75, oBuyMenuDescription);
 				}
 			}
 			buy_menu_description.item_variable = item_variable;

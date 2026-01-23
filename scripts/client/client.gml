@@ -118,8 +118,8 @@ function handle_bird_sync_client() {
 				var make_snd = buffer_read(receive_buffer, buffer_u8);
                 var inst_destroy = find_instance_by_network_id(oBird, net_id_destroy);
 
-				var BloodSplashNumber = ceil(damage / 5);
-				var BloodParticleNumber = ceil(damage / 2);
+				var BloodSplashNumber = round(damage / 5);
+				var BloodParticleNumber = round(damage / 2);
 				if (instance_exists(inst_destroy)) {
 					if(make_snd == true){
 						create_blood(BloodSplashNumber, inst_destroy.x, inst_destroy.y, c_red, BloodParticleNumber);		

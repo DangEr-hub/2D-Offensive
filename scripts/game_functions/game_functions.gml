@@ -178,10 +178,10 @@ function buy_item(ItemID){
 			global.ItemIndex[#ItemID, ItemStat.MaxAmmo], 
 			global.ItemIndex[#ItemID, ItemStat.ClipAmmo], 
 			global.ItemIndex[#ItemID, ItemStat.BaseDurability],
-			global.ItemIndex[#ItemID, ItemStat.has_scope],
-			global.ItemIndex[#ItemID, ItemStat.has_barrel],
-			global.ItemIndex[#ItemID, ItemStat.has_grip],
-			global.ItemIndex[#ItemID, ItemStat.has_suppressor],
+			global.ItemIndex[#ItemID, ItemStat.preattached][$ "scope"] ?? Item.None,
+            global.ItemIndex[#ItemID, ItemStat.preattached][$ "barrel"] ?? Item.None,
+            global.ItemIndex[#ItemID, ItemStat.preattached][$ "grip"] ?? Item.None,
+            global.ItemIndex[#ItemID, ItemStat.preattached][$ "suppressor"] ?? Item.None,
 			false
 		);
 	}
@@ -294,9 +294,6 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 			    if(bullet_tracer.stats.Object_index == oPlayer){
 			        has_suppressor =
 			            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.advanced_suppressor;
-			    }else if(bullet_tracer.stats.Object_index != -1){
-			        has_suppressor =
-			            global.ItemIndex[# instance_emitter.WeaponID[instance_emitter.WeaponPositionID], ItemStat.has_suppressor] != Item.None;
 			    }
 			}
 		
@@ -323,9 +320,9 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	
 	var particles_number = 1;
 	if(TracerImage != 2){
-		particles_number = ceil(damage/5);
+		particles_number = round(damage/5);
 		create_fog(BulletX, BulletY, damage/10, random(360), 0.1, random_range(.1, .5), 
-			clamp(ceil(damage/10), 5, 7.5), clamp(damage/50, .5, .9), 
+			clamp(round(damage/10), 5, 7.5), clamp(damage/50, .5, .9), 
 			clamp(damage/50, .1, .75), 2 * game_get_speed(gamespeed_fps)
 		);	
 	}
@@ -512,9 +509,9 @@ function percent_chance(argument0) {
 function statistics_hit(Type, Damage, ObjectType){
 	switch(Type){
 		case "Health":
-			if(ObjectType.stats.Health_points >= ceil(Damage)){
-				ObjectType.attack_damage = ceil(Damage);
-				ObjectType.stats.Health_points -= ceil(Damage);
+			if(ObjectType.stats.Health_points >= round(Damage)){
+				ObjectType.attack_damage = round(Damage);
+				ObjectType.stats.Health_points -= round(Damage);
 			}else{
 				ObjectType.attack_damage = ObjectType.stats.Health_points;
 				ObjectType.stats.Health_points = 0;
@@ -597,7 +594,7 @@ function create_shooting_effects(object){
 		#region Create flash effect
 		if(stats.Health_points > 0){
 			if(flash_effect_timer == -1){
-				flash_effect_timer = ceil(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * 2);
+				flash_effect_timer = round(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * 2);
 				MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 				MuzzleFlashLight.angle = RotationAngle;
 				MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
@@ -637,8 +634,8 @@ function player_shooting(){
 			suppressor_multiplier = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_suppressor], ItemStat.Defense];	
 		}
 		var current_weapon_id = wpn_id;
-		var kb_phase_1 = ceil(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback);
-		var kb_phase_2 = ceil(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback);
+		var kb_phase_1 = round(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback);
+		var kb_phase_2 = round(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback);
 		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
 		var recoil_offset_y = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetY];
 		var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
@@ -860,8 +857,8 @@ function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBase
     var weight = EnemyPhysical[1];
     var age = EnemyAge;
 	
-	var Stamina = ceil(EnemyBaseStamina * 1.1*exp(-(power(age - 40, 2)/2)));
-    var Health = ceil(EnemyBaseHP + height / 10 + weight / 10 * 1.1 * exp(-(power(age - 40, 2) / 2)));
+	var Stamina = round(EnemyBaseStamina * 1.1*exp(-(power(age - 40, 2)/2)));
+    var Health = round(EnemyBaseHP + height / 10 + weight / 10 * 1.1 * exp(-(power(age - 40, 2) / 2)));
 
     var enemy_struct = {
         Health_points: Health,

@@ -28,7 +28,7 @@
 						
 						#region Particles
 						if(instance_exists(oParticleSystem)){
-							var spark_number = ceil(knife_object.stats.Damage/5);
+							var spark_number = round(knife_object.stats.Damage/5);
 							part_particles_create(global.ParticleSystem, knife_object.x, knife_object.y, oParticleSystem.Spark, spark_number);
 							var posX = knife_object.x;
 							var posY = knife_object.y;
@@ -61,7 +61,7 @@
 							knife_object.y
 						);
 						particle_create(
-							ceil(WallParticles/2), 
+							round(WallParticles/2), 
 							0.8, 
 							random(360), 
 							ParticleTexture, 

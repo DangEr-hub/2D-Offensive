@@ -4,7 +4,7 @@ statistics_height_tab = max(192 * global.GUIMultiplier, 224);
 alpha = 1;
 black = -1;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(statistics_width_tab, statistics_height_tab);
 
 statistics_x = zui_get_width() * .25;

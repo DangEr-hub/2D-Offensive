@@ -9,11 +9,13 @@ if (mouse_check_button_pressed(mb_left)) {
         active = true;
 		cursor_pos = string_length(text);
     } else {
-		if(is_callable(callback)){
-			callback(text);	
+		if(active == true){
+			if(is_callable(callback)){
+				callback(text);	
+			}
+	        active = false;
+			cursor_pos = string_length(text);
 		}
-        active = false;
-		cursor_pos = string_length(text);
     }
 }
 

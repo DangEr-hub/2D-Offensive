@@ -4,7 +4,7 @@ tab_height = max(512 * global.GUIMultiplier, 768);
 
 
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);
 
 rank_position = 0;

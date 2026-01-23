@@ -2,7 +2,7 @@ event_inherited();
 armour_description_width = max(896 * global.GUIMultiplier, 1080);
 armour_description_height = max(192 * global.GUIMultiplier, 256);
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(armour_description_width, armour_description_height);
 
 cell_width = min(192 * global.GUIMultiplier, 256);

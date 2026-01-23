@@ -262,7 +262,7 @@ function EnemyShooting(DangerX, DangerY){
 		
 		#region Create flash effect
 		if(flash_effect_timer == -1){
-			flash_effect_timer = ceil(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * .75);
+			flash_effect_timer = round(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * .75);
 			if(Ammo[WeaponPositionID] % 2 == 0){
 				var MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 				MuzzleFlashLight.angle = RotationAngle;
@@ -297,12 +297,12 @@ function set_state(state){
 function healing_ai(){
 	if(percent_chance(75 * rank_boost)){
 		if(State != STATES.MoveAway){
-			SetReactionTimer(ceil(ReactionTime*.5));
+			SetReactionTimer(round(ReactionTime*.5));
 			State = STATES.MoveAway;
 		}
 	}else{
 		if(State != STATES.Move){
-			SetReactionTimer(ceil(ReactionTime*.5));
+			SetReactionTimer(round(ReactionTime*.5));
 			State = STATES.Move;
 		}
 	}
@@ -328,7 +328,7 @@ function MoveRunAway(DangerX, DangerY){
 	XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	Speed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
-	MoveTime = ceil(random_range(DangerDistance/Speed, DangerDistance/Speed));
+	MoveTime = round(random_range(DangerDistance/Speed, DangerDistance/Speed));
 }
 
 function bot_move_shooting(DangerX, DangerY){

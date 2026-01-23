@@ -75,7 +75,7 @@ function collision_line_point(argument0, argument1, argument2, argument3, argume
 	if (rr != noone) {
 	    var p0 = 0;
 	    var p1 = 1;
-	    repeat (ceil(log2(point_distance(x1, y1, x2, y2))) + 1) {
+	    repeat (round(log2(point_distance(x1, y1, x2, y2))) + 1) {
 	        var np = p0 + (p1 - p0) * 0.5;
 	        var nx = x1 + (x2 - x1) * np;
 	        var ny = y1 + (y2 - y1) * np;

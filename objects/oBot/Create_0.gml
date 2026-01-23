@@ -86,7 +86,7 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 
 rank_boost = get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
 rank_less = get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
-chasing_timer = ceil(5 * game_get_speed(gamespeed_fps) * rank_boost);
+chasing_timer = round(5 * game_get_speed(gamespeed_fps) * rank_boost);
 
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);

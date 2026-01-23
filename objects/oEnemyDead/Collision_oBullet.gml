@@ -6,8 +6,8 @@ if(global.ItemIndex[# other.stats.Item_id, ItemStat.Type] != "Weapon"){
 
 
 var bullet_hit = snd_BulletHit;
-var BloodSplashNumber = ceil(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 5);
-var BloodParticleNumber = ceil(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 2);
+var BloodSplashNumber = round(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 5);
+var BloodParticleNumber = round(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 2);
 
 if(other.stats.Tracer_image == 2){
 	BloodParticleNumber = 1;

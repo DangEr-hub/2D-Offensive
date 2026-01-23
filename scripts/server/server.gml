@@ -130,8 +130,8 @@ function server_process_bird_death(bird_inst, damage, make_snd = true){
     }
 	
 	if(make_snd == true){
-		var BloodSplashNumber = ceil(damage / 5);
-		var BloodParticleNumber = ceil(damage / 2);
+		var BloodSplashNumber = round(damage / 5);
+		var BloodParticleNumber = round(damage / 2);
 		create_blood(BloodSplashNumber, bird_inst.x, bird_inst.y, c_red, BloodParticleNumber);
 	
 		play_sound(x, y, snd_BirdDeath, find_instance_by_network_id(oPlayer, oNetworkManager.my_pid));

@@ -391,9 +391,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	
 			if(StaminaHealingTimer == -1){
 				if(stats.Stamina_points >= 0 && stats.Stamina_points < global.player_stats_struct.Max_stamina){
-					var stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/50);
+					var stamina_healing_power = round(global.player_stats_struct.Max_stamina/50);
 					if(moving_state == STATES_PLAYER.prone_state){
-						stamina_healing_power = ceil(global.player_stats_struct.Max_stamina/10);
+						stamina_healing_power = round(global.player_stats_struct.Max_stamina/10);
 					}
 					if(stats.Stamina_points <= global.player_stats_struct.Max_stamina - stamina_healing_power){
 						stats.Stamina_points += stamina_healing_power;
@@ -416,7 +416,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Bot selection and command
-			if(keyboard_check_pressed(global.KeyBinds[| KEY.KeySelectBot])){
+			if(keyboard_check_pressed(global.KeyBinds[| KEY.SelectBot])){
 			    ds_list_clear(bot_select_list);
 
 
@@ -457,7 +457,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			    bot_select_index = -1;
 			}
 			
-			if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyCommandBot])){
+			if(keyboard_check_pressed(global.KeyBinds[| KEY.CommandBot])){
 			    if(selected_bot != noone){
 					command[0] = oCrosshair.x;
 					command[1] = oCrosshair.y;
@@ -498,7 +498,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Drop weapon
-			if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyDropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != STATES_PLAYER.machine_gun_state){
+			if(keyboard_check_pressed(global.KeyBinds[| KEY.DropWeapon]) && player_can_shoot == true && !global.my_console[? "active"] && !is_inventory_full() && moving_state != STATES_PLAYER.machine_gun_state){
 				player_has_scope = -1; ScopeIn = false;	
 				gain_item(
 					wpn_id, 1, global.Inventory[# WeaponID, Index.slot_ammo], global.Inventory[# WeaponID, Index.slot_clip_ammo], 
@@ -512,7 +512,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Hold stamina
 			stamina_inaccuracy = 1;
 			if (!global.my_console[? "active"] && wpn_id != Item.None){
-				if(keyboard_check(global.KeyBinds[| KEY.KeyHoldStamina]) && stats.Stamina_points > 0){
+				if(keyboard_check(global.KeyBinds[| KEY.HoldStamina]) && stats.Stamina_points > 0){
 					statistics_hit("Stamina", STAMINA_HOLD_VALUE, id);
 					stamina_inaccuracy = .5;
 				}
@@ -522,20 +522,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Legs animation
 			Legs.image_speed = (global.my_console[$ "active"] || moving_state == STATES_PLAYER.prone_state || moving_state == STATES_PLAYER.machine_gun_state || 
 			moving_state == STATES_PLAYER.mortar_state || instance_exists(oInventory) || Moving == false) ? 0 : 1;
-			#endregion
-	
-			#region Buy menu
-			if (!global.my_console[? "active"] && !instance_exists(oInventory) && moving_state != STATES_PLAYER.mortar_state && 
-			keyboard_check_pressed(global.KeyBinds[| KEY.KeyBuyMenu])) {
-			    if (instance_exists(oBuyMenu)) {
-			        player_can_shoot = true;
-			        with (oBuyMenuDescription) zui_destroy();
-			        with (oBuyMenu) zui_destroy();
-			    } else {
-			        player_can_shoot = false;
-			        with (zui_main()) zui_create(zui_get_width()*.5, zui_get_height()*.5, oBuyMenu);
-			    }
-			}
 			#endregion
 	
 			#region Scope attachments
@@ -620,7 +606,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#endregion
 		
 					#region Low health camera shake
-					if(stats.Health_points <= ceil(global.player_stats_struct.Max_health/2)){
+					if(stats.Health_points <= round(global.player_stats_struct.Max_health/2)){
 						LowHPCrossShake = 1;
 						ViewAngleAmplitude += 0.5;
 						LowHPViewAngleFrequency = 75;
@@ -784,7 +770,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Shooting mode
 			var Shoot = -1; var shooting_mode = ds_list_find_value(global.ItemIndex[#wpn_id, ItemStat.ShootingMode], weapon_shooting_mode);
 	
-			if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyChangeMode]) && shooting == false){
+			if(keyboard_check_pressed(global.KeyBinds[| KEY.ChangeMode]) && shooting == false){
 				var list_size = ds_list_size(global.ItemIndex[#wpn_id, ItemStat.ShootingMode]);
 				if(weapon_shooting_mode < list_size){ weapon_shooting_mode = (weapon_shooting_mode + 1) % list_size; }
 			}
@@ -797,18 +783,18 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}else{
 					KickBackTime = round(.5 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
 				}
-				Shoot = input_check(global.KeyBinds[| KEY.KeyShootMouse]);
-				if(input_check(global.KeyBinds[| KEY.KeyShootMouse], false, true) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true)){
+				Shoot = input_check(global.KeyBinds[| KEY.ShootMouse]);
+				if(input_check(global.KeyBinds[| KEY.ShootMouse], false, true) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true)){
 					kick_back_timer = KickBackTime; shooting = false; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
 			}else if(shooting_mode == "Semi" || shooting_mode == "Burst"){
 				KickBackTime = round(.25 * game_get_speed(gamespeed_fps) * global.ItemIndex[#wpn_id, ItemStat.KBResetMultiplier]);
-				Shoot = input_check(global.KeyBinds[| KEY.KeyShootMouse], true);
+				Shoot = input_check(global.KeyBinds[| KEY.ShootMouse], true);
 				/* Jelikož se při auto modu vždycky resetne "shooting" na false po tom co hráč releasne tlačítko na střílení, musel jsem přidat "shooting_reset_timer" */
-				if(input_check(global.KeyBinds[| KEY.KeyShootMouse], false, false) && shooting_reset_timer == -1){
+				if(input_check(global.KeyBinds[| KEY.ShootMouse], false, false) && shooting_reset_timer == -1){
 					shooting_reset_timer = KickBackTime;
 				}
-				if((input_check(global.KeyBinds[| KEY.KeyShootMouse], false, true) && global.Inventory[# WeaponID, Index.slot_ammo] > 0) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true && shooting_reset_timer == -1)){
+				if((input_check(global.KeyBinds[| KEY.ShootMouse], false, true) && global.Inventory[# WeaponID, Index.slot_ammo] > 0) || (global.Inventory[# WeaponID, Index.slot_ammo] <= 0 && shooting == true && shooting_reset_timer == -1)){
 					shooting_reset_timer = KickBackTime; kick_back_timer = KickBackTime; crosshair_position[0] = oCrosshair.x; crosshair_position[1] = oCrosshair.y;
 				}
 				
@@ -845,7 +831,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if!(global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] == -1){
 				if(wpn_id != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None && moving_state != STATES_PLAYER.mortar_state && item_equip_timer == -1){
 					if (player_can_shoot == true && !global.my_console[? "active"]) {
-						if(input_check(global.KeyBinds[| KEY.KeyShootMouse], true, false) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
+						if(input_check(global.KeyBinds[| KEY.ShootMouse], true, false) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
 							play_sound(x, y, snd_empty_magazine);
 						}
 					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[# wpn_id, ItemStat.Defense] == 1))){
@@ -919,10 +905,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Movement
 			if(player_can_shoot == true && !global.my_console[? "active"] && moving_state < STATES_PLAYER.machine_gun_state){
-				var Up = keyboard_check(global.KeyBinds[| KEY.KeyUp]);
-				var Right = keyboard_check(global.KeyBinds[| KEY.KeyRight]);
-				var Left = keyboard_check(global.KeyBinds[| KEY.KeyLeft]);
-				var Down = keyboard_check(global.KeyBinds[| KEY.KeyDown]);
+				var Up = keyboard_check(global.KeyBinds[| KEY.Up]);
+				var Right = keyboard_check(global.KeyBinds[| KEY.Right]);
+				var Left = keyboard_check(global.KeyBinds[| KEY.Left]);
+				var Down = keyboard_check(global.KeyBinds[| KEY.Down]);
 				MoveDirection = point_direction(Left, Up, Right, Down);
 				var Delta = delta_time / 1000000;
 				var xpos = Right - Left;
@@ -1079,7 +1065,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(player_can_shoot == true){
 			
 				#region Light attack
-				if(input_check(global.KeyBinds[| KEY.KeyKnifeLight], true, false) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
+				if(input_check(global.KeyBinds[| KEY.KnifeLight], true, false) && stats.Stamina_points >= STAMINA_KNIFE_LIGHT){
 					if(knife_attack_timer == -1){
 						knife_attack_timer = global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed];
 						Knife.stats.Reward = global.ItemIndex[# wpn_id, ItemStat.reward];
@@ -1092,7 +1078,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 		
 				#region Heavy attack
-				if(input_check(global.KeyBinds[| KEY.KeyKnifeHeavy], true, false) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
+				if(input_check(global.KeyBinds[| KEY.KnifeHeavy], true, false) && stats.Stamina_points >= STAMINA_KNIFE_HEAVY){
 					if(knife_attack_timer == -1){
 						knife_attack_timer = global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed];
 						Knife.stats.Reward = global.ItemIndex[# wpn_id, ItemStat.reward];
@@ -1166,7 +1152,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Running and prone and machine gun
 			if(!global.my_console[? "active"]){
 	
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyProne]) && Moving == false){
+				if(keyboard_check_pressed(global.KeyBinds[| KEY.Prone]) && Moving == false){
 					if(moving_state == STATES_PLAYER.none_state){
 						moving_state = STATES_PLAYER.prone_state;
 					}else if(moving_state == STATES_PLAYER.prone_state){
@@ -1177,7 +1163,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(instance_exists(oMortar) && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments)){
 					var mortar = instance_nearest(x, y, oMortar);		
 					if(distance_to_object(mortar) <= PickUpDistance){
-						if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyPickUp])){
+						if(keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
 							if(moving_state == STATES_PLAYER.none_state){ /// Pokud neběži ani se neplazí
 								player_can_shoot = false;
 								with(zui_main()){
@@ -1199,7 +1185,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(instance_exists(oMachineGun)){
 					var machine_gun = instance_nearest(x, y, oMachineGun);		
 					if(distance_to_object(machine_gun) <= PickUpDistance){
-						if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyPickUp])){
+						if(keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
 							if(moving_state == STATES_PLAYER.none_state && global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None){ /// Pokud neběži ani se neplazí
 						
 								#region Equip machine gun
@@ -1291,7 +1277,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 			}
 	
-			if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyToggleNightVision]) && !global.my_console[? "active"]){
+			if(keyboard_check_pressed(global.KeyBinds[| KEY.ToggleNightVision]) && !global.my_console[? "active"]){
 				if(global.Inventory[# OtherSlot.Helmet, Index.slot_durability] > 0){
 					if(string_pos("night vision", global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.Name]) > 0){
 						play_sound(x, y, snd_ToggleNightVision);
@@ -1360,7 +1346,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!global.my_console[? "active"] && !instance_exists(oBuyMenu) && moving_state != STATES_PLAYER.mortar_state){
 		
 				#region Inventory
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyInventory])){
+				if(keyboard_check_pressed(global.KeyBinds[| KEY.Inventory])){
 					if(player_can_shoot == true){
 						instance_create_layer(x, y, "OtherO", oInventory);
 						player_can_shoot = false;
@@ -1382,7 +1368,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(instance_exists(oItems)){
 				    var Items = instance_nearest(x, y, oItems);
 				    if(distance_to_object(Items) <= PickUpDistance){   
-				        if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyPickUp])){
+				        if(keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
 				            with(Items){
 				                gain_item(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
 								destroy_pickup_instance(id);
@@ -1393,7 +1379,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 				
 				#region Item cycling
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyCycleRight])){
+				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleRight])){
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
@@ -1404,7 +1390,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					}
 					item_use_position = max(item_use_position, 0);
 				}			
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.KeyCycleLeft])){
+				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleLeft])){
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
@@ -1419,7 +1405,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 
 				#region Item use
-				if(input_check(global.KeyBinds[| KEY.KeyUseItem], true, false) && !instance_exists(oInventory) && moving_state != STATES_PLAYER.machine_gun_state
+				if(input_check(global.KeyBinds[| KEY.UseItem], true, false) && !instance_exists(oInventory) && moving_state != STATES_PLAYER.machine_gun_state
 				 && !instance_exists(oWeaponAttachments) ){
 					var Id = global.Inventory[# item_use_position, Index.slot_id];
 			
@@ -1590,7 +1576,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 		
 				#region Scope
-				var ScopeButton = input_check(global.KeyBinds[| KEY.KeyScope], false, false);
+				var ScopeButton = input_check(global.KeyBinds[| KEY.Scope], false, false);
 				if!(instance_exists(oInventory)){
 					if(global.Inventory[# WeaponID, Index.slot_scope] != Item.None && CanShoot == true && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 						if(ScopeButton){
@@ -1706,7 +1692,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			  }
 			 AmmoNeeded = global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] - global.Inventory[# WeaponID, Index.slot_ammo];
 
-			  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KEY.KeyReload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None && FlashedAlpha <= 0){
+			  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KEY.Reload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None && FlashedAlpha <= 0){
 			    Reloading = true;
 			    ReloadTimer = global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed];
 			  }
@@ -1808,6 +1794,10 @@ if (should_handle_death) {
 	if(is_local || !IS_NET){
 	    round_end("Loss");
 	    camera_set_view_angle(CAM, 0);
+	}
+	
+	with(oBuyMenuDescription){
+		zui_destroy();	
 	}
 
     play_sound(x, y, choose(snd_Death1, snd_Death2));

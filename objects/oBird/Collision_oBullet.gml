@@ -1,8 +1,8 @@
 var damage = other.stats.Damage;
 
 if(!IS_NET){
-	var BloodSplashNumber = ceil(damage / 5);
-	var BloodParticleNumber = ceil(damage / 2);
+	var BloodSplashNumber = round(damage / 5);
+	var BloodParticleNumber = round(damage / 2);
 
 	create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
 }

@@ -32,9 +32,9 @@ if(instance_exists(global.local_player)){
 	        WobbleY += 5*max(100/(global.local_player.stats.Stamina_points + 1), 3) * 1.5;
 	        WobbleScopeInMultiplier = clamp(100/(global.local_player.stats.Stamina_points + 1), 3, 10);
 	    } else {
-	        WobbleX += 5*max(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0);
-	        WobbleY += 5*max(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
-	        WobbleScopeInMultiplier = clamp(ceil((100/(global.local_player.stats.Stamina_points + 1)) - 1)*5, 0, 10);
+	        WobbleX += 5*max(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0);
+	        WobbleY += 5*max(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
+	        WobbleScopeInMultiplier = clamp(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*5, 0, 10);
 	    }
 	}
 

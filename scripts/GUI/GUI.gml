@@ -113,6 +113,9 @@ function reset_gui(){
 		with(zui_main()){
 			zui_create(zui_get_width() * .5, zui_get_height() * .5, oBuyMenu);
 		}
+		with(oBuyMenuDescription){
+			zui_destroy();
+		}
 	}
 	if(instance_exists(oDraw)){
 		with(oDraw){

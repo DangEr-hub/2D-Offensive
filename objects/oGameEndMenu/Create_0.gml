@@ -1,5 +1,5 @@
 event_inherited();
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 pause_width_tab = 384 * global.GUIMultiplier;
 pause_height_tab = max(512 * global.GUIMultiplier, 768);
 //pause_width_tab = 768 * global.GUIMultiplier;
@@ -127,7 +127,7 @@ with (zui_create(title_position_x - score_string_width/2 + player_score_string_w
 	color = c_dkgray;
 	caption = other.enemy_score;
 }
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 #endregion
 
 

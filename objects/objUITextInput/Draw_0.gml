@@ -9,7 +9,7 @@ if (zui_get_hover()) {
 
 draw_sprite_stretched_ext(sprButton, 0, -1, -1, __width, __height, draw_get_color(), alpha * alpha_value);
 draw_set_valign(1);
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 draw_text_outlined(x + 5, y + zui_get_height()/2, text, c_white, c_black, 1);
 
 if (active) {

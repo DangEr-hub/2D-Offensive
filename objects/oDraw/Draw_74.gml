@@ -9,7 +9,7 @@ if(instance_exists(oPlayer)){
 	}
 	aberration_level = global.aberration_level;
 	saturation_level = global.saturation_level;
-	if(global.local_player.stats.Health_points <= ceil(global.player_stats_struct.Max_health/2) && global.local_player.stats.Health_points > 0){
+	if(global.local_player.stats.Health_points <= round(global.player_stats_struct.Max_health/2) && global.local_player.stats.Health_points > 0){
 		aberration_level = clamp(global.local_player.stats.Health_points/500, 0.01, 0.05);
 		saturation_level = min(0 + global.local_player.stats.Health_points/100, global.saturation_level);
 	}

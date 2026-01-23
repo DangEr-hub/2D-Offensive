@@ -2,7 +2,7 @@ event_inherited();
 pause_width_tab = 384 * global.GUIMultiplier;
 pause_height_tab = 384 * global.GUIMultiplier;
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(pause_width_tab, pause_height_tab);
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {

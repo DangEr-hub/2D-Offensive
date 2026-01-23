@@ -3,7 +3,7 @@ setting_tab_width = 512 * global.GUIMultiplier;
 setting_tab_height = 512 * global.GUIMultiplier;
 
 //draw_set_valign(1);
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(setting_tab_width, setting_tab_height);
 
 gap = 256 * global.GUIMultiplier;

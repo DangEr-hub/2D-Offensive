@@ -2,7 +2,7 @@ event_inherited();
 weapon_description_width = max(896 * global.GUIMultiplier, 1080);
 weapon_description_height = max(192 * global.GUIMultiplier, 256);
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(weapon_description_width, weapon_description_height);
 
 cell_width = min(192 * global.GUIMultiplier, 256);

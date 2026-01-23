@@ -21,6 +21,7 @@ global.hard_mode = false;
 global.Weather = 0;
 
 
+
 global.player_stats_struct = {
 	Name: "DangEr",
 	All_shots: 0,
@@ -28,6 +29,7 @@ global.player_stats_struct = {
 	Kills: 0,
 	Hit_shots: 0,
 	Deaths: 0,
+	Diamonds: 1000,
     Get_KD: function() {
         return (Deaths != 0) ? (Kills / Deaths) : 0;
     },
@@ -188,13 +190,13 @@ global.MapProperties[#MAP.Nuclear, MAP_STAT.MapEndHours] = 20 * 60;
 
 
 enum KEY{
-	KeyUp, KeyLeft, KeyDown, KeyRight,
-	KeyInventory, KeyPickUp, KeyCycleLeft,
-	KeyCycleRight, KeyShootMouse, KeyReload,
-	KeyGrenadeThrowMouse, KeyPause, KeyToggleNightVision, KeyChangeMode,
-	KeyProne, KeyWeaponAttachments, KeySelectBot, KeyCommandBot, 
-	KeyBuyMenu, KeyHoldStamina, KeyDropWeapon, KeyConsole,
-	KeyKnifeLight, KeyKnifeHeavy, KeyUseItem, KeyScope,
+	Up, Left, Down, Right,
+	Inventory, PickUp, CycleLeft,
+	CycleRight, ShootMouse, Reload,
+	GrenadeThrowMouse, Pause, ToggleNightVision, ChangeMode,
+	Prone, WeaponAttachments, SelectBot, CommandBot, 
+	BuyMenu, HoldStamina, DropWeapon, Console,
+	KnifeLight, KnifeHeavy, UseItem, Scope,
 	Total
 }
 

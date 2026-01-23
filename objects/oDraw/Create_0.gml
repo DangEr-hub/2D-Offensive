@@ -7,7 +7,7 @@ KilledByWeapon = "Nothing";
 KilledByName = "No one";
 var_slot = 0;
 item_description = "";
-Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.KeyPickUp])) + "]";
+Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.PickUp])) + "]";
 HUDShift = 16;
 
 NightVisionSurface = -1;

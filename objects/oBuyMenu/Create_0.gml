@@ -1,8 +1,8 @@
 event_inherited();
-buy_menu_width = clamp(1182 * global.GUIMultiplier, ceil(global.GuiW * .75), ceil(global.GuiW * .975));
-buy_menu_height = clamp(798 * global.GUIMultiplier, ceil(global.GuiH * .75), ceil(global.GuiH * .975));
+buy_menu_width = clamp(1182 * global.GUIMultiplier, round(global.GuiW * .825), round(global.GuiW * .975));
+buy_menu_height = clamp(798 * global.GUIMultiplier, round(global.GuiH * .825), round(global.GuiH * .975));
 
-draw_set_font(set_font("Menu_small"));
+draw_set_font(set_font("GUI_small"));
 zui_set_size(buy_menu_width, buy_menu_height);
 
 
@@ -16,7 +16,7 @@ function create_buy_item(_x, _y, _item, _clickable){
         zui_set_size(other.button_width, other.button_height);
         zui_set_anchor(0.5, 0);
         caption_color = MAIN_COLOR;
-        caption_offset_y = -other.button_height/4 - 8;
+        caption_offset_y = -other.button_height/4 - 4;
         caption = string(global.ItemIndex[#_item, ItemStat.Name]);
     }
 
@@ -57,13 +57,14 @@ function create_buy_item(_x, _y, _item, _clickable){
     }
 }
 
-button_width = min(128 * global.GUIMultiplier, 192);
+button_width = min(144 * global.GUIMultiplier, 192);
 button_height = min(64 * global.GUIMultiplier, 96);
 buy_items = [
-    [Item.AKM, Item.m4a1, Item.SG550, Item.SSG08, Item.awm, Item.galil, Item.MK18],
-    [Item.MAC11, Item.famas, Item.Spas, Item.None, Item.None, Item.None, Item.None],
+    [Item.AKM, Item.m4a1, Item.SG550, Item.galil, Item.MK18, Item.famas, Item.None],
+    [Item.MAC11, Item.Spas, Item.None, Item.None, Item.None, Item.None, Item.None],
+	[Item.SSG08, Item.awm, Item.Dragunov, Item.None, Item.None, Item.None, Item.None],
     [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.None, Item.None],
-    [Item.Javelin, Item.Dragunov, Item.None, Item.None, Item.None, Item.None, Item.None],
+    [Item.Javelin, Item.None, Item.None, Item.None, Item.None, Item.None, Item.None],
     [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.HealingKit, Item.None, Item.None],
     [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None]
 ];

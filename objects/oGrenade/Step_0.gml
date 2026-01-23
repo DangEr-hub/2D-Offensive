@@ -117,7 +117,7 @@ if(ExplosionTimer == -1 || ExplodeTimer == -1){
 						oBot.Reloading = false;
 						oBot.Flashed = true;
 						oBot.trigger_texture_timer = oBot.trigger_texture_time;
-						oBot.FlashedTimer = ceil(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
+						oBot.FlashedTimer = round(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
 						#endregion
 						
 					}
