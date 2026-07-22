@@ -5,9 +5,8 @@ function create_fog(xx, yy, radius, dir, spd, rot_spd, num, alpha, fade, time, m
 		Fog.moving_x = moving[0];
 		Fog.moving_y = moving[1];
 		with(Fog){
-			smoke_setup(radius, dir, spd, rot_spd, num, alpha, fade, time);	
+			smoke_setup(radius, dir, spd, rot_spd, num, alpha, fade, time * global.time_step);	
 		}
-		
 		return Fog;
 	}
 	
@@ -26,7 +25,7 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 	GrenadeObject.stats = {
 		Object_index: ObjectType.object_index,
 		Owner_name: ObjectType.stats.Name,
-		Speed: max(GrenadeSpeed + (DotProduct * .1), 1),
+		Speed: max(GrenadeSpeed * global.time_step + (DotProduct * .1), 1),
 		Object: ObjectType,
 		Item_id: ItemID,
 		Direction: point_direction(PositionX, PositionY, TargetX, TargetY)
@@ -42,13 +41,13 @@ function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness
 				sprite_index = Sprite;
 				image_angle = Angle;
 				fric = Friction;
-				image_speed = ImageSpeed;
+				image_speed = ImageSpeed * global.time_step;
 				Stay = CanStay;
 				Bounce = CanBounce;
 				image_index = ImageIndex;
 				alpha = Alpha;
-				FadeAwayTimer = FadeAwayTime;
-				motion_add(Dir + AngleRandomness, Speed);
+				FadeAwayTimer = FadeAwayTime * global.time_step;
+				motion_add(Dir + AngleRandomness, Speed * global.time_step);
 			}
 		}
 	}
@@ -77,7 +76,7 @@ function explosion_create(ShrapnelNumber, pos, ExplosionDamage, Destroy, ObjectT
 			[
 				Id,
 				i * (360/ShrapnelNumber),
-				BULLET_SPEED * .75,
+				BULLET_SPEED * global.time_step,
 				ExplosionDistance,
 			],
 			ObjectType,

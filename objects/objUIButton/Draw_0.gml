@@ -1,4 +1,3 @@
-// 1. Definujeme referenční (designovou) velikost tlačítka
 var ref_w = 192;
 var ref_h = 64;
 
@@ -6,7 +5,6 @@ var ref_h = 64;
 var ratio_x = __width / ref_w;
 var ratio_y = __height / ref_h;
 
-// 3. Použijeme menší z poměrů, aby sprite zůstal poměrově správně a "nevytekl" (Uniform Scale)
 var final_scale = min(ratio_x, ratio_y) * 2;
 
 if (zui_get_hover()) {

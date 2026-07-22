@@ -167,7 +167,7 @@ with (zui_create(statistics_x, rank_title_y + text_gap*4, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.headshot_percentage;
 	color = c_white;
-	caption = "Headshot percentage: " + string(global.player_stats_struct.Get_headshot_percentage()) + "%";
+	caption = "Headshot percentage: " + string(global.player_stats_struct.Get_headshot_percentage()) + " %";
 }
 
 with (zui_create(statistics_x, rank_title_y + text_gap*5, objUILabel)) {

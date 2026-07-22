@@ -13,68 +13,69 @@ function is_inventory_full(Item = Item.None){
 }
 
 function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, Destroy = true) {
-	Slot = 4;
-	while(Slot < INVENTORY_SIZE){
-	    if(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-	        if (global.Inventory[# Slot, Index.slot_id] == Item.None){
-	            global.Inventory[# Slot, Index.slot_id] = ID;
-	            global.Inventory[# Slot, Index.SlotAmount] += Amount;
-				global.Inventory[# Slot, Index.slot_durability] = ItemDurability;
-	            if(global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-	                ///Weapon
-	                Id = global.Inventory[# Slot, Index.slot_id];
-	                global.Inventory[# Slot, Index.slot_ammo] = ItemAmmo;
-	                global.Inventory[# Slot, Index.slot_clip_ammo] = ItemClipAmmo;
-					global.Inventory[# Slot, Index.slot_scope] = (ItemScope != Item.None) ? ItemScope : global.Inventory[# Slot, Index.slot_scope];
-					global.Inventory[# Slot, Index.slot_barrel] = (ItemBarrel != Item.None) ? ItemBarrel : global.Inventory[# Slot, Index.slot_barrel];
-					global.Inventory[# Slot, Index.slot_grip] = (ItemGrip != Item.None) ? ItemGrip : global.Inventory[# Slot, Index.slot_grip];
-					global.Inventory[# Slot, Index.slot_suppressor] = (Itemsuppressor != Item.None) ? Itemsuppressor : global.Inventory[# Slot, Index.slot_suppressor];
-	            }
-				if(Destroy == true){
-					destroy_pickup_instance(id);
-				}
-	            break;
-	        }
-	    }
-	    Slot ++;
+	var hotbar_n = 4;
+	var type = global.ItemIndex[#ID, ItemStat.Type];
+	var is_stackable = !(type == "Armour" || type == "Helmet" || type == "Weapon" || type == "Shield");
+	var PickedUp = false;
+
+	// --- SEKCE 1: HLEDÁNÍ STEJNÉHO ID ---
+	if(is_stackable) {
+		// Nejdříve zkusíme přičíst item k existujícímu stacku kdekoli (včetně hotbaru)
+		for(var i = 0; i < INVENTORY_SIZE; i++) {
+			if(global.Inventory[# i, Index.slot_id] == ID) {
+				global.Inventory[# i, Index.SlotAmount] += Amount;
+				PickedUp = true;
+				break;
+			}
+		}
 	}
 
-	///Item
-	if!(global.ItemIndex[#ID, ItemStat.Type] == "Armour" || global.ItemIndex[#ID, ItemStat.Type] == "Helmet" || global.ItemIndex[#ID, ItemStat.Type] == "Weapon"){
-	    var yy = 4;
-		var PickedUp = false;
-	    repeat(INVENTORY_SIZE){
-	        if(global.Inventory[#yy, Index.slot_id] == ID){
-	            global.Inventory[# yy, Index.SlotAmount] += Amount;
-	            PickedUp = true;
-				if(Destroy == true){
-					destroy_pickup_instance(id);
+	// --- SEKCE 2: VOLNÉ MÍSTO (Pro zbraně nebo nové itemy) ---
+	if(!PickedUp) {
+		// Priorita 1: Hledáme volné místo od hotbar_n výše
+		for(var i = hotbar_n; i < INVENTORY_SIZE; i++) {
+			if(global.Inventory[# i, Index.slot_id] == Item.None) {
+				insert_item_to_slot(i, ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, type);
+				PickedUp = true;
+				break;
+			}
+		}
+		
+		// Priorita 2: Pokud je stále plno, zkusíme volné místo v hotbaru (0 až hotbar_n-1)
+		if(!PickedUp) {
+			for(var i = 0; i < hotbar_n; i++) {
+				if(global.Inventory[# i, Index.slot_id] == Item.None) {
+					insert_item_to_slot(i, ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope, ItemBarrel, ItemGrip, Itemsuppressor, type);
+					PickedUp = true;
+					break;
 				}
-	            break;
-	        }else{
-	            yy ++;
-	        }
-	    }
-    
-	    ///All items
-	    if(!PickedUp){
-	        yy = 4;
-	        repeat(INVENTORY_SIZE){
-	            if(global.Inventory[#yy, Index.slot_id] == Item.None){
-	                global.Inventory[# yy, Index.slot_id] = ID;
-	                global.Inventory[# yy, Index.SlotAmount] += Amount;
-					if(Destroy == true){
-						destroy_pickup_instance(id);
-					}
-	                PickedUp = true;
-	                break;
-	            }else{
-	                yy ++;
-	            }
-	        }
-	    }
+			}
+		}
 	}
+
+	// --- FINÁLNÍ ZNIČENÍ PICKUPU ---
+	if(PickedUp) {
+		if(Destroy) { destroy_pickup_instance(id); }
+		return true;
+	}
+
 	return false;
+}
+
+// Pomocná funkce
+function insert_item_to_slot(_slot, _ID, _Amount, _Ammo, _Clip, _Dur, _Scope, _Barr, _Grip, _Supp, _type) {
+	global.Inventory[# _slot, Index.slot_id] = _ID;
+	global.Inventory[# _slot, Index.SlotAmount] = _Amount;
+	global.Inventory[# _slot, Index.slot_durability] = _Dur;
+	
+	if(_type == "Weapon") {
+		global.Inventory[# _slot, Index.slot_ammo] = _Ammo;
+		global.Inventory[# _slot, Index.slot_clip_ammo] = _Clip;
+		if(_Scope != Item.None) global.Inventory[# _slot, Index.slot_scope] = _Scope;
+		if(_Barr != Item.None)  global.Inventory[# _slot, Index.slot_barrel] = _Barr;
+		if(_Grip != Item.None)   global.Inventory[# _slot, Index.slot_grip] = _Grip;
+		if(_Supp != Item.None)  global.Inventory[# _slot, Index.slot_suppressor] = _Supp;
+	}
 }
 
 function inventory_create() {
@@ -137,7 +138,7 @@ function InventoryInit() {
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, Total
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, Total
 	}
 
 	enum ItemStat{
@@ -203,7 +204,7 @@ function ItemDeclare(){
 function ItemAmountSubstract(ID, Amount){
 	global.Inventory[# ID, Index.SlotAmount] -= Amount;
 	if(global.Inventory[# ID, Index.SlotAmount] <= 0){
-		for(i=0;i<ds_grid_height(global.Inventory);i++){
+		for(i=0;i<Index.Total;i++){
 			global.Inventory[# ID, i] = 0;
 		}
 	}
@@ -450,6 +451,29 @@ function item_swap(type, slot_type){
 		global.Inventory[# VarSlot, Index.slot_grip] = TempArray[Index.slot_grip];
 		global.Inventory[# VarSlot, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
 		global.Inventory[# VarSlot, Index.slot_scope] = TempArray[Index.slot_scope];
+	}else if(type == "draw_varslot"){
+		// Uvnitř description od itemu/zbraně/armouru
+		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# oDraw.var_slot, Index.slot_id];
+		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# oDraw.var_slot, Index.SlotAmount];
+		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# oDraw.var_slot, Index.slot_ammo];
+		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo];
+		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# oDraw.var_slot, Index.slot_durability];
+		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# oDraw.var_slot, Index.SlotShootingType];
+		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# oDraw.var_slot, Index.slot_barrel];
+		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# oDraw.var_slot, Index.slot_grip];
+		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# oDraw.var_slot, Index.slot_suppressor];
+		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# oDraw.var_slot, Index.slot_scope];	
+	
+		global.Inventory[# oDraw.var_slot, Index.slot_id] = TempArray[Index.slot_id];
+		global.Inventory[# oDraw.var_slot, Index.SlotAmount] = TempArray[Index.SlotAmount];
+		global.Inventory[# oDraw.var_slot, Index.slot_ammo] = TempArray[Index.slot_ammo];
+		global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
+		global.Inventory[# oDraw.var_slot, Index.slot_durability] = TempArray[Index.slot_durability];
+		global.Inventory[# oDraw.var_slot, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
+		global.Inventory[# oDraw.var_slot, Index.slot_barrel] = TempArray[Index.slot_barrel];
+		global.Inventory[# oDraw.var_slot, Index.slot_grip] = TempArray[Index.slot_grip];
+		global.Inventory[# oDraw.var_slot, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
+		global.Inventory[# oDraw.var_slot, Index.slot_scope] = TempArray[Index.slot_scope];
 	}
 	
 	if(IS_NET){
@@ -461,6 +485,145 @@ function item_swap(type, slot_type){
 	}
 	
 	TempArray = undefined;	
+}
+
+function item_equip(slot, slot_string, weapon_id, equip = true){
+	var Id = global.Inventory[# slot, Index.slot_id];
+	var wpn_id = global.Inventory[# weapon_id, Index.slot_id];
+			
+	if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade") {
+				
+		#region Grenade use
+		if(EquippedGrenadeTimer == -1){
+			create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
+			global.ItemIndex[#Id, ItemStat.BulletCasingID], global.ItemIndex[#Id, ItemStat.ReloadSpeed], oCrosshair.x, oCrosshair.y, Id);						
+			ItemAmountSubstract(slot, 1);
+			EquippedGrenadeTimer = EquippedGrenadeTime;
+			grenade_angle = random(360);
+		}
+		#endregion
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+				
+		#region Landmine use
+		landmine_create(x, y, Id);
+		ItemAmountSubstract(slot, 1);
+		#endregion
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
+				
+		#region Item use
+		switch(Id){
+			case Item.HealingKit:
+			    if(!Healing && stats.Health_points < global.player_stats_struct.Max_health){
+			        global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			        HealingItemId = Item.HealingKit; Healing = true; ItemAmountSubstract(slot, 1);
+			    }
+			break;
+			case Item.low_cal_box:
+			case Item.med_cal_box:
+			case Item.high_cal_box:
+			case Item.gauge_box:
+			    var cal_needed = global.ItemIndex[# Id, ItemStat.caliber_type]; // Kalibr
+			    if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == cal_needed){
+			        var amt = global.ItemIndex[# Id, ItemStat.MaxAmmo];
+			        global.Inventory[# WeaponID, Index.slot_clip_ammo] += amt;
+			        damage_indicator("+" + string(amt), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
+			        ItemAmountSubstract(slot, 1);
+			    }
+			break;			
+			case Item.red_dot_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
+			case Item.two_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
+			case Item.adaptive_chambering: weapon_attachment_equip(Id, Index.slot_barrel); break;	
+			case Item.vertical_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
+			case Item.horizontal_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
+			case Item.advanced_suppressor: weapon_attachment_equip(Id, Index.slot_suppressor); break;	
+			case Item.range_finder: weapon_attachment_equip(Id, Index.slot_barrel); break;
+		}
+		#endregion
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+								
+		#region Primary equip and dequip
+		var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+		if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Primary);
+			primary_slot_id = Item.None;
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Primary);
+		}
+		#endregion
+				
+		#region Secondary equip and dequip
+		var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
+		if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Secondary);
+			secondary_slot_id = Item.None;
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Secondary);
+		}
+		#endregion
+				
+		#region Knife equip and dequip
+		var tertiary_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
+		if (tertiary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Knife);
+			tertiary_slot_id = Item.None;
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			item_swap("slot_string", OtherSlot.Knife);
+		}
+		#endregion
+						
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Armour"){
+				
+		#region Armour equip and dequip
+		var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+		if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], armour_slot_id);
+			item_swap("slot_string", OtherSlot.Armour);
+			armour_slot_id = Item.None;
+			with(id){ equip_network_propagate(); }
+		} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], armour_slot_id);
+			item_swap("slot_string", OtherSlot.Armour);
+			with(id){ equip_network_propagate(); }
+		}
+		#endregion
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+				
+		#region Helmet equip and dequip
+		var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+		if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], helmet_slot_id);
+			item_swap("slot_string", OtherSlot.Helmet);
+			helmet_slot_id = Item.None;
+			with(id){ equip_network_propagate(); }
+		} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], helmet_slot_id);
+			item_swap("slot_string", OtherSlot.Helmet);
+			with(id){ equip_network_propagate(); }
+		}
+		#endregion
+				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
+				
+		#region Shield use
+		global.local_player.item_equip_timer = global.local_player.item_equip_time;
+		#endregion
+				
+	}	
 }
 
 

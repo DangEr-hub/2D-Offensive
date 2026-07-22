@@ -2,6 +2,7 @@ draw_set_font(set_font("Console"));
 var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
 
+
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
 	
 	#region Draw lens flare
@@ -23,7 +24,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		if(global.local_player.player_has_scope == 0){
 			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*5), 0.1);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
-			var ScopeRadius = sprite_get_width(spr_SniperScope) * 2;
+			var ScopeRadius = sprite_get_width(spr_SniperScope) * 1.75;
 			if (!surface_exists(BlackoutSurface)) {
 				BlackoutSurface = surface_create(SurfaceWidth, SurfaceHeight);
 			} else if (surface_get_width(BlackoutSurface) != SurfaceWidth || surface_get_height(BlackoutSurface) != SurfaceHeight) {
@@ -35,8 +36,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			ZoomValue = lerp(ZoomValue, scope_zoom_value, .01);
 			var captureWidth = ScopeRadius * 4;
 			var captureHeight = ScopeRadius * 4;
-			var captureX = oCrosshair.crosshair_x - captureWidth / 2;
-			var captureY = oCrosshair.crosshair_y - captureHeight / 2;
+			var captureX = (oCrosshair.crosshair_x - captureWidth / 2);
+			var captureY = (oCrosshair.crosshair_y - captureHeight / 2);
 
 			// Check if surface exists and then set its target
 			if (surface_exists(zoomSurface)) {
@@ -455,7 +456,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			
 			draw_text_outlined(money_x, money_y, "Money: ", c_white, c_black, 1);
 			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats_struct.Money), MAIN_COLOR, c_black, 1);
-			draw_sprite_ext(spr_Coin, 0, money_x + 8 + string_width(money_string)*1.1, money_y, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+			draw_sprite_ext(spr_Coin, 0, money_x + string_width(money_string) * .9, money_y, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 
 			draw_set_color(c_black);
 		
@@ -800,8 +801,10 @@ with(oSlot){
 				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
 					item_swap("varslot", OtherSlot.Primary);
 					primary_slot_id = Item.None;
+					with(global.local_player){ weapon_network_propagate(); }
 				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
 					item_swap("varslot", OtherSlot.Primary);
+					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
 				
@@ -810,8 +813,10 @@ with(oSlot){
 				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
 					item_swap("varslot", OtherSlot.Secondary);
 					secondary_slot_id = Item.None;
+					with(global.local_player){ weapon_network_propagate(); }
 				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
 					item_swap("varslot", OtherSlot.Secondary);
+					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
 				
@@ -820,10 +825,44 @@ with(oSlot){
 				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
 					item_swap("varslot", OtherSlot.Knife);
 					knife_slot_id = Item.None;
+					with(global.local_player){ weapon_network_propagate(); }
 				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
 					item_swap("varslot", OtherSlot.Knife);
+					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
+				
+				#region Armour equip and dequip
+				var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+				if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], armour_slot_id);
+					item_swap("varslot", OtherSlot.Armour);
+					armour_slot_id = Item.None;
+					with(global.local_player){ equip_network_propagate(); }
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], armour_slot_id);
+					item_swap("varslot", OtherSlot.Armour);
+					with(global.local_player){ equip_network_propagate(); }
+				}
+				#endregion
+				
+				#region Helmet equip and dequip
+				var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+				if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], helmet_slot_id);
+					item_swap("varslot", OtherSlot.Helmet);
+					helmet_slot_id = Item.None;
+					with(global.local_player){ equip_network_propagate(); }
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], helmet_slot_id);
+					item_swap("varslot", OtherSlot.Helmet);
+					with(global.local_player){ equip_network_propagate(); }
+				}
+				#endregion
+				
+				#region Shield use
+				#endregion
+				
 			}
 		}
 	

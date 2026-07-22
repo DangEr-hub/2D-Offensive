@@ -131,15 +131,15 @@ if(type == "Respawn menu"){
 					break;
 									
 					case ItemStat.ReloadSpeed:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + "s";
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + " s";
 					break;
 
 					case ItemStat.MovingSpdMul:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + " %";
 					break;
 
 					case ItemStat.PenetrationPower:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + "%";
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + " %";
 					break;
 									
 					case ItemStat.ShootTimer:
@@ -179,7 +179,7 @@ if(type == "Respawn menu"){
 	var rows = 1;
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
-	var statTitles = ["Weight: ", "Defense modifier: ", "Durability: "];
+	var statTitles = ["Weight: ", "Defense: ", "Durability: "];
 						
 	#region Draw grid
 	for (var i = 0; i < rows; i++) {
@@ -203,10 +203,19 @@ if(type == "Respawn menu"){
 						text = 
 							statTitles[statIndex - ItemStat.Weight] + 
 							string(global.Inventory[#oDraw.var_slot, Index.slot_durability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
-							"%";
+							" %";
 					break;
-					default:
-						text = statTitles[statIndex - ItemStat.Weight] + string(global.ItemIndex[#Id, statIndex]);
+					case ItemStat.Defense:
+						text = 
+							statTitles[statIndex - ItemStat.Weight] + 
+							string_format((1 - global.ItemIndex[# Id, ItemStat.Defense]) * 100, 0, 1) +
+							" %";
+					break;
+					case ItemStat.Weight:
+						text = 
+							statTitles[statIndex - ItemStat.Weight] + 
+							string_format((1 - global.ItemIndex[# Id, ItemStat.Weight]), 0, 1) +
+							" kg";
 					break;
 				}
 				#endregion
@@ -247,7 +256,7 @@ if(type == "Respawn menu"){
 				break;
 				
 				case "Penetration power: ":
-					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.PenetrationPower]*100) + "%";
+					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.PenetrationPower]*100) + " %";
 				break;
 				
 				case "Damage drop: ":

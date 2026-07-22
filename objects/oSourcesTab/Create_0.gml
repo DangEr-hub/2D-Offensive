@@ -1,15 +1,15 @@
 event_inherited();
-tab_width = 768 * global.GUIMultiplier;
-tab_height = 512 * global.GUIMultiplier;
+tab_width = 1536;
+tab_height = 1024;
 draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);
 
 pos_x = zui_get_width() * .01;
 pos_y = zui_get_height() * .1;
-gap = 170 * global.GUIMultiplier;
+gap = 120 * global.GUIMultiplier;
 gap_x = 210 * global.GUIMultiplier;
 text_height = string_height("a")*2;
-max_i = 17;
+max_i = 20;
 
 with (zui_create(0, 0, objUIWindowCaption)) {
 	caption = "Sources";
@@ -23,37 +23,46 @@ with (zui_create(zui_get_width() * .75, pos_y, objUILabel)) {
 
 
 source_names = [
-	"Headshot sound (1): ",
-	"Headshot sound (2): ",
-	"AWM sound: ",
-	"Spas-12 sound: ",
-	"Empty magazine sound: ",
-	"SSG 08 sound: ",
-	"Bullet nearby sound: ",
-	"Glock-17 sound: ",
-	"USP unsilenced sound: ",
-	"Metallic sound: ",
-	"Explosion sound: ",
-	"Birds sound: ",
-	"Rain sound: ",
+	"Headshot (1): ",
+	"Headshot (2): ",
+	"AWM: ",
+	"Spas-12: ",
+	"Empty magazine: ",
+	"SSG 08: ",
+	"Bullet nearby: ",
+	"Glock-17: ",
+	"USP unsilenced: ",
+	"Metallic: ",
+	"Explosion: ",
+	"Birds: ",
+	"Rain: ",
 	"GUI engine: ",
 	"Bloom shader: ",
 	"Blur shader: ",
-	"Armour hit sound: ",
-	"Metal hit sound: ",
+	"Armour hit: ",
+	"Metal hit: ",
 	"Hit no armour: ",
-	"Footsteps sound: ",
-	"Ear ring sound: ",
+	"Footsteps: ",
+	"Ear ring: ",
 	"Wood hit: ",
 	"Concrete hit: ",
 	"Glass hit: ",
-	"Airplane sound: ",
-	"Falling bomb sound: ",
+	"Airplane: ",
+	"Falling bomb: ",
 	"Few textures: ",
 	"Snow flake: ",
 	"Weapons (1): ",
 	"Weapons (2): ",
 	"Weapons (3): ",
+	"Beep: ",
+	"Machine gun: ",
+	"SG550: ",
+	"MK18: ",
+	"P250: ",
+	"MAC11: ",
+	"Bot ref (1): ",
+	"Bot ref (2): ",
+	"M4A1: ",
 ];
 
 sources = [
@@ -87,7 +96,16 @@ sources = [
 	"https://opengameart.org/content/snow-flake",
 	"https://arlantr.itch.io/free-guns-pixelart",
 	"https://munstudios.itch.io/2d-pixel-guns-pack",
-	"https://datdev.itch.io/pixel-guns-2d-weapon-pack"
+	"https://datdev.itch.io/pixel-guns-2d-weapon-pack",
+	"https://pixabay.com/sound-effects/technology-beep-sound-8333/",
+	"https://pixabay.com/sound-effects/film-special-effects-072807-heavy-machine-gun-50-caliber-39765/",
+	"https://pixabay.com/sound-effects/film-special-effects-m249-sound-effects-244559/",
+	"https://pixabay.com/sound-effects/film-special-effects-ak47-168856/",
+	"https://pixabay.com/sound-effects/film-special-effects-gun-shot-350315/",
+	"https://pixabay.com/sound-effects/film-special-effects-mp5-168858/",
+	"https://www.pngaaa.com/detail/800857",
+	"https://es.pixilart.com/art/top-down-sprite-sr2cf59db022b7e",
+	"https://pixabay.com/sound-effects/film-special-effects-gun-shot-2-530789/"
 	
 	
 	

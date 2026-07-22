@@ -1,5 +1,18 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function struct_merge_data(current_struct, saved_struct) {
+    if (saved_struct == undefined) return current_struct;
+    
+    var keys = variable_struct_get_names(saved_struct);
+    for (var i = 0; i < array_length(keys); i++) {
+        var key = keys[i];
+        if (variable_struct_exists(current_struct, key)) {
+            current_struct[$ key] = saved_struct[$ key];
+        }
+    }
+    return current_struct;
+}
+
 function save_game(){
 	
 	#region Save game
@@ -71,6 +84,16 @@ function save_game(){
 	}
 	var json_string = json_stringify(global.rating_struct);
 	var file = file_text_open_write("rating.json");
+	file_text_write_string(file, json_string);
+	file_text_close(file);
+	#endregion
+	
+	#region Save upgrades
+	if(file_exists("upgrades.json")){
+		file_delete("upgrades.json");
+	}
+	json_string = json_stringify(global.built_upgrades);
+	file = file_text_open_write("upgrades.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
 	#endregion
@@ -196,12 +219,36 @@ function load_game(){
 	}
 	#endregion
 	
+	#region Load upgrades
+	if (file_exists("upgrades.json")) {
+	    var file = file_text_open_read("upgrades.json");
+	    var json_string = file_text_read_string(file);
+	    file_text_close(file);
+	    global.built_upgrades = json_parse(json_string);
+		for (var i = 0; i < Item.Total; i++) {
+		        if (global.ItemIndex[# i, ItemStat.Type] == "Weapon") {
+		            var upgs = global.built_upgrades[$ string(i)];
+		            if (upgs == undefined) continue;
+            
+		            // Aplikujeme upgrady pouze pokud jsou ve structu nastaveny na true
+		            if (upgs.ammo)        global.ItemIndex[# i, ItemStat.MaxAmmo]          = round(global.ItemIndex[# i, ItemStat.BaseMaxAmmo] * AMMO_UPG);
+		            if (upgs.reload)      global.ItemIndex[# i, ItemStat.ReloadSpeed]      = global.ItemIndex[# i, ItemStat.BaseReloadSpeed] * RELOAD_UPG;
+		            if (upgs.equip)       global.ItemIndex[# i, ItemStat.EquipTime]        = global.ItemIndex[# i, ItemStat.BaseEquipTime] * EQUIP_UPG;
+		            if (upgs.movement)    global.ItemIndex[# i, ItemStat.MovingSpdMul]     = min(global.ItemIndex[# i, ItemStat.BaseMovingSpdMul] * MV_UPG, 1);
+		            if (upgs.penetration) global.ItemIndex[# i, ItemStat.PenetrationPower]  = min(global.ItemIndex[# i, ItemStat.BasePenetrationPower] * PEN_UPG, 1);
+		            if (upgs.damage)      global.ItemIndex[# i, ItemStat.Damage]           = global.ItemIndex[# i, ItemStat.BaseDamage] * DMG_UPG;
+		        }
+		    }
+	}
+	#endregion
+	
 	#region Load player stats
 	if (file_exists("player_stats.json")) {
 	    var file = file_text_open_read("player_stats.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
-	    global.player_stats_struct = json_parse(json_string);
+		var loaded_stats = json_parse(json_string);
+	    struct_merge_data(global.player_stats_struct, loaded_stats);
 		
 	    global.player_stats_struct.Get_KD = function() {
 	        return (global.player_stats_struct.Deaths != 0) ? (global.player_stats_struct.Kills / global.player_stats_struct.Deaths) : 0;

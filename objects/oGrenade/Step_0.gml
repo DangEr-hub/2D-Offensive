@@ -3,10 +3,10 @@
 if(stuck == false){
 	x += lengthdir_x(stats.Speed, stats.Direction);
 	y += lengthdir_y(stats.Speed, stats.Direction);
-	stats.Speed *= .95;
+	stats.Speed *= .95 * global.time_step;
 	
 	if!(place_meeting(x, y, oParentTile) && place_meeting(x, y, oBot)){
-		image_angle += stats.Speed*2;
+		image_angle += stats.Speed*2 * global.time_step;
 	}
 
 }
@@ -47,7 +47,7 @@ if(stats.Item_id == Item.StickyGrenade){
 }
 
 if(ExplodeTimer > -1){
-	ExplodeTimer --;
+	ExplodeTimer -= global.time_step;
 }
 
 #region Explode
@@ -58,10 +58,10 @@ if(stats.Speed < .1 && stats.Speed > .0001){
 }
 
 if(ExplosionTimer > -1){
-	ExplosionTimer --;
+	ExplosionTimer -= global.time_step;
 }
 
-if(ExplosionTimer == -1 || ExplodeTimer == -1){
+if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 	if(stats.Speed < .1){
 		if(stats.Item_id == Item.HEGrenade){
 			

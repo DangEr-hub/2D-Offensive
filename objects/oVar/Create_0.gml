@@ -19,6 +19,7 @@ global.CameraHeight = 1080/2;
 global.ranked_game = false;
 global.hard_mode = false;
 global.Weather = 0;
+global.time_step = 1;
 
 
 

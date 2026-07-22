@@ -1,7 +1,9 @@
 global.ParticleSystem = part_system_create();
 part_system_depth(global.ParticleSystem, -10000);
+part_system_automatic_update(global.ParticleSystem, false);
 
 leaf_emitter = part_emitter_create(global.ParticleSystem);
+part_timer = 0;
 
 //Headshot
 headshot_particle = part_type_create();

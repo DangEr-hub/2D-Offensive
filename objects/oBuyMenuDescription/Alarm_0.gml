@@ -91,12 +91,12 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
 		color = c_white;
-		caption = "Damage dropoff: ";
+		caption = "Damage drop-off: ";
 	}
 	
 	if(global.ItemIndex[#item_variable, ItemStat.Damage] > 0){
 		for(var i=0;i<damage_drop;i++){
-			with(zui_create(start_x + string_width("Damage dropoff: ")*1.15 + (i*32), start_y + text_gap*3, objUIImage)){
+			with(zui_create(start_x + string_width("Damage drop-off: ")*1.15 + (i*32), start_y + text_gap*3, objUIImage)){
 				zui_set_size(64, 64);
 				sprite = spr_difficulty_star;
 				sprite_image_index = 0
@@ -109,7 +109,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	
 	#region Range
 	function range_to_stars(_range){
-	    if(_range >= 850){return 5;}
+	    if(_range >= 825){return 5;}
 	    if(_range >= 770){return 4;}
 	    if(_range >= 600){return 3;}
 	    if(_range >= 550){return 2;}
@@ -245,11 +245,11 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
 		color = c_white;
-		caption = "Damage dropoff: ";
+		caption = "Damage drop-off: ";
 	}
 	
 	for(var i=0;i<damage_drop;i++){
-		with(zui_create(start_x + string_width("Damage dropoff: ")*1.15 + (i*32), start_y + text_gap, objUIImage)){
+		with(zui_create(start_x + string_width("Damage drop-off: ")*1.15 + (i*32), start_y + text_gap, objUIImage)){
 			zui_set_size(64, 64);
 			sprite = spr_difficulty_star;
 			sprite_image_index = 0

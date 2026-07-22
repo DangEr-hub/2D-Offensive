@@ -1,7 +1,7 @@
 if (alpha_timer > -1) {
-    alpha_timer--;
+    alpha_timer -= global.time_step;
 } else {
-    image_alpha -= .05;
+    image_alpha -= .05 * global.time_step;
     image_alpha = max(image_alpha, min_alpha);
 }
 
@@ -11,7 +11,7 @@ if (!explode) {
 
 if(explode == true){
 	if (image_timer < explosion_timer) {
-	    image_timer++;
+	    image_timer += global.time_step;
 	    var progress = image_timer / explosion_timer;
 	    image_index = lerp(ImageIndex, ImageIndex + 3, progress);
 	}else{

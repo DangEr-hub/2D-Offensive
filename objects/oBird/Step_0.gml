@@ -1,4 +1,13 @@
 /* oBird step event */
+if(state == 0){
+	speed = 0;
+	image_speed = base_is_walk * global.time_step;
+	walk_spd = base_spd_walk * global.time_step;
+}else{
+	speed = base_spd_fly * global.time_step;
+	image_speed = base_is_fly * global.time_step;
+}
+
 var margin = 32;
 if(x >= (room_width + margin) || x <= (0 - margin) || y >= (room_height + margin) || y <= (0 - margin)){
     if (IS_NET && oNetworkManager.is_server) {
@@ -72,10 +81,8 @@ if (state == 0) {
                 move_towards_point(move_pos[0], move_pos[1], walk_spd);
             }
         }
-        move_timer--;
+        move_timer -= global.time_step;
     }
-
-    image_speed = walk_spd * 0.4;
 }
 
 

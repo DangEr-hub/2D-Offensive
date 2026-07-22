@@ -1,5 +1,7 @@
 /* Create event */
 event_inherited();
+chasing_timer = -1;
+reload_timer = -1;
 predictive_side = choose(-1, 1);
 shoot_accumulator = 0;
 chasing_available = false;
@@ -11,8 +13,8 @@ target_x = x;
 target_y = y;
 has_suppressor = false;
 refresh_target_timer = 5 * game_get_speed(gamespeed_fps);
-alarm[1] = 1;
-team = TEAM.TERRORIST;//percent_chance(25) ? TEAM.POLICE : TEAM.TERRORIST;
+search_timer = 1;
+team = percent_chance(15) ? TEAM.POLICE : TEAM.TERRORIST;
 NearestDangerObject = noone;
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
@@ -23,7 +25,7 @@ EquippedLandMine = Item.None;
 stats = {};
 NearestDangerX = -1;
 NearestDangerY = -1;
-stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
+stats = create_enemy(85, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
 stats.Max_health_points = stats.Health_points;
 stats.Max_stamina_points = stats.Stamina_points;
 WeaponID = [0, 0];
@@ -77,7 +79,7 @@ GrenadeObject = noone;
 check_chasing_timer = 1 * game_get_speed(gamespeed_fps);
 alarm[6] = 1;
 sprite_index = team == TEAM.TERRORIST ? choose(spr_TerroristBot, spr_TerroristBot3, spr_TerroristBot2) : choose(spr_PoliceBot, spr_PoliceBot2);
-alarm[0] = 5;
+mv_timer = 5;
 
 #region Flashed
 FlashedTimer = -1;

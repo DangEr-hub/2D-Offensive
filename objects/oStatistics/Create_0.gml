@@ -55,7 +55,7 @@ with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(o
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.time;
 	color = c_white;
-	caption = "Average playing time: " + string(other.average_playing_time) + "s";
+	caption = "Average playing time: " + string(other.average_playing_time) + " s";
 }
 #endregion
 

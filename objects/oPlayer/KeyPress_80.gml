@@ -1,4 +1,5 @@
 if!(global.my_console[? "active"]){
-	round_end("Win");
-	//spawn_enemies(global.MapID);
+	if(global.time_step == 1){
+	global.time_step = .25;
+	}else{ global.time_step = 1;}
 }

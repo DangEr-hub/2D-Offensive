@@ -1,4 +1,10 @@
 #macro IS_NET instance_exists(oNetworkManager)
+#macro AMMO_UPG 1.25
+#macro RELOAD_UPG 0.75
+#macro EQUIP_UPG 0.5
+#macro MV_UPG 1.15
+#macro PEN_UPG 1.1
+#macro DMG_UPG 1.1
 #macro SMOKE_TIME 5 * game_get_speed(gamespeed_fps)
 #macro INTERPOLATION_SPD 0.3
 #macro HOTBAR_SIZE 4

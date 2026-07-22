@@ -5,8 +5,6 @@ if(is_local){
 			sprite_index = spr_BirdWalking;
 			image_index = 0;
 			state = 0;
-			speed = 0;
-			image_speed = 0.25;
 			alarm[0] = random_range(5 * game_get_speed(gamespeed_fps), 7 * game_get_speed(gamespeed_fps));
 			depth = layer_get_depth("LivingO") + 1;
 		}else{
@@ -15,8 +13,6 @@ if(is_local){
 			state = 1;
 			direction = random(360);
 			image_angle = direction;
-			speed = random_range(1, 2);
-			image_speed = 0.75;
 			depth = -1000;
 		}
 	}

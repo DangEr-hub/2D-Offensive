@@ -1,11 +1,12 @@
 part_pos = [local_to_world(32, 139), local_to_world(32, 116)];
+speed = base_spd * global.time_step;
 
 part_particles_create(global.ParticleSystem, part_pos[0][0], part_pos[0][1], oParticleSystem.fire_particle, 2);
 part_particles_create(global.ParticleSystem, part_pos[1][0], part_pos[1][1], oParticleSystem.fire_particle, 2);
 part_particles_create(global.ParticleSystem, part_pos[0][0], part_pos[0][1], oParticleSystem.FlameParticle, 2);
 part_particles_create(global.ParticleSystem, part_pos[1][0], part_pos[1][1], oParticleSystem.FlameParticle, 2);
 
-if(fog_timer > -1){ fog_timer --; }
+if(fog_timer > -1){ fog_timer -= global.time_step; }
 
 if(fog_timer == -1){
 	var Fog = create_fog(part_pos[0][0], part_pos[0][1], 15, random(360), 0.25, random_range(.5, 1), 

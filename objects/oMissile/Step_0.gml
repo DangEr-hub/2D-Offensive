@@ -6,7 +6,7 @@
 var scale = 1;
 if(!z_bouncing){
     // ===== APPROACH FROM HEIGHT =====
-    z -= z * z_approach;
+    z -= z * z_approach * global.time_step;
     if(z < 5){
         z = 0;
 
@@ -21,10 +21,10 @@ if(!z_bouncing){
 }else{
     // ===== BOUNCE =====
     z += zspeed - zgravity;
-    zspeed *= 0.9;
+    zspeed *= 0.9 * global.time_step;
     if(z <= 0){
         z = 0;
-        zmaxspeed *= 0.9;
+        zmaxspeed *= 0.9 * global.time_step;
         zspeed = zmaxspeed;
 
         // ukončení bouncu
@@ -44,7 +44,7 @@ image_yscale = scale;
 #endregion
 
 if(particle_timer > -1){
-	particle_timer --;
+	particle_timer -= global.time_step;
 }
 
 if(z_bouncing == false && z <= 1){

@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 4.214512,
+  "duration": 0.835792,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_machine_gun",
+  "soundFile": "snd_machine_gun.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.5,
 }

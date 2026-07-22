@@ -19,5 +19,5 @@
   "sampleRate": 48000,
   "soundFile": "snd_Spas.wav",
   "type": 0,
-  "volume": 0.15,
+  "volume": 0.1,
 }

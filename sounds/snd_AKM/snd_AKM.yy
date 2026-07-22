@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 2.848957,
+  "duration": 1.540104,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_AKM",
+  "soundFile": "snd_AKM.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.55,
 }

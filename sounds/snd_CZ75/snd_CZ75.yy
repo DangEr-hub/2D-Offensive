@@ -1,7 +1,7 @@
 {
   "resourceType": "GMSound",
   "resourceVersion": "1.0",
-  "name": "snd_ToggleNightVision",
+  "name": "snd_CZ75",
   "audioGroupId": {
     "name": "audiogroup_default",
     "path": "audiogroups/audiogroup_default",
@@ -10,14 +10,14 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.109501,
+  "duration": 1.392608,
   "parent": {
-    "name": "Other",
-    "path": "folders/Sounds/Other.yy",
+    "name": "Weapons",
+    "path": "folders/Sounds/Weapons.yy",
   },
   "preload": false,
   "sampleRate": 44100,
-  "soundFile": "snd_ToggleNightVision.wav",
+  "soundFile": "snd_CZ75.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.2,
 }

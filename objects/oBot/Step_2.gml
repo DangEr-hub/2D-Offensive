@@ -12,13 +12,13 @@ if(XSpeed == 0 && YSpeed == 0){
 	exit;
 }
 if(hasLegs){
-	Legs.image_speed = 1;
+	Legs.image_speed = (1 * global.time_step);
 }
 
 // --------------------
 // Y AXIS (hybrid move)
 // --------------------
-var ys = YSpeed;
+var ys = YSpeed * global.time_step;
 if(ys != 0){
 	var ystep = sign(ys);
 	// try full move
@@ -64,7 +64,7 @@ if(ys != 0){
 // --------------------
 // X AXIS (hybrid move)
 // --------------------
-var xs = XSpeed;
+var xs = XSpeed * global.time_step;
 if(xs != 0){
 	var xstep = sign(xs);
 

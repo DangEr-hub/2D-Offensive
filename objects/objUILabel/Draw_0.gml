@@ -35,21 +35,21 @@ if(drawable == true){
 				var spotted_chance = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
 				var attack_power = (1 - global.ItemIndex[#Id, ItemStat.Defense]) * 100;
 
-				draw_string_line(statistics_x, statistics_y, "Accuracy: ", accuracy, c_green, "%");
-				draw_string_line(statistics_x, statistics_y + 20, "Getting spotted chance: ", -spotted_chance, c_green, "%");
-				draw_string_line(statistics_x, statistics_y + 40, "Attack power: ", -attack_power, c_red, "%");
+				draw_string_line(statistics_x, statistics_y, "Accuracy: ", accuracy, c_green, " %");
+				draw_string_line(statistics_x, statistics_y + 20, "Getting spotted chance: ", -spotted_chance, c_green, " %");
+				draw_string_line(statistics_x, statistics_y + 40, "Attack power: ", -attack_power, c_red, " %");
 			} else if (Id == Item.vertical_grip) {
 				var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
 				var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
 
-				draw_string_line(statistics_x, statistics_y, "Vertical recoil: ", -vertical_recoil, c_green, "%");
-				draw_string_line(statistics_x, statistics_y + 20, "Horizontal recoil: ", -horizontal_recoil, c_red, "%");
+				draw_string_line(statistics_x, statistics_y, "Vertical recoil: ", -vertical_recoil, c_green, " %");
+				draw_string_line(statistics_x, statistics_y + 20, "Horizontal recoil: ", -horizontal_recoil, c_red, " %");
 			} else if (Id == Item.horizontal_grip) {
 				var horizontal_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackPower]) * 100;
 				var vertical_recoil = (1 - global.ItemIndex[#Id, ItemStat.KickBackInaccuracyMultiplier]) * 100;
 
-				draw_string_line(statistics_x, statistics_y, "Horizontal recoil: ", -horizontal_recoil, c_green, "%");
-				draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, "%");
+				draw_string_line(statistics_x, statistics_y, "Horizontal recoil: ", -horizontal_recoil, c_green, " %");
+				draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, " %");
 			}
 		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
 			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
@@ -57,7 +57,7 @@ if(drawable == true){
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 		
-			var offset_y = DescriptionStringHeight * 2.25;
+			var offset_y = DescriptionStringHeight * 2.35;
 			var disadvantages_string = global.ItemIndex[#Id, ItemStat.disadvantages];
 			var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
 			var advantages_string = global.ItemIndex[#Id, ItemStat.advantages];

@@ -41,68 +41,7 @@ with(zui_create(zui_get_width() * .35, zui_get_height() - button_height*1.25, ob
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
-		var wpn_id = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
-		switch(global.ItemIndex[#Id, ItemStat.Type]){
-				
-			case "Item":
-				
-				#region Item use
-				switch(Id){
-					case Item.HealingKit:
-						if(global.local_player.Healing == false && global.local_player.stats.Health_points < global.player_stats_struct.Max_health){
-							global.local_player.item_equip_timer = global.local_player.item_equip_time;
-							global.local_player.HealingItemId = Item.HealingKit;
-							global.local_player.Healing = true;
-							ItemAmountSubstract(global.local_player.item_use_position, 1);
-						}
-					break;	
-							
-					case Item.low_cal_box:
-						if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.LOW){
-							global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
-							damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
-							ItemAmountSubstract(global.local_player.item_use_position, 1);
-						}
-					break;
-							
-					case Item.med_cal_box:
-						if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.MEDIUM){
-							global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
-							damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
-							ItemAmountSubstract(global.local_player.item_use_position, 1);
-						}
-					break;
-							
-					case Item.high_cal_box:
-						if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.HIGH){
-							global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
-							damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
-							ItemAmountSubstract(global.local_player.item_use_position, 1);
-						}
-					break;
-							
-					case Item.gauge_box:
-						if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == CALIBER.GAUGES){
-							global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo] += global.ItemIndex[# Id, ItemStat.MaxAmmo];	
-							damage_indicator("+" + string(global.ItemIndex[# Id, ItemStat.MaxAmmo]), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
-							ItemAmountSubstract(global.local_player.item_use_position, 1);
-						}
-					break;
-					
-					case Item.red_dot_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
-					case Item.two_scope: weapon_attachment_equip(Id, Index.slot_scope); break;
-					case Item.adaptive_chambering: weapon_attachment_equip(Id, Index.slot_barrel); break;	
-					case Item.vertical_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
-					case Item.horizontal_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
-					case Item.advanced_suppressor: weapon_attachment_equip(Id, Index.slot_suppressor); break;	
-					case Item.range_finder: weapon_attachment_equip(Id, Index.slot_barrel); break;
-				}
-				#endregion
-					
-			break;				
-				
-		}
+		item_equip(oDraw.var_slot, "draw_varslot", global.local_player.WeaponID);
 	};
 }
 

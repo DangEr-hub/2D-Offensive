@@ -1,6 +1,7 @@
 event_inherited();
-//draw_text(x, y - 20, "current_building_id " + string(current_building_id));
-//draw_text(x, y - 40, "door_cooldown " + string(door_cooldown));
+draw_text(x, y - 20, "ReloadTime " + string(ReloadTime));
+draw_text(x, y - 40, "ReloadTimer " + string(ReloadTimer));
+draw_text(x, y - 60, "def " + string(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense]));
 //draw_text(x, y - 60, "shooting_reset_timer " + string(shooting_reset_timer));
 //draw_text(x, y - 110, "CanShoot " + string(CanShoot));
 
@@ -133,8 +134,8 @@ if(Visible == true){
 				draw_sprite_ext(
 					spr_Items,
 					global.Inventory[# WeaponID, Index.slot_suppressor],
-					Weapon.x + lengthdir_x(WeaponDistance*.95, RotationAngle),
-					Weapon.y + lengthdir_y(WeaponDistance*.95, RotationAngle),
+					Weapon.x + lengthdir_x(WeaponDistance*.925, RotationAngle),
+					Weapon.y + lengthdir_y(WeaponDistance*.925, RotationAngle),
 					.5,
 					.5,
 					RotationAngle,

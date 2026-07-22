@@ -1,9 +1,9 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-//draw_set_font(fnt_ConsoleSmall);
-//draw_text(x, y - 50, "state " + string(State));
-//draw_text(x, y - 75, "alarm0 " + string(alarm[0]));
+draw_set_font(fnt_ConsoleSmall);
+draw_text(x, y - 50, "chasing_timer " + string(chasing_timer));
+draw_text(x, y - 75, "search_timer " + string(search_timer));
 //draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
 if(stats.Health_points <= 0){
 	exit;
@@ -64,8 +64,8 @@ if(Visible == true){
 		draw_sprite_ext(
 			spr_Items,
 			attachments[WeaponPositionID, ATTACHMENTS.slot_suppressor],
-			Weapon.x + lengthdir_x(WeaponDistance*.975, RotationAngle),
-			Weapon.y + lengthdir_y(WeaponDistance*.975, RotationAngle),
+			Weapon.x + lengthdir_x(WeaponDistance*.925, RotationAngle),
+			Weapon.y + lengthdir_y(WeaponDistance*.925, RotationAngle),
 			.5,
 			.5,
 			RotationAngle,

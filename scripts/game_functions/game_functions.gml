@@ -125,24 +125,26 @@ function input_check(keycode, pressed = false, release = false){
         keycode == mb_left ||
         keycode == mb_right ||
         keycode == mb_middle;
+	var value = -1;
 
     if(is_mouse){
+		value = mouse_check_button(keycode);
         if(pressed){
-            return mouse_check_button_pressed(keycode);
+            value = mouse_check_button_pressed(keycode);
         }
         if(release){
-            return mouse_check_button_released(keycode);
+            value = mouse_check_button_released(keycode);
         }
-        return mouse_check_button(keycode);
     }else{
+		value = keyboard_check(keycode);
         if(pressed){
-            return keyboard_check_pressed(keycode);
+            value = keyboard_check_pressed(keycode);
         }
         if(release){
-            return keyboard_check_released(keycode);
+            value = keyboard_check_released(keycode);
         }
-        return keyboard_check(keycode);
     }
+	return value;
 }
 
 function array_max(arr) {
@@ -698,7 +700,7 @@ function player_shooting(){
 				[
 					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
-					BULLET_SPEED,
+					BULLET_SPEED * global.time_step,
 					global.ItemIndex[#wpn_id, ItemStat.Range]
 				],
 				id,
@@ -721,7 +723,7 @@ function inaccuracy_formula(WID, ObjectType){
 			if(instance_exists(oPlayer)){
 				var MovingIn = 1;
 				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
-				var range_inaccuracy = 1 + (ObjectType.Range * global.ItemIndex[#WID, ItemStat.accuracy_drop]);
+				var range_inaccuracy = max(ObjectType.Range * global.ItemIndex[#WID, ItemStat.accuracy_drop], 1);
 				var moving_state_inaccuracy = 1;
 	
 				if(ObjectType.moving_state == STATES_PLAYER.prone_state){
@@ -737,7 +739,7 @@ function inaccuracy_formula(WID, ObjectType){
 
 				if(global.ItemIndex[# WID, ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
 					if(ObjectType.ScopeIn == false){
-						if(global.ItemIndex[# WID, ItemStat.Defense] == 1){ ///Klasické sniperky
+						if(global.ItemIndex[# WID, ItemStat.Defense] == 0){ ///Klasické sniperky
 							ScopeTimerInaccuracy = 50;
 						}else{ ///Semi-automatické sniperky
 							ScopeTimerInaccuracy = 10;	
@@ -791,14 +793,16 @@ function inaccuracy_formula(WID, ObjectType){
 }
 
 function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
-	if(instance_exists(inst_id)){
-	    var playerInstance = global.local_player;
-		audio_emitter_gain(inst_id.Emitter, playerInstance.muffled_sounds);
-		audio_emitter_pitch(inst_id.Emitter, playerInstance.muffled_sounds);
-	    audio_emitter_position(inst_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
-	    audio_emitter_falloff(inst_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);
-	    audio_play_sound_on(inst_id.Emitter, Sound, Priority, false);
-	}
+    if (instance_exists(inst_id)) {
+        var playerInstance = global.local_player;  
+        // Výpočet finálního pitche: ohlušení * zpomalení času
+        var final_pitch = playerInstance.muffled_sounds * global.time_step;
+        audio_emitter_gain(inst_id.Emitter, playerInstance.muffled_sounds);
+        audio_emitter_pitch(inst_id.Emitter, final_pitch);        
+        audio_emitter_position(inst_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
+        audio_emitter_falloff(inst_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);        
+        audio_play_sound_on(inst_id.Emitter, Sound, Priority, false);
+    }
 }
 	
 function smoke_setup(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time, move = false){

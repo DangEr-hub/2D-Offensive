@@ -79,17 +79,21 @@ if(check_vis_timer == -1){
 				}
 
 	            if (col != noone) {
-					if (instance_exists(col) && (observer.moving_state == STATES_PLAYER.machine_gun_state && col.object_index == oMachineGunFloor) || col.transparent == true){
-						Visible = true;   
-					}else{
-		            if (Visible && VisibilityTimer == -1)
-		                VisibilityTimer = VisibilityTime;
+					if (instance_exists(col)) {
+	                    // Bezpečná kontrola transparentnosti
+	                    var is_transparent = variable_instance_exists(col, "transparent") && col.transparent == true;
+	                    var is_mg_floor = (observer.moving_state == STATES_PLAYER.machine_gun_state && col.object_index == oMachineGunFloor);
+
+	                    if (is_mg_floor || is_transparent) {
+	                        Visible = true;   
+	                    } else {
+	                        if (Visible && VisibilityTimer == -1)
+	                            VisibilityTimer = VisibilityTime;
+	                    }
 					}
 				}else{
 					Visible = true;
 				}
-
-
 	        } else {
 	            if (Visible && VisibilityTimer == -1)
 	                VisibilityTimer = VisibilityTime;

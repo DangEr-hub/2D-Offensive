@@ -1,10 +1,10 @@
 /* oItems step event */
 z += zspeed - zgravity;
 
-zspeed *= .75;
+zspeed *= .75 * global.time_step;
 
 if(z <= 0){
-	zmaxspeed *= .7;
+	zmaxspeed *= .7 * global.time_step;
 	zspeed = zmaxspeed;
 }
 
@@ -28,8 +28,8 @@ if(LightObject != undefined){
 if(!IS_NET || oNetworkManager.is_server){
 
 	if(PushTimer > -1){
-	    var proposedX = x + round(lengthdir_x(PushForce, PushDirection));
-	    var proposedY = y + round(lengthdir_y(PushForce, PushDirection));
+	    var proposedX = x + round(lengthdir_x(PushForce, PushDirection)) * global.time_step;
+	    var proposedY = y + round(lengthdir_y(PushForce, PushDirection)) * global.time_step;
     
 	    if (!place_meeting(proposedX, proposedY, oParentTile)) {
 	        x = proposedX;
@@ -37,7 +37,7 @@ if(!IS_NET || oNetworkManager.is_server){
 	    }
 	    image_angle += round(sign(angle_difference(image_angle, PushDirection)) * PushForce);    
 
-	    PushTimer--;
+	    PushTimer -= 1;
 	}
 }
 

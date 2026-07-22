@@ -3,7 +3,7 @@ crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
-if(global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == WEAPON_CLASS.PISTOL){
+if(global.local_player.weapon_shooting_mode == "Semi"){
 	recoil_speed = 10;
 	StabilizationSpeed = 75;
 }

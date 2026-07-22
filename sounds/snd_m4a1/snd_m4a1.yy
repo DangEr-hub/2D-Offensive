@@ -10,7 +10,7 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 1.40322,
+  "duration": 0.342021,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_m4a1.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.95,
 }
