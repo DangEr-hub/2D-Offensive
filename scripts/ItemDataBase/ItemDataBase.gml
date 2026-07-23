@@ -548,7 +548,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
 	
 	global.ItemIndex[# Item.famas, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, "Primary", 5, 7.5, snd_Famas, 2, 1, true,
+	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, "Primary", 5, 7, snd_Famas, 2, 1, true,
 	5, 10, 10, 4, .03, 7, 3.5, .00175, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .00035, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.famas, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.famas, ItemStat.disadvantages] = "-Low magazine capacity\n-Low penetration power\n-High damage drop-off";

@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 1.791361,
+  "duration": 0.879458,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_Dragunov",
+  "soundFile": "snd_Dragunov.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.7,
 }

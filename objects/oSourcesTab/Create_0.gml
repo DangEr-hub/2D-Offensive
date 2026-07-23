@@ -4,21 +4,21 @@ tab_height = 1024;
 draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);
 
-pos_x = zui_get_width() * .01;
-pos_y = zui_get_height() * .1;
+pos_x = zui_get_width() * .005;
+pos_y = zui_get_height() * .07;
 gap = 120 * global.GUIMultiplier;
-gap_x = 210 * global.GUIMultiplier;
+gap_x = 160 * global.GUIMultiplier;
 text_height = string_height("a")*2;
-max_i = 20;
+max_i = 21;
 
 with (zui_create(0, 0, objUIWindowCaption)) {
 	caption = "Sources";
 	draggable = 1;
 }
 
-with (zui_create(zui_get_width() * .75, pos_y, objUILabel)) {
+with (zui_create(zui_get_width() * .7, pos_y, objUILabel)) {
 	color = c_white;
-	caption = "Inspired by Counter-Strike, \nUnturned and CS2D.";
+	caption = "Inspired by Counter-Strike, CS2D \nand Unturned.";
 }
 
 
@@ -63,6 +63,20 @@ source_names = [
 	"Bot ref (1): ",
 	"Bot ref (2): ",
 	"M4A1: ",
+	"Light engine: ",
+	"Helper (1): ",
+	"Desert Eagle: ",
+	"GUI Icons: ",
+	"Explosion: ",
+	"Button: ",
+	"MP5: ",
+	"Five-seven: ",
+	"Dragunov: ",
+	"TEC-9: ",
+	"SCAR: ",
+	"Galil: ",
+	"Leg anim.: ",
+	"Console: ",
 ];
 
 sources = [
@@ -105,7 +119,21 @@ sources = [
 	"https://pixabay.com/sound-effects/film-special-effects-mp5-168858/",
 	"https://www.pngaaa.com/detail/800857",
 	"https://es.pixilart.com/art/top-down-sprite-sr2cf59db022b7e",
-	"https://pixabay.com/sound-effects/film-special-effects-gun-shot-2-530789/"
+	"https://pixabay.com/sound-effects/film-special-effects-gun-shot-2-530789/",
+	"https://github.com/JujuAdams/Bulb",
+	"https://marketplace.gamemaker.io/assets/6355/sprite_getpixel-optimized",
+	"https://pixabay.com/sound-effects/film-special-effects-desert-eagle-168857/",
+	"https://game-icons.net/",
+	"https://bananarana8.itch.io/pixel-art-explosion-effect",
+	"https://pixabay.com/sound-effects/immersivecontrol-button-click-sound-463065/",
+	"https://pixabay.com/sound-effects/film-special-effects-mp5-168858/",
+	"https://pixabay.com/sound-effects/film-special-effects-072803-semi-auto-pistol-26934/",
+	"https://pixabay.com/sound-effects/film-special-effects-perdition-1911-pistol-82365/",
+	"https://pixabay.com/sound-effects/film-special-effects-gunfire-single-shot-colt-peacemaker-94951/",
+	"https://pixabay.com/sound-effects/film-special-effects-ar15-168855/",
+	"https://pixabay.com/sound-effects/film-special-effects-beretta-92fs-168853/",
+	"https://opengameart.org/content/animated-top-down-survivor-player",
+	"https://marketplace.gamemaker.io/assets/1356/developer-console",
 	
 	
 	

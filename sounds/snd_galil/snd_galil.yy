@@ -10,14 +10,14 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 3.156259,
+  "duration": 0.730167,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
   },
   "preload": true,
   "sampleRate": 44100,
-  "soundFile": "snd_galil",
+  "soundFile": "snd_galil.wav",
   "type": 0,
-  "volume": 0.25,
+  "volume": 0.65,
 }

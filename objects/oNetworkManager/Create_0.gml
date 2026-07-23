@@ -10,7 +10,7 @@ network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
 network_type = network_socket_udp;
 server_port = 50000;
-server_ip = "127.0.0.1"; // zatím localhost
+server_ip = "127.0.0.1"; // localhost
 max_clients = 4;
 
 // Network state
@@ -67,8 +67,8 @@ equipment_sync = false;
 weapon_sync = false;
 send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
-accum_server = 0;   // časování TICK_UPDATE na serveru
-hb_client    = 0;   // heartbeat na klientovi
+accum_server = 0;   //  TICK_UPDATE serveru
+hb_client    = 0;   // heartbeat of client
 
 /// ping
 ping_interval = 1;  // how often to measure latency

@@ -22,8 +22,14 @@ equip_upg = noone;
 move_upg = noone;
 pen_upg = noone;
 dmg_upg = noone;
+
+
 show_dmg_graph = noone;
 dmg_graph = noone;
+
+show_range_graph = noone;
+range_graph = noone;
+
 
 wpn_desc_txt = "";
 wpn_string = array_create(30, "");
@@ -183,12 +189,14 @@ refresh_weapon_ui = function(){
 		with(pen_upg)         { zui_set_depth(is_locked ? 100 : -1000); }
 		with(dmg_upg)         { zui_set_depth(is_locked ? 100 : -1000); }
 		with(show_dmg_graph)  { zui_set_depth(is_locked ? 100 : -1000); }
+		with(show_range_graph)  { zui_set_depth(is_locked ? 100 : -1000); }
 
 	    if(instance_exists(img_lockbg)){
 	        with(img_lockbg){ drawable = is_locked; }
 	    }
 		
 		if(instance_exists(dmg_graph)){ with(dmg_graph){ zui_destroy(); } }
+		if(instance_exists(range_graph)){ with(range_graph){ zui_destroy(); } }
 		
 		// --- RESET A AKTUALIZACE UPGRADŮ V UI ---
         var upg_data = global.built_upgrades[$ string(wpn)];
@@ -602,15 +610,22 @@ with(zui_create(zui_get_width() * .25 - arrow_w/1.95, zui_get_height() * .9, obj
 /* GRAPHS */
 dmg_graph_callback = function(){
 	
+	if(instance_exists(oWeaponsTab.range_graph)){
+		with(oWeaponsTab.range_graph){
+			zui_destroy();	
+		}
+	}
+	
 	if!(instance_exists(oWeaponsTab.dmg_graph)){
 	oWeaponsTab.dmg_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
 	
-	/*with(dmg_graph){
+	with(dmg_graph){
 		zui_set_depth(-1000);
-		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / 100) + 1;
+		scale = 100;
+		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / scale) + 1;
 		
 		for(var i = 0; i < steps; i++){
-			array_push(values_x, i*100);	
+			array_push(values_x, i*scale);	
 		}
 		
 		var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Damage];
@@ -618,12 +633,29 @@ dmg_graph_callback = function(){
 		for(var i = 0; i < array_length(values_x); i ++){
 			array_push(values_y, base_dmg * power(1 - dmg_drop, values_x[i]));
 		}
-	}*/
+	}
 	
-	with(dmg_graph){
+	}else{
+		with(oWeaponsTab.dmg_graph){zui_destroy(oWeaponsTab.dmg_graph);}
+	}
+};
+
+range_graph_callback = function(){
+	
+	if(instance_exists(oWeaponsTab.dmg_graph)){
+		with(oWeaponsTab.dmg_graph){
+			zui_destroy();	
+		}
+	}
+	
+	
+	if!(instance_exists(oWeaponsTab.range_graph)){
+	oWeaponsTab.range_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
+	
+	with(range_graph){
 		zui_set_depth(-1000);
-		scale = 50
-		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / scale) + 1;
+		scale = 50;
+		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / scale) + 2;
 		
 		for(var i = 0; i < steps; i++){
 			array_push(values_x, i*scale);	
@@ -636,9 +668,9 @@ dmg_graph_callback = function(){
 	}
 	
 	}else{
-		with(oWeaponsTab.dmg_graph){zui_destroy(oWeaponsTab.dmg_graph);}
+		with(oWeaponsTab.range_graph){zui_destroy(oWeaponsTab.range_graph);}
 	}
-}
+};
 
 graph_x = r_x + text_height*5;
 graph_y = r_y + text_height*3;
@@ -648,6 +680,14 @@ with(show_dmg_graph){
 	caption = "Damage function";
     color = c_white;
     callback = oWeaponsTab.dmg_graph_callback;
+}
+
+show_range_graph = zui_create(graph_x, graph_y + text_height*3, objUIButton);
+with(show_range_graph){
+    zui_set_size(oWeaponsTab.b_w*1.25, oWeaponsTab.b_h);
+	caption = "Accuracy function";
+    color = c_white;
+    callback = oWeaponsTab.range_graph_callback;
 }
 
 

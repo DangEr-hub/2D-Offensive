@@ -10,7 +10,7 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 1.529615,
+  "duration": 0.967417,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 48000,
   "soundFile": "snd_Spas.wav",
   "type": 0,
-  "volume": 0.1,
+  "volume": 0.4,
 }

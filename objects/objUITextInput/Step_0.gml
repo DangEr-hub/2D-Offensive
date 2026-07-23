@@ -8,6 +8,7 @@ if (mouse_check_button_pressed(mb_left)) {
 		pressed = 1;
         active = true;
 		cursor_pos = string_length(text);
+		audio_play_sound(snd_Button, 0, false);
     } else {
 		if(active == true){
 			if(is_callable(callback)){
