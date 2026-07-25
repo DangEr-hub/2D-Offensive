@@ -546,11 +546,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 								
 		#region Primary equip and dequip
 		var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
-		if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+		if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Primary);
 			primary_slot_id = Item.None;
-		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Primary);
 		}
@@ -558,11 +558,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 				
 		#region Secondary equip and dequip
 		var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
-		if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+		if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Secondary);
 			secondary_slot_id = Item.None;
-		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Secondary);
 		}
@@ -570,11 +570,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 				
 		#region Knife equip and dequip
 		var tertiary_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
-		if (tertiary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
+		if (tertiary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Knife);
 			tertiary_slot_id = Item.None;
-		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
+		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			item_swap("slot_string", OtherSlot.Knife);
 		}

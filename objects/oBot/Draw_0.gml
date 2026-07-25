@@ -2,8 +2,8 @@
 // You can write your code in this editor
 event_inherited();
 draw_set_font(fnt_ConsoleSmall);
-draw_text(x, y - 50, "chasing_timer " + string(chasing_timer));
-draw_text(x, y - 75, "search_timer " + string(search_timer));
+//draw_text(x, y - 50, "chasing_timer " + string(chasing_timer));
+//draw_text(x, y - 75, "search_timer " + string(search_timer));
 //draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
 if(stats.Health_points <= 0){
 	exit;

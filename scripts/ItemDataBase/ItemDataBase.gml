@@ -1,5 +1,28 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function damage_curve_explinlog(dist, range, boundary_1, boundary_2, value_1, value_2, value_3, exp_power, log_power){
+    var t = clamp(dist / range, 0, 1);
+
+    // Exp  part
+    if(t <= boundary_1){
+        var p = t / boundary_1;
+        return lerp(1.0, value_1, power(p, exp_power));
+    }
+
+    // Lin part
+    if(t <= boundary_2){
+        var p = (t - boundary_1) / (boundary_2 - boundary_1);
+        return lerp(value_1, value_2, p);
+    }
+
+    /// Log part
+    var p = (t - boundary_2) / (1 - boundary_2);
+    p = ln(1 + log_power * p) / ln(1 + log_power);
+
+    return lerp(value_2, value_3, p);
+}
+
+
 function add_shooting_modes(weapon, modes) {
 	var shootingModesList = ds_list_create();
     
@@ -154,7 +177,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.None, ItemStat.KickBackPower] = 1;	
 	
 	global.ItemIndex[# Item.AKM, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 36, 270, 30, "Primary", 8, 6, snd_AKM, 5, 1.25, true,
+	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 36, 270, 30, WEAPON_TYPE.PRIMARY, 8, 6, snd_AKM, 5, 1.25, true,
 	10, 20, 10, 5.9, .015, 10, 3.5, .0013, 1, 7, .25, 1, WEAPON_CLASS.ASSAULT_RIFLE, .81, .795, .00015, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5, true, "7.62x39 mm", CALIBER.HIGH);
 	global.ItemIndex[# Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
@@ -170,7 +193,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.KevlarHelm, ItemStat.Description] = "This basic helmet provides " + string_format((1 - global.ItemIndex[# Item.KevlarHelm, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained.";
 	
 	global.ItemIndex[# Item.DesertEagle, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.DesertEagle, "Desert Eagle", 1.75 * game_get_speed(gamespeed_fps), 700, 53, 70, 7, "Secondary", 4, 11, snd_DesertEagle, 7, 2, false,
+	WeaponStats(Item.DesertEagle, "Desert Eagle", 1.75 * game_get_speed(gamespeed_fps), 700, 53, 70, 7, WEAPON_TYPE.SECONDARY, 4, 11, snd_DesertEagle, 7, 2, false,
 	0, 0, 10, 30, 2.5, 9, 7.5, .003, 0, 0, .5, 1, WEAPON_CLASS.PISTOL, .9, .932, .00059, .1 * game_get_speed(gamespeed_fps), .77, 75, 2, 7, true, ".50 AE", CALIBER.HIGH);
 	global.ItemIndex[# Item.DesertEagle, ItemStat.random_bullet_spread] = true;
 	global.ItemIndex[# Item.DesertEagle, ItemStat.difficulty] = 5;
@@ -187,7 +210,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic " + string_format((1 - global.ItemIndex[# Item.KevlarVest, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
 	
 	global.ItemIndex[# Item.Spas, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 400, 33, 120, 12, "Primary", 5, 30, snd_Spas, 15, 2, false,
+	WeaponStats(Item.Spas, "Spas-12", .75 * game_get_speed(gamespeed_fps), 400, 33, 120, 12, WEAPON_TYPE.PRIMARY, 5, 30, snd_Spas, 15, 2, false,
 	0, 0, 20, 10, 1.25, 2, 7.5, .009, 0, 0, .25, 2, WEAPON_CLASS.SHOTGUN, .89, .575, .00135, .75 * game_get_speed(gamespeed_fps), .73, 140, 2, 10, false, "12 Gauge", CALIBER.GAUGES);
 	global.ItemIndex[# Item.Spas, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.Spas, ItemStat.disadvantages] = "-Low penetration power\n-Low range";
@@ -212,7 +235,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.MilitaryVest, ItemStat.Description] = "Enhanced with " + string_format((1 - global.ItemIndex[# Item.MilitaryVest, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
 	
 	global.ItemIndex[# Item.SSG08, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SSG08, "SSG 08", 3 * game_get_speed(gamespeed_fps), 825, 110, 100, 10, "Primary", 2, 30, snd_SSG08, 15, 2, false,
+	WeaponStats(Item.SSG08, "SSG 08", 3 * game_get_speed(gamespeed_fps), 825, 110, 100, 10, WEAPON_TYPE.PRIMARY, 2, 30, snd_SSG08, 15, 2, false,
 	0, 0, 10, 20, 50, 10, 10, .001, 0, 0, .25, 1, WEAPON_CLASS.SNIPER_RIFLE, .87, .85, .00013, 1 * game_get_speed(gamespeed_fps), .5, 170, 2, 7, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[# Item.SSG08, ItemStat.difficulty] = 5;
 	global.ItemIndex[# Item.SSG08, ItemStat.preattached] = { scope: Item.two_scope };
@@ -224,7 +247,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.SSG08, ItemStat.Description] = "SSG08 is a precision sniper rifle known for its deadly accuracy. While it offers unmatched precision, its lower damage requires skilled shooters to make each shot count, making it a challenging yet rewarding choice on the battlefield.";
 	
 	global.ItemIndex[# Item.MAC11, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 580, 29, 300, 30, "Primary", 3, 6, snd_MAC11, 2, 1, true,
+	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 580, 29, 300, 30, WEAPON_TYPE.PRIMARY, 3, 6, snd_MAC11, 2, 1, true,
 	15, 20, -9, 9, 0.025, 1.5, 2, .015, 1, 5, .9, 0, WEAPON_CLASS.SUBMACHINE_GUN, .9, .57, .00053, .1 * game_get_speed(gamespeed_fps), .89, 105, .5, 9, false, ".380 ACP", CALIBER.LOW);
 	global.ItemIndex[# Item.MAC11, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.MAC11, ItemStat.disadvantages] = "-Low penetration power\n-High bullet spread\n-Low range";
@@ -235,7 +258,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.MAC11, ItemStat.Description] = "MAC11 is offering exceptional mobility in close-quarters combat, altough it has limited damage output and armor penetration. Has lightweight design and rapid rate of fire but requires skilled maneuvering to maximize its effectiveness while minimizing its drawbacks.";
 	
 	global.ItemIndex[# Item.MP9, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 685, 28, 280, 30, "Primary", 4, 5, snd_MP9, 1.5, 0.8, true,
+	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 685, 28, 280, 30, WEAPON_TYPE.PRIMARY, 4, 5, snd_MP9, 1.5, 0.8, true,
 	8, 18, 14, 7, 0.02, 1.75, 1, .011, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .88, .7, .00058, 1 * game_get_speed(gamespeed_fps), .5, 135, 1, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.MP9, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MP9, ItemStat.disadvantages] = "-Slow equip\n-High recoil\n-High damage drop-off";
@@ -268,7 +291,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.FlashBangGrenade, ItemStat.Description] = "Disorient foes with this non-lethal flashbang. Its blinding flash and deafening bang disrupt enemy senses, ideal for stealthy advances.";
 
 	global.ItemIndex[# Item.SG550, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 790, 43, 300, 30, "Primary", 10, 7, snd_SG550, 2, 1.75, true,
+	WeaponStats(Item.SG550, "SIG SG550", 2.5 * game_get_speed(gamespeed_fps), 790, 43, 300, 30, WEAPON_TYPE.PRIMARY, 10, 7, snd_SG550, 2, 1.75, true,
 	10, 17, -7, 7, 0.01, 9, 3.5, .0025, 3, 8, .15, 1, WEAPON_CLASS.ASSAULT_RIFLE, .82, .97, .00014, .75 * game_get_speed(gamespeed_fps), .83, 300, 1, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.SG550, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.SG550, ItemStat.preattached] = { scope: Item.red_dot_scope };
@@ -331,7 +354,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.SmokeGrenade, ItemStat.Description] = "Upon impact, smoke grenade blankets the surrounding area with dense smoke, perfect for obscuring vision, enabling stealthy movements, or disorienting opponents.";
 
 	global.ItemIndex[# Item.Javelin, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Javelin, "FGM-148", 1.5 * game_get_speed(gamespeed_fps), 490, 138, 50, 1, "Primary", 25, 15, snd_Javelin, 15, 5, false,
+	WeaponStats(Item.Javelin, "FGM-148", 1.5 * game_get_speed(gamespeed_fps), 490, 138, 50, 1, WEAPON_TYPE.PRIMARY, 25, 15, snd_Javelin, 15, 5, false,
 	0, 0, 0, 0, 0, 5, 7.5, .001, 15, 25, .25, -1, WEAPON_CLASS.MISSILE, .59, .99, .00075, 1 * game_get_speed(gamespeed_fps), .5, 350, 1, 4, false, "127 mm HEAT", CALIBER.ROCKET);
 	global.ItemIndex[# Item.Javelin, ItemStat.difficulty] = 1;
 	global.ItemIndex[# Item.Javelin, ItemStat.disadvantages] = "-Very bad mobility\n-Dangerous explosion\n-Only one rocket per shot";
@@ -341,7 +364,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.Javelin, ItemStat.Description] = "High-damage, armor-piercing powerhouse. Mastery requires skill due to its inaccuracy and limited magazine but in the hands of a skilled player, each shot spells devastation for your enemies.";
 
 	global.ItemIndex[# Item.Glock, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 500, 29, 240, 24, "Secondary", 4, 9, snd_Glock, 3, 1, false,
+	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 500, 29, 240, 24, WEAPON_TYPE.SECONDARY, 4, 9, snd_Glock, 3, 1, false,
 	24, 24, 5, 8, .1, 1.1, 1, .008, 0, 5, .99, 0, WEAPON_CLASS.PISTOL, .97, .47, .001, 0.05 * game_get_speed(gamespeed_fps), .9, 20, .5, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.Glock, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
@@ -351,7 +374,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.Glock, ItemStat.Description] = "The Glock-17 balances moderate damage with a generous magazine capacity, but its limited armor penetration capabilities make it less effective against heavily protected targets.";
 
 	global.ItemIndex[# Item.MK18, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MK18, "MK18", 2.1 * game_get_speed(gamespeed_fps), 715, 33, 700, 30, "Primary", 7, 5.5, snd_MK18, 2, 1, true,
+	WeaponStats(Item.MK18, "MK18", 2.1 * game_get_speed(gamespeed_fps), 715, 33, 700, 30, WEAPON_TYPE.PRIMARY, 7, 5.5, snd_MK18, 2, 1, true,
 	10, 20, 13, 9, .01, 8, 3.5, .0012, 0, 10, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .89, .71, .00019, .2 * game_get_speed(gamespeed_fps), .73, 300, .75, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.MK18, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MK18, ItemStat.disadvantages] = "-Low penetration power\n-High recoil";
@@ -359,9 +382,23 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.MK18, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[# Item.MK18, ItemStat.AmmoSpriteID] = 8;
 	global.ItemIndex[# Item.MK18, ItemStat.Description] = "MK18 is a potent rifle renowned for its rapid fire rate and exceptional accuracy over longer distances, though with a punchier recoil. While sacrificing some armor penetration, its swift RPM makes it ideal for precise engagements, striking a balance between speed and effectiveness on the battlefield.";
+	global.ItemIndex[# Item.MK18, ItemStat.DamageDrop] = function(dist)  {
+		return damage_curve_explinlog(
+		    dist,
+		    global.ItemIndex[# Item.MK18, ItemStat.Range],
+		    0.25,   // boundary_1 - 20 % dostřelu
+		    0.65,   // boundary_2 - 70 % dostřelu
+		    0.92,   // value_1 - 97 % damage
+		    0.87,   // value_2 - 85 % damage
+		    0.81,   // value_3 - 77 % damage na max range
+
+		    3.0,
+		    5.0 
+		);
+	}
 
 	global.ItemIndex[# Item.m4a1, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 730, 34, 300, 25, "Primary", 5, 6, snd_m4a1, 2.5, 1, true,
+	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 730, 34, 300, 25, WEAPON_TYPE.PRIMARY, 5, 6, snd_m4a1, 2.5, 1, true,
 	10, 15, -5, 3.9, .01, 8, 3.5, .0027, 1, 7.75, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .85, .7, .00027, .1 * game_get_speed(gamespeed_fps), .73, 290, .75, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.m4a1, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.m4a1, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
@@ -372,7 +409,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.m4a1, ItemStat.Description] = "The M4A1 rifle is a great choice with a preattached silencer, offering reduced recoil for improved accuracy, altough at the cost of lower armor penetration. While it may struggle against heavily armored opponents, its stealthy profile and manageable recoil make it a favored option for precise engagements.";
 	
 	global.ItemIndex[# Item.awm, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 900, 118, 50, 5, "Primary", 1, 30, snd_awm, 30, 2, false,
+	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 900, 118, 50, 5, WEAPON_TYPE.PRIMARY, 1, 30, snd_awm, 30, 2, false,
 	0, 0, 25, 50, 50, 25, 7.5, .0005, 0, 0, .05, 1, WEAPON_CLASS.SNIPER_RIFLE, .77, .99, .000075, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2, 5, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[# Item.awm, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.awm, ItemStat.preattached] = { scope: Item.two_scope };
@@ -384,7 +421,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.awm, ItemStat.Description] = "Formidable long-range weapon, boasting unparalleled damage and minimal damage drop over distance, yet hampered by its poor mobility. Skilled marksmen wield it to devastating effect, delivering precise and lethal shots.";
 	
 	global.ItemIndex[# Item.Dragunov, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Dragunov, "Dragunov", 3.75 * game_get_speed(gamespeed_fps), 890, 94, 45, 15, "Primary", 2, 20, snd_Dragunov, 20, 1.5, false,
+	WeaponStats(Item.Dragunov, "Dragunov", 3.75 * game_get_speed(gamespeed_fps), 890, 94, 45, 15, WEAPON_TYPE.PRIMARY, 2, 20, snd_Dragunov, 20, 1.5, false,
 	0, 0, 15, 25, 5, 25, 5, .00075, 0, 0, .15, 1, WEAPON_CLASS.SNIPER_RIFLE, .815, .975, .00075, 1 * game_get_speed(gamespeed_fps), .25, 500, 2, 5, false, "7.62x54 mm", CALIBER.HIGH);
 	global.ItemIndex[# Item.Dragunov, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.Dragunov, ItemStat.random_bullet_spread] = true;
@@ -398,7 +435,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.Dragunov, ItemStat.Description] = "Semi-automatic long-range rifle with high base damage and strong penetration, offset by limited mobility and noticeable damage drop over distance. Its ability to fire successive shots without breaking aim rewards steady, disciplined marksmanship.";
 	
 	global.ItemIndex[# Item.usp, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 580, 35, 350, 15, "Secondary", 3, 8, snd_usp, 2, 1, false,
+	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 580, 35, 350, 15, WEAPON_TYPE.SECONDARY, 3, 8, snd_usp, 2, 1, false,
 	9, 12, 1, 1, .175, 5.5, 1, .0057, 0, 13, .93, 0, WEAPON_CLASS.PISTOL, .97, .44, .0002, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.usp, ItemStat.KBStabilization] = 10;
 	global.ItemIndex[# Item.usp, ItemStat.difficulty] = 4;
@@ -410,7 +447,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.usp, ItemStat.Description] = "Is a precision weapon, excelling in accuracy with its first shot and boasting considerable damage, yet its lackluster armor penetration. Enhanced with a preattached silencer, offering skilled players a tactical advantage despite its limitations against heavily protected foes.";
 	
 	global.ItemIndex[# Item.p250, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 600, 33, 105, 15, "Secondary", 4, 7, snd_p250, 2, 1, false,
+	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 600, 33, 105, 15, WEAPON_TYPE.SECONDARY, 4, 7, snd_p250, 2, 1, false,
 	15, 15, 1, 4, .5, 3.75, 2, .0075, 0, 5.9, .99, 0, WEAPON_CLASS.PISTOL, .93, .5, .00029, round(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.p250, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.p250, ItemStat.disadvantages] = "-Low penetration power";
@@ -420,7 +457,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.p250, ItemStat.Description] = "With sharp first-shot accuracy, the P250 is ideal for quick surprises on a budget. Despite its recoil, skilled hands can make it work. While it lacks armor penetration, its tactical edge remains in sudden encounters.";
 	
 	global.ItemIndex[# Item.tec9, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 615, 27, 180, 18, "Secondary", 5, 7, snd_Tec9, 2, 1.1, false,
+	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 615, 27, 180, 18, WEAPON_TYPE.SECONDARY, 5, 7, snd_Tec9, 2, 1.1, false,
 	7, 12, 1, 3, .025, 2.5, 3, .00725, 2, 10, .95, 0, WEAPON_CLASS.PISTOL, .975, .71, .00037, round(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.tec9, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.tec9, ItemStat.disadvantages] = "-Low damage\n-Slow equip";
@@ -430,7 +467,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.tec9, ItemStat.Description] = "Fast and unforgiving, the TEC-9 thrives in constant motion. Its mobility and accuracy while moving make it a dangerous tool. With higher penetration than most pistols, it rewards bold plays and relentless pressure. The TEC-9 turns reckless rushes into calculated strikes.";
 
 	global.ItemIndex[# Item.CZ75, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.CZ75, "CZ-75", 2 * game_get_speed(gamespeed_fps), 585, 23, 96, 15, "Secondary", 2, 5, snd_CZ75, 1, 1, true,
+	WeaponStats(Item.CZ75, "CZ-75", 2 * game_get_speed(gamespeed_fps), 585, 23, 96, 15, WEAPON_TYPE.SECONDARY, 2, 5, snd_CZ75, 1, 1, true,
 	5, 10, 3, 4, .0125, 5, 2, .00925, 2, 12, .75, 0, WEAPON_CLASS.PISTOL, .875, .67, .00042, round(.5 * game_get_speed(gamespeed_fps)), .75, 75, 1.25, 12, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.CZ75, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.CZ75, ItemStat.disadvantages] = "-Low damage\n-Slow equip\n-Worse range accuracy";
@@ -542,13 +579,13 @@ function ItemDataBase(){
 		
 	///Reprezentace základní machine gun
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 600, 33, 500, 50, "Primary", 10, 7, snd_machine_gun, 10, 2, false,
+	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 600, 33, 500, 50, WEAPON_TYPE.PRIMARY, 10, 7, snd_machine_gun, 10, 2, false,
 	0, 0, 10, 30, .05, 1, 1, .0025, 0, 0, 1, 1, WEAPON_CLASS.MACHINE_GUN, .95, .775, .001, 1.75 * game_get_speed(gamespeed_fps), 1, 0, 1, 4, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.ItemColor] = c_ltgray;
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
 	
 	global.ItemIndex[# Item.famas, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, "Primary", 5, 7, snd_Famas, 2, 1, true,
+	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, WEAPON_TYPE.PRIMARY, 5, 7, snd_Famas, 2, 1, true,
 	5, 10, 10, 4, .03, 7, 3.5, .00175, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .00035, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.famas, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.famas, ItemStat.disadvantages] = "-Low magazine capacity\n-Low penetration power\n-High damage drop-off";
@@ -558,7 +595,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.famas, ItemStat.Description] = "FAMAS is a reliable weapon with low recoil and high accuracy. Despite its 25-round magazine, poor armor penetration, and high damage drop-off, mastering it unleashes devastating close to mid-range power, swiftly eliminating targets with precision.";
 	
 	global.ItemIndex[# Item.galil, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.galil, "Galil", 1.75 * game_get_speed(gamespeed_fps), 700, 36, 270, 30, "Primary", 10, 6, snd_galil, 5, 2, true,
+	WeaponStats(Item.galil, "Galil", 1.75 * game_get_speed(gamespeed_fps), 700, 36, 270, 30, WEAPON_TYPE.PRIMARY, 10, 6, snd_galil, 5, 2, true,
 	8, 20, 12, 5.9, .02, 10, 3.5, .002, 1, 7, .59, 1, WEAPON_CLASS.ASSAULT_RIFLE, .89, .71, .0003, .25 * game_get_speed(gamespeed_fps), .85, 180, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.galil, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.galil, ItemStat.disadvantages] = "-High bullet spread\n-High horizontal recoil\n-Low penetration power";
@@ -568,7 +605,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.galil, ItemStat.Description] = "Galil is a fierce contender known for its unruly recoil and limited armor penetration. Despite its challenges, mastering this weapon unlocks a devastating force on the battlefield, swiftly eliminating targets with precision and agility.";
 
 	global.ItemIndex[# Item.steel_knife, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.steel_knife, "Steel knife", .5 * game_get_speed(gamespeed_fps), 48, 27,-1, -1, "Tertiary", 0, 10, snd_knife, 5, 2, false,
+	WeaponStats(Item.steel_knife, "Steel knife", .5 * game_get_speed(gamespeed_fps), 48, 27,-1, -1, WEAPON_TYPE.TERTIARY, 0, 10, snd_knife, 5, 2, false,
 	0, 0, 0, 0, 10, 0, 0, 10, 0, 0, 0, 0, WEAPON_CLASS.KNIFE, .97, 1, 0, .25 * game_get_speed(gamespeed_fps), 0, 0, 1, 15, false, "", 0);
 	global.ItemIndex[# Item.steel_knife, ItemStat.disadvantages] = "";
 	global.ItemIndex[# Item.steel_knife, ItemStat.advantages] = "";

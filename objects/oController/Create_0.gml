@@ -130,11 +130,23 @@ weapons_callback = function(){
 	}
 };
 
+draw_set_font(set_font("GUI_medium"));
+title_w = string_width("2D offensive");
+
 
 with (zui_main()) {
 	var window_id = noone;
 	var button_width = max(128 * global.GUIMultiplier, 192);
 	var button_height = 32 * global.GUIMultiplier;
+	
+	
+	with (zui_create(zui_get_width() * .1 - oController.title_w/2, zui_get_height() * .05, objUILabel)) {
+		color = MAIN_COLOR;
+		caption = "2D Offensive";
+		font = set_font("GUI_medium");
+	}
+
+
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);

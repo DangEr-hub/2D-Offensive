@@ -27,8 +27,7 @@ captions = [
 	"Cycle item right", "Shoot", "Reload",
 	"Grenade throw", "Pause", "Toggle night vision", "Change shooting mode",
 	"Prone", "Show attachments", "Select bot", "Command bot",
-	"Open buy menu", "Hold stamina", "Drop weapon", "Cycle inventory left",
-	"Cycle inventory right", "Cycle inventory up", "Cycle inventory down",
+	"Open buy menu", "Hold stamina", "Drop weapon",
 	"Open console", "Knife light attack", "Knife heavy attack", "Use item",
 	"Scope",
 ];

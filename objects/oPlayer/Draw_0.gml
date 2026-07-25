@@ -1,7 +1,7 @@
 event_inherited();
-draw_text(x, y - 20, "ReloadTime " + string(ReloadTime));
-draw_text(x, y - 40, "ReloadTimer " + string(ReloadTimer));
-draw_text(x, y - 60, "def " + string(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense]));
+//draw_text(x, y - 20, "ReloadTime " + string(ReloadTime));
+//draw_text(x, y - 40, "ReloadTimer " + string(ReloadTimer));
+//draw_text(x, y - 60, "def " + string(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense]));
 //draw_text(x, y - 60, "shooting_reset_timer " + string(shooting_reset_timer));
 //draw_text(x, y - 110, "CanShoot " + string(CanShoot));
 

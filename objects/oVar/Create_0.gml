@@ -95,6 +95,10 @@ enum WEAPON_CLASS {
 	KNIFE
 }
 
+enum WEAPON_TYPE {
+	PRIMARY, SECONDARY, TERTIARY	
+};
+
 enum WPN_ATTACHMENTS{
 	weapon_scope, weapon_barrel, weapon_grip, weapon_suppressor, Total
 }

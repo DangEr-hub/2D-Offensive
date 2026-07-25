@@ -77,6 +77,7 @@ source_names = [
 	"Galil: ",
 	"Leg anim.: ",
 	"Console: ",
+	"MP7: ",
 ];
 
 sources = [
@@ -134,6 +135,7 @@ sources = [
 	"https://pixabay.com/sound-effects/film-special-effects-beretta-92fs-168853/",
 	"https://opengameart.org/content/animated-top-down-survivor-player",
 	"https://marketplace.gamemaker.io/assets/1356/developer-console",
+	"https://pixabay.com/sound-effects/film-special-effects-m1911a1-168854/",
 	
 	
 	

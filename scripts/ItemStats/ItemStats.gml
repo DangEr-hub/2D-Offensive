@@ -37,6 +37,7 @@
 /// @param lck
 /// @param cal
 /// @param calt
+
 function WeaponStats(){
     ItemID = argument[0];
 	global.ItemIndex[#ItemID, ItemStat.Bullets] = 1;

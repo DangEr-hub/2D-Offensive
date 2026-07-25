@@ -69,7 +69,12 @@ refresh_weapon_ui = function(){
 		}
 
 		for(var i = 0; i < array_length(dist); i++){
-			var dmg = base_dmg * power(1 - dmg_drop, dist[i]);
+			var dmg = 0;
+	        if(is_method(dmg_drop)){
+				dmg = base_dmg * dmg_drop(dist[i]);
+			}else{
+				dmg = base_dmg * power(1 - dmg_drop, dist[i]);
+			}
 			var part = string_format(dmg/base_dmg * 100, 0, 1) + " % (" + string(dist[i]) + " u)";
 
 			if(i < array_length(dist) div 2){
@@ -114,7 +119,7 @@ refresh_weapon_ui = function(){
 			"Maximal range: " + string_format(max_range, 0, 1) + " units",
 			"Fire modes: " + fire_modes,
 			"Class: " + string(get_wpn_type(wpn)),
-			"Type: " + string(global.ItemIndex[# wpn, ItemStat.WeaponType]),
+			"Type: " + (global.ItemIndex[# wpn, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY ? "Primary" : (global.ItemIndex[# wpn, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY ? "Secondary" : "Tertiary")),
 			"Moving spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.MovingInaccuracyMultiplier] * 100, 0, 1) + " %",
 			"Kickback spread increase: " + string_format(global.ItemIndex[# wpn, ItemStat.KickBackInaccuracyMultiplier] * 100, 0, 1) + " % per shot",
 			"Complex recoil: " + complex_recoil,
@@ -619,9 +624,9 @@ dmg_graph_callback = function(){
 	if!(instance_exists(oWeaponsTab.dmg_graph)){
 	oWeaponsTab.dmg_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
 	
-	with(dmg_graph){
+	/*with(dmg_graph){
 		zui_set_depth(-1000);
-		scale = 100;
+		scale = 10;
 		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / scale) + 1;
 		
 		for(var i = 0; i < steps; i++){
@@ -633,10 +638,36 @@ dmg_graph_callback = function(){
 		for(var i = 0; i < array_length(values_x); i ++){
 			array_push(values_y, base_dmg * power(1 - dmg_drop, values_x[i]));
 		}
+	}*/
+
+	with(dmg_graph){
+	    zui_set_depth(-1000);
+
+	    values_x = [];
+	    values_y = [];
+
+	    var sample_step = 50;
+	    var weapon_range = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range];
+	    var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Damage];
+		var dmg_func = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.DamageDrop];
+
+	    var steps = ceil(weapon_range / sample_step) + 1;
+
+	    for(var i = 0; i < steps; i++){
+	        var dist = min(i * sample_step, weapon_range);
+	        var damage = base_dmg;
+
+	        if(is_callable(dmg_func)){
+	            damage = dmg_func(dist);
+	        }
+
+	        array_push(values_x, dist);
+	        array_push(values_y, base_dmg * damage);
+	    }
 	}
 	
 	}else{
-		with(oWeaponsTab.dmg_graph){zui_destroy(oWeaponsTab.dmg_graph);}
+		with(oWeaponsTab.dmg_graph){with(oWeaponsTab.dmg_graph){zui_destroy();}}
 	}
 };
 
@@ -668,7 +699,7 @@ range_graph_callback = function(){
 	}
 	
 	}else{
-		with(oWeaponsTab.range_graph){zui_destroy(oWeaponsTab.range_graph);}
+		with(oWeaponsTab.range_graph){with(oWeaponsTab.range_graph){zui_destroy();}}
 	}
 };
 

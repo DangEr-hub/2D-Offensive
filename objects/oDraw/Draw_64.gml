@@ -798,11 +798,11 @@ with(oSlot){
 	
 				#region Primary equip
 				var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
-				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary")) {
+				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 					item_swap("varslot", OtherSlot.Primary);
 					primary_slot_id = Item.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Primary") {
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
 					item_swap("varslot", OtherSlot.Primary);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
@@ -810,11 +810,11 @@ with(oSlot){
 				
 				#region Secondary equip
 				var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
-				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary")) {
+				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 					item_swap("varslot", OtherSlot.Secondary);
 					secondary_slot_id = Item.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Secondary") {
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
 					item_swap("varslot", OtherSlot.Secondary);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
@@ -822,11 +822,11 @@ with(oSlot){
 				
 				#region Knife equip
 				var knife_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
-				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary")) {
+				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 					item_swap("varslot", OtherSlot.Knife);
 					knife_slot_id = Item.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == "Tertiary") {
+				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
 					item_swap("varslot", OtherSlot.Knife);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
@@ -905,10 +905,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Primary){
 			
 				#region Primary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary")) {
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 				    item_swap("mouse", VarSlot);
 				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Primary") {
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -916,10 +916,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Secondary){
 				
 				#region Secondary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary")) {
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 				    item_swap("mouse", VarSlot);
 				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Secondary") {
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -927,10 +927,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Knife){
 				
 				#region Knife equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary")) {
+				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 				    item_swap("mouse", VarSlot);
 				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == "Tertiary") {
+				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
