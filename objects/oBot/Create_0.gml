@@ -93,7 +93,8 @@ chasing_timer = round(5 * game_get_speed(gamespeed_fps) * rank_boost);
 #region Set armour
 ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
 HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
-ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability]];
+ShieldID = Item.None;
+ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability], global.ItemIndex[# ShieldID, ItemStat.BaseDurability]];
 #endregion
 
 #region Movement engine

@@ -35,6 +35,7 @@ popup_main_menu_callback_positive = function(){
 		zui_destroy();
 	}
 	save_game();
+	audio_stop_all();
 	room_goto(rm_main_menu);
 };
 

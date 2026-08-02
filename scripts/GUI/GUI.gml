@@ -148,7 +148,7 @@ function reset_gui(){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
 					var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
-					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}

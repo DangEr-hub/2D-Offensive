@@ -10,7 +10,7 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.55381,
+  "duration": 0.788146,
   "parent": {
     "name": "Other",
     "path": "folders/Sounds/Other.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_HeadShot1.wav",
   "type": 0,
-  "volume": 0.75,
+  "volume": 0.6,
 }

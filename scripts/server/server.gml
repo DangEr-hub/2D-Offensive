@@ -731,6 +731,7 @@ function server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, impac
 		buffer_write(send_buffer, buffer_f16, aimpunch_modifier);
 		buffer_write(send_buffer, buffer_f16, equip_dur[0]);
 		buffer_write(send_buffer, buffer_f16, equip_dur[1]);
+		buffer_write(send_buffer, buffer_f16, equip_dur[2]);
 
         var k = ds_map_find_first(clients);
         var n = ds_map_size(clients);
@@ -755,13 +756,14 @@ function handle_hit_server(socket_key) {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
+		var shield_dur = buffer_read(receive_buffer, buffer_f16);
 
         var attacker_pid = ds_map_find_value(clients, socket_key);
         if (attacker_pid < 0) {
             attacker_pid = attacker_pid_claim;
         }
 
-        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur]);
+        server_process_hit(attacker_pid, victim_pid, damage, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur, shield_dur]);
     }
 }
 	

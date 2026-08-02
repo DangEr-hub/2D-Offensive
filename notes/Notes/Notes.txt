@@ -4,3 +4,26 @@ https://pixabay.com/sound-effects/film-special-effects-m249-sound-effects-244559
 
 vyresit cz-75
 pridat damage functions
+
+WeaponStats removed drop values:
+AKM: dmg_drop: .00015, acc_drop: .0013
+Desert Eagle: dmg_drop: .00059, acc_drop: .003
+Spas-12: dmg_drop: .00135, acc_drop: .009
+SSG 08: dmg_drop: .00013, acc_drop: .001
+MAC11: dmg_drop: .00053, acc_drop: .015
+MP9: dmg_drop: .00058, acc_drop: .011
+SIG SG550: dmg_drop: .00014, acc_drop: .0025
+FGM-148: dmg_drop: .00075, acc_drop: .001
+Glock-17: dmg_drop: .001, acc_drop: .008
+MK18: dmg_drop: .00019, acc_drop: .0012
+M4A1: dmg_drop: .00027, acc_drop: .0027
+AWM: dmg_drop: .000075, acc_drop: .0005
+Dragunov: dmg_drop: .00075, acc_drop: .00075
+USP: dmg_drop: .0002, acc_drop: .0057
+P250: dmg_drop: .00029, acc_drop: .0075
+TEC-9: dmg_drop: .00037, acc_drop: .00725
+CZ-75: dmg_drop: .00042, acc_drop: .00925
+Basic machine gun: dmg_drop: .001, acc_drop: .0025
+FAMAS: dmg_drop: .00035, acc_drop: .00175
+Galil: dmg_drop: .0003, acc_drop: .002
+Steel knife: dmg_drop: 0, acc_drop: 10

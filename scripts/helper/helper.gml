@@ -30,8 +30,8 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, ICON.health);
 	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2));	
-	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], 
-	equip_dur[0], equip_dur[1], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
+	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], global.Inventory[# OtherSlot.Shield, Index.slot_id],
+	equip_dur[0], equip_dur[1], equip_dur[2], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
 	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
 	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
@@ -70,6 +70,8 @@ function equip_network_propagate(){
 			ds_map_set(data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
 			ds_map_set(data, "armour_id",  global.Inventory[# OtherSlot.Armour, Index.slot_id]);
 			ds_map_set(data, "armour_dur", global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
+			ds_map_set(data, "shield_id",  global.Inventory[# OtherSlot.Shield, Index.slot_id]);
+			ds_map_set(data, "shield_dur", global.Inventory[# OtherSlot.Shield, Index.slot_durability]);
 		}
 	}
 }

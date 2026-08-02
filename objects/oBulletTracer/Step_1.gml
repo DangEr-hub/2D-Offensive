@@ -20,7 +20,7 @@ if(wall_collision == noone && instance_exists(stats.Object)){
 
 var bullet_damage = 0;
 if(wall_collision != noone){
-	bullet_damage = stats.Damage * power(1 - global.ItemIndex[#stats.Item_id, ItemStat.DamageDrop], point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
+	bullet_damage = stats.Damage * global.ItemIndex[#stats.Item_id, ItemStat.damage_drop](point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
 	if(impact_flag == true){
 		var glass_modifier = 1;
 		if(wall_collision.inst_id.transparent){

@@ -460,10 +460,11 @@ function handle_hit_client() {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(receive_buffer, buffer_f16);
 		var helmet_dur = buffer_read(receive_buffer, buffer_f16);
+		var shield_dur = buffer_read(receive_buffer, buffer_f16);
 
 		var victim = find_instance_by_network_id(oPlayer, victim_pid);
 		if (instance_exists(victim)) {
-			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], attacker_pid);
+			hit_remote_object(damage, victim, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur, shield_dur], attacker_pid);
 		}
 	}
 }
@@ -737,6 +738,7 @@ function handle_hit_packet_client() {
 		var aimpunch_modifier = buffer_read(receive_buffer, buffer_f16);
 		var armour_dur = buffer_read(send_buffer, buffer_f16);
 		var helmet_dur = buffer_read(send_buffer, buffer_f16);
+		var shield_dur = buffer_read(send_buffer, buffer_f16);
 
         if (victim_pid != my_pid) {
             return;
@@ -744,7 +746,7 @@ function handle_hit_packet_client() {
 
         var player = find_instance_by_network_id(oPlayer, my_pid);
         if (instance_exists(player)) {
-			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur], attacker_pid);
+			hit_remote_object(damage, player, hitbox_type, [impact_x, impact_y], hit_spd_mod, aimpunch_modifier, [armour_dur, helmet_dur, shield_dur], attacker_pid);
         }
     }
 }

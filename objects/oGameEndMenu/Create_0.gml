@@ -65,6 +65,7 @@ popup_main_menu_callback_positive = function(){
 		zui_destroy();
 	}
 	clear_player_statistics(global.rating_struct.Rounds_win + global.rating_struct.Rounds_lost);
+	audio_stop_all();
 	room_goto(rm_main_menu);
 };
 

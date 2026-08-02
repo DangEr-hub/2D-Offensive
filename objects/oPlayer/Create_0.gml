@@ -13,7 +13,6 @@ selected_bot = noone;
 bot_select_index = -1;
 bot_select_list = ds_list_create();
 alarm[0] = 1;
-Weapon = -1;
 wpn_id = Item.None;
 Knife = -1;
 AmmoNeeded = 0;
@@ -47,7 +46,7 @@ shooting = false;
 item_use_position = 0;
 PickUpDistance = 4;
 WeaponNumber = 0;
-WeaponNumberMax = 2;
+WeaponNumberMax = 3;
 CanShoot = true;
 ShootTimer = -1;
 WeaponID = OtherSlot.Primary;
@@ -169,8 +168,10 @@ death_attacker_pid = -1;
 network_bit_state = 0;
 network_armour_id = Item.None;
 network_helmet_id = Item.None;
+network_shield_id = Item.None;
 network_armour_dur = 0;
 network_helmet_dur = 0;
+network_shield_dur = 0;
 network_weapon_id = Item.None;
 network_shoot_timer = -1;
 network_suppressor = Item.None;
@@ -186,6 +187,7 @@ if(global.ranked_game == true){
 }
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
+Shield = instance_create_depth(x + WX, y + WY, depth - 1, oShield);
 
 global.local_player = get_local_player();
 

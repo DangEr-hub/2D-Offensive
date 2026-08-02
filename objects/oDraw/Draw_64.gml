@@ -5,6 +5,7 @@ draw_set_valign(fa_middle);
 
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
 	
+	
 	#region Draw lens flare
 	if(instance_exists(oObjectLamp)){
 		with(oObjectLamp){
@@ -654,6 +655,19 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 			draw_set_font(set_font("Console"));
 		}
 		#endregion
+		
+		#region Draw compass
+		var w = 256 * global.GUIMultiplier; var h = 24 * global.GUIMultiplier;
+		var position_y = oDraw.HUDShift*2;
+		var position_x = global.GuiW/2 - w/2; 
+		draw_set_font(set_font("Title"));
+		var score_h = string_height("1")*1;
+		draw_set_font(set_font("Console"));
+		
+		draw_compass(position_x, position_y + score_h, w, h);
+		
+		
+		#endregion
 	
 		#region Draw admin HUD
 		if(global.draw_advanced_hud == true){
@@ -661,6 +675,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 			var AdminHUDX = global.GuiW - HUDShift;
 			var AdminHUDY = HUDShift;
 		
+			draw_set_font(set_font("GUI_grid"));
 			//Player velocity
 			var PlayerVelocity = sqrt(power(global.local_player.XSpeed, 2) + power(global.local_player.YSpeed, 2)) * game_get_speed(gamespeed_fps);
 			var SpdString = "Velocity: " + string_format(min(PlayerVelocity, MOVE_SPD * game_get_speed(gamespeed_fps)), 0, 1) + " Units/Second";
@@ -777,7 +792,10 @@ with(oSlot){
 			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
 		}
 		draw_set_alpha(1);
+		
 	}
+	
+	draw_text(xx, yy, VarSlot);
 	
 	if(instance_exists(global.local_player)){
 		if(VarSlot == global.local_player.WeaponID || global.local_player.item_use_position == VarSlot){
@@ -860,7 +878,18 @@ with(oSlot){
 				}
 				#endregion
 				
-				#region Shield use
+				#region Shield equip
+				var shield_slot_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+				if (shield_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Shield")) {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], shield_slot_id);
+					item_swap("varslot", OtherSlot.Shield);
+					shield_slot_id = Item.None;
+					with(global.local_player){ equip_network_propagate(); }
+				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Shield") {
+					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], shield_slot_id);
+					item_swap("varslot", OtherSlot.Shield);
+					with(global.local_player){ equip_network_propagate(); }
+				}
 				#endregion
 				
 			}

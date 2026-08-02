@@ -1,9 +1,16 @@
 function calculate_damage_drop_stars(dmg_drop){
-    var best  = global.ItemIndex[# Item.awm, ItemStat.DamageDrop];
-    var worst = global.ItemIndex[# Item.Spas, ItemStat.DamageDrop];
+    var distance = 900;
 
-    // logaritmická normalizace (lepší rozlišení low-endu)
-    var t = (log10(worst) - log10(dmg_drop)) / (log10(worst) - log10(best));
+    var b_func = global.ItemIndex[# Item.awm, ItemStat.damage_drop];
+    var w_func = global.ItemIndex[# Item.Spas, ItemStat.damage_drop];
+
+    if(!is_callable(dmg_drop) || !is_callable(b_func) || !is_callable(w_func)){return 1;}
+
+    var best = b_func(distance);
+    var worst = w_func(distance);
+    var value = dmg_drop(distance);
+
+    var t = (log10(worst) - log10(value)) / (log10(worst) - log10(best));
     t = clamp(t, 0, 1);
     t = power(t, 0.8);
 
@@ -85,7 +92,7 @@ if(global.ItemIndex[# item_variable, ItemStat.Type] == "Weapon"){
 	#endregion	
 	
 	#region Damage drop
-	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
+	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.damage_drop];
 	var damage_drop = calculate_damage_drop_stars(base_damage_drop);
 	with(zui_create(start_x, start_y + text_gap*3, objUILabel)){
 		zui_set_anchor(0, 0);
@@ -239,7 +246,7 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	#endregion
 	
 	#region Damage drop
-	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.DamageDrop];
+	var base_damage_drop = global.ItemIndex[#item_variable, ItemStat.damage_drop];
 	var damage_drop = calculate_damage_drop_stars(base_damage_drop);
 	with(zui_create(start_x, start_y + text_gap, objUILabel)){
 		zui_set_anchor(0, 0);

@@ -25,6 +25,7 @@ function console_preset(argument0) {
 	console_add(c, "toggle_bloom_shader {0,1} " + string(global.BloomShader));
 	console_add(c, "set_time_speed " + string(global.TimeSpeed));
 	console_add(c, "set_time ");
+	console_add(c, "set_buy_time ");
 	console_add(c, "toggle_camera_crosshair_shake {0,1} " + string(global.ViewShake));
 	console_add(c, "set_player_inaccuracy " + string(global.PlayerInaccuracy));
 	console_add(c, "clear_particles {0,1} ");

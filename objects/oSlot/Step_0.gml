@@ -65,7 +65,7 @@ if(global.Inventory[#VarSlot, Index.slot_id] == Item.None){
 if(DrawItemInfo == true){
 	if(oDraw.DrawInfo == false){
 		var Id = global.Inventory[#VarSlot, Index.slot_id];
-		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
+		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
 			item_description_destroy();

@@ -151,3 +151,67 @@ function draw_impact_trace(x1, y1, x2, y2){
         last_y = ny;
     }
 }
+
+function draw_compass(xx, yy, w, h){
+    draw_set_alpha(global.GUIHUDAlpha * 0.75);
+
+    draw_set_color(c_black);
+    draw_rectangle(xx, yy, xx + w, yy + h, true);
+
+    draw_set_color(c_gray);
+    draw_rectangle(xx + 1, yy + 1, xx + w - 1, yy + h - 1, false);
+
+    var center_x = xx + w * 0.5;
+    var center_y = yy + h * 0.5;
+    var v_angle = 180;
+    var player_angle = global.local_player.RotationAngle;
+
+    draw_set_color(c_white);
+
+    var n = 18;
+    var spacing = w / n;
+
+    for(var i = 1; i < n; i++){
+        draw_line(xx + i * spacing, yy, xx + i * spacing, yy + h);
+    }
+
+    draw_set_font(set_font("GUI_grid"));
+
+    var directions = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
+
+    for(var i = 0; i < array_length(directions); i++){
+        var direction_angle = i * 45;
+        var angle_diff = angle_difference(player_angle, direction_angle);
+
+        if(abs(angle_diff) <= v_angle){
+            var text_value = directions[i];
+            var text_x = center_x + (angle_diff / v_angle) * (w * 0.5);
+
+            draw_text_outlined(
+                text_x - string_width(text_value) * 0.5,
+                yy + h,
+                text_value,
+                c_white,
+                c_black,
+                1
+            );
+        }
+    }
+
+    with(oBot){
+        if(Visible == true){
+            var enemy_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
+            var angle_diff = angle_difference(global.local_player.RotationAngle, enemy_dir);
+            var marker_x = center_x + (angle_diff / v_angle) * (w * 0.5);
+			var col = team == TEAM.POLICE ? c_blue : c_red;
+
+            if(abs(angle_diff) <= v_angle){
+                draw_set_color(col);
+                draw_circle(marker_x, center_y, 8, false);
+            }
+        }
+    }
+
+    draw_set_alpha(1);
+    draw_set_color(c_white);
+}

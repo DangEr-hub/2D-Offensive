@@ -119,7 +119,7 @@ if(is_local){
 			explosion_create(
 				20, 
 				[NearestTargetX, NearestTargetY],
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage] * power(1 - global.ItemIndex[#other.stats.Item_id, ItemStat.DamageDrop], PointDistance), 
+				global.ItemIndex[# stats.Item_id, ItemStat.Damage] * global.ItemIndex[# other.stats.Item_id, ItemStat.damage_drop](PointDistance), 
 				false, 
 				stats.Object, 
 				stats.Item_id,

@@ -242,7 +242,10 @@ function console_submit(Console) {
 								oLightRenderer.CurrentMinute = real(c[1]) % 60;
 							}
 						}
-					break;			
+					break;	
+					case "set_buy_time":
+						if(no == 1 && string_digits(c[1]) != "") then oDraw.buy_time = max(real(c[1]), 0);
+					break;
 					case "set_time_speed":
 						if(no == 1 && string_digits(c[1]) != "" && (!IS_NET || global.sv_cheats == true)) then global.TimeSpeed = real(c[1]);
 					break;	
@@ -411,6 +414,7 @@ function console_submit(Console) {
 					case "unlock_all_items":
 						if(no == 1 && string_digits(c[1]) != ""){
 							if(!IS_NET || global.sv_cheats == true){
+								reset_gui();
 								
 								for(var w = 0; w < Item.Total; w ++){
 									if(global.ItemIndex[# w, ItemStat.Type] != "Weapon" && global.ItemIndex[# w, ItemStat.Type] != "Grenade" &&

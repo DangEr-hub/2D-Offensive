@@ -6,6 +6,12 @@ global.local_player = get_local_player();
 
 if(instance_exists(global.local_player)){
 	
+	#region Buy time
+	if(buy_time > 0){
+		buy_time --;
+	}
+	#endregion
+	
 	#region Bird spawning
 	if((!IS_NET || oNetworkManager.is_server) && percent_chance(0.25) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false && instance_number(oBird) < 10){
 		var birds = random_range(1, 2);
@@ -154,7 +160,7 @@ if(instance_exists(global.local_player)){
 	
 	#region Buy menu
 	if (!global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state && 
-	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
+	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu]) && buy_time > 0) {
 		if (instance_exists(oBuyMenu)) {
 			global.local_player.player_can_shoot = true;
 			with (oBuyMenuDescription) zui_destroy();

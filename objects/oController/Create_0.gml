@@ -50,6 +50,22 @@ play_ranked_callback = function(){
 	}
 };
 
+cases_callback = function(){
+	if!(instance_exists(oCasesTab)){
+		with(zui_main()){
+			var window_id = noone;
+			
+			with(objUIWindow){
+				zui_destroy();
+			}
+			
+			with (zui_create(zui_get_width() * 0.59, zui_get_height() * 0.5, oCasesTab, -1)) {
+				window_id = id;
+			}
+		}
+	}
+};
+
 statistics_callback = function(){
 	if!(instance_exists(oStatisticsTab)){
 		with(zui_main()){
@@ -205,6 +221,14 @@ with (zui_main()) {
 	}
 	
 	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*10.5, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(button_width);
+		zui_set_height(button_height);
+		caption = "Cases";
+		callback = oController.cases_callback;
+	}
+	
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*12, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);

@@ -59,3 +59,16 @@ if(global.MapID == MAP.Desert){
 		}
 	}
 }
+
+if(percent_chance(4)){
+    var firefly_x = random_range(cam_x, cam_x + cam_width);
+    var firefly_y = random_range(cam_y, cam_y + cam_height);
+
+    part_particles_create(
+        global.ParticleSystem,
+        firefly_x,
+        firefly_y,
+        oParticleSystem.firefly_particle,
+        1
+    );
+}

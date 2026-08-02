@@ -104,6 +104,18 @@ part_type_life(leaf_particle, 2 * game_get_speed(gamespeed_fps), 3 * game_get_sp
 part_type_orientation(leaf_particle, 0, 359, 0.1, 1, 1);
 part_type_alpha3(leaf_particle, 0.5, 1, 0.02);
 
+/// Fireflies
+firefly_particle = part_type_create();
+part_type_shape(firefly_particle, pt_shape_sphere);
+part_type_size(firefly_particle, .075, .1, 0, 0);
+part_type_color3(firefly_particle, make_color_rgb(80, 255, 80), make_color_rgb(160, 255, 100), make_color_rgb(40, 120, 20));
+part_type_alpha3(firefly_particle, 0, 1, 0);
+//part_type_blend(firefly_particle, true);
+part_type_speed(firefly_particle, 0.1, 0.5, 0, 0);
+part_type_direction(firefly_particle, 0, 359, 0, 0);
+part_type_orientation(firefly_particle, 0, 359, 0, 0, false);
+part_type_life(firefly_particle, 90, 270);
+
 //snow_particle
 weather_emitter = part_emitter_create(global.ParticleSystem);
 snow_particle = part_type_create();

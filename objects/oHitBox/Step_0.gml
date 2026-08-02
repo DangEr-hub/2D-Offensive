@@ -24,7 +24,7 @@ if(instance_exists(MainObject)){
 
 		            if (collision_rectangle(min_x, min_y, max_x, max_y, id, true, false)) {
 						// Znemožnění dát hlavu s nožem - max(image_index, HITBOX.BodyNoWeapon)
-						hit_living_object(MainObject, max(image_index, HITBOX.BodyNoWeapon), knife_object, MainObject.ArmourID, MainObject.HelmetID, knife_object.x, knife_object.y);
+						hit_living_object(MainObject, max(image_index, HITBOX.BodyNoWeapon), knife_object, MainObject.ArmourID, MainObject.HelmetID, MainObject.ShieldID, knife_object.x, knife_object.y);
 						
 						MainObject.hit_timer = knife_object.stats.Hit_timer;
 		            }

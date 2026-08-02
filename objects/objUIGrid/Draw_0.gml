@@ -214,7 +214,7 @@ if(type == "Respawn menu"){
 					case ItemStat.Weight:
 						text = 
 							statTitles[statIndex - ItemStat.Weight] + 
-							string_format((1 - global.ItemIndex[# Id, ItemStat.Weight]), 0, 1) +
+							string_format(global.ItemIndex[# Id, ItemStat.Weight], 0, 1) +
 							" kg";
 					break;
 				}
@@ -236,7 +236,7 @@ if(type == "Respawn menu"){
 	var rows = 1;
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
-	var statTitles = ["Damage: ", "Penetration power: ", "Damage drop: "];
+	var statTitles = ["Damage: ", "Penetration power: "];
 						
 	#region Draw grid
 	for (var i = 0; i < rows; i++) {
@@ -257,10 +257,6 @@ if(type == "Respawn menu"){
 				
 				case "Penetration power: ":
 					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.PenetrationPower]*100) + " %";
-				break;
-				
-				case "Damage drop: ":
-					text = statTitles[2] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.DamageDrop]*100) + "%/Unit";
 				break;
 			}
 			

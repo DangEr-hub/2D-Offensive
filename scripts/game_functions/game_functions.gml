@@ -318,7 +318,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
-	var damage = BulletDamage * power(1 - global.ItemIndex[# BulletItemID, ItemStat.DamageDrop], point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
+	var damage = BulletDamage * global.ItemIndex[# BulletItemID, ItemStat.damage_drop](point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
 	
 	var particles_number = 1;
 	if(TracerImage != 2){
@@ -723,7 +723,12 @@ function inaccuracy_formula(WID, ObjectType){
 			if(instance_exists(oPlayer)){
 				var MovingIn = 1;
 				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
-				var range_inaccuracy = max(ObjectType.Range * global.ItemIndex[#WID, ItemStat.accuracy_drop], 1);
+				
+				var range_inaccuracy = 1;
+				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
+				if(is_callable(accuracy_func) && !is_real(accuracy_func) && is_method(accuracy_func)){
+					range_inaccuracy = max(1 + (1 - global.ItemIndex[#WID, ItemStat.accuracy_drop](ObjectType.Range)), 1);
+				}
 				var moving_state_inaccuracy = 1;
 	
 				if(ObjectType.moving_state == STATES_PLAYER.prone_state){
@@ -762,9 +767,12 @@ function inaccuracy_formula(WID, ObjectType){
 				var FlashedInaccuracy = 1;
 				var InSmokeInaccuracy = 1;
 				var EnemyMovingInaccuracy = 1;
-				var EnemyRangeInaccuracy = 1 + (point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x) * 
-				global.ItemIndex[#WID, ItemStat.accuracy_drop]);
-
+				var EnemyRangeInaccuracy = 1;
+				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
+				if(is_callable(accuracy_func) && !is_real(accuracy_func) && is_method(accuracy_func)){
+				 EnemyRangeInaccuracy = 1 + (1 -  accuracy_func(point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x)));
+				}
+			
 				var smoke_list = ds_list_create();
 				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x, oSmokeTile, true, false, smoke_list, false);
 				behind_smoke_inaccuracy = 5 * smoke_number + 1;

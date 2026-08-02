@@ -75,15 +75,25 @@ if (is_remote) {
 
 if (instance_exists(oDraw) && stats.Health_points > 0){
 	
+	#region Shield
+	if(global.ItemIndex[# wpn_id, ItemStat.Type] == "Shield"){
+		shield_equip = true;	
+		Shield.image_index = (wpn_id == Item.kevlar_shield) ? 1 : ((wpn_id == Item.military_shield) ? 2 : 3);
+	}else{
+		shield_equip = false;
+		Shield.image_index = 0;
+	}
+	#endregion
+	
 	#region Weapon texture
 	var weapon_index = global.ItemIndex[# wpn_id, ItemStat.AmmoSpriteID] + 1;		
 	Weapon.image_index = wpn_id != Item.None ? weapon_index : 0;		
-	if(global.Inventory[# item_use_position, Index.slot_id] != Item.None && is_local){ Weapon.image_index = 0; }
+	if((global.Inventory[# item_use_position, Index.slot_id] != Item.None && is_local) || shield_equip == true){ Weapon.image_index = 0; }
 	#endregion
 
 	#region Player texture
 	
-	if(global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote && stats.Health_points > 0){
+	if(global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote && stats.Health_points > 0 && shield_equip == false){
 		switch(global.ItemIndex[# wpn_id, ItemStat.WeaponTypeClass]){
 			
 			case WEAPON_CLASS.ASSAULT_RIFLE:
@@ -334,6 +344,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	
 		if(is_local == true){
 			
+			
 			#region Timers and variables
 			stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
 			stats.Damage_health_points = clamp(stats.Damage_health_points, 1, global.player_stats_struct.Max_health);
@@ -549,7 +560,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				var max_rotation = 0;	
 				var LowHPViewAngleFrequency = 0;
 				var ExplosionViewAngleFrequency = 0;
-				var AimPunchStrength = 5;
+				var AimPunchStrength = 2;
 				var GunCrossShake = 0;
 				var AimPunchCrossShake = 0;
 				var ExplosionCrossShake = 0;
@@ -920,7 +931,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				var ShootingSpeedMultiplier = 1;
 				var ReloadingSpeedMultiplier = 1;
 				var moving_speed_multiplier = 1;
-				var WeightSpeedMultiplier = 1 / (global.player_stats_struct.Weight/50 + 1);
+				var WeightSpeedMultiplier = 1 / (global.player_stats_struct.Weight/75 + 1);
 				var WeaponSpeedMultiplier = 1;
 				
 				if(AimPunchTimer == -1){ aimpunch_speed_multiplier = 1; }
@@ -1148,7 +1159,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 
 			#region Running and prone and machine gun
-			if(!global.my_console[? "active"]){
+			if(!global.my_console[? "active"] && shield_equip == false){
 	
 				if(keyboard_check_pressed(global.KeyBinds[| KEY.Prone]) && Moving == false){
 					if(moving_state == STATES_PLAYER.none_state){
@@ -1253,9 +1264,12 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 					Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
 					Weapon.y = y + lengthdir_y(WY, RotationAngle) - lengthdir_y(Weapon.KickBackEffect, RotationAngle);
+					Shield.x = x + lengthdir_x(WX, RotationAngle);
+					Shield.y = y + lengthdir_y(WY, RotationAngle);
 					RotationAngle += sin(degtorad(pointdir - RotationAngle)) * RotationSpeed + min(KickBackAngle, 45);
 					RotationAngle = (RotationAngle % 360 + 360) % 360;
 					Weapon.image_angle = RotationAngle + KickBackAngle * .5;
+					Shield.image_angle = RotationAngle;
 					Knife.image_angle = RotationAngle;
 					Weapon.RotationAngle = Weapon.image_angle;
 	
@@ -1443,7 +1457,16 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			    // If there was a change in the weapon number
 			    if (changeDetected) {
-					var equipTime = global.ItemIndex[# global.Inventory[# WeaponNumber + OtherSlot.Primary, Index.slot_id], ItemStat.EquipTime];
+					var weaponSlot = OtherSlot.Primary;
+
+					switch (WeaponNumber) {
+					    case 0: weaponSlot = OtherSlot.Primary; break;
+					    case 1: weaponSlot = OtherSlot.Secondary; break;
+					    case 2: weaponSlot = OtherSlot.Knife; break;
+					    case 3: weaponSlot = OtherSlot.Shield; break;
+					}
+
+					var equipTime = global.ItemIndex[# global.Inventory[# weaponSlot, Index.slot_id], ItemStat.EquipTime];
 			        if (equipTime > 0) {
 						equip_time = 0;
 						equip_timer = equipTime;

@@ -138,20 +138,20 @@ function InventoryInit() {
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, dilatation_pill, MP9, CZ75, Total
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, Total
 	}
 
 	enum ItemStat{
 		/* Draw weapon stats */
 	    Damage, MaxAmmo, ReloadSpeed, Range, ShootTimer, WeaponTypeClass, MovingSpdMul, PenetrationPower, ShootingMode, MovingInaccuracyMultiplier, Inaccuracy,
-		KickBackInaccuracyMultiplier, DamageDrop, accuracy_drop, ClipAmmo,
+		KickBackInaccuracyMultiplier, damage_drop, accuracy_drop, ClipAmmo,
 		
 		/* Draw armour stats */
 		Weight, Defense, BaseDurability, KickBackPower, RecoilOffsetX, RecoilOffsetY, Description, ShootSpdMul, EquipTime,
 		BulletCasingID, ItemColor, ScopeInaccuracyResetTimer, WeaponType, AmmoType, NightVisionIntensityPower, NightVisionNoisePower, AmmoSpriteID,
 		EnemyInaccuracyCompensation, Type, Name, Bullets, SoundID, CrosshairShake, CameraShake, HardRecoil, KBPhase1, KBPhase2, RecoilX, RecoilY,
 		advantages, disadvantages, slot, Cost, ReloadSpdMul, difficulty, KBResetMultiplier, reward, KBStabilization, random_bullet_spread, is_locked, caliber,
-		caliber_type, attach_sockets, attachments, preattached, BaseMaxAmmo, BaseReloadSpeed, BaseEquipTime, BaseMovingSpdMul, BasePenetrationPower, BaseDamage,
+		caliber_type, attach_sockets, attachments, preattached, BaseMaxAmmo, BaseReloadSpeed, BaseEquipTime, BaseMovingSpdMul, BasePenetrationPower, BaseDamage, Rarity,
 		Total
 	}
 	
@@ -354,138 +354,25 @@ function switch_weapon_number(){
 					}
 				}
 			break;
+			
+			case 3:
+				if(WeaponID != OtherSlot.Shield){
+					weapon_shooting_mode = 0;
+					ReloadTime = 0;
+					ReloadTimer = -1;
+					WeaponID = OtherSlot.Shield;
+					Reloading = false;
+					if(kick_back_timer != -1){
+						kick_back_timer = KickBackTime;
+					}
+				}
+			break;
+			
 		}
 		with(id){ weapon_network_propagate(); }
 	}
 }
 	
-function item_swap(type, slot_type){
-	if!(instance_exists(oInventory)){
-		global.local_player.item_equip_timer = global.local_player.item_equip_time;
-	}
-	TempArray = array_create(Index.Total - 1, 0);
-	TempArray[Index.slot_id] = global.Inventory[# slot_type, Index.slot_id];
-	TempArray[Index.SlotAmount] = global.Inventory[# slot_type, Index.SlotAmount];
-	TempArray[Index.slot_ammo] = global.Inventory[# slot_type, Index.slot_ammo];
-	TempArray[Index.slot_clip_ammo] = global.Inventory[# slot_type, Index.slot_clip_ammo];
-	TempArray[Index.slot_durability] = global.Inventory[# slot_type, Index.slot_durability];
-	TempArray[Index.SlotShootingType] = global.Inventory[# slot_type, Index.SlotShootingType];
-	TempArray[Index.slot_barrel] = global.Inventory[# slot_type, Index.slot_barrel];
-	TempArray[Index.slot_grip] = global.Inventory[# slot_type, Index.slot_grip];
-	TempArray[Index.slot_scope] = global.Inventory[# slot_type, Index.slot_scope];
-	TempArray[Index.slot_suppressor] = global.Inventory[# slot_type, Index.slot_suppressor];
-	
-	if(type == "mouse"){
-		
-		global.Inventory[# slot_type, Index.slot_id] = global.MouseSlot[# 0, Index.slot_id];
-		global.Inventory[# slot_type, Index.SlotAmount] = global.MouseSlot[# 0, Index.SlotAmount];
-		global.Inventory[# slot_type, Index.slot_ammo] = global.MouseSlot[# 0, Index.slot_ammo];
-		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.MouseSlot[# 0, Index.slot_clip_ammo];
-		global.Inventory[# slot_type, Index.slot_durability] = global.MouseSlot[# 0, Index.slot_durability];
-		global.Inventory[# slot_type, Index.SlotShootingType] = global.MouseSlot[# 0, Index.SlotShootingType];
-		global.Inventory[# slot_type, Index.slot_barrel] = global.MouseSlot[# 0, Index.slot_barrel];
-		global.Inventory[# slot_type, Index.slot_grip] = global.MouseSlot[# 0, Index.slot_grip];
-		global.Inventory[# slot_type, Index.slot_suppressor] = global.MouseSlot[# 0, Index.slot_suppressor];
-		global.Inventory[# slot_type, Index.slot_scope] = global.MouseSlot[# 0, Index.slot_scope];	
-	
-		global.MouseSlot[# 0, Index.slot_id] = TempArray[Index.slot_id];
-		global.MouseSlot[# 0, Index.SlotAmount] = TempArray[Index.SlotAmount];
-		global.MouseSlot[# 0, Index.slot_ammo] = TempArray[Index.slot_ammo];
-		global.MouseSlot[# 0, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
-		global.MouseSlot[# 0, Index.slot_durability] = TempArray[Index.slot_durability];
-		global.MouseSlot[# 0, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
-		global.MouseSlot[# 0, Index.slot_barrel] = TempArray[Index.slot_barrel];
-		global.MouseSlot[# 0, Index.slot_grip] = TempArray[Index.slot_grip];
-		global.MouseSlot[# 0, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
-		global.MouseSlot[# 0, Index.slot_scope] = TempArray[Index.slot_scope];
-		
-	}else if(type == "item_use_position"){
-		
-		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# global.local_player.item_use_position, Index.slot_id];
-		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# global.local_player.item_use_position, Index.SlotAmount];
-		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# global.local_player.item_use_position, Index.slot_ammo];
-		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# global.local_player.item_use_position, Index.slot_clip_ammo];
-		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# global.local_player.item_use_position, Index.slot_durability];
-		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# global.local_player.item_use_position, Index.SlotShootingType];
-		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# global.local_player.item_use_position, Index.slot_barrel];
-		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# global.local_player.item_use_position, Index.slot_grip];
-		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# global.local_player.item_use_position, Index.slot_suppressor];
-		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# global.local_player.item_use_position, Index.slot_scope];	
-	
-		global.Inventory[# global.local_player.item_use_position, Index.slot_id] = TempArray[Index.slot_id];
-		global.Inventory[# global.local_player.item_use_position, Index.SlotAmount] = TempArray[Index.SlotAmount];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_ammo] = TempArray[Index.slot_ammo];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_durability] = TempArray[Index.slot_durability];
-		global.Inventory[# global.local_player.item_use_position, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_barrel] = TempArray[Index.slot_barrel];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_grip] = TempArray[Index.slot_grip];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
-		global.Inventory[# global.local_player.item_use_position, Index.slot_scope] = TempArray[Index.slot_scope];
-	}else if(type == "description_button"){
-		
-		for(var i=0;i<Index.Total;i++){
-			global.Inventory[# slot_type, i] = 0;
-		}
-		
-	}else if(type == "varslot"){
-		// Uvnitř objektu oSlot jenom - VarSlot proměnná
-		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# VarSlot, Index.slot_id];
-		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# VarSlot, Index.SlotAmount];
-		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# VarSlot, Index.slot_ammo];
-		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# VarSlot, Index.slot_clip_ammo];
-		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# VarSlot, Index.slot_durability];
-		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# VarSlot, Index.SlotShootingType];
-		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# VarSlot, Index.slot_barrel];
-		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# VarSlot, Index.slot_grip];
-		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# VarSlot, Index.slot_suppressor];
-		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# VarSlot, Index.slot_scope];	
-	
-		global.Inventory[# VarSlot, Index.slot_id] = TempArray[Index.slot_id];
-		global.Inventory[# VarSlot, Index.SlotAmount] = TempArray[Index.SlotAmount];
-		global.Inventory[# VarSlot, Index.slot_ammo] = TempArray[Index.slot_ammo];
-		global.Inventory[# VarSlot, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
-		global.Inventory[# VarSlot, Index.slot_durability] = TempArray[Index.slot_durability];
-		global.Inventory[# VarSlot, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
-		global.Inventory[# VarSlot, Index.slot_barrel] = TempArray[Index.slot_barrel];
-		global.Inventory[# VarSlot, Index.slot_grip] = TempArray[Index.slot_grip];
-		global.Inventory[# VarSlot, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
-		global.Inventory[# VarSlot, Index.slot_scope] = TempArray[Index.slot_scope];
-	}else if(type == "draw_varslot"){
-		// Uvnitř description od itemu/zbraně/armouru
-		global.Inventory[# slot_type, Index.slot_id] = global.Inventory[# oDraw.var_slot, Index.slot_id];
-		global.Inventory[# slot_type, Index.SlotAmount] = global.Inventory[# oDraw.var_slot, Index.SlotAmount];
-		global.Inventory[# slot_type, Index.slot_ammo] = global.Inventory[# oDraw.var_slot, Index.slot_ammo];
-		global.Inventory[# slot_type, Index.slot_clip_ammo] = global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo];
-		global.Inventory[# slot_type, Index.slot_durability] = global.Inventory[# oDraw.var_slot, Index.slot_durability];
-		global.Inventory[# slot_type, Index.SlotShootingType] = global.Inventory[# oDraw.var_slot, Index.SlotShootingType];
-		global.Inventory[# slot_type, Index.slot_barrel] = global.Inventory[# oDraw.var_slot, Index.slot_barrel];
-		global.Inventory[# slot_type, Index.slot_grip] = global.Inventory[# oDraw.var_slot, Index.slot_grip];
-		global.Inventory[# slot_type, Index.slot_suppressor] = global.Inventory[# oDraw.var_slot, Index.slot_suppressor];
-		global.Inventory[# slot_type, Index.slot_scope] = global.Inventory[# oDraw.var_slot, Index.slot_scope];	
-	
-		global.Inventory[# oDraw.var_slot, Index.slot_id] = TempArray[Index.slot_id];
-		global.Inventory[# oDraw.var_slot, Index.SlotAmount] = TempArray[Index.SlotAmount];
-		global.Inventory[# oDraw.var_slot, Index.slot_ammo] = TempArray[Index.slot_ammo];
-		global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo] = TempArray[Index.slot_clip_ammo];
-		global.Inventory[# oDraw.var_slot, Index.slot_durability] = TempArray[Index.slot_durability];
-		global.Inventory[# oDraw.var_slot, Index.SlotShootingType] = TempArray[Index.SlotShootingType];
-		global.Inventory[# oDraw.var_slot, Index.slot_barrel] = TempArray[Index.slot_barrel];
-		global.Inventory[# oDraw.var_slot, Index.slot_grip] = TempArray[Index.slot_grip];
-		global.Inventory[# oDraw.var_slot, Index.slot_suppressor] = TempArray[Index.slot_suppressor];
-		global.Inventory[# oDraw.var_slot, Index.slot_scope] = TempArray[Index.slot_scope];
-	}
-	
-	if(IS_NET){
-		if(slot_type == OtherSlot.Primary || slot_type == OtherSlot.Secondary || slot_type == OtherSlot.Knife){
-			with(global.local_player){ weapon_network_propagate(); }
-		}else{
-			with(global.local_player){ equip_network_propagate(); }
-		}
-	}
-	
-	TempArray = undefined;	
-}
 
 function item_equip(slot, slot_string, weapon_id, equip = true){
 	var Id = global.Inventory[# slot, Index.slot_id];
@@ -548,11 +435,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
 		if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Primary);
+			item_swap("item_use_position", OtherSlot.Primary);
 			primary_slot_id = Item.None;
 		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Primary);
+			item_swap("item_use_position", OtherSlot.Primary);
 		}
 		#endregion
 				
@@ -560,11 +447,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
 		if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Secondary);
+			item_swap("item_use_position", OtherSlot.Secondary);
 			secondary_slot_id = Item.None;
 		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Secondary);
+			item_swap("item_use_position", OtherSlot.Secondary);
 		}
 		#endregion
 				
@@ -572,11 +459,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		var tertiary_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
 		if (tertiary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Knife);
+			item_swap("item_use_position", OtherSlot.Knife);
 			tertiary_slot_id = Item.None;
 		} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
-			item_swap("slot_string", OtherSlot.Knife);
+			item_swap("item_use_position", OtherSlot.Knife);
 		}
 		#endregion
 						
@@ -588,13 +475,13 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			ItemAddWeight(global.Inventory[# slot, Index.slot_id], armour_slot_id);
-			item_swap("slot_string", OtherSlot.Armour);
+			item_swap("item_use_position", OtherSlot.Armour);
 			armour_slot_id = Item.None;
 			with(id){ equip_network_propagate(); }
 		} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			ItemAddWeight(global.Inventory[# slot, Index.slot_id], armour_slot_id);
-			item_swap("slot_string", OtherSlot.Armour);
+			item_swap("item_use_position", OtherSlot.Armour);
 			with(id){ equip_network_propagate(); }
 		}
 		#endregion
@@ -606,24 +493,36 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			ItemAddWeight(global.Inventory[# slot, Index.slot_id], helmet_slot_id);
-			item_swap("slot_string", OtherSlot.Helmet);
+			item_swap("item_use_position", OtherSlot.Helmet);
 			helmet_slot_id = Item.None;
 			with(id){ equip_network_propagate(); }
 		} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
 			global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			ItemAddWeight(global.Inventory[# slot, Index.slot_id], helmet_slot_id);
-			item_swap("slot_string", OtherSlot.Helmet);
+			item_swap("item_use_position", OtherSlot.Helmet);
 			with(id){ equip_network_propagate(); }
 		}
 		#endregion
 				
 	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
 				
-		#region Shield use
-		global.local_player.item_equip_timer = global.local_player.item_equip_time;
+		#region Helmet equip and dequip
+		var shield_slot_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+		if (shield_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Shield")) {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], shield_slot_id);
+			item_swap("item_use_position", OtherSlot.Shield);
+			shield_slot_id = Item.None;
+			with(id){ equip_network_propagate(); }
+		} else if (global.ItemIndex[# Id, ItemStat.Type] == "Shield") {
+			global.local_player.item_equip_timer = global.local_player.item_equip_time;
+			ItemAddWeight(global.Inventory[# slot, Index.slot_id], shield_slot_id);
+			item_swap("item_use_position", OtherSlot.Shield);
+			with(id){ equip_network_propagate(); }
+		}
 		#endregion
 				
-	}	
+	}
 }
 
 

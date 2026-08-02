@@ -9,6 +9,7 @@ var_slot = 0;
 item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.PickUp])) + "]";
 HUDShift = 16;
+buy_time = 0;
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;
@@ -21,7 +22,13 @@ wind = {
 	strength: random_range(1.5, 2.5)
 };
 
+if(global.ranked_game == true){
+	buy_time = BUY_TIME;	
+}
+
 draw_set_font(set_font("Console"));
+
+
 
 #region Weapon attachments
 show_weapon_attachments = false;

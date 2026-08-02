@@ -1,3 +1,4 @@
+#macro BUY_TIME 60 * game_get_speed(gamespeed_fps)
 #macro IS_NET instance_exists(oNetworkManager)
 #macro AMMO_UPG 1.25
 #macro RELOAD_UPG 0.75
@@ -12,7 +13,7 @@
 #macro FLASH_LERP 0.0075
 #macro MAX_FOG 20
 #macro BOT_SELECT_RADIUS 512
-#macro MOVE_SPD 700
+#macro MOVE_SPD 750
 #macro BULLET_SPEED 50
 #macro SHADOW_DIST 24
 #macro RD_OFFSET 1.0 // stabilní hráč je považován s RD_ES = 1.0

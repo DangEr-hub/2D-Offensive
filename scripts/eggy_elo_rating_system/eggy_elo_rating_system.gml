@@ -213,6 +213,8 @@ function calculate_new_rd(old_rd, volatility, enemy_rds){
 	games_information = calculate_games_information(enemy_rds);
 	
 	var new_rd = 1/sqrt(1/power(_rd, 2) + games_information);
+	
+	return new_rd;
 }
 
 function calculate_team_ep(enemy_ep, enemy_rd){
@@ -301,7 +303,13 @@ function calculate_ep_change(prob_win, game_result, your_kills, your_hs, A_ep, A
 	if(game_result < 0.5){
 		base_modifier = 1 / (1 + ep_modifier_diff + statistics_modifier);
 	}
-	
+
+if(!is_real(rd_modifier)){
+    show_debug_message("rd_modifier is invalid: " + string(rd_modifier));
+    show_debug_message("A_rd: " + string(A_rd));
+    return 0;
+}
+
     return game_result_change * base_modifier * rd_modifier;
 }
 

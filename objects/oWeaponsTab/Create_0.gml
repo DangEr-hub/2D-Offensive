@@ -32,8 +32,8 @@ range_graph = noone;
 
 
 wpn_desc_txt = "";
-wpn_string = array_create(30, "");
-ui_objects = array_create(30, noone);
+wpn_string = array_create(29, "");
+ui_objects = array_create(29, noone);
 
 
 
@@ -61,7 +61,7 @@ refresh_weapon_ui = function(){
 		var dmg_drop_txt_2 = "";
 		var dist = array_create(4, 0);
 		var base_dmg = global.ItemIndex[# wpn, ItemStat.Damage];
-		var dmg_drop = global.ItemIndex[# wpn, ItemStat.DamageDrop];
+		var dmg_drop = global.ItemIndex[# wpn, ItemStat.damage_drop];
 		var max_range = global.ItemIndex[# wpn, ItemStat.Range];
 		
 		for(var i = 0; i < array_length(dist); i++){
@@ -115,7 +115,6 @@ refresh_weapon_ui = function(){
 			"Kill reward: " + string(global.ItemIndex[# wpn, ItemStat.reward]),
 			"Damage progress (1): " + dmg_drop_txt_1,
 			"Damage progress (2): " + dmg_drop_txt_2,
-			"Range spread increase: " + string_format(10000 * global.ItemIndex[# wpn, ItemStat.accuracy_drop], 0, 1) + " % per 100 units",
 			"Maximal range: " + string_format(max_range, 0, 1) + " units",
 			"Fire modes: " + fire_modes,
 			"Class: " + string(get_wpn_type(wpn)),
@@ -266,7 +265,7 @@ refresh_weapon_ui = function(){
 
 draw_set_font(set_font("Console"));
 weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
-			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, 
+			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.CZ75,
 			Item.Spas, Item.Javelin
 		  ];
 wpn = weapons[0];
@@ -469,8 +468,9 @@ with(wpn_sprite){
 }
 
 with(img_lock){
+	var lock = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.is_locked];
 	zui_set_size(180 * global.GUIMultiplier, 180 * global.GUIMultiplier);
-	zui_set_depth(-1000);
+	zui_set_depth(lock ? -1000 : 1000);
 	sprite = spr_Lock;
 	clickable = false;
 	drawable = other.is_locked;
@@ -480,8 +480,9 @@ with(img_lock){
 	sprite_height_size = 180 * global.GUIMultiplier;
 }
 with(img_lockbg){
+	var lock = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.is_locked];
 	zui_set_size(other.tab_width, other.tab_height);
-	zui_set_depth(-1000);
+	zui_set_depth(lock ? -1000 : 1000);
 	sprite = spr_lockbg;
 	drawable = other.is_locked;
 	clickable = false;
@@ -490,6 +491,9 @@ with(img_lockbg){
 	sprite_height_size = other.tab_height;
 }
 refresh_weapon_ui();
+
+
+
 /***************************************************/
 
 /* --- UI SETUP --- */
@@ -634,7 +638,7 @@ dmg_graph_callback = function(){
 		}
 		
 		var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Damage];
-		var dmg_drop = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.DamageDrop];
+		var dmg_drop = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.damage_drop];
 		for(var i = 0; i < array_length(values_x); i ++){
 			array_push(values_y, base_dmg * power(1 - dmg_drop, values_x[i]));
 		}
@@ -649,7 +653,7 @@ dmg_graph_callback = function(){
 	    var sample_step = 50;
 	    var weapon_range = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range];
 	    var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Damage];
-		var dmg_func = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.DamageDrop];
+		var dmg_func = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.damage_drop];
 
 	    var steps = ceil(weapon_range / sample_step) + 1;
 
@@ -657,7 +661,7 @@ dmg_graph_callback = function(){
 	        var dist = min(i * sample_step, weapon_range);
 	        var damage = base_dmg;
 
-	        if(is_callable(dmg_func)){
+	        if(is_callable(dmg_func) && !is_real(dmg_func)){
 	            damage = dmg_func(dist);
 	        }
 
@@ -684,18 +688,27 @@ range_graph_callback = function(){
 	oWeaponsTab.range_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
 	
 	with(range_graph){
-		zui_set_depth(-1000);
-		scale = 50;
-		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range] / scale) + 2;
-		
-		for(var i = 0; i < steps; i++){
-			array_push(values_x, i*scale);	
-		}
-		
+	    zui_set_depth(-1000);
+	    values_x = [];
+	    values_y = [];
+	    var sample_step = 50;
+	    var weapon_range = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range];
+	    var base_spread = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Inaccuracy];
+	    var accuracy_func = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.accuracy_drop];
 
-		for(var i = 0; i < array_length(values_x); i ++){
-			array_push(values_y, (values_x[i] * global.ItemIndex[# oWeaponsTab.wpn, ItemStat.accuracy_drop] + 1) * global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Inaccuracy]);
-		}
+	    var steps = ceil(weapon_range / sample_step) + 1;
+
+	    for(var i = 0; i < steps; i++){
+	        var dist = min(i * sample_step, weapon_range);
+	        var accuracy_modifier = 1.0;
+
+	        if(is_callable(accuracy_func)){
+	            accuracy_modifier = accuracy_func(dist);
+	        }
+
+	        array_push(values_x, dist);
+	        array_push(values_y, (1.0 + (1.0 - accuracy_modifier)) * base_spread);
+	    }
 	}
 	
 	}else{

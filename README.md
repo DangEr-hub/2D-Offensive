@@ -5,12 +5,16 @@
 It takes some inspiration from my favourite games like Counter-Strike, CS2D and Unturned.
 
 <p align="center">
-  <img src="Screenshot.png" alt="Screenshot " width="45%">
-  <img src="Screenshot_menu.png" alt="Screenshot_menu" width="45%">
+  <img src="Screenshot.png" alt="Gameplay screenshot" width="45%">
+  <img src="Screenshot_menu.png" alt="Weapon menu screenshot" width="45%">
 </p>
 
 <p align="center">
-  <em>Early WIP screenshot and weapon menu example.</em>
+  <img src="Screenshot_nightvision.png" alt="Night vision screenshot" width="70%">
+</p>
+
+<p align="center">
+  <em>Early WIP gameplay, weapon menu and night vision examples.</em>
 </p>
 
 ## Gameplay Idea
@@ -20,16 +24,6 @@ The idea of the game is built around hitboxes, aiming, weapon skill, movement, a
 The goal is not just to make a simple top-down shooter where every gun feels the same, but to experiment with weapon handling, different weapon stats, player movement, and combat that depends at least a bit on aim and positioning (strong CS inspiration).
 
 One of the main experiments is a kind of "3D aiming" system. Bullets do not simply travel as a perfect 2D line from the player through the crosshair. Instead, shots are spread around the crosshair in 2D space, somewhat closer to how weapon inaccuracy works in FPS games but in 2D. The player's position and aim direction still matter, but the final shot placement depends on weapon accuracy, movement, recoil, spread, and where the crosshair is pointing. This mechanic is main reaason why aim and hitboxes matter.
-
-<p align="center">
-  <a href="Bullet_logic.mp4">
-    <img src="Bullet_logic.png" alt="Bullet logic preview" width="70%">
-  </a>
-</p>
-
-<p align="center">
-  <em>Click the preview to watch the bullet logic / "3D aiming" test.</em>
-</p>
 
 ## Project Status
 

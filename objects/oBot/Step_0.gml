@@ -29,8 +29,7 @@ if(stats.Health_points <= 0){
 			attachments[WeaponPositionID][ATTACHMENTS.slot_scope],
 			attachments[WeaponPositionID][ATTACHMENTS.slot_barrel],
 			attachments[WeaponPositionID][ATTACHMENTS.slot_grip],
-			attachments[WeaponPositionID][ATTACHMENTS.slot_suppressor],
-		
+			attachments[WeaponPositionID][ATTACHMENTS.slot_suppressor]
 		);
 	}
 	if(ArmourID != Item.None){
@@ -72,11 +71,14 @@ if(stats.Health_points <= 0){
 if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1 && trigger_texture_timer > -1){
 	
 	#region Weapon texture
-	var weapon_indexes = { "AKM":1, "Desert Eagle":2, "Spas-12":3, "SSG 08":4, "MAC11":5, "SIG SG550":6, "FGM-148":7,"Glock-17":8, 
+	/*ssssvar weapon_indexes = { "AKM":1, "Desert Eagle":2, "Spas-12":3, "SSG 08":4, "MAC11":5, "SIG SG550":6, "FGM-148":7,"Glock-17":8, 
 							"M4A1":9, "AWM":10, "USP":11, "Galil":12, "P250":13, "MK18":14,"FAMAS":15, "TEC-9":16};
 		
 		
-	Weapon.image_index = weapon_indexes[$ global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.Name]] ?? 0;		
+	Weapon.image_index = weapon_indexes[$ global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.Name]] ?? 0;		*/
+	
+	var weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.AmmoSpriteID] + 1;		
+	Weapon.image_index = WeaponID[WeaponPositionID] != Item.None ? weapon_index : 0;		
 	#endregion
 	
 	#region Enemy texture

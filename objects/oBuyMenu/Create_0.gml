@@ -5,9 +5,9 @@ buy_menu_height = clamp(798 * global.GUIMultiplier, round(global.GuiH * .825), r
 draw_set_font(set_font("GUI_small"));
 zui_set_size(buy_menu_width, buy_menu_height);
 
-
-with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-	caption = "Buy time remaining: ";
+buy_time_cap = zui_create(0, 0, objUIWindowCaption, depth - 1);
+with (buy_time_cap) {
+	caption = "Buy time remaining: " + string(oDraw.buy_time);
 	draggable = 1;
 }
 
@@ -66,7 +66,8 @@ buy_items = [
     [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.CZ75, Item.None],
     [Item.Javelin, Item.Spas, Item.None, Item.None, Item.None, Item.None, Item.None],
     [Item.HEGrenade, Item.SmokeGrenade, Item.StickyGrenade, Item.FlashBangGrenade, Item.HealingKit, Item.None, Item.None],
-    [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None]
+    [Item.KevlarHelm, Item.KevlarVest, Item.MilitaryHelm, Item.MilitaryVest, Item.SpecOpsHelm, Item.SpecOpsVest, Item.None],
+	[Item.kevlar_shield, Item.military_shield, Item.spec_ops_shield, Item.None, Item.None, Item.None, Item.None]
 ];
 
 var start_x = zui_get_width() * .055;

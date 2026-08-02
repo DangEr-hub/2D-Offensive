@@ -101,6 +101,11 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
         floor(struct_get_default(options, "label_decimals", 1))
     );
 
+    var y_label_decimals = max(
+        0,
+        floor(struct_get_default(options, "y_label_decimals", max(label_decimals, 1)))
+    );
+
     var font = struct_get_default(options, "font", -1);
 
     var minimum_x = x_values[0];
@@ -204,7 +209,7 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
     {
         draw_set_alpha(background_alpha);
         draw_set_color(bg_color);
-        draw_rectangle(xx, yy, xx + width, yy + height, false);
+        draw_rectangle(xx - 16, yy, xx + width, yy + height, false);
     }
 
     if(show_grid)
@@ -314,7 +319,7 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
             draw_text(
                 plot_x1 - 7,
                 label_y,
-                string_format(y_value, 0, label_decimals)
+                string_format(y_value, 0, y_label_decimals)
             );
         }
     }
