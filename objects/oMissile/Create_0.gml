@@ -14,6 +14,10 @@ ExplosionTime = 1 * game_get_speed(gamespeed_fps);
 image_angle = random_range(-45, 45);
 particle_timer = -1;
 z_approach = 0.0175;
+network_id = -1;
+network_authority = (!IS_NET || (instance_exists(oNetworkManager) && oNetworkManager.is_server));
+network_visual_only = (IS_NET && !network_authority);
+bomb_explosion_broadcasted = false;
 play_sound(x, y, snd_FallingBomb);
 depth = -1100;
 

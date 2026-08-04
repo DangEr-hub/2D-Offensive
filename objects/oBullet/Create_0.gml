@@ -9,6 +9,7 @@ mask_index = spr_Bullet;
 image_angle = random(360);
 alarm[0] = 1;
 is_remote = false;
+bullet_network_id = -1;
 
 stats = {
     "Damage": 0,

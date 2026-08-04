@@ -3,7 +3,9 @@ enum PLAYER_FLAGS {
     GODMODE = 1,  // 0b00000001 1 << 0
     MOVING = 2, // 0b00000010 1 << 1
     RELOADING = 4,   // 0b00000100 1 << 2
-	FLASHED = 8
+	FLASHED = 8,
+	PRONE = 16,
+	THROWING_GRENADE = 32
 }
 
 network_set_config(network_config_use_non_blocking_socket, true);
@@ -12,6 +14,7 @@ network_type = network_socket_udp;
 server_port = 50000;
 server_ip = "127.0.0.1"; // localhost
 max_clients = 4;
+server_max_damage_per_hit = 500;
 
 // Network state
 
@@ -36,9 +39,13 @@ projectiles_seen = ds_map_create(); // key = proj_id, val = true
 player_stats = ds_map_create();
 item_registry = ds_map_create();
 bird_registry = ds_map_create();
+grenade_registry = ds_map_create();
+airplane_registry = ds_map_create();
 item_pos_buffer = ds_list_create();
 free_item_ids = -1;
 free_bird_ids = -1;
+free_grenade_ids = -1;
+free_airplane_ids = -1;
 
 
 // Packet types
@@ -60,7 +67,24 @@ enum PACKET {
 	PLAYER_DEATH,
 	PLAYER_RESPAWN,
 	PING,
-	BIRD_SYNC
+	BIRD_SYNC,
+	GRENADE_SYNC,
+	AIRPLANE_SYNC
+}
+
+enum GRENADE_SYNC_ACTION {
+	REQUEST_SPAWN,
+	SPAWN,
+	EXPLODE
+}
+
+enum AIRPLANE_SYNC_ACTION {
+	SPAWN,
+	UPDATE,
+	DESTROY,
+	BOMB_SPAWN,
+	BOMB_EXPLODE,
+	REQUEST_DAMAGE
 }
 
 equipment_sync = false;

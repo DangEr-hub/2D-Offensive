@@ -15,7 +15,12 @@ if (IS_NET) {
 			network_id = compute_item_network_id();
 		}
 		with(oNetworkManager){
-		    var data = ds_map_create();
+		    var data;
+			if (ds_map_exists(item_registry, other.network_id)) {
+				data = ds_map_find_value(item_registry, other.network_id);
+			} else {
+				data = ds_map_create();
+			}
 		    ds_map_set(data, "obj_index", other.object_index);
 		    ds_map_set(data, "x", other.x);
 		    ds_map_set(data, "y", other.y);

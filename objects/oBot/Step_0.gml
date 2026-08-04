@@ -147,7 +147,7 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 
 #region States 
 
-if(State == STATES.MoveCommand){
+if(State == STATES.MoveCommand && global.EnemyCanMove == true){
 	MoveTowards(target_x, target_y, Acceleration*3, 0, 0);
 }
 
@@ -250,8 +250,42 @@ if(global.EnemyCanMove == true && mv_timer <= 1){
 #region Command state
 if(State == STATES.MoveCommand){
     if(point_distance(x, y, target_x, target_y) < 16){
-		global.local_player.command = array_create(array_length(global.local_player.command), -1);
+		if(instance_exists(global.local_player) && global.local_player.selected_bot == id){
+			global.local_player.command = array_create(array_length(global.local_player.command), -1);
+		}
+		command_timer = -1;
+		command_stuck_timer = -1;
         set_state(STATES.Idle);
+    }else{
+		if(command_timer > -1){
+			command_timer -= global.time_step;
+		}
+		if(command_stuck_timer > -1){
+			command_stuck_timer -= global.time_step;
+		}
+
+		var command_failed = command_timer <= 0 && command_timer != -1;
+		if(command_stuck_timer <= 0 && command_stuck_timer != -1){
+			var command_progress = point_distance(x, y, command_last_x, command_last_y);
+			if(command_progress < 2 && point_distance(x, y, target_x, target_y) > 24){
+				command_failed = true;
+			}else{
+				command_last_x = x;
+				command_last_y = y;
+				command_stuck_timer = command_stuck_time;
+			}
+		}
+
+		if(command_failed){
+			if(instance_exists(global.local_player) && global.local_player.selected_bot == id){
+				global.local_player.command = array_create(array_length(global.local_player.command), -1);
+			}
+			command_timer = -1;
+			command_stuck_timer = -1;
+			mv_timer = 0;
+			MoveTime = 0;
+			set_state(STATES.Idle);
+		}
     }
 }
 #endregion
@@ -269,6 +303,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
             case STATES.MoveToward:
             case STATES.MoveAwayFromGrenade:
 			case STATES.MovePredictive:
+			case STATES.MoveCommand:
                 try_shoot(0.15 * shoot_chance);
             break;
 
@@ -633,7 +668,7 @@ if!(instance_exists(ChasingObject)){
 	ChasingObjectSpotted = false;
 }else if(chasing_available){
 	ChasingObjectSpot(chasing_timer);
-}else if(ChasingObjectSpotted == false){
+}else if(ChasingObjectSpotted == false && State != STATES.MoveCommand){
 	if(Flashed == false){
 		set_state(STATES.Idle);			
 	}else{

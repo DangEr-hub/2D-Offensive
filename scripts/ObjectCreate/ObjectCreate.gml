@@ -15,6 +15,11 @@ function create_fog(xx, yy, radius, dir, spd, rot_spd, num, alpha, fade, time, m
 
 
 function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
+	if(IS_NET && instance_exists(oNetworkManager) && !oNetworkManager.is_server && oNetworkManager.is_connected){
+		send_grenade_spawn_request(ID, GrenadeSpeed, TargetX, TargetY, ItemID);
+		return noone;
+	}
+
 	ObjectSpeed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
 	MoveDirX = dcos(MoveDirection) * ObjectSpeed;
 	MoveDirY = -dsin(MoveDirection) * ObjectSpeed;
@@ -31,6 +36,23 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 		Direction: point_direction(PositionX, PositionY, TargetX, TargetY)
 	};
 	GrenadeObject.image_index = ID;
+
+	if(IS_NET && instance_exists(oNetworkManager) && oNetworkManager.is_server){
+		GrenadeObject.network_id = compute_grenade_network_id();
+		GrenadeObject.network_owner_pid = 255;
+		GrenadeObject.network_authority = true;
+		GrenadeObject.network_visual_only = false;
+		GrenadeObject.grenade_explosion_broadcasted = false;
+
+		if(ObjectType.object_index == oPlayer){
+			GrenadeObject.network_owner_pid = ObjectType.network_id;
+		}
+
+		ds_map_set(oNetworkManager.grenade_registry, GrenadeObject.network_id, GrenadeObject);
+		server_grenade_spawn_broadcast(GrenadeObject);
+	}
+
+	return GrenadeObject;
 }
 
 function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, xPosition, yPosition, Alpha = 1, FadeAwayTime = 1){

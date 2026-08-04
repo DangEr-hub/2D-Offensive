@@ -2,7 +2,7 @@
 event_inherited();
 current_building_id = -1;
 door_cooldown = -1;
-command = array_create(3, -1);
+command = array_create(4, -1);
 anim_base = TEXTURES.prone;
 equip_time_max = -1;
 prev_anim_base = anim_base;
@@ -69,6 +69,9 @@ ToggleInfraVision = false;
 AimPunchDir = 0;
 KickBack = 0;
 KickBackAngle = 0;
+DeltaKickBack = 0;
+DeltaX = 0;
+DeltaY = 0;
 kick_back_timer = -1;
 KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
 Range = 0;
@@ -166,6 +169,7 @@ death_attacker_pid = -1;
 
 // Network state
 network_bit_state = 0;
+network_moving_state = STATES_PLAYER.none_state;
 network_armour_id = Item.None;
 network_helmet_id = Item.None;
 network_shield_id = Item.None;
@@ -179,6 +183,7 @@ network_barrel = Item.None;
 network_scope = Item.None;
 network_grip = Item.None;
 network_throw_grenade = false;
+network_item_use_id = Item.None;
 
 #endregion
 

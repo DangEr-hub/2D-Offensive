@@ -1,4 +1,12 @@
 /* oBird step event */
+if (IS_NET && oNetworkManager.is_server && network_id >= 0) {
+	network_sync_timer -= global.time_step;
+	if (network_sync_timer <= 0) {
+		server_process_bird_change(id, 4);
+		network_sync_timer = 15;
+	}
+}
+
 if(state == 0){
 	speed = 0;
 	image_speed = base_is_walk * global.time_step;

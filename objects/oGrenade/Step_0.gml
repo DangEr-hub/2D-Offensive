@@ -63,6 +63,12 @@ if(ExplosionTimer > -1){
 
 if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 	if(stats.Speed < .1){
+		if(network_visual_only){
+			exit;
+		}
+		if(IS_NET && network_authority){
+			server_grenade_explosion_broadcast(id);
+		}
 		if(stats.Item_id == Item.HEGrenade){
 			
 			#region Create explosion effect

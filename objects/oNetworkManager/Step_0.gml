@@ -14,18 +14,25 @@ if (is_server) {
                 ds_map_set(data, "x", x);
                 ds_map_set(data, "y", y);
                 ds_map_set(data, "dir", RotationAngle);
-				ds_map_set(data, "health", stats.Health_points);
+				ds_map_set(data, "hp", stats.Health_points);
 				
 				var bit_states = 0;
 				if (global.GodMode) { bit_states |= PLAYER_FLAGS.GODMODE; }
 				if(Moving){ bit_states |= PLAYER_FLAGS.MOVING; }
 				if(Reloading){ bit_states |= PLAYER_FLAGS.RELOADING; }
 				if(Flashed){ bit_states |= PLAYER_FLAGS.FLASHED; }
+				if(moving_state == STATES_PLAYER.prone_state){ bit_states |= PLAYER_FLAGS.PRONE; }
+				if(EquippedGrenadeTimer > -1){ bit_states |= PLAYER_FLAGS.THROWING_GRENADE; }
 				ds_map_set(data, "state",  bit_states);
+				ds_map_set(data, "moving_state", moving_state);
+				ds_map_set(data, "team", team);
+				ds_map_set(data, "item_use_id", global.Inventory[# item_use_position, Index.slot_id]);
+				server_update_reload_state(0, bit_states);
             }
             ds_map_set(data, "timestamp", current_time);
         }
         send_tick_broadcast();
+        server_cleanup_projectiles();
 		
 		/// Player equipments update
 		if(equipment_sync){

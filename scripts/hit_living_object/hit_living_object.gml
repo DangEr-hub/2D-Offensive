@@ -42,6 +42,28 @@ function enemy_initialized(hitObj, enemy_key, enemy_name) {
     return enemyStatsMap;
 }
 
+function hitmap_record_hit(victim, attacker, attacker_key, attacker_name, victim_key, victim_name, damage) {
+	var victimStatsMap = enemy_initialized(victim, attacker_key, attacker_name);
+	if(!is_undefined(victimStatsMap)){
+		ds_map_replace(victimStatsMap, "HitsReceived", ds_map_find_value(victimStatsMap, "HitsReceived") + 1);
+		ds_map_replace(victimStatsMap, "DamageReceived", ds_map_find_value(victimStatsMap, "DamageReceived") + damage);
+	}
+
+	var attackerStatsMap = enemy_initialized(attacker, victim_key, victim_name);
+	if(!is_undefined(attackerStatsMap)){
+	    ds_map_replace(attackerStatsMap, "HitsGiven", ds_map_find_value(attackerStatsMap, "HitsGiven") + 1);
+	    ds_map_replace(attackerStatsMap, "DamageGiven", ds_map_find_value(attackerStatsMap, "DamageGiven") + damage);
+	}
+}
+
+function hitmap_record_given(attacker, victim_key, victim_name, damage) {
+	var attackerStatsMap = enemy_initialized(attacker, victim_key, victim_name);
+	if(!is_undefined(attackerStatsMap)){
+	    ds_map_replace(attackerStatsMap, "HitsGiven", ds_map_find_value(attackerStatsMap, "HitsGiven") + 1);
+	    ds_map_replace(attackerStatsMap, "DamageGiven", ds_map_find_value(attackerStatsMap, "DamageGiven") + damage);
+	}
+}
+
 function create_blood(splash_number, xx, yy, color, part_number){
 	repeat(splash_number){
 		BloodSplash = instance_create_layer(xx, yy, "ItemsO", oBloodSplash);
@@ -156,10 +178,18 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
     if (attacker_pid < 0 || victim_pid < 0) {return;}
 
     var damage = hit_object.attack_damage;
+    var weapon_id = attacking_item.stats.Item_id;
+    var penetration_damage = attacking_item.stats.Penetration_damage;
+    var shot_start_x = attacking_item.stats.Starting_x;
+    var shot_start_y = attacking_item.stats.Starting_y;
+    var projectile_id = -1;
+    if (variable_instance_exists(attacking_item, "bullet_network_id")) {
+        projectile_id = attacking_item.bullet_network_id;
+    }
 
     with (oNetworkManager) {
         if (is_server) {
-                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1], equip_dur[2]]);
+                server_process_hit(attacker_pid, victim_pid, damage, BodyPart, [impact_pos[0], impact_pos[1]], hit_object.aimpunch_speed_multiplier, hit_object.AimPunchMultiplier, [equip_dur[0], equip_dur[1], equip_dur[2]], weapon_id, penetration_damage, [shot_start_x, shot_start_y], projectile_id, true);
         } else if (is_connected) {
                 buffer_seek(send_buffer, buffer_seek_start, 0);
                 buffer_write(send_buffer, buffer_u8, PACKET.HIT);
@@ -167,6 +197,11 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
                 buffer_write(send_buffer, buffer_u8, attacker_pid);
                 buffer_write(send_buffer, buffer_u8, victim_pid);
                 buffer_write(send_buffer, buffer_f16, damage);
+                buffer_write(send_buffer, buffer_s32, projectile_id);
+                buffer_write(send_buffer, buffer_u16, weapon_id);
+                buffer_write(send_buffer, buffer_f16, penetration_damage);
+                buffer_write(send_buffer, buffer_f16, shot_start_x);
+                buffer_write(send_buffer, buffer_f16, shot_start_y);
                 buffer_write(send_buffer, buffer_u8, BodyPart);
                 buffer_write(send_buffer, buffer_f16, impact_pos[0]);
                 buffer_write(send_buffer, buffer_f16, impact_pos[1]);
@@ -174,6 +209,7 @@ function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
 				buffer_write(send_buffer, buffer_f16, hit_object.AimPunchMultiplier);
 				buffer_write(send_buffer, buffer_f16, equip_dur[0]); ///Armour dur
 				buffer_write(send_buffer, buffer_f16, equip_dur[1]); ///Helmet dur
+				buffer_write(send_buffer, buffer_f16, equip_dur[2]); ///Shield dur
 
                 network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
         }
@@ -198,19 +234,32 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var data = -1;
 	var hp = hit_object.stats.Health_points;
 	var attacker = attacking_item.stats.Object;
+
+	if(IS_NET && is_player && !oNetworkManager.is_server && hit_object.is_remote){
+		send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [0, 0, 0]);
+		return;
+	}
+
+	if(IS_NET && is_player && oNetworkManager.is_server){
+		send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [0, 0, 0]);
+		return;
+	}
 	
 	/* Networking */
 	if(is_player){
-		has_godmode = bit_state_has(hit_object.network_bit_state, PLAYER_FLAGS.GODMODE);
-		armour_id = hit_object.network_armour_id;
-		helmet_id = hit_object.network_helmet_id;
-		shield_id = hit_object.network_shield_id;
-		
-		if(IS_NET){
+		if(IS_NET && hit_object.is_remote){
+			has_godmode = bit_state_has(hit_object.network_bit_state, PLAYER_FLAGS.GODMODE);
+			armour_id = hit_object.network_armour_id;
+			helmet_id = hit_object.network_helmet_id;
+			shield_id = hit_object.network_shield_id;
 			armour_durability = hit_object.network_armour_dur;
 			helmet_durability = hit_object.network_helmet_dur;
 			shield_durability = hit_object.network_shield_dur;
 		}else{
+			has_godmode = global.GodMode;
+			armour_id = ArmourID;
+			helmet_id = HelmetID;
+			shield_id = ShieldID;
 			helmet_durability = global.Inventory[# OtherSlot.Helmet, Index.slot_durability];
 			armour_durability = global.Inventory[# OtherSlot.Armour, Index.slot_durability];
 			shield_durability = global.Inventory[# OtherSlot.Shield, Index.slot_durability];
@@ -219,6 +268,9 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	/*************/
 	
 	if(is_bot){
+		armour_id = hit_object.ArmourID;
+		helmet_id = hit_object.HelmetID;
+		shield_id = hit_object.ShieldID;
 		armour_durability = hit_object.ArmourDurability[0];
 		helmet_durability = hit_object.ArmourDurability[1];
 		shield_durability = hit_object.ArmourDurability[2];
@@ -293,7 +345,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		
 		var shield_modifier = 1;
 		if(hit_object.shield_equip == true && shield_durability > 0){
-			shield_modifier = global.ItemIndex[# ShieldID, ItemStat.Defense];
+			shield_modifier = global.ItemIndex[# shield_id, ItemStat.Defense];
 			play_sound(hit_object.x, hit_object.y, snd_BulletMetal, hit_object);
 		}
 		
@@ -344,19 +396,13 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    victim_name = hit_object.stats.Name;
 		}
 		
-		// When an enemy hits the hit_object
-		var enemyStatsMap = enemy_initialized(hit_object, attacker_key, attacker_name);
-		if!(is_undefined(enemyStatsMap)){
-			ds_map_replace(enemyStatsMap, "HitsReceived", ds_map_find_value(enemyStatsMap, "HitsReceived") + 1);
-			ds_map_replace(enemyStatsMap, "DamageReceived", ds_map_find_value(enemyStatsMap, "DamageReceived") + hit_object.attack_damage);
+		var should_record_hitmap = true;
+		if (IS_NET && !oNetworkManager.is_server && is_player && hit_object.is_remote) {
+			should_record_hitmap = false;
 		}
 
-		// When the hit_object hits back the attacking_item.stats.Object
-	    var hitObjectStatsMap = enemy_initialized(attacker, victim_key, victim_name);
-		
-		if!(is_undefined(hitObjectStatsMap)){
-		    ds_map_replace(hitObjectStatsMap, "HitsGiven", ds_map_find_value(hitObjectStatsMap, "HitsGiven") + 1);
-		    ds_map_replace(hitObjectStatsMap, "DamageGiven", ds_map_find_value(hitObjectStatsMap, "DamageGiven") + hit_object.attack_damage);
+		if (should_record_hitmap) {
+			hitmap_record_hit(hit_object, attacker, attacker_key, attacker_name, victim_key, victim_name, hit_object.attack_damage);
 		}
 		
 		#endregion
@@ -465,7 +511,21 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durability, helmet_durability, shield_durability, impact_x, impact_y, attacking_item.stats.Object, hit_object, is_player);
 		
         if (IS_NET) {
-            send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [hit_object.network_armour_dur, hit_object.network_helmet_dur]);
+			var synced_equip_dur = [
+				hit_object.network_armour_dur,
+				hit_object.network_helmet_dur,
+				hit_object.network_shield_dur
+			];
+
+			if(is_player && hit_object.is_local){
+				synced_equip_dur = [
+					global.Inventory[# OtherSlot.Armour, Index.slot_durability],
+					global.Inventory[# OtherSlot.Helmet, Index.slot_durability],
+					global.Inventory[# OtherSlot.Shield, Index.slot_durability]
+				];
+			}
+
+            send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], synced_equip_dur);
         }
 		
 		damage_indicator("-" + string(round(hit_object.attack_damage)), impact_x, impact_y, c_white, spr_Icons, ICON.health);

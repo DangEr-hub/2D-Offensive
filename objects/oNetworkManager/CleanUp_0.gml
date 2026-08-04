@@ -16,6 +16,20 @@ if(free_item_ids != -1){
 }
 
 ds_map_destroy(bird_registry);
+ds_map_destroy(grenade_registry);
+ds_map_destroy(airplane_registry);
+
+if(free_bird_ids != -1){
+	ds_stack_destroy(free_bird_ids);
+}
+
+if(free_grenade_ids != -1){
+	ds_stack_destroy(free_grenade_ids);
+}
+
+if(free_airplane_ids != -1){
+	ds_stack_destroy(free_airplane_ids);
+}
 
 if (oNetworkManager.is_server) {
     // Server shutdown
@@ -50,7 +64,7 @@ if (oNetworkManager.is_server) {
 			-1,
 		);
 	}
-	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	if(global.Inventory[# OtherSlot.Secondary, Index.slot_id] != Item.None){
 	request_item_drop(
 		global.Inventory[# OtherSlot.Secondary, Index.slot_id],
 		global.local_player.x,
@@ -65,7 +79,7 @@ if (oNetworkManager.is_server) {
 		-1,
 	);
 	}
-	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	if(global.Inventory[# OtherSlot.Helmet, Index.slot_id] != Item.None){
 	request_item_drop(
 		global.Inventory[# OtherSlot.Helmet, Index.slot_id],
 		global.local_player.x,
@@ -80,7 +94,7 @@ if (oNetworkManager.is_server) {
 		-1,
 	);
 	}
-	if(global.Inventory[# OtherSlot.Primary, Index.slot_id] != Item.None){
+	if(global.Inventory[# OtherSlot.Armour, Index.slot_id] != Item.None){
 	request_item_drop(
 		global.Inventory[# OtherSlot.Armour, Index.slot_id],
 		global.local_player.x,
@@ -89,6 +103,21 @@ if (oNetworkManager.is_server) {
 		global.Inventory[# OtherSlot.Armour, Index.slot_clip_ammo],
 		global.Inventory[# OtherSlot.Armour, Index.slot_durability],
 		global.Inventory[# OtherSlot.Armour, Index.SlotAmount],
+		-1,
+		-1,
+		-1,
+		-1,
+	);
+	}
+	if(global.Inventory[# OtherSlot.Shield, Index.slot_id] != Item.None){
+	request_item_drop(
+		global.Inventory[# OtherSlot.Shield, Index.slot_id],
+		global.local_player.x,
+		global.local_player.y,
+		global.Inventory[# OtherSlot.Shield, Index.slot_ammo],
+		global.Inventory[# OtherSlot.Shield, Index.slot_clip_ammo],
+		global.Inventory[# OtherSlot.Shield, Index.slot_durability],
+		global.Inventory[# OtherSlot.Shield, Index.SlotAmount],
 		-1,
 		-1,
 		-1,

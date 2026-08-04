@@ -234,6 +234,10 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		   [bullet_x, bullet_y], 
 		   BulletDamage, item_dir_spd_dist[0], name_vis[1], name_vis[0]
 	   );
+	    if (IS_NET && !explosion && proj_id < 0) {
+		    instance_destroy(bullet_tracer);
+		    return noone;
+	    }
 	    bullet_tracer.bullet_network_id = proj_id;
 		
 		if(IS_NET){
@@ -316,7 +320,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	
 }
 
-function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id){
+function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id, projectile_id = -1){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
 	var damage = BulletDamage * global.ItemIndex[# BulletItemID, ItemStat.damage_drop](point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
 	
@@ -366,6 +370,7 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	Bullet.stats.Object_index = ObjectIndex;
 	Bullet.stats.Owner_name = ObjectName;
 	Bullet.stats.Owner_id = owner_id;
+	Bullet.bullet_network_id = projectile_id;
 	return Bullet;
 }
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {

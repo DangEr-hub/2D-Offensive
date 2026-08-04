@@ -795,8 +795,6 @@ with(oSlot){
 		
 	}
 	
-	draw_text(xx, yy, VarSlot);
-	
 	if(instance_exists(global.local_player)){
 		if(VarSlot == global.local_player.WeaponID || global.local_player.item_use_position == VarSlot){
 			draw_sprite_ext(sprite_index, 1, xx, yy, scale, scale, 0, image_blend, slot_alpha);

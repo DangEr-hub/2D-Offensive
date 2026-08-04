@@ -61,7 +61,7 @@ button_width = min(144 * global.GUIMultiplier, 192);
 button_height = min(64 * global.GUIMultiplier, 96);
 buy_items = [
     [Item.AKM, Item.m4a1, Item.SG550, Item.galil, Item.MK18, Item.famas, Item.None],
-    [Item.MAC11, Item.MP9, Item.None, Item.None, Item.None, Item.None, Item.None],
+    [Item.MAC11, Item.MP9, Item.MP7, Item.None, Item.None, Item.None, Item.None],
 	[Item.SSG08, Item.awm, Item.Dragunov, Item.None, Item.None, Item.None, Item.None],
     [Item.Glock, Item.usp, Item.DesertEagle, Item.p250, Item.tec9, Item.CZ75, Item.None],
     [Item.Javelin, Item.Spas, Item.None, Item.None, Item.None, Item.None, Item.None],

@@ -146,6 +146,7 @@ function weapon_attachment_equip(ID, AttachmentPosition, ObjectType = global.loc
             global.Inventory[# WeaponID, AttachmentPosition] = ID;
             item_equip_timer = item_equip_time;
             ItemAmountSubstract(item_use_position, 1);
+            weapon_network_propagate();
         }
     }
 }
@@ -181,6 +182,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.Dragunov, ["Semi", "Safety"]);
 	add_shooting_modes(Item.MP9, ["Auto", "Safety"]);
 	add_shooting_modes(Item.CZ75, ["Auto", "Burst", "Safety"]);
+	add_shooting_modes(Item.MP7, ["Auto", "Burst", "Safety"]);
 
 	// assault rifles + snipers
 	global.ItemIndex[# Item.AKM, ItemStat.attachments]  = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
@@ -195,6 +197,7 @@ function ItemDataBase(){
 	// smg
 	global.ItemIndex[# Item.MAC11, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.MP9, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
+	global.ItemIndex[# Item.MP7, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
 	// pistole
 	global.ItemIndex[# Item.DesertEagle, ItemStat.attachments] = [ATTACHMENTS.slot_barrel];
 	global.ItemIndex[# Item.Glock, ItemStat.attachments]       = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
@@ -227,6 +230,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.MAC11, ItemStat.attach_sockets] = { barrel: [10, -8], grip: [10, 1], suppressor: [30, -11] };
 	global.ItemIndex[# Item.MP9, ItemStat.attach_sockets] = { barrel: [15, -11], suppressor: [38, -10.5] };
+	global.ItemIndex[# Item.MP7, ItemStat.attach_sockets] = { barrel: [15, -11], suppressor: [38, -10.5] };
 
 	global.ItemIndex[# Item.Spas, ItemStat.attach_sockets] = { barrel: [23, -2], grip: [24, 12] };
 	
@@ -394,7 +398,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.SSG08, ItemStat.advantages] = "\n+High damage\n+High range";
 	global.ItemIndex[# Item.SSG08, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[# Item.SSG08, ItemStat.AmmoSpriteID] = 2;
-	global.ItemIndex[# Item.SSG08, ItemStat.Rarity] = RARITY.RARE;
+	global.ItemIndex[# Item.SSG08, ItemStat.Rarity] = RARITY.UNCOMMON;
 	global.ItemIndex[# Item.SSG08, ItemStat.ScopeInaccuracyResetTimer] = 15;
 	global.ItemIndex[# Item.SSG08, ItemStat.Description] = "SSG08 is a precision sniper rifle known for its deadly accuracy. While it offers unmatched precision, its lower damage requires skilled shooters to make each shot count, making it a challenging yet rewarding choice on the battlefield.";
 	global.ItemIndex[# Item.SSG08, ItemStat.damage_drop] = function(dist)  {
@@ -416,7 +420,7 @@ function ItemDataBase(){
 	
 	
 	global.ItemIndex[# Item.MAC11, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 580, 29, 300, 30, WEAPON_TYPE.PRIMARY, 3, 6, snd_MAC11, 2, 1, true,
+	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 580, 29, 300, 30, WEAPON_TYPE.PRIMARY, 5, 6, snd_MAC11, 2, 1, true,
 	15, 20, -9, 9, 0.025, 1.5, 2, 1, 5, .9, 0, WEAPON_CLASS.SUBMACHINE_GUN, .9, .57, .1 * game_get_speed(gamespeed_fps), .89, 105, .5, 9, false, ".380 ACP", CALIBER.LOW);
 	global.ItemIndex[# Item.MAC11, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.MAC11, ItemStat.disadvantages] = "-Low penetration power\n-High bullet spread\n-Low range";
@@ -447,7 +451,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.MP9, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 685, 28, 280, 30, WEAPON_TYPE.PRIMARY, 4, 5, snd_MP9, 1.5, 0.8, true,
-	8, 18, 14, 7, 0.02, 1.75, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .88, .7, 1 * game_get_speed(gamespeed_fps), .5, 135, 1, 9, false, "9x19 mm", CALIBER.LOW);
+	8, 18, 14, 7, 0.02, 1.75, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .88, .7, 1 * game_get_speed(gamespeed_fps), .5, 155, 1, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.MP9, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MP9, ItemStat.disadvantages] = "-Slow equip\n-High recoil\n-High damage drop-off";
 	global.ItemIndex[# Item.MP9, ItemStat.advantages] = "+Great penetration power\n+Great range for SMG\n+Great rate of fire";
@@ -471,6 +475,36 @@ function ItemDataBase(){
 		    global.ItemIndex[# Item.MP9, ItemStat.Range],
 		    0.5, 0.7, 
 			0.49, -1.53, -5.0,   // -5 - 700% spread na max range
+		    5.0, 4.0
+		);
+	}	
+	
+	global.ItemIndex[# Item.MP7, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.MP7, "MP7", 1.45 * game_get_speed(gamespeed_fps), 600, 34, 390, 35, WEAPON_TYPE.PRIMARY, 3, 6, snd_mp7, 1.75, 0.9, true,
+	18, 28, 8, 7, 0.125, 2.25, 1.25, -2, 5, .87, 0, WEAPON_CLASS.SUBMACHINE_GUN, .825, .63, 0.7 * game_get_speed(gamespeed_fps), .8, 135, 1, 9, false, "4.6x30 mm", CALIBER.LOW);
+	global.ItemIndex[# Item.MP7, ItemStat.difficulty] = 3;
+	global.ItemIndex[# Item.MP7, ItemStat.disadvantages] = "-Low penetration power\n-High kickback inaccuracy\n-High damage drop-off";
+	global.ItemIndex[# Item.MP7, ItemStat.advantages] = "+High damage\n+Great accuracy";
+	global.ItemIndex[# Item.MP7, ItemStat.ItemColor] = c_gray;
+	global.ItemIndex[# Item.MP7, ItemStat.AmmoSpriteID] = 19;
+	global.ItemIndex[# Item.MP7, ItemStat.Rarity] = RARITY.COMMON;
+	global.ItemIndex[# Item.MP7, ItemStat.EnemyInaccuracyCompensation] = 1.5;
+	global.ItemIndex[# Item.MP7, ItemStat.Description] = "MP7 combines high damage with outstanding accuracy, allowing it to dominate close-range firefights. However, its severe damage drop-off quickly reduces effectiveness at longer ranges, demanding aggressive positioning to unleash its full potential.";
+	global.ItemIndex[# Item.MP7, ItemStat.damage_drop] = function(dist)  {
+		return curve_loglinexp(
+		    dist,
+		    global.ItemIndex[# Item.MP7, ItemStat.Range],
+		    0.57, 0.7,
+		    0.81, 0.54,
+		    0.41, 9.0, 4.0
+		);
+	}
+	global.ItemIndex[# Item.MP7, ItemStat.accuracy_drop] = function(dist)  {
+		return curve_loglinexp(
+		    dist,
+		    global.ItemIndex[# Item.MP7, ItemStat.Range],
+		    0.4, 0.75, 
+			0.67, -1.1, -2.8,   // -2.8 - 480% spread na max range
 		    5.0, 4.0
 		);
 	}	
@@ -619,7 +653,7 @@ function ItemDataBase(){
 		    dist,
 		    global.ItemIndex[# Item.Javelin, ItemStat.Range],
 		    0.5, 0.75,
-		    0.87
+		    0.57
 		);
 	}
 	global.ItemIndex[# Item.Javelin, ItemStat.accuracy_drop] = function(dist)  {
@@ -663,7 +697,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.MK18, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.MK18, "MK18", 2.1 * game_get_speed(gamespeed_fps), 715, 33, 700, 30, WEAPON_TYPE.PRIMARY, 7, 5.5, snd_MK18, 2, 1, true,
-	10, 20, 13, 9, .01, 8, 3.5, 0, 10, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .89, .71, .2 * game_get_speed(gamespeed_fps), .73, 300, .75, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	10, 20, 13, 9, .01, 8, 3.5, 0, 10, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .92, .71, .2 * game_get_speed(gamespeed_fps), .73, 300, .75, 5, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.MK18, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MK18, ItemStat.disadvantages] = "-Low penetration power\n-High recoil";
 	global.ItemIndex[# Item.MK18, ItemStat.advantages] = "+Good mobility\n+Low bullet spread";
@@ -737,7 +771,7 @@ function ItemDataBase(){
 		    dist,
 		    global.ItemIndex[# Item.awm, ItemStat.Range],
 		    0.4, 0.57, 
-			0.95, 0.91, 0.88,
+			0.98, 0.95, 0.91,
 		    5.0, 7.0
 		);
 	}
@@ -1078,7 +1112,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.famas, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, WEAPON_TYPE.PRIMARY, 5, 7, snd_Famas, 2, 1, true,
-	5, 10, 10, 4, .03, 7, 3.5, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	5, 10, 10, 4, .03, 7, 3.5, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.famas, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.famas, ItemStat.disadvantages] = "-Low magazine capacity\n-Low penetration power\n-High damage drop-off";
 	global.ItemIndex[# Item.famas, ItemStat.advantages] = "+Low bullet spread\n+Low vertical recoil";
@@ -1107,7 +1141,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.galil, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.galil, "Galil", 1.75 * game_get_speed(gamespeed_fps), 700, 36, 270, 30, WEAPON_TYPE.PRIMARY, 10, 6, snd_galil, 5, 2, true,
-	8, 20, 12, 5.9, .02, 10, 3.5, 1, 7, .59, 1, WEAPON_CLASS.ASSAULT_RIFLE, .89, .71, .25 * game_get_speed(gamespeed_fps), .85, 180, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	8, 20, 12, 5.9, .02, 10, 3.5, 1, 7, .59, 1, WEAPON_CLASS.ASSAULT_RIFLE, .89, .71, .25 * game_get_speed(gamespeed_fps), .85, 180, 1, 8, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.galil, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.galil, ItemStat.disadvantages] = "-High bullet spread\n-High horizontal recoil\n-Low penetration power";
 	global.ItemIndex[# Item.galil, ItemStat.advantages] = "+Fast equipping\n+Fast reloading\n+Low price";

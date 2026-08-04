@@ -21,20 +21,79 @@ function compute_bird_network_id() {
     }
 }
 
+function compute_grenade_network_id() {
+    with (oNetworkManager) {
+        if (free_grenade_ids != -1 && ds_exists(free_grenade_ids, ds_type_stack) && ds_stack_size(free_grenade_ids) > 0) {
+            return ds_stack_pop(free_grenade_ids);
+        }
+    }
+    return irandom(65535);
+}
+
+function compute_airplane_network_id() {
+    with (oNetworkManager) {
+        if (free_airplane_ids != -1 && ds_exists(free_airplane_ids, ds_type_stack) && ds_stack_size(free_airplane_ids) > 0) {
+            return ds_stack_pop(free_airplane_ids);
+        }
+    }
+    return irandom(65535);
+}
+
 function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid){
 	
 	var blood_color = c_red;
 	if(BodyPart <= HITBOX.HeadProne){
 		blood_color = c_maroon;
 	}
+
+	object.attack_damage = damage;
+
+	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
+	var helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
+	var shield_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+	var update_local_inventory = true;
 	
+	if(IS_NET && object.object_index == oPlayer){
+		update_local_inventory = (object.network_id == oNetworkManager.my_pid);
+
+		if(!update_local_inventory){
+			armour_id = object.network_armour_id;
+			helmet_id = object.network_helmet_id;
+			shield_id = object.network_shield_id;
+		}
+	}
+
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, ICON.health);
-	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2));	
-	hit_effects(BodyPart, global.Inventory[# OtherSlot.Armour, Index.slot_id], global.Inventory[# OtherSlot.Helmet, Index.slot_id], global.Inventory[# OtherSlot.Shield, Index.slot_id],
+	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2));
+	hit_effects(BodyPart, armour_id, helmet_id, shield_id,
 	equip_dur[0], equip_dur[1], equip_dur[2], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
-	global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
-	global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
+
+	if(IS_NET && object.object_index == oPlayer){
+		with(object){
+			network_armour_dur = equip_dur[0];
+			network_helmet_dur = equip_dur[1];
+			network_shield_dur = equip_dur[2];
+		}
+
+		var attacker = find_instance_by_network_id(oPlayer, attacker_pid);
+		var attacker_name = "Player " + string(attacker_pid);
+		if(instance_exists(attacker)){
+			attacker_name = attacker.stats.Name;
+		}
+
+		var should_record_hitmap = object.is_local || (instance_exists(attacker) && attacker.is_local);
+
+		if(should_record_hitmap){
+			hitmap_record_hit(object, attacker, attacker_pid, attacker_name, object.network_id, object.stats.Name, damage);
+		}
+	}
+
+	if(!IS_NET || update_local_inventory){
+		global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
+		global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
+		global.Inventory[# OtherSlot.Shield, Index.slot_durability] = equip_dur[2];
+	}
 	if(damage > 2){
 		with(object){
 			AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
@@ -90,6 +149,12 @@ function weapon_network_propagate(){
 			}
 
 			ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);
+			ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, Index.slot_scope]);
+			ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, Index.slot_barrel]);
+			ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, Index.slot_grip]);
+			ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, Index.slot_suppressor]);
+			ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, Index.slot_ammo]);
+			ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, Index.slot_clip_ammo]);
 		}
 	}
 }
@@ -124,12 +189,25 @@ function create_local_player(pid) {
         ds_map_add(player_data, "x", player.x);
         ds_map_add(player_data, "y", player.y);
         ds_map_add(player_data, "dir", player.RotationAngle);
+        ds_map_add(player_data, "state", 0);
+        ds_map_add(player_data, "moving_state", player.moving_state);
+        ds_map_add(player_data, "team", player.team);
+        ds_map_add(player_data, "hp", player.stats.Health_points);
         
         // Initialize equipment with current values
         ds_map_add(player_data, "helmet_id", global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
         ds_map_add(player_data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
         ds_map_add(player_data, "armour_id", global.Inventory[# OtherSlot.Armour, Index.slot_id]);
         ds_map_add(player_data, "armour_dur", global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
+        ds_map_add(player_data, "shield_id", global.Inventory[# OtherSlot.Shield, Index.slot_id]);
+        ds_map_add(player_data, "shield_dur", global.Inventory[# OtherSlot.Shield, Index.slot_durability]);
+        ds_map_add(player_data, "weapon_id", global.Inventory[# player.WeaponID, Index.slot_id]);
+        ds_map_add(player_data, "weapon_scope", global.Inventory[# player.WeaponID, Index.slot_scope]);
+        ds_map_add(player_data, "weapon_barrel", global.Inventory[# player.WeaponID, Index.slot_barrel]);
+        ds_map_add(player_data, "weapon_grip", global.Inventory[# player.WeaponID, Index.slot_grip]);
+        ds_map_add(player_data, "weapon_suppressor", global.Inventory[# player.WeaponID, Index.slot_suppressor]);
+        ds_map_add(player_data, "weapon_ammo", global.Inventory[# player.WeaponID, Index.slot_ammo]);
+        ds_map_add(player_data, "weapon_clip_ammo", global.Inventory[# player.WeaponID, Index.slot_clip_ammo]);
         
         ds_map_add(player_states, pid, player_data);
     }
@@ -138,6 +216,62 @@ function create_local_player(pid) {
 }
 
 /// @function create_remote_player(pid, x_pos, y_pos)
+function apply_remote_player_network_state(player, pid) {
+    if (!instance_exists(player) || !instance_exists(oNetworkManager)) return;
+
+    var player_data = ds_map_find_value(oNetworkManager.player_states, pid);
+    if (is_undefined(player_data)) return;
+
+    var dir = ds_map_find_value(player_data, "dir");
+    var bit_state = ds_map_find_value(player_data, "state");
+    var moving_state_id = ds_map_find_value(player_data, "moving_state");
+    var team_id = ds_map_find_value(player_data, "team");
+    var item_use_id = ds_map_find_value(player_data, "item_use_id");
+    var hp = ds_map_find_value(player_data, "hp");
+    var helmet_id = ds_map_find_value(player_data, "helmet_id");
+    var helmet_dur = ds_map_find_value(player_data, "helmet_dur");
+    var armour_id = ds_map_find_value(player_data, "armour_id");
+    var armour_dur = ds_map_find_value(player_data, "armour_dur");
+    var shield_id = ds_map_find_value(player_data, "shield_id");
+    var shield_dur = ds_map_find_value(player_data, "shield_dur");
+    var weapon_id = ds_map_find_value(player_data, "weapon_id");
+    var weapon_scope = ds_map_find_value(player_data, "weapon_scope");
+    var weapon_barrel = ds_map_find_value(player_data, "weapon_barrel");
+    var weapon_grip = ds_map_find_value(player_data, "weapon_grip");
+    var weapon_suppressor = ds_map_find_value(player_data, "weapon_suppressor");
+
+    with (player) {
+        if (!is_undefined(dir)) {
+            RotationAngle = dir;
+            target_direction = dir;
+        }
+        if (!is_undefined(bit_state)) {
+            network_bit_state = bit_state;
+            network_throw_grenade = (bit_state & PLAYER_FLAGS.THROWING_GRENADE) != 0;
+        }
+        if (!is_undefined(moving_state_id)) {
+            network_moving_state = moving_state_id;
+            moving_state = moving_state_id;
+        }
+        if (!is_undefined(team_id)) team = team_id;
+        if (!is_undefined(item_use_id)) network_item_use_id = item_use_id;
+        if (!is_undefined(hp) && !is_undefined(stats)) stats.Health_points = hp;
+
+        if (!is_undefined(helmet_id)) network_helmet_id = helmet_id;
+        if (!is_undefined(helmet_dur)) network_helmet_dur = helmet_dur;
+        if (!is_undefined(armour_id)) network_armour_id = armour_id;
+        if (!is_undefined(armour_dur)) network_armour_dur = armour_dur;
+        if (!is_undefined(shield_id)) network_shield_id = shield_id;
+        if (!is_undefined(shield_dur)) network_shield_dur = shield_dur;
+
+        if (!is_undefined(weapon_id)) network_weapon_id = weapon_id;
+        if (!is_undefined(weapon_scope)) network_scope = weapon_scope;
+        if (!is_undefined(weapon_barrel)) network_barrel = weapon_barrel;
+        if (!is_undefined(weapon_grip)) network_grip = weapon_grip;
+        if (!is_undefined(weapon_suppressor)) network_suppressor = weapon_suppressor;
+    }
+}
+
 function create_remote_player(pid, x_pos, y_pos) {
     var player = instance_create_layer(x_pos, y_pos, "LivingO", oPlayer);
     player.network_id = pid;
@@ -145,6 +279,7 @@ function create_remote_player(pid, x_pos, y_pos) {
     player.is_remote = true;
     player.target_x = x_pos;
     player.target_y = y_pos;
+    apply_remote_player_network_state(player, pid);
 
     return player;
 }
@@ -204,8 +339,8 @@ function sync_object_create(x_pos, y_pos, create_data) {
         buffer_write(send_buffer, buffer_u8,  inst.barrel_attachment);
         buffer_write(send_buffer, buffer_u8,  inst.grip_attachment);
         buffer_write(send_buffer, buffer_u8,  inst.suppressor_attachment);
-        buffer_write(send_buffer, buffer_u16,  inst.ClipAmmo);
-        buffer_write(send_buffer, buffer_u8,  inst.Ammo);
+        buffer_write(send_buffer, buffer_s16,  inst.ClipAmmo);
+        buffer_write(send_buffer, buffer_s16,  inst.Ammo);
         buffer_write(send_buffer, buffer_f16,  inst.Durability);
 		buffer_write(send_buffer, buffer_u8,  inst.Amount);
         
@@ -329,8 +464,8 @@ function request_item_drop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClip
 	            buffer_write(send_buffer, buffer_u8,  OWBA);
 	            buffer_write(send_buffer, buffer_u8,  OWGA);
 	            buffer_write(send_buffer, buffer_u8,  OWsuppressorA);
-	            buffer_write(send_buffer, buffer_u16, ObjectClipAmmo);
-	            buffer_write(send_buffer, buffer_u8,  ObjectAmmo);
+	            buffer_write(send_buffer, buffer_s16, ObjectClipAmmo);
+	            buffer_write(send_buffer, buffer_s16, ObjectAmmo);
 	            buffer_write(send_buffer, buffer_f16, ObjectDurability);
 				buffer_write(send_buffer, buffer_u8, ObjectAmount);
 

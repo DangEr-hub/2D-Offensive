@@ -22,6 +22,13 @@ global.Weather = 0;
 global.time_step = 1;
 
 
+global.cases_cost = {
+	AR_cases: 12,
+	Pistol_cases: 8,
+	Sniper_cases: 14,
+	Smg_cases: 10,
+	Heavy_cases: 10
+};
 
 global.player_stats_struct = {
 	Name: "DangEr",
@@ -31,6 +38,11 @@ global.player_stats_struct = {
 	Hit_shots: 0,
 	Deaths: 0,
 	Diamonds: 1000,
+	AR_cases: 100,
+	Pistol_cases: 100,
+	Sniper_cases: 100,
+	Smg_cases: 100,
+	Heavy_cases: 100,
     Get_KD: function() {
         return (Deaths != 0) ? (Kills / Deaths) : 0;
     },

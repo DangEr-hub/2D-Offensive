@@ -7,6 +7,7 @@ wpn_id = global.Inventory[# WeaponID, Index.slot_id];
 
 if (is_remote) {
 	wpn_id = network_weapon_id;
+	moving_state = network_moving_state;
 	
 	if(network_shoot_timer == 0){
 		create_shooting_effects(id);
@@ -84,16 +85,18 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 		Shield.image_index = 0;
 	}
 	#endregion
-	
+
+	var equipped_use_item_id = is_remote ? network_item_use_id : global.Inventory[# item_use_position, Index.slot_id];
+
 	#region Weapon texture
 	var weapon_index = global.ItemIndex[# wpn_id, ItemStat.AmmoSpriteID] + 1;		
 	Weapon.image_index = wpn_id != Item.None ? weapon_index : 0;		
-	if((global.Inventory[# item_use_position, Index.slot_id] != Item.None && is_local) || shield_equip == true){ Weapon.image_index = 0; }
+	if(equipped_use_item_id != Item.None || shield_equip == true){ Weapon.image_index = 0; }
 	#endregion
 
 	#region Player texture
 	
-	if(global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote && stats.Health_points > 0 && shield_equip == false){
+	if(equipped_use_item_id == Item.None && stats.Health_points > 0 && shield_equip == false){
 		switch(global.ItemIndex[# wpn_id, ItemStat.WeaponTypeClass]){
 			
 			case WEAPON_CLASS.ASSAULT_RIFLE:
@@ -434,6 +437,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Bot selection and command
+			if(array_length(command) < 4){
+				command = array_create(4, -1);
+			}
+
 			if(keyboard_check_pressed(global.KeyBinds[| KEY.SelectBot])){
 			    ds_list_clear(bot_select_list);
 
@@ -452,7 +459,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			    // filtr POLICE botů
 			    for(var i = bot_count - 1; i >= 0; i--){
 			        var bot = bot_select_list[| i];
-			        if(!instance_exists(bot) || bot.team != TEAM.POLICE){
+			        if(!instance_exists(bot) || bot.team != TEAM.POLICE || bot.stats.Health_points <= 0){
 			            ds_list_delete(bot_select_list, i);
 			        }
 			    }
@@ -473,6 +480,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!instance_exists(selected_bot)){
 			    selected_bot = noone;
 			    bot_select_index = -1;
+			}else if(selected_bot.team != TEAM.POLICE || selected_bot.stats.Health_points <= 0){
+			    selected_bot = noone;
+			    bot_select_index = -1;
 			}
 			
 			if(keyboard_check_pressed(global.KeyBinds[| KEY.CommandBot])){
@@ -480,15 +490,29 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					command[0] = oCrosshair.x;
 					command[1] = oCrosshair.y;
 					command[2] = 0.1;
+					command[3] = 5 * game_get_speed(gamespeed_fps);
 			        with(selected_bot){
 						set_state(STATES.MoveCommand);
-						target_x = oCrosshair.x;
-						target_y = oCrosshair.y;
+						target_x = other.command[0];
+						target_y = other.command[1];
+						command_timer = command_time;
+						command_stuck_timer = command_stuck_time;
+						command_last_x = x;
+						command_last_y = y;
+						mv_timer = 0;
+						MoveTime = 0;
 			        }
 			    }
 			}
 			
-			if(command[2] > 0){
+			if(command[0] != -1 && command[3] > -1){
+				command[3] -= global.time_step;
+				if(command[3] <= 0){
+					command = array_create(array_length(command), -1);
+				}
+			}
+
+			if(command[0] != -1 && command[2] > 0){
 				command[2] = min(command[2] + .01, 1);	
 			}
 			#endregion
@@ -1214,6 +1238,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 								y = m_pos[1];
 								machine_gun.stats.Object = id;
 								moving_state = STATES_PLAYER.machine_gun_state;	
+								weapon_network_propagate();
 							}else if(moving_state == STATES_PLAYER.machine_gun_state){
 								ReloadTime = 0;
 								moving_state = STATES_PLAYER.none_state;
@@ -1234,6 +1259,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 								player_has_scope = -1;
 								ScopeIn = false;	
 								WeaponDrop(1, id);
+								weapon_network_propagate();
 								#endregion
 						
 							}

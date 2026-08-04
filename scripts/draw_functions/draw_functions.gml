@@ -212,6 +212,22 @@ function draw_compass(xx, yy, w, h){
         }
     }
 
+	if(instance_exists(global.local_player)){
+	    with(oPlayer){
+	        if(is_remote && Visible == true && stats.Health_points > 0){
+	            var remote_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
+	            var remote_angle_diff = angle_difference(global.local_player.RotationAngle, remote_dir);
+	            var remote_marker_x = center_x + (remote_angle_diff / v_angle) * (w * 0.5);
+				var remote_col = team == global.local_player.team ? c_blue : c_red;
+
+	            if(abs(remote_angle_diff) <= v_angle){
+	                draw_set_color(remote_col);
+	                draw_circle(remote_marker_x, center_y, 6, false);
+	            }
+	        }
+	    }
+	}
+
     draw_set_alpha(1);
     draw_set_color(c_white);
 }

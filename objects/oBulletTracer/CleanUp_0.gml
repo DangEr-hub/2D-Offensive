@@ -7,5 +7,6 @@ if(infra_vision_light != undefined){
 }
 LightObject.Destroy();
 LightObject = undefined;
-ds_list_destroy(HitList);
-
+if(!is_undefined(HitList) && ds_exists(HitList, ds_type_list)){
+	ds_list_destroy(HitList);
+}

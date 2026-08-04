@@ -35,42 +35,47 @@ function lottery_rarity_color(rarity){
 function lottery_rarity_weight(rarity){
     switch(rarity){
         case RARITY.COMMON: return 100;
-        case RARITY.UNCOMMON: return 45;
-        case RARITY.RARE: return 18;
-        case RARITY.LEGENDARY: return 9;
+        case RARITY.UNCOMMON: return 35;
+        case RARITY.RARE: return 25;
+        case RARITY.LEGENDARY: return 10;
     }
 
     return 1;
 }
 
 function lottery_start(){
-    lottery_items = [];
+	if(lottery_active == false){
+		lottery_last_center_index = -1;
+	    lottery_items = [];
 
-    var item_count = 45;
+	    var item_count = 50;
 
-    for(var i = 0; i < item_count; i++){
-        array_push(lottery_items, lottery_pick_weapon(lottery_weapon_pool));
-    }
+	    for(var i = 0; i < item_count; i++){
+	        array_push(lottery_items, lottery_pick_weapon(lottery_weapon_pool));
+	    }
 
-    lottery_winner_index = item_count - irandom_range(5, 8);
+	    lottery_winner_index = item_count - irandom_range(5, 8);
 
-    lottery_scroll_start = 0;
-    lottery_scroll_target = lottery_winner_index;
-    lottery_scroll = lottery_scroll_start;
+	    lottery_scroll_start = 0;
+	    lottery_scroll_target = lottery_winner_index;
+	    lottery_scroll = lottery_scroll_start;
 
-    lottery_timer = 0;
-    lottery_duration = irandom_range(240, 360);
-    lottery_result = -1;
-    lottery_active = true;
+	    lottery_timer = 0;
+	    lottery_duration = irandom_range(240, 360);
+	    lottery_result = -1;
+	    lottery_active = true;
+	}
 }
 
-function draw_lottery(xx, yy, w, h){
+function draw_lottery(pos_x, pos_y, w, h){
     draw_set_alpha(global.GUIHUDAlpha);
-    draw_set_color(c_black);
-    draw_rectangle(xx, yy, xx + w, yy + h, false);
-
-    var center_x = xx + w * 0.5;
-    var center_y = yy + h * 0.5;
+    draw_set_color(make_color_rgb(0, 76, 76));
+    draw_rectangle(pos_x, pos_y, pos_x + w, pos_y + h, false);
+		
+	draw_set_alpha(1);
+	draw_set_color(c_white);
+    var center_x = pos_x + w * 0.5;
+    var center_y = pos_y + h * 0.5;
 
     var slot_width = 64 * global.GUIMultiplier;
     var slot_height = h - 8 * global.GUIMultiplier;
@@ -80,8 +85,8 @@ function draw_lottery(xx, yy, w, h){
         var slot_x = center_x + (i - lottery_scroll) * slot_width;
         var distance_from_center = abs(slot_x - center_x);
 
-        if(slot_x + slot_width * 0.5 < xx){continue;}
-        if(slot_x - slot_width * 0.5 > xx + w){continue;}
+        if(slot_x + slot_width * 0.5 < pos_x){continue;}
+        if(slot_x - slot_width * 0.5 > pos_x + w){continue;}
 
         var proximity = 1 - clamp(distance_from_center / (w * 0.5), 0, 1);
         var scale = lerp(0.7, 1.15, proximity);
@@ -93,13 +98,9 @@ function draw_lottery(xx, yy, w, h){
         var current_slot_width = slot_width * 0.9 * scale;
         var current_slot_height = slot_height * scale;
 		
-	    draw_set_color(c_white);
-	    draw_rectangle(xx, yy, xx + w, yy + h, true);
-		
-		
-	    draw_set_alpha(1);
-	    draw_set_color(c_white);
-
+	    draw_set_color(MAIN_COLOR);
+	    draw_rectangle(pos_x, pos_y, pos_x + w, pos_y + h, true);
+		draw_set_alpha(1);
         draw_set_color(rarity_color);
         draw_rectangle(
             slot_x - current_slot_width * 0.5 - 5,
@@ -109,8 +110,9 @@ function draw_lottery(xx, yy, w, h){
             false
         );
 
+		// Draw item card border
         draw_set_color(c_black);
-        draw_set_alpha(global.GUIHUDAlpha * 0.65);
+        draw_set_alpha(global.GUIHUDAlpha * 0.5);
         draw_rectangle(
             slot_x - current_slot_width * 0.5 + 3,
             center_y - current_slot_height * 0.5 + 3,
@@ -138,11 +140,14 @@ function draw_lottery(xx, yy, w, h){
 	    draw_set_color(c_red);
 	    draw_line_width(
 	        center_x,
-	        yy,
+	        pos_y,
 	        center_x,
-	        yy + h,
+	        pos_y + h,
 	        4 * global.GUIMultiplier
 	    );
+		
+		draw_set_alpha(1);
+		draw_set_color(c_white);
 		
 
 

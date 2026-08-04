@@ -48,6 +48,15 @@ if(particle_timer > -1){
 }
 
 if(z_bouncing == false && z <= 1){
+	if (network_visual_only) {
+		instance_destroy();
+		exit;
+	}
+
+	if (IS_NET && network_authority && oNetworkManager.is_server) {
+		server_process_airplane_bomb_explode(id);
+	}
+
 	var exp_pos = local_to_world(31, 31);
 	explosion_create(30, [exp_pos[0], exp_pos[1]], stats.Damage, true, stats.Object, stats.Item_id);
 }else{

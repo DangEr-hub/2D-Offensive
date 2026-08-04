@@ -65,7 +65,6 @@ if(instance_exists(global.local_player)){
 			#region Variables
 			var KBPhase1 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase1];
 			var KBPhase2 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase2];
-			var MaxKickBack = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo];
 			#endregion
 
 			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootTimer] / 2 
@@ -77,7 +76,7 @@ if(instance_exists(global.local_player)){
 			    var targetX = mouse_x;
 			    var targetY = mouse_y;
 				
-			    if (global.local_player.KickBack == KBPhase1 || global.local_player.KickBack == KBPhase2 || global.local_player.KickBack >= MaxKickBack) {
+			    if (global.local_player.KickBack == KBPhase1 || global.local_player.KickBack == KBPhase2) {
 			        global.local_player.DeltaKickBack = global.local_player.KickBack;
 			    }					
 
@@ -87,11 +86,7 @@ if(instance_exists(global.local_player)){
 			        targetX -= ((global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX);
 					targetY = mouse_y - DeltaY;
 			    } else {
-					if(sign(recoilX) == -1){
-						targetX += (global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX;
-					}else{
-						targetX += ((global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX) - (KBPhase1 * recoilX);
-					}
+					targetX += ((global.local_player.KickBack - global.local_player.DeltaKickBack) * recoilX) - ((KBPhase2 - KBPhase1) * recoilX);
 					targetY = mouse_y - DeltaY;
 			    }
 

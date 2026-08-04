@@ -14,6 +14,7 @@ walk_spd = base_spd_walk;
 move_pos = [x, y];
 move_timer = -1;
 network_id = -1;
+network_sync_timer = irandom_range(5, 20);
 alarm[0] = random_range(1 * game_get_speed(gamespeed_fps), 2 * game_get_speed(gamespeed_fps));
 
 

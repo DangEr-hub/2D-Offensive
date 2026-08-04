@@ -172,6 +172,7 @@ if(wall_collision != noone){
 			if!(audio_is_playing(wall_sound)){play_sound(x, y, wall_sound, stats.Object);}
 		
 			instance_destroy(self);
+			exit;
 			#endregion
 		
 		}

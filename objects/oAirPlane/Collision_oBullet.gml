@@ -1,6 +1,10 @@
 var dmg = round(other.stats.Damage * global.ItemIndex[# other.stats.Item_id, ItemStat.PenetrationPower]);
 var p_number = round(dmg/10);
 
+if (IS_NET && !oNetworkManager.is_server) {
+	send_airplane_damage_request(network_id, dmg, other.x, other.y);
+	exit;
+}
 
 play_sound(other.x, other.y, snd_BulletMetal);
 

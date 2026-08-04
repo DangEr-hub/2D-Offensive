@@ -163,7 +163,8 @@ if(is_local){
 				stats.Object_index,
 				stats.Owner_name,
 				direction,
-				stats.Owner_id
+				stats.Owner_id,
+				bullet_network_id
 			);
 
 		    // Update tracking for the last bullet created
@@ -192,7 +193,8 @@ if(image_index == 0){
 			stats.Object_index,
 			stats.Owner_name,
 			direction,
-			stats.Owner_id
+			stats.Owner_id,
+			bullet_network_id
 		);
 		bullet.is_remote = is_remote;
 		instance_destroy(id);

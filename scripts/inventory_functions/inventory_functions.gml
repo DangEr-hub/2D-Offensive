@@ -138,7 +138,7 @@ function InventoryInit() {
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, Total
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Total
 	}
 
 	enum ItemStat{

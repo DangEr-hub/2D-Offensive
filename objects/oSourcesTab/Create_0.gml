@@ -23,8 +23,6 @@ with (zui_create(zui_get_width() * .7, pos_y, objUILabel)) {
 
 
 source_names = [
-	"Headshot (1): ",
-	"Headshot (2): ",
 	"AWM: ",
 	"Spas-12: ",
 	"Empty magazine: ",
@@ -81,8 +79,6 @@ source_names = [
 ];
 
 sources = [
-	"https://pixabay.com/sound-effects/bulletimpact1-442717/",
-	"https://pixabay.com/sound-effects/bullethit-449809/",
 	"https://pixabay.com/sound-effects/sniper-rifle-5989/",
 	"https://pixabay.com/sound-effects/shotgun-firing-4-6746/",
 	"https://pixabay.com/sound-effects/empty-gun-shot-6209/",

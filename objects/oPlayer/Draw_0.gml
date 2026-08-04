@@ -110,6 +110,24 @@ if(Visible == true){
 				var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
 			    draw_sprite_ext(spr_Items, global.Inventory[# item_use_position, Index.slot_id], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
 			}
+		}else if(is_remote && network_item_use_id != Item.None){
+			var remote_item_offset_x = 35;
+			var remote_item_offset_y = 40;
+			if!(throwing_grenade()){
+				remote_item_offset_x = 40;
+				remote_item_offset_y = -10;
+			}
+			if(moving_state == STATES_PLAYER.prone_state){
+				remote_item_offset_x = 110;
+				remote_item_offset_y = 35;
+				if!(throwing_grenade()){
+					remote_item_offset_x = 100;
+					remote_item_offset_y = -3;
+				}
+			}
+			var remote_item_x = x + lengthdir_x(remote_item_offset_x, RotationAngle) - lengthdir_y(remote_item_offset_y, RotationAngle);
+			var remote_item_y = y + lengthdir_y(remote_item_offset_x, RotationAngle) + lengthdir_x(remote_item_offset_y, RotationAngle);
+		    draw_sprite_ext(spr_Items, network_item_use_id, remote_item_x, remote_item_y, 1, 1, RotationAngle, c_white, 1);
 		}
 		#endregion
 	
@@ -128,20 +146,29 @@ if(Visible == true){
 		#endregion
 	
 		#region Draw suppressor attachment on equipped weapon
-		if(WeaponID <= OtherSlot.Secondary){
-			if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
-				draw_sprite_ext(
-					spr_Items,
-					global.Inventory[# WeaponID, Index.slot_suppressor],
-					Weapon.x + lengthdir_x(WeaponDistance*.925, RotationAngle),
-					Weapon.y + lengthdir_y(WeaponDistance*.925, RotationAngle),
-					.5,
-					.5,
-					RotationAngle,
-					c_white, 
-					1
-				);
-			}
+		var suppressor_id = Item.None;
+		var should_draw_suppressor = false;
+
+		if(is_remote){
+			suppressor_id = network_suppressor;
+			should_draw_suppressor = (network_weapon_id != Item.None && network_item_use_id == Item.None);
+		}else if(WeaponID <= OtherSlot.Secondary){
+			suppressor_id = global.Inventory[# WeaponID, Index.slot_suppressor];
+			should_draw_suppressor = (global.Inventory[# item_use_position, Index.slot_id] == Item.None);
+		}
+
+		if(should_draw_suppressor && suppressor_id != Item.None){
+			draw_sprite_ext(
+				spr_Items,
+				suppressor_id,
+				Weapon.x + lengthdir_x(WeaponDistance*.925, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance*.925, RotationAngle),
+				.5,
+				.5,
+				RotationAngle,
+				c_white,
+				1
+			);
 		}
 		#endregion
 	

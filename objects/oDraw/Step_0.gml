@@ -59,7 +59,7 @@ if(instance_exists(global.local_player)){
 		airplane.image_angle = area[4];
 
         if (IS_NET && oNetworkManager.is_server) {
-                //process airplane spawn
+                server_process_airplane_spawn(airplane);
         }
 	}
 	#endregion

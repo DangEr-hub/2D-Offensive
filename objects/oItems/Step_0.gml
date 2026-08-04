@@ -46,6 +46,7 @@ if (IS_NET && !oNetworkManager.is_server) {
    y = lerp(y, target_y, INTERPOLATION_SPD);
 }
 
+if(!IS_NET || oNetworkManager.is_server){
 #region push items
 var inst = instance_place(x, y, oItems);
 
@@ -83,3 +84,4 @@ VelocityY *= 0.8;
 AccelX = 0;
 AccelY = 0;
 #endregion
+}

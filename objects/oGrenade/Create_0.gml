@@ -13,3 +13,9 @@ zmaxspeed = 20;
 zspeed = zmaxspeed;
 ExplosionTimer = -1;
 ExplosionTime = 1 * game_get_speed(gamespeed_fps);
+
+network_id = -1;
+network_owner_pid = 255;
+network_authority = true;
+network_visual_only = false;
+grenade_explosion_broadcasted = false;
