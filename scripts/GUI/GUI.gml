@@ -17,8 +17,32 @@ function mouse_to_gui(xpos1, ypos1, xpos2, ypos2){
 
 function window_resize(){
     window_set_size(global.window_width, global.window_height);
-    surface_resize(application_surface, global.CameraWidth, global.CameraHeight);
+    surface_resize(application_surface, global.GuiW, global.GuiH);
     camera_set_view_size(CAM, global.CameraWidth, global.CameraHeight);
+}
+
+function draw_health_bar_fill(frame, xpos, ypos, progress, scale = global.GUIMultiplier, blend = c_white){
+	var source_width = round(sprite_get_width(spr_HealthBar) * clamp(progress, 0, 1));
+	if(source_width <= 0){
+		return;
+	}
+
+	var draw_x = round(xpos - sprite_get_xoffset(spr_HealthBar) * scale);
+	var draw_y = round(ypos - sprite_get_yoffset(spr_HealthBar) * scale);
+	draw_sprite_part_ext(
+		spr_HealthBar,
+		frame,
+		0,
+		0,
+		source_width,
+		sprite_get_height(spr_HealthBar),
+		draw_x,
+		draw_y,
+		scale,
+		scale,
+		blend,
+		1
+	);
 }
 
 function pause(ObjectType){
@@ -84,7 +108,78 @@ function item_description_destroy(){
 	}
 }
 
-function reset_gui(){	
+function statistics_table_open(){
+	if(instance_exists(oStatisticsTable) || !instance_exists(global.local_player)) return;
+
+	with(zui_main()){
+		zui_create(zui_get_width() * .5, zui_get_height() * .5, oStatisticsTable, -2000);
+	}
+}
+
+function statistics_table_close(){
+	if(instance_exists(oStatisticsTable)){
+		with(oStatisticsTable){
+			zui_destroy();
+		}
+	}
+}
+
+function open_ingame_settings(){
+	var settings_is_open = false;
+	with(oSettingsTab){
+		if(instance_exists(__parent)){
+			settings_is_open = true;
+		}else{
+			var black_id = overlay_black;
+			if(instance_exists(black_id)){
+				with(black_id){
+					zui_destroy();
+				}
+			}
+			zui_destroy();
+		}
+	}
+
+	if(settings_is_open){
+		return;
+	}
+
+	with(zui_main()){
+		var settings_black = zui_create(0, 0, objUIBlack, -1999);
+		with(zui_create(zui_get_width() * .5, zui_get_height() * .5, oSettingsTab, -2000)){
+			ingame_overlay = true;
+			overlay_black = settings_black;
+			alpha = global.GUIHUDAlpha * 1.25;
+			alpha_value = 0;
+			window_id = id;
+
+			with(zui_create(zui_get_width() * .5, zui_get_height() - 32 * global.GUIMultiplier, objUIButton)){
+				zui_set_anchor(.5, 0);
+				zui_set_size(128 * global.GUIMultiplier, 24 * global.GUIMultiplier);
+				caption = "Back";
+				callback = function(){
+					with(oSettingsTab){
+						if(ingame_overlay){
+							var black_id = overlay_black;
+							if(instance_exists(black_id)){
+								with(black_id){
+									zui_destroy();
+								}
+							}
+							zui_destroy();
+						}
+					}
+				};
+			}
+		}
+	}
+}
+
+function reset_gui(){
+	var restore_statistics_table = instance_exists(oStatisticsTable)
+		&& keyboard_check(global.KeyBinds[| KEY.Scoreboard]);
+	statistics_table_close();
+
 	if(instance_exists(oWeaponAttachments)){
 		with(oWeaponAttachments){
 			zui_destroy();
@@ -168,6 +263,10 @@ function reset_gui(){
 				}
 			}
 		}
+	}
+
+	if(restore_statistics_table){
+		statistics_table_open();
 	}
 }
 	

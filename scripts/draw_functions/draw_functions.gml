@@ -66,6 +66,62 @@ function draw_string_line(x, y, text, number, color, text_last_string, text_colo
     draw_text_outlined(x + string_width(text) + string_width(number_sign + string(number)), y, text_last_string, color, outline_color, outline_distance);
 }
 
+function draw_circular_bar(x, y, radius, value, max_value, bar_color, background_color, thickness = 4, alpha = 1, start_angle = -90) {
+	var previous_color = draw_get_color();
+	var previous_alpha = draw_get_alpha();
+	var safe_radius = max(1, radius);
+	var safe_thickness = clamp(thickness, 1, safe_radius);
+	var inner_radius = max(0, safe_radius - safe_thickness * .5);
+	var outer_radius = safe_radius + safe_thickness * .5;
+	var progress = max_value > 0 ? clamp(value / max_value, 0, 1) : 0;
+	var segments = max(96, ceil(outer_radius * 3));
+	var safe_alpha = clamp(alpha, 0, 1);
+
+	draw_set_alpha(1);
+	draw_primitive_begin(pr_trianglestrip);
+	for(var i = 0; i <= segments; i++) {
+		var angle = start_angle + (i / segments) * 360;
+		draw_vertex_color(
+			x + lengthdir_x(outer_radius, angle),
+			y + lengthdir_y(outer_radius, angle),
+			background_color,
+			safe_alpha
+		);
+		draw_vertex_color(
+			x + lengthdir_x(inner_radius, angle),
+			y + lengthdir_y(inner_radius, angle),
+			background_color,
+			safe_alpha
+		);
+	}
+	draw_primitive_end();
+
+	if(progress > 0) {
+		var filled_segments = ceil(segments * progress);
+		draw_primitive_begin(pr_trianglestrip);
+		for(var i = 0; i <= filled_segments; i++) {
+			var progress_position = min(i / segments, progress);
+			var angle = start_angle + progress_position * 360;
+			draw_vertex_color(
+				x + lengthdir_x(outer_radius, angle),
+				y + lengthdir_y(outer_radius, angle),
+				bar_color,
+				safe_alpha
+			);
+			draw_vertex_color(
+				x + lengthdir_x(inner_radius, angle),
+				y + lengthdir_y(inner_radius, angle),
+				bar_color,
+				safe_alpha
+			);
+		}
+		draw_primitive_end();
+	}
+
+	draw_set_color(previous_color);
+	draw_set_alpha(previous_alpha);
+}
+
 function draw_text_outlined(position_x, position_y, text, text_color, outline_color, outline_width) {
 	draw_set_halign(fa_left);
 	var xx = position_x;
@@ -203,7 +259,7 @@ function draw_compass(xx, yy, w, h){
             var enemy_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
             var angle_diff = angle_difference(global.local_player.RotationAngle, enemy_dir);
             var marker_x = center_x + (angle_diff / v_angle) * (w * 0.5);
-			var col = team == TEAM.POLICE ? c_blue : c_red;
+			var col = stats.Team == TEAM.POLICE ? c_blue : c_red;
 
             if(abs(angle_diff) <= v_angle){
                 draw_set_color(col);
@@ -218,7 +274,7 @@ function draw_compass(xx, yy, w, h){
 	            var remote_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
 	            var remote_angle_diff = angle_difference(global.local_player.RotationAngle, remote_dir);
 	            var remote_marker_x = center_x + (remote_angle_diff / v_angle) * (w * 0.5);
-				var remote_col = team == global.local_player.team ? c_blue : c_red;
+				var remote_col = stats.Team == global.local_player.stats.Team ? c_blue : c_red;
 
 	            if(abs(remote_angle_diff) <= v_angle){
 	                draw_set_color(remote_col);

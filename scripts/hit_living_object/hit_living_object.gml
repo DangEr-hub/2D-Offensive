@@ -32,27 +32,111 @@ function enemy_initialized(hitObj, enemy_key, enemy_name) {
         ds_map_add(enemyStatsMap, "Name", enemy_name);
         ds_map_add(enemyStatsMap, "HitsReceived", 0);
         ds_map_add(enemyStatsMap, "DamageReceived", 0);
+		ds_map_add(enemyStatsMap, "AssistDamageReceived", 0);
         ds_map_add(enemyStatsMap, "HitsGiven", 0);
         ds_map_add(enemyStatsMap, "DamageGiven", 0);
         hitObj.HitMap[? enemy_key] = enemyStatsMap;
     } else {
         enemyStatsMap = hitObj.HitMap[? enemy_key];
+		if(!ds_map_exists(enemyStatsMap, "AssistDamageReceived")){
+			ds_map_add(enemyStatsMap, "AssistDamageReceived", 0);
+		}
     }
 
     return enemyStatsMap;
 }
 
 function hitmap_record_hit(victim, attacker, attacker_key, attacker_name, victim_key, victim_name, damage) {
+	var dmg = round(damage);
 	var victimStatsMap = enemy_initialized(victim, attacker_key, attacker_name);
 	if(!is_undefined(victimStatsMap)){
 		ds_map_replace(victimStatsMap, "HitsReceived", ds_map_find_value(victimStatsMap, "HitsReceived") + 1);
-		ds_map_replace(victimStatsMap, "DamageReceived", ds_map_find_value(victimStatsMap, "DamageReceived") + damage);
+		ds_map_replace(victimStatsMap, "DamageReceived", ds_map_find_value(victimStatsMap, "DamageReceived") + dmg);
+		ds_map_replace(victimStatsMap, "AssistDamageReceived", ds_map_find_value(victimStatsMap, "AssistDamageReceived") + dmg);
 	}
 
 	var attackerStatsMap = enemy_initialized(attacker, victim_key, victim_name);
 	if(!is_undefined(attackerStatsMap)){
 	    ds_map_replace(attackerStatsMap, "HitsGiven", ds_map_find_value(attackerStatsMap, "HitsGiven") + 1);
-	    ds_map_replace(attackerStatsMap, "DamageGiven", ds_map_find_value(attackerStatsMap, "DamageGiven") + damage);
+	    ds_map_replace(attackerStatsMap, "DamageGiven", ds_map_find_value(attackerStatsMap, "DamageGiven") + dmg);
+	}
+}
+
+function award_damage_assists(victim, killer_key){
+	if(!instance_exists(victim)){ return; }
+
+	var maximum_hp = global.player_stats.Max_health;
+	if(variable_struct_exists(victim.stats, "Max_health_points")){
+		maximum_hp = victim.stats.Max_health_points;
+	}
+	var assist_threshold = maximum_hp * .4;
+	var attacker_keys = ds_map_keys_to_array(victim.HitMap);
+
+	for(var i = 0; i < array_length(attacker_keys); i++){
+		var attacker_key = attacker_keys[i];
+		var hit_stats = victim.HitMap[? attacker_key];
+		var assist_damage = 0;
+
+		if(ds_map_exists(hit_stats, "AssistDamageReceived")){
+			assist_damage = ds_map_find_value(hit_stats, "AssistDamageReceived");
+			ds_map_set(hit_stats, "AssistDamageReceived", 0);
+		}
+
+		if(attacker_key == killer_key || assist_damage <= assist_threshold){
+			continue;
+		}
+
+		var assister = noone;
+		if(IS_NET){
+			assister = find_instance_by_network_id(oPlayer, attacker_key);
+		}else{
+			if(instance_exists(global.local_player) && attacker_key == global.local_player.network_id){
+				assister = global.local_player;
+			}else if(instance_exists(attacker_key)){
+				assister = attacker_key;
+			}
+		}
+
+		if(!instance_exists(assister)){
+			continue;
+		}
+
+		if(assister.object_index == oPlayer){
+			assister.stats.Assists++;
+			if(!IS_NET && assister.is_local){
+				global.game_struct.Match_assists++;
+			}
+			if(assister.is_local && global.ranked_game){
+				global.player_stats.Assists++;
+				if(instance_exists(oRatingController)){
+					oRatingController.assists++;
+				}else if(instance_exists(oEggyEloRatingSystem)){
+					oEggyEloRatingSystem.assists++;
+				}
+			}
+		}else if(assister.object_index == oBot){
+			assister.stats.Assists++;
+		}else{
+			continue;
+		}
+
+		if(IS_NET && assister.object_index == oPlayer && instance_exists(oNetworkManager) && oNetworkManager.is_server){
+			with(oNetworkManager){
+				var assister_stats = ds_map_find_value(player_stats, attacker_key);
+				if(is_undefined(assister_stats)){
+					assister_stats = ds_map_create();
+					ds_map_set(assister_stats, "Kills", 0);
+					ds_map_set(assister_stats, "Deaths", 0);
+					ds_map_set(assister_stats, "Assists", 0);
+					ds_map_set(assister_stats, "Money", 0);
+					ds_map_add(player_stats, attacker_key, assister_stats);
+				}else if(!ds_map_exists(assister_stats, "Assists")){
+					ds_map_set(assister_stats, "Assists", 0);
+				}
+
+				ds_map_set(assister_stats, "Assists", ds_map_find_value(assister_stats, "Assists") + 1);
+			}
+		}
 	}
 }
 
@@ -234,6 +318,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var data = -1;
 	var hp = hit_object.stats.Health_points;
 	var attacker = attacking_item.stats.Object;
+	var is_bomb_damage = attacking_item.stats.Item_id == Item.Bomb;
 
 	if(IS_NET && is_player && !oNetworkManager.is_server && hit_object.is_remote){
 		send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [0, 0, 0]);
@@ -372,7 +457,10 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		var victim_name = "";
 
 		#region Hitmap
-		if (instance_exists(attacker)) {
+		if (is_bomb_damage) {
+			attacker_key = HITMAP_KEY_BOMB;
+			attacker_name = global.ItemIndex[# Item.Bomb, ItemStat.Name];
+		} else if (instance_exists(attacker)) {
 		    if (attacker.object_index == oPlayer) {
 		        attacker_key  = attacker.network_id;  // PID hráče
 		        attacker_name = attacker.Name;
@@ -402,7 +490,8 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		}
 
 		if (should_record_hitmap) {
-			hitmap_record_hit(hit_object, attacker, attacker_key, attacker_name, victim_key, victim_name, hit_object.attack_damage);
+			var hitmap_attacker = is_bomb_damage ? noone : attacker;
+			hitmap_record_hit(hit_object, hitmap_attacker, attacker_key, attacker_name, victim_key, victim_name, min(hit_object.attack_damage, hp));
 		}
 		
 		#endregion
@@ -421,13 +510,25 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.reward];
 
 		if (hp <= hit_object.attack_damage) {
-		    if (!IS_NET) {
-		        // SINGLEPLAYER REWARD
-		        global.player_stats_struct.Money += reward;
-		        if (global.ranked_game) {
-		            global.player_stats_struct.Kills++;
-		            oRatingController.kills++;
-		        }
+			award_damage_assists(hit_object, attacker_key);
+
+			if (!IS_NET) {
+				if(instance_exists(attacker) && attacker.object_index == oPlayer && attacker.is_local){
+					global.player_stats.Money += reward;
+					attacker.stats.Kills++;
+					global.game_struct.Match_kills++;
+					if(global.ranked_game){
+						global.player_stats.Kills++;
+						oRatingController.kills++;
+					}
+				}else if(instance_exists(attacker) && attacker.object_index == oBot){
+					attacker.stats.Kills++;
+					attacker.stats.Money += reward;
+				}
+
+				if(is_bot){
+					hit_object.stats.Deaths++;
+				}
 		    } else if (oNetworkManager.is_server) {
 		        // MULTIPLAYER REWARD – jen host zapisuje statistiky (anti-cheat)
 		        if (attacker_pid >= 0) {
@@ -437,6 +538,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		                    attacker_stats = ds_map_create();
 		                    ds_map_set(attacker_stats, "Kills", 0);
 		                    ds_map_set(attacker_stats, "Deaths", 0);
+		                    ds_map_set(attacker_stats, "Assists", 0);
 		                    ds_map_set(attacker_stats, "Money", 0);
 		                    ds_map_add(player_stats, attacker_pid, attacker_stats);
 		                }
@@ -454,6 +556,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		                    victim_stats = ds_map_create();
 		                    ds_map_set(victim_stats, "Kills", 0);
 		                    ds_map_set(victim_stats, "Deaths", 0);
+		                    ds_map_set(victim_stats, "Assists", 0);
 		                    ds_map_set(victim_stats, "Money", 0);
 		                    ds_map_add(player_stats, victim_pid, victim_stats);
 		                }
@@ -474,13 +577,15 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		if (is_player) {
 		    hit_object.AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
 		} else {
-		    if (global.ranked_game) {
+			var counts_for_accuracy = attacking_item.object_index == oBullet
+				&& attacking_item.stats.Tracer_image == 0;
+		    if (global.ranked_game && counts_for_accuracy) {
 		        if (!IS_NET) {
 		            // SINGLEPLAYER
-		            global.player_stats_struct.Hit_shots++;
+		            global.player_stats.Hit_shots++;
 		            oRatingController.hit_shots++;
 		            if (BodyPart <= HITBOX.HeadProne) {
-		                global.player_stats_struct.Headshots++;
+		                global.player_stats.Headshots++;
 		                oRatingController.headshots++;
 		            }
 		        } else if (oNetworkManager.is_server && attacker_pid >= 0) {
@@ -491,6 +596,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		                    stats = ds_map_create();
 		                    ds_map_set(stats, "Kills", 0);
 		                    ds_map_set(stats, "Deaths", 0);
+		                    ds_map_set(stats, "Assists", 0);
 		                    ds_map_set(stats, "Money", 0);
 		                    ds_map_set(stats, "Hit_shots", 0);
 		                    ds_map_set(stats, "Headshots", 0);
@@ -566,9 +672,7 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
         if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
         || BodyPart >= HITBOX.ArmNoWeapon) {
 
-            if !audio_is_playing(snd_BulletHit) {
-                play_sound(impact_x, impact_y, snd_BulletHit, attacking_object);
-            }
+			play_sound(impact_x, impact_y, snd_BulletHit, attacking_object);
 
         } else {
             dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
@@ -592,9 +696,7 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
 
             var sound_effect = snd_BulletHitArmour1;
 
-            if !audio_is_playing(sound_effect) {
-                play_sound(impact_x, impact_y, sound_effect, attacking_object);
-            }
+			play_sound(impact_x, impact_y, sound_effect, attacking_object);
         }
 
     } else {
@@ -602,9 +704,7 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
         if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
 
             var sound_effect2 = choose(snd_HeadShot1, snd_HeadShot2);
-            if !audio_is_playing(sound_effect2) {
-                play_sound(impact_x, impact_y, sound_effect2, attacking_object);
-            }
+			play_sound(impact_x, impact_y, sound_effect2, attacking_object);
 
         } else {
             var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense];
@@ -625,9 +725,7 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
                 part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
             }
 
-            if !audio_is_playing(snd_HeadShotHelmet) {
-                play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_object);
-            }
+			play_sound(impact_x, impact_y, snd_HeadShotHelmet, attacking_object);
         }
     }
 }

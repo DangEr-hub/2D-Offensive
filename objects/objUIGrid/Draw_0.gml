@@ -1,5 +1,144 @@
 draw_set_alpha(alpha * alpha_value);
-if(type == "Respawn menu"){
+if(show_stats){
+	var grid_width = __width;
+	var grid_height = __height;
+	var row_height = clamp(30 * global.GUIMultiplier, 34, 42);
+	var section_height = grid_height * .5;
+	var columns = ["Player", "K", "A", "D", "K/D", "Money"];
+	var column_ratios = [.38, .1, .1, .1, .14, .18];
+	var local_team = instance_exists(global.local_player) ? global.local_player.stats.Team : TEAM.POLICE;
+	var enemy_team = local_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE;
+	var friendly_title = local_team == TEAM.POLICE ? "POLICE" : "TERRORISTS";
+	var enemy_title = enemy_team == TEAM.POLICE ? "POLICE" : "TERRORISTS";
+	var local_kills = global.game_struct.Match_kills;
+	var local_assists = global.game_struct.Match_assists;
+	var local_deaths = global.game_struct.Match_deaths;
+	if(IS_NET && instance_exists(oNetworkManager) && instance_exists(global.local_player)){
+		var local_stats = ds_map_find_value(oNetworkManager.player_stats, global.local_player.network_id);
+		if(!is_undefined(local_stats)){
+			if(ds_map_exists(local_stats, "Kills")) local_kills = local_stats[? "Kills"];
+			if(ds_map_exists(local_stats, "Assists")) local_assists = local_stats[? "Assists"];
+			if(ds_map_exists(local_stats, "Deaths")) local_deaths = local_stats[? "Deaths"];
+		}
+	}
+	var local_rows = [[
+		global.player_stats.Name,
+		local_kills,
+		local_assists,
+		local_deaths,
+		local_deaths > 0 ? local_kills / local_deaths : 0,
+		global.player_stats.Money
+	]];
+	var remote_rows = [];
+
+	if(IS_NET && instance_exists(oNetworkManager)){
+		for(var player_index = 0; player_index < instance_number(oPlayer); player_index++){
+			var remote_player = instance_find(oPlayer, player_index);
+			if(instance_exists(remote_player) && remote_player.is_remote){
+				var kills = 0;
+				var assists = 0;
+				var deaths = 0;
+				var money = 0;
+				var player_data = ds_map_find_value(oNetworkManager.player_stats, remote_player.network_id);
+				if(!is_undefined(player_data)){
+					if(ds_map_exists(player_data, "Kills")) kills = player_data[? "Kills"];
+					if(ds_map_exists(player_data, "Assists")) assists = player_data[? "Assists"];
+					if(ds_map_exists(player_data, "Deaths")) deaths = player_data[? "Deaths"];
+					if(ds_map_exists(player_data, "Money")) money = player_data[? "Money"];
+				}
+				var display_name = remote_player.stats.Name + " [" + string(remote_player.network_id) + "]";
+				array_push(remote_rows, [display_name, kills, assists, deaths, deaths > 0 ? kills / deaths : 0, money]);
+			}
+		}
+	}else{
+		var friendly_bot_rows = [];
+		var enemy_bot_rows = [];
+		for(var bot_index = 0; bot_index < array_length(global.BotMatchStats); bot_index++){
+			var bot_stats = global.BotMatchStats[bot_index];
+			if(bot_stats.Room != room) continue;
+
+			var bot_row = [
+				bot_stats.Name,
+				bot_stats.Kills,
+				bot_stats.Assists,
+				bot_stats.Deaths,
+				bot_stats.Deaths > 0 ? bot_stats.Kills / bot_stats.Deaths : 0,
+				bot_stats.Money
+			];
+			if(bot_stats.Team == local_team){
+				array_push(friendly_bot_rows, bot_row);
+			}else if(bot_stats.Team == enemy_team){
+				array_push(enemy_bot_rows, bot_row);
+			}
+		}
+
+		for(var i = 0; i < array_length(friendly_bot_rows) - 1; i++){
+			for(var j = i + 1; j < array_length(friendly_bot_rows); j++){
+				if(friendly_bot_rows[j][1] > friendly_bot_rows[i][1]){
+					var swap_row = friendly_bot_rows[i];
+					friendly_bot_rows[i] = friendly_bot_rows[j];
+					friendly_bot_rows[j] = swap_row;
+				}
+			}
+		}
+
+		for(var i = 0; i < array_length(enemy_bot_rows) - 1; i++){
+			for(var j = i + 1; j < array_length(enemy_bot_rows); j++){
+				if(enemy_bot_rows[j][1] > enemy_bot_rows[i][1]){
+					var swap_row = enemy_bot_rows[i];
+					enemy_bot_rows[i] = enemy_bot_rows[j];
+					enemy_bot_rows[j] = swap_row;
+				}
+			}
+		}
+
+		for(var i = 0; i < min(5, array_length(friendly_bot_rows)); i++){
+			array_push(local_rows, friendly_bot_rows[i]);
+		}
+		for(var i = 0; i < min(5, array_length(enemy_bot_rows)); i++){
+			array_push(remote_rows, enemy_bot_rows[i]);
+		}
+	}
+
+	var draw_scoreboard_section = function(_title, _rows, _top, _height, _row_height, _grid_width, _columns, _column_ratios){
+		draw_set_font(set_font("GUI_grid"));
+		draw_text_outlined(x, _top, _title, MAIN_COLOR, c_black, 1);
+		var table_top = _top + _row_height;
+		var current_x = x;
+
+		for(var col = 0; col < array_length(_columns); col++){
+			var width = _grid_width * _column_ratios[col];
+			var header_x = current_x + (width - string_width(_columns[col])) * .5;
+			draw_text_outlined(header_x, table_top + (_row_height - string_height(_columns[col])) * .5, _columns[col], c_white, c_black, 1);
+			draw_set_color(MAIN_COLOR);
+			draw_rectangle(current_x, table_top, current_x + width, table_top + _row_height, true);
+			current_x += width;
+		}
+		draw_set_color(MAIN_COLOR);
+		draw_line(x, table_top, x + _grid_width, table_top);
+
+		var max_rows = max(1, floor((_height - _row_height * 2) / _row_height));
+		for(var row = 0; row < min(array_length(_rows), max_rows); row++){
+			current_x = x;
+			var row_top = table_top + (row + 1) * _row_height;
+			for(var col = 0; col < array_length(_columns); col++){
+				var width = _grid_width * _column_ratios[col];
+				var value = _rows[row][col];
+				var value_string = (col == 4 && is_real(value)) ? string_format(value, 0, 2) : string(value);
+				var text_x = current_x + (width - string_width(value_string)) * .5;
+				if(col == 0) text_x = current_x + max(8 * global.GUIMultiplier, 10);
+				draw_text_outlined(text_x, row_top + (_row_height - string_height(value_string)) * .5, value_string, c_white, c_black, 1);
+				draw_set_color(MAIN_COLOR);
+				draw_rectangle(current_x, row_top, current_x + width, row_top + _row_height, true);
+				current_x += width;
+			}
+		}
+	};
+
+	draw_scoreboard_section(friendly_title, local_rows, y, section_height, row_height, grid_width, columns, column_ratios);
+	draw_scoreboard_section(enemy_title, remote_rows, y + section_height, section_height, row_height, grid_width, columns, column_ratios);
+	draw_set_alpha(1);
+}else if(type == "Respawn menu"){
 	
 	#region Respawn menu
 	var max_rows = 8;
@@ -234,9 +373,9 @@ if(type == "Respawn menu"){
 
 	#region Item description
 	var rows = 1;
-	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
 	var statTitles = ["Damage: ", "Penetration power: "];
+	var columns = array_length(statTitles);
 						
 	#region Draw grid
 	for (var i = 0; i < rows; i++) {

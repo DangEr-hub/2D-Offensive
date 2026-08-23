@@ -25,6 +25,12 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
     var show_axes = struct_get_default(options, "show_axes", true);
     var show_points = struct_get_default(options, "show_points", true);
     var show_labels = struct_get_default(options, "show_labels", true);
+	var x_axis_name = string(struct_get_default(options, "x_axis_name", ""));
+	var y_axis_name = string(struct_get_default(options, "y_axis_name", ""));
+	var background_margin = max(
+		0,
+		struct_get_default(options, "background_margin", 0.1)
+	);
 
     var bg_color = struct_get_default(
         options,
@@ -96,14 +102,19 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
         struct_get_default(options, "axis_width", 2)
     );
 
-    var label_decimals = max(
-        0,
-        floor(struct_get_default(options, "label_decimals", 1))
-    );
+	var legacy_label_decimals = max(
+		0,
+		floor(struct_get_default(options, "label_decimals", 1))
+	);
+
+	var x_label_decimals = max(
+		0,
+		floor(struct_get_default(options, "x_label_decimals", legacy_label_decimals))
+	);
 
     var y_label_decimals = max(
         0,
-        floor(struct_get_default(options, "y_label_decimals", max(label_decimals, 1)))
+        floor(struct_get_default(options, "y_label_decimals", max(legacy_label_decimals, 1)))
     );
 
     var font = struct_get_default(options, "font", -1);
@@ -205,11 +216,28 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
 
     if(font != -1){ draw_set_font(font); }
 
+	var background_margin_x = width * background_margin;
+	var background_margin_y = height * background_margin;
+
+	if(x_axis_name != ""){
+		background_margin_y = max(background_margin_y, string_height(x_axis_name));
+	}
+
+	if(y_axis_name != ""){
+		background_margin_x = max(background_margin_x, string_height(y_axis_name));
+	}
+
     if(show_background)
     {
         draw_set_alpha(background_alpha);
         draw_set_color(bg_color);
-        draw_rectangle(xx - 16, yy, xx + width, yy + height, false);
+        draw_rectangle(
+			xx - background_margin_x,
+			yy - background_margin_y,
+			xx + width + background_margin_x,
+			yy + height + background_margin_y,
+			false
+		);
     }
 
     if(show_grid)
@@ -303,7 +331,7 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
             draw_text(
                 label_x,
                 plot_y2 + 5,
-                string_format(x_value, 0, label_decimals)
+                string_format(x_value, 0, x_label_decimals)
             );
         }
 
@@ -365,6 +393,33 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
             true
         );
     }
+
+	if(x_axis_name != ""){
+		draw_set_alpha(1);
+		draw_set_color(label_color);
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_middle);
+		draw_text(
+			xx + width * .5,
+			yy + height + background_margin_y * .5,
+			x_axis_name
+		);
+	}
+
+	if(y_axis_name != ""){
+		draw_set_alpha(1);
+		draw_set_color(label_color);
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_middle);
+		draw_text_transformed(
+			xx - background_margin_x * .5,
+			yy + height * .5,
+			y_axis_name,
+			1,
+			1,
+			90
+		);
+	}
 
     draw_set_color(old_color);
     draw_set_alpha(old_alpha);

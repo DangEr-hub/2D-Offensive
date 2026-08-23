@@ -29,6 +29,11 @@ draw_graph(
 	    line_width,
 	    point_radius,
 	    label_decimals,
+		x_label_decimals,
+		y_label_decimals,
+		x_axis_name,
+		y_axis_name,
+		background_margin,
 
 	    font
 	}

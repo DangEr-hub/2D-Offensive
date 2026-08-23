@@ -6,8 +6,8 @@ zui_set_size(tab_width, tab_height);
 
 pos_x = zui_get_width() * .005;
 pos_y = zui_get_height() * .07;
-gap = 120 * global.GUIMultiplier;
-gap_x = 160 * global.GUIMultiplier;
+gap = max(120 * global.GUIMultiplier, 160);
+gap_x = max(160 * global.GUIMultiplier, 200);
 text_height = string_height("a")*2;
 max_i = 21;
 
@@ -63,7 +63,6 @@ source_names = [
 	"M4A1: ",
 	"Light engine: ",
 	"Helper (1): ",
-	"Desert Eagle: ",
 	"GUI Icons: ",
 	"Explosion: ",
 	"Button: ",
@@ -119,7 +118,6 @@ sources = [
 	"https://pixabay.com/sound-effects/film-special-effects-gun-shot-2-530789/",
 	"https://github.com/JujuAdams/Bulb",
 	"https://marketplace.gamemaker.io/assets/6355/sprite_getpixel-optimized",
-	"https://pixabay.com/sound-effects/film-special-effects-desert-eagle-168857/",
 	"https://game-icons.net/",
 	"https://bananarana8.itch.io/pixel-art-explosion-effect",
 	"https://pixabay.com/sound-effects/immersivecontrol-button-click-sound-463065/",
@@ -147,7 +145,7 @@ for(i = 0; i < array_length(sources); i++){
 
     src_but = zui_create(
         pos_x + gap + extra_x,
-        pos_y - text_height/4 + text_height * row_i,
+        round(pos_y - text_height/4 + text_height * row_i),
         objUIButton
     );
     with(src_but){

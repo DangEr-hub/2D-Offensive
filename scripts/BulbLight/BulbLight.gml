@@ -1,4 +1,4 @@
-/// @param renderer
+ /// @param renderer
 /// @param sprite
 /// @param image
 /// @param x

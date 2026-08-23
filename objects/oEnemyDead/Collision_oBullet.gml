@@ -14,6 +14,4 @@ if(other.stats.Tracer_image == 2){
 }
 
 create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
-if!(audio_is_playing(bullet_hit)){
-	play_sound(other.x, other.y, bullet_hit, other.stats.Object);	
-}
+play_sound(other.x, other.y, bullet_hit, other.stats.Object);

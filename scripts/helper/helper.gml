@@ -39,7 +39,7 @@ function compute_airplane_network_id() {
     return irandom(65535);
 }
 
-function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid){
+function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid, attacker_item_id = Item.None){
 	
 	var blood_color = c_red;
 	if(BodyPart <= HITBOX.HeadProne){
@@ -78,14 +78,22 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 
 		var attacker = find_instance_by_network_id(oPlayer, attacker_pid);
 		var attacker_name = "Player " + string(attacker_pid);
+		var hitmap_attacker_key = attacker_pid;
+		var hitmap_attacker = attacker;
 		if(instance_exists(attacker)){
 			attacker_name = attacker.stats.Name;
 		}
+		if (attacker_item_id == Item.Bomb) {
+			hitmap_attacker_key = HITMAP_KEY_BOMB;
+			attacker_name = global.ItemIndex[# Item.Bomb, ItemStat.Name];
+			hitmap_attacker = noone;
+		}
 
-		var should_record_hitmap = object.is_local || (instance_exists(attacker) && attacker.is_local);
+		var should_record_hitmap = oNetworkManager.is_server || object.is_local || (instance_exists(attacker) && attacker.is_local);
 
 		if(should_record_hitmap){
-			hitmap_record_hit(object, attacker, attacker_pid, attacker_name, object.network_id, object.stats.Name, damage);
+			var effective_damage = min(damage, max(object.stats.Health_points, 0));
+			hitmap_record_hit(object, hitmap_attacker, hitmap_attacker_key, attacker_name, object.network_id, object.stats.Name, effective_damage);
 		}
 	}
 
@@ -191,7 +199,7 @@ function create_local_player(pid) {
         ds_map_add(player_data, "dir", player.RotationAngle);
         ds_map_add(player_data, "state", 0);
         ds_map_add(player_data, "moving_state", player.moving_state);
-        ds_map_add(player_data, "team", player.team);
+        ds_map_add(player_data, "Team", player.stats.Team);
         ds_map_add(player_data, "hp", player.stats.Health_points);
         
         // Initialize equipment with current values
@@ -225,7 +233,7 @@ function apply_remote_player_network_state(player, pid) {
     var dir = ds_map_find_value(player_data, "dir");
     var bit_state = ds_map_find_value(player_data, "state");
     var moving_state_id = ds_map_find_value(player_data, "moving_state");
-    var team_id = ds_map_find_value(player_data, "team");
+    var team_id = ds_map_find_value(player_data, "Team");
     var item_use_id = ds_map_find_value(player_data, "item_use_id");
     var hp = ds_map_find_value(player_data, "hp");
     var helmet_id = ds_map_find_value(player_data, "helmet_id");
@@ -253,7 +261,7 @@ function apply_remote_player_network_state(player, pid) {
             network_moving_state = moving_state_id;
             moving_state = moving_state_id;
         }
-        if (!is_undefined(team_id)) team = team_id;
+        if (!is_undefined(team_id)) stats.Team = team_id;
         if (!is_undefined(item_use_id)) network_item_use_id = item_use_id;
         if (!is_undefined(hp) && !is_undefined(stats)) stats.Health_points = hp;
 
@@ -270,6 +278,43 @@ function apply_remote_player_network_state(player, pid) {
         if (!is_undefined(weapon_grip)) network_grip = weapon_grip;
         if (!is_undefined(weapon_suppressor)) network_suppressor = weapon_suppressor;
     }
+}
+
+function position_in_bomb_area(_x, _y, _map_id = global.MapID){
+	if(_map_id < 0 || _map_id >= MAP.Total){
+		return false;
+	}
+
+	var bomb_areas = global.MapProperties[# _map_id, MAP_STAT.BombAreas];
+	if(!ds_exists(bomb_areas, ds_type_map)){
+		return false;
+	}
+
+	var area_key = ds_map_find_first(bomb_areas);
+	while(!is_undefined(area_key)){
+		var area = bomb_areas[? area_key];
+		if(is_array(area) && array_length(area) >= 4
+		&& point_in_rectangle(_x, _y, area[0], area[1], area[2], area[3])){
+			return true;
+		}
+		area_key = ds_map_find_next(bomb_areas, area_key);
+	}
+
+	return false;
+}
+
+function find_living_player_teammate(team, excluded_player = noone) {
+	var player_count = instance_number(oPlayer);
+	for (var player_index = 0; player_index < player_count; player_index++) {
+		var player = instance_find(oPlayer, player_index);
+		if (instance_exists(player)
+		&& player != excluded_player
+		&& player.stats.Team == team
+		&& player.stats.Health_points > 0) {
+			return player;
+		}
+	}
+	return noone;
 }
 
 function create_remote_player(pid, x_pos, y_pos) {
@@ -342,7 +387,7 @@ function sync_object_create(x_pos, y_pos, create_data) {
         buffer_write(send_buffer, buffer_s16,  inst.ClipAmmo);
         buffer_write(send_buffer, buffer_s16,  inst.Ammo);
         buffer_write(send_buffer, buffer_f16,  inst.Durability);
-		buffer_write(send_buffer, buffer_u8,  inst.Amount);
+		buffer_write(send_buffer, buffer_u16, inst.Amount);
         
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -428,9 +473,10 @@ function request_item_pickup(inst_id) {
             buffer_write(send_buffer, buffer_u32, send_sequence++);
             buffer_write(send_buffer, buffer_u8, 1); // destroy request
             buffer_write(send_buffer, buffer_u16, net_id);
-			buffer_write(send_buffer, buffer_u16, obj_ind);
+            buffer_write(send_buffer, buffer_u16, obj_ind);
 
             network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+			instance_destroy(inst_id);
         }
     }
 }
@@ -467,7 +513,7 @@ function request_item_drop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClip
 	            buffer_write(send_buffer, buffer_s16, ObjectClipAmmo);
 	            buffer_write(send_buffer, buffer_s16, ObjectAmmo);
 	            buffer_write(send_buffer, buffer_f16, ObjectDurability);
-				buffer_write(send_buffer, buffer_u8, ObjectAmount);
+				buffer_write(send_buffer, buffer_u16, ObjectAmount);
 
 	            network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
 	        }

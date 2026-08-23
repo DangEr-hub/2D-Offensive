@@ -82,6 +82,22 @@ statistics_callback = function(){
 	}
 };
 
+ers_callback = function(){
+	if!(instance_exists(oERSTab)){
+		with(zui_main()){
+			var window_id = noone;
+
+			with(objUIWindow){
+				zui_destroy();
+			}
+
+			with(zui_create(zui_get_width() * .59, zui_get_height() * .5, oERSTab, -1)){
+				window_id = id;
+			}
+		}
+	}
+};
+
 settings_callback = function(){
 	if!(instance_exists(oSettingsTab)){
 		with(zui_main()){
@@ -191,11 +207,19 @@ with (zui_main()) {
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
+		caption = "ERS";
+		callback = oController.ers_callback;
+	}
+
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*6, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(button_width);
+		zui_set_height(button_height);
 		caption = "Weapons";
 		callback = oController.weapons_callback;
 	}
 	
-	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*6, objUIButton)){
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*7.5, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
@@ -203,7 +227,7 @@ with (zui_main()) {
 		callback = oController.settings_callback;
 	}
 	
-	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*7.5, objUIButton)){
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*9, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
@@ -211,7 +235,7 @@ with (zui_main()) {
 		callback = oController.keyboard_callback;
 	}
 	
-	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*9, objUIButton)){
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*10.5, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
@@ -220,7 +244,7 @@ with (zui_main()) {
 		callback = oController.sources_callback;
 	}
 	
-	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*10.5, objUIButton)){
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*12, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);
@@ -228,7 +252,7 @@ with (zui_main()) {
 		callback = oController.cases_callback;
 	}
 	
-	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*12, objUIButton)){
+	with(zui_create(zui_get_width() * .1, zui_get_height() * .1 + button_height*13.5, objUIButton)){
 		zui_set_anchor(0.5, 0);
 		zui_set_width(button_width);
 		zui_set_height(button_height);

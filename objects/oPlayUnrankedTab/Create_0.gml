@@ -10,19 +10,34 @@ unranked_description_string = "Commit to a full scale match\nwithout worrying to
 checkbox_gap = 8 * global.GUIMultiplier;
 hard_mode_checkbox_width = 16 * global.GUIMultiplier;
 hard_mode_checkbox_height = 16 * global.GUIMultiplier;
-map_play_button_width = 64 * global.GUIMultiplier;
+map_play_button_width = 72 * global.GUIMultiplier;
 map_play_button_height = 16 * global.GUIMultiplier;
-map_name_array = ["Dust", "Cache"];
-map_image_sprite_height = 64 * global.GUIMultiplier;
+map_image_sprite_height = 72 * global.GUIMultiplier;
 map_image_sprite_width = 128 * global.GUIMultiplier;
 map_image_position_x = 32;
 map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
+if(global.MapID != -1){
+	global.map_rounds[global.MapID][0] = global.game_struct.Rounds_win;
+	global.map_rounds[global.MapID][1] = global.game_struct.Rounds_lost;
+	global.game_struct.Rounds_win = 0;
+	global.game_struct.Rounds_lost = 0;
+}
+
+for(var j=0;j<MAP.Total;j++){
+	map_name_array[j] = global.MapProperties[#j, MAP_STAT.Name];
+}
 
 map_callbacks = [
-    function() { room_goto(rm_Desert); },
-    function() { room_goto(rm_RainForest); },
+    function() {
+		map_init(MAP.Desert);
+		room_goto(rm_Desert);
+	},
+    function() {
+		map_init(MAP.RainForest);
+		room_goto(rm_RainForest);
+	}
 ];
 
 with (zui_create(0, 0, objUIWindowCaption)) {

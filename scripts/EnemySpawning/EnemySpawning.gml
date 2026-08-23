@@ -36,25 +36,31 @@ function is_place_free(xx, yy) {
     return collision_free;
 }
 
-function spawn_enemies(map_index) {
-    var spawn_areas = global.MapProperties[# map_index, MAP_STAT.SpawnAreas];
+function spawn_bots(map_index, spawn_friendly = false) {
+    var area_stat = spawn_friendly ? MAP_STAT.FriendAreas : MAP_STAT.EnemyAreas;
+    var maximum_stat = spawn_friendly ? MAP_STAT.MaxFriends : MAP_STAT.MaxEnemies;
+    var spawn_areas = global.MapProperties[# map_index, area_stat];
+    if(!ds_exists(spawn_areas, ds_type_map)) return false;
+
     var area_keys = ds_map_keys_to_array(spawn_areas);
     var num_areas = array_length(area_keys);
 
-    // Get the maximum number of enemies for this map
-    var max_enemies = global.MapProperties[# map_index, MAP_STAT.MaxEnemies];
-    var enemies_to_spawn = max_enemies;
+    var bots_to_spawn = global.MapProperties[# map_index, maximum_stat];
+    var player_team = instance_exists(global.local_player) ? global.local_player.stats.Team : TEAM.POLICE;
+    var spawned_team = spawn_friendly
+        ? player_team
+        : (player_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE);
 
     for (var j = 0; j < num_areas; j += 1) {
         var area_key = area_keys[j];
         var area = spawn_areas[? area_key];
-        var area_max_enemies = area[4]; // The fifth element is the max number of enemies for this area
+        var area_max_bots = area[4];
 
         //if(is_player_nearby_area(area)){
-	        var enemies_in_area = min(area_max_enemies, enemies_to_spawn);
-	        enemies_to_spawn -= enemies_in_area;
+	        var bots_in_area = min(area_max_bots, bots_to_spawn);
+	        bots_to_spawn -= bots_in_area;
 
-	        for (var i = 0; i < enemies_in_area; i += 1) {
+	        for (var i = 0; i < bots_in_area; i += 1) {
 	            var spawn_x = 0;
 				var spawn_y = 0;
 	            var attempts = 0;
@@ -73,8 +79,11 @@ function spawn_enemies(map_index) {
 	            }
 
 	            if (attempts < max_attempts) {
-	                // Spawn the enemy at the valid point
-	                instance_create_layer(spawn_x, spawn_y, "LivingO", oBot);
+	                var bot = instance_create_layer(spawn_x, spawn_y, "LivingO", oBot);
+				bot.stats.Team = spawned_team;
+				bot.sprite_index = spawned_team == TEAM.TERRORIST
+					? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4)
+					: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
 	            } else {
 					return false;
 	            }
@@ -82,14 +91,18 @@ function spawn_enemies(map_index) {
 		//}
 
         // If no more enemies need to be spawned, break out of the loop
-        if (enemies_to_spawn <= 0) {
+        if (bots_to_spawn <= 0) {
             break;
         }
     }
+
+	return true;
 }
 
-function draw_spawn_areas(map_index) {
-    var spawn_areas = global.MapProperties[# map_index, MAP_STAT.SpawnAreas];
+function draw_spawn_areas(map_index, draw_friendly = false) {
+    var area_stat = draw_friendly ? MAP_STAT.FriendAreas : MAP_STAT.EnemyAreas;
+    var spawn_areas = global.MapProperties[# map_index, area_stat];
+    if(!ds_exists(spawn_areas, ds_type_map)) return;
     var area_keys = ds_map_keys_to_array(spawn_areas);
     var num_areas = array_length(area_keys);
 

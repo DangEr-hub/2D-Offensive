@@ -30,7 +30,12 @@ label_color = c_white;
 
 line_width = 2;
 point_radius = 3;
-label_decimals = 0;
+label_decimals = 1;
+x_label_decimals = 1;
+y_label_decimals = 1;
+x_axis_name = "";
+y_axis_name = "";
+background_margin = 0.1;
 
 font = set_font("GUI_small");
 

@@ -10,3 +10,5 @@ Angle = 0;
 Sprite = spr_Explosion;
 alarm[0] = round((sprite_get_number(Sprite) - 2) / image_speed);
 ExplosionPower = 1;
+
+create_haze_effect(x, y, 10 * game_get_speed(gamespeed_fps), id, "Circle", true, 256);

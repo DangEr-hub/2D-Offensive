@@ -137,8 +137,8 @@ function InventoryInit() {
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
 		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
-		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, MolotovGrenade, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Total
+		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Scar, MolotovGrenade, Bomb, Total
 	}
 
 	enum ItemStat{
@@ -211,9 +211,9 @@ function ItemAmountSubstract(ID, Amount){
 }
 
 function ItemAddWeight(ID, OtherID){
-	global.player_stats_struct.Weight -= global.ItemIndex[# OtherID, ItemStat.Weight];
-	global.player_stats_struct.Weight += global.ItemIndex[# ID, ItemStat.Weight];
-	global.player_stats_struct.Weight = clamp(global.player_stats_struct.Weight, 0, global.player_stats_struct.Max_weight);
+	global.player_stats.Weight -= global.ItemIndex[# OtherID, ItemStat.Weight];
+	global.player_stats.Weight += global.ItemIndex[# ID, ItemStat.Weight];
+	global.player_stats.Weight = clamp(global.player_stats.Weight, 0, global.player_stats.Max_weight);
 }
 
 function ItemDrop(ID, PositionX, PositionY, ObjectAmmo = -1, ObjectClipAmmo = -1, ObjectDurability = -1, ObjectAmount = 1, OWSA = -1, OWBA = -1, OWGA = -1, OWsuppressorA = -1){
@@ -297,6 +297,9 @@ function WeaponDrop(ID, ObjectType){
 		for(var i = 0;i<Index.Total;i++){
 			global.Inventory[# ID, i] = 0;
 		}
+		with(global.local_player){
+			weapon_network_propagate();
+		}
 	}
 }
 
@@ -305,7 +308,7 @@ function ArmourDrop(ID, ObjectType){
 		if(global.local_player.ToggleNightVision == true){
 			global.local_player.ToggleNightVision = false;
 		}
-		global.player_stats_struct.Weight -= global.ItemIndex[# global.Inventory[# ID, Index.slot_id], ItemStat.Weight];
+		global.player_stats.Weight -= global.ItemIndex[# global.Inventory[# ID, Index.slot_id], ItemStat.Weight];
 		for(var i = 0;i<Index.Total;i++){
 			global.Inventory[# ID, i] = 0;
 		}
@@ -401,8 +404,26 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 				
 		#region Item use
 		switch(Id){
+			case Item.Bomb:
+				if (stats.Team == TEAM.TERRORIST && !global.bomb_planted && !Healing && !planting_pending && can_plant) {
+					
+					if(planting == false){
+						planting = true;
+						planting_value = 0;
+						planting_slot = slot;
+						CanShoot = false;
+						player_can_shoot = false;
+					}else{
+						planting = false;
+						planting_value = 0;
+						planting_slot = slot;
+						CanShoot = true;
+						player_can_shoot = true;
+					}
+				}
+			break;
 			case Item.HealingKit:
-			    if(!Healing && stats.Health_points < global.player_stats_struct.Max_health){
+			    if(!Healing && stats.Health_points < global.player_stats.Max_health){
 			        global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			        HealingItemId = Item.HealingKit; Healing = true; ItemAmountSubstract(slot, 1);
 			    }

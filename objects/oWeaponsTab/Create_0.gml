@@ -265,11 +265,11 @@ refresh_weapon_ui = function(){
 
 draw_set_font(set_font("Console"));
 weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
-			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.MP9, Item.MP7, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.CZ75,
+			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.MP9, Item.MP7, Item.P90, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.CZ75,
 			Item.Spas, Item.Javelin
 		  ];
 wpn = weapons[0];
-wpn_x = zui_get_width() * .25;
+wpn_x = global.GUIMultiplier >= 2 ? zui_get_width() * .25 : zui_get_width() * .2;
 wpn_y = zui_get_height() * .3;
 
 /* INIT */
@@ -289,20 +289,20 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.ammo == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.ammo = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.ammo = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.MaxAmmo] = ceil(global.ItemIndex[# w_id, ItemStat.BaseMaxAmmo] * AMMO_UPG);
                     oWeaponsTab.ammo_upg.color = c_lime;
                     oWeaponsTab.ui_objects[1].color = c_lime;
                 }
             } else {
-                upg_data.ammo = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.ammo = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.MaxAmmo] = global.ItemIndex[# w_id, ItemStat.BaseMaxAmmo];        
                 oWeaponsTab.ammo_upg.color = c_white;
                 oWeaponsTab.ui_objects[1].color = c_white;
             }
             oWeaponsTab.ammo_upg.caption = (upg_data.ammo ? "-" : "+") + string((AMMO_UPG - 1) * 100) + " % Magazine capacity";
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[1].caption = "Ammo: " + string(global.ItemIndex[# w_id, ItemStat.MaxAmmo]) + "/" + string(global.ItemIndex[# w_id, ItemStat.ClipAmmo]);
         }
     },
@@ -311,20 +311,20 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.reload == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.reload = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.reload = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.ReloadSpeed] = round(global.ItemIndex[# w_id, ItemStat.BaseReloadSpeed] * RELOAD_UPG);
                     oWeaponsTab.reload_upg.color = c_lime;
                     oWeaponsTab.ui_objects[12].color = c_lime;
                 }
             } else {
-                upg_data.reload = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.reload = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.ReloadSpeed] = global.ItemIndex[# w_id, ItemStat.BaseReloadSpeed];
                 oWeaponsTab.reload_upg.color = c_white;
                 oWeaponsTab.ui_objects[12].color = c_white;
             }
             oWeaponsTab.reload_upg.caption = (upg_data.reload ? "-" : "+") + string_format((1 - RELOAD_UPG) * 100, 0, 1) + " % Reload speed";   
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[12].caption = "Reload time: " + string_format(global.ItemIndex[# w_id, ItemStat.ReloadSpeed] / 60, 0, 1) + " s";
         }
     },
@@ -333,20 +333,20 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.equip == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.equip = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.equip = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.EquipTime] = round(global.ItemIndex[# w_id, ItemStat.BaseEquipTime] * EQUIP_UPG);
                     oWeaponsTab.equip_upg.color = c_lime;
                     oWeaponsTab.ui_objects[13].color = c_lime;
                 }
             } else {
-                upg_data.equip = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.equip = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.EquipTime] = global.ItemIndex[# w_id, ItemStat.BaseEquipTime];
                 oWeaponsTab.equip_upg.color = c_white;
                 oWeaponsTab.ui_objects[13].color = c_white;
             }
             oWeaponsTab.equip_upg.caption = (upg_data.equip ? "-" : "+") + string_format((1 - EQUIP_UPG) * 100, 0, 1) + " % Equip speed";
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[13].caption = "Equip time: " + string_format(global.ItemIndex[# w_id, ItemStat.EquipTime] / 60, 0, 1) + " s";
         }
     },
@@ -355,20 +355,20 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.movement == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.movement = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.movement = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.MovingSpdMul] = min(global.ItemIndex[# w_id, ItemStat.BaseMovingSpdMul] * MV_UPG, 1);
                     oWeaponsTab.move_upg.color = c_lime;
                     oWeaponsTab.ui_objects[9].color = c_lime;
                 }
             } else {
-                upg_data.movement = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.movement = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.MovingSpdMul] = global.ItemIndex[# w_id, ItemStat.BaseMovingSpdMul];
                 oWeaponsTab.move_upg.color = c_white;
                 oWeaponsTab.ui_objects[9].color = c_white;
             }
             oWeaponsTab.move_upg.caption = (upg_data.movement ? "-" : "+") + string_format((MV_UPG - 1) * 100, 0, 1) + " % Movement speed";
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[9].caption = "Movement speed: " + string_format(MOVE_SPD * global.ItemIndex[# w_id, ItemStat.MovingSpdMul], 0, 1) + " units/s";
         }
     },
@@ -377,20 +377,20 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.penetration == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.penetration = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.penetration = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.PenetrationPower] = min(global.ItemIndex[# w_id, ItemStat.BasePenetrationPower] * PEN_UPG, 1);
                     oWeaponsTab.pen_upg.color = c_lime;
                     oWeaponsTab.ui_objects[11].color = c_lime;
                 }
             } else {
-                upg_data.penetration = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.penetration = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.PenetrationPower] = global.ItemIndex[# w_id, ItemStat.BasePenetrationPower];
                 oWeaponsTab.pen_upg.color = c_white;
                 oWeaponsTab.ui_objects[11].color = c_white;
             }
             oWeaponsTab.pen_upg.caption = (upg_data.penetration ? "-" : "+") + string_format((PEN_UPG - 1) * 100, 0, 1) + " % Armor penetration";
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[11].caption = "Penetration power: " + string_format(global.ItemIndex[# w_id, ItemStat.PenetrationPower] * 100, 0, 1) + " %";
         }
     },
@@ -399,21 +399,21 @@ upgrades = {
         callback: function() {
             var w_id = oWeaponsTab.wpn; var upg_data = global.built_upgrades[$ string(w_id)];
             if (upg_data.damage == false) {
-                if (global.player_stats_struct.Diamonds >= self.cost) {
-                    upg_data.damage = true; global.player_stats_struct.Diamonds -= self.cost;
+                if (global.player_stats.Diamonds >= self.cost) {
+                    upg_data.damage = true; global.player_stats.Diamonds -= self.cost;
                     global.ItemIndex[# w_id, ItemStat.Damage] = global.ItemIndex[# w_id, ItemStat.BaseDamage] * DMG_UPG;
                     oWeaponsTab.dmg_upg.color = c_lime;
                     for(var i=4; i<=8; i++) oWeaponsTab.ui_objects[i].color = c_lime;
                 }
             } else {
-                upg_data.damage = false; global.player_stats_struct.Diamonds += self.cost;
+                upg_data.damage = false; global.player_stats.Diamonds += self.cost;
                 global.ItemIndex[# w_id, ItemStat.Damage] = global.ItemIndex[# w_id, ItemStat.BaseDamage];
                 oWeaponsTab.dmg_upg.color = c_white;
                 for(var i=4; i<=8; i++) oWeaponsTab.ui_objects[i].color = c_white;
             }
             var bd = global.ItemIndex[# w_id, ItemStat.Damage];
             oWeaponsTab.dmg_upg.caption = (upg_data.damage ? "-" : "+") + string_format((DMG_UPG - 1) * 100, 0, 1) + " % Base damage";
-            oWeaponsTab.diamonds.caption = string(global.player_stats_struct.Diamonds);
+            oWeaponsTab.diamonds.caption = string(global.player_stats.Diamonds);
             oWeaponsTab.ui_objects[4].caption = "Base damage: " + string_format(bd, 0, 1);
             oWeaponsTab.ui_objects[5].caption = "Body damage: " + string_format(bd * BODY_MULTIPLIER, 0, 1);
             oWeaponsTab.ui_objects[6].caption = "Head damage: " + string_format(bd * HEADSHOT_MULTIPLIER, 0, 1);
@@ -430,7 +430,7 @@ with(diamonds){
 	font = set_font("Console");
 	icon_sprite_index = spr_Coin;
 	icon_image_index = 1;
-	caption = string(global.player_stats_struct.Diamonds);
+	caption = string(global.player_stats.Diamonds);
 }
 
 ui_objects[0] = zui_create(zui_get_width() * .25, zui_get_height() * .07, objUILabel);	
@@ -497,8 +497,8 @@ refresh_weapon_ui();
 /***************************************************/
 
 /* --- UI SETUP --- */
-b_w = 96 * global.GUIMultiplier;
-b_h = 32 * global.GUIMultiplier;
+b_w = max(96 * global.GUIMultiplier, 140);
+b_h = max(32 * global.GUIMultiplier, 48);
 upg_gap = b_w * 1.25;
 upg_x = zui_get_width() * .075;
 upg1_y = zui_get_height() * .175;
@@ -580,7 +580,7 @@ with(dmg_upg){
 
 
 /* Arrows */
-var arrow_w = 32 * global.GUIMultiplier;
+var arrow_w = 48 * global.GUIMultiplier;
 with(zui_create(zui_get_width() * .25 + arrow_w/1.95, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(arrow_w);
@@ -627,7 +627,6 @@ dmg_graph_callback = function(){
 	
 	if!(instance_exists(oWeaponsTab.dmg_graph)){
 	oWeaponsTab.dmg_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
-	
 	/*with(dmg_graph){
 		zui_set_depth(-1000);
 		scale = 10;
@@ -649,7 +648,9 @@ dmg_graph_callback = function(){
 
 	    values_x = [];
 	    values_y = [];
-
+		x_axis_name = "Range";
+		y_axis_name = "Damage";
+			
 	    var sample_step = 50;
 	    var weapon_range = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range];
 	    var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Damage];
@@ -691,6 +692,8 @@ range_graph_callback = function(){
 	    zui_set_depth(-1000);
 	    values_x = [];
 	    values_y = [];
+		x_axis_name = "Range";
+		y_axis_name = "Inaccuracy";
 	    var sample_step = 50;
 	    var weapon_range = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Range];
 	    var base_spread = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.Inaccuracy];
@@ -729,7 +732,7 @@ with(show_dmg_graph){
 show_range_graph = zui_create(graph_x, graph_y + text_height*3, objUIButton);
 with(show_range_graph){
     zui_set_size(oWeaponsTab.b_w*1.25, oWeaponsTab.b_h);
-	caption = "Accuracy function";
+	caption = "Inaccuracy function";
     color = c_white;
     callback = oWeaponsTab.range_graph_callback;
 }

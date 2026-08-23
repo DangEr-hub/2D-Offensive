@@ -28,6 +28,7 @@ if surface_exists(haze_final_surface) surface_free(haze_final_surface);
 if surface_exists(nightvision_surface) surface_free(nightvision_surface);
 if surface_exists(bloom_surface1) surface_free(bloom_surface1);
 if surface_exists(bloom_surface2) surface_free(bloom_surface2);
+if surface_exists(final_surface) surface_free(final_surface);
 
 
 if(sprite_exists(BackGround) && BackGround > -1){sprite_delete(BackGround);}

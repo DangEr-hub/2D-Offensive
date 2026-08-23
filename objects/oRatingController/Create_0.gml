@@ -13,6 +13,7 @@ all_shots = 0;
 player_win = false;
 headshots = 0;
 kills = 0;
+assists = 0;
 current_round = 0;
 playing_time = 0;
 round_ended = false;

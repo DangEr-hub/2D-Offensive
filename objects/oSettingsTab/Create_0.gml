@@ -1,4 +1,6 @@
 event_inherited();
+ingame_overlay = false;
+overlay_black = noone;
 setting_tab_width = 512 * global.GUIMultiplier;
 setting_tab_height = 512 * global.GUIMultiplier;
 
@@ -52,7 +54,7 @@ window_resolution_callback = function() {
 };
 
 gui_scale_callback = function() {
-    var gui_scales = [1, 1.5, 2];
+    var gui_scales = [1, 2];
     var closest_index = 0;
     var smallest_diff = abs(global.GUIMultiplier - gui_scales[0]);
     
@@ -161,7 +163,7 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 	draggable = 1;
 }
 
-with (zui_create(position_x + gap, position_y - text_height/4, objUISlider)) {
+with (zui_create(position_x + gap, round(position_y - text_height/4), objUISlider)) {
 	zui_set_anchor(0.5, 0);
 	zui_set_width(256);
 
@@ -230,7 +232,7 @@ with(zui_create(position_x, position_y + text_height*3, objUILabel)){
 	caption = other.toggle_particles_string;
 }
 
-toggle_particles_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*3, objUIButton);
+toggle_particles_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*3), objUIButton);
 with(toggle_particles_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);
@@ -268,15 +270,33 @@ with(zui_create(position_x + gap*.75, position_y + text_height*4 - text_height/3
 }
 #endregion
 
-#region Fullscreen
+#region Dynamic crosshair
 checkbox_size = 16 * global.GUIMultiplier;
-fullscreen_string = "Toggle fullscreen: ";
 with(zui_create(position_x, position_y + text_height*5, objUILabel)){
+	color = c_white;
+	caption = "Dynamic crosshair: ";
+}
+
+with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, objUICheckbox)){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = global.DynamicCrosshair;
+	callback = function(){
+		value = !value;
+		global.DynamicCrosshair = value;
+		save_game();
+	};
+}
+#endregion
+
+#region Fullscreen
+fullscreen_string = "Toggle fullscreen: ";
+with(zui_create(position_x, position_y + text_height*6, objUILabel)){
 	color = c_white;
 	caption = other.fullscreen_string;
 }
 
-with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, objUICheckbox)){
+with(zui_create(position_x + gap, position_y + text_height*6 - checkbox_size/2, objUICheckbox)){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
 	value = window_get_fullscreen();
@@ -289,28 +309,28 @@ with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, 
 
 #region Player name
 player_name_string = "Player’s name: ";
-with(zui_create(position_x, position_y + text_height*6, objUILabel)){
+with(zui_create(position_x, position_y + text_height*7, objUILabel)){
 	color = c_white;
 	caption = other.player_name_string;
 }
 
-with(zui_create(position_x + gap*.75, position_y + text_height*6 - text_height/3, objUITextInput)){
+with(zui_create(position_x + gap*.75, position_y + text_height*7 - text_height/3, objUITextInput)){
 	zui_set_anchor(0, 0);
-	init_text = global.player_stats_struct.Name;
+	init_text = global.player_stats.Name;
 	max_string_length = 16;
 	callback = function(InputText){
-		global.player_stats_struct.Name = InputText;
+		global.player_stats.Name = InputText;
 	};
 }
 #endregion
 
 #region Window size
-with(zui_create(position_x, position_y + text_height*7, objUILabel)){
+with(zui_create(position_x, position_y + text_height*8, objUILabel)){
 	color = c_white;
 	caption = "Window size: ";
 }
 
-window_resolution_button = zui_create(position_x + gap, position_y + text_height * 6.5, objUIButton);
+window_resolution_button = zui_create(position_x + gap, position_y + text_height * 7.5, objUIButton);
 
 with (window_resolution_button) {
     zui_set_anchor(0.5, 0);
@@ -325,12 +345,12 @@ with (window_resolution_button) {
 #endregion
 
 #region GUI scale
-with(zui_create(position_x, position_y + text_height*8, objUILabel)){
+with(zui_create(position_x, position_y + text_height*9, objUILabel)){
 	color = c_white;
 	caption = "GUI scale: ";
 }
 
-gui_scale_button = zui_create(position_x + gap, position_y - text_height/4 + text_height*8, objUIButton);
+gui_scale_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*9), objUIButton);
 with(gui_scale_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.GUIMultiplier);

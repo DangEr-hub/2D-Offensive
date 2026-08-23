@@ -29,7 +29,7 @@ captions = [
 	"Prone", "Show attachments", "Select bot", "Command bot",
 	"Open buy menu", "Hold stamina", "Drop weapon",
 	"Open console", "Knife light attack", "Knife heavy attack", "Use item",
-	"Scope",
+	"Scope", "Show scoreboard",
 ];
 
 var rows = floor(tab_height/text_height) - 2;

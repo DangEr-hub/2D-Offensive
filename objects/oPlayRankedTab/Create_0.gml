@@ -19,10 +19,10 @@ map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
 
 if(global.MapID != -1){
-	global.map_rounds[global.MapID][0] = global.rating_struct.Rounds_win;
-	global.map_rounds[global.MapID][1] = global.rating_struct.Rounds_lost;
-	global.rating_struct.Rounds_win = 0;
-	global.rating_struct.Rounds_lost = 0;	
+	global.map_rounds[global.MapID][0] = global.game_struct.Rounds_win;
+	global.map_rounds[global.MapID][1] = global.game_struct.Rounds_lost;
+	global.game_struct.Rounds_win = 0;
+	global.game_struct.Rounds_lost = 0;	
 }
 
 for(var j=0;j<MAP.Total;j++){
@@ -32,11 +32,11 @@ for(var j=0;j<MAP.Total;j++){
 
 map_callbacks = [
     function() { 
-		set_map_rounds(MAP.Desert);
+		map_init(MAP.Desert);
 		room_goto(rm_Desert);
 	},
     function() { 
-		set_map_rounds(MAP.RainForest);
+		map_init(MAP.RainForest);
 		room_goto(rm_RainForest); 
 	}
 ];
@@ -85,9 +85,24 @@ with (zui_create(play_unranked_tab_width * .85 + hard_mode_checkbox_width + chec
 	caption = "Hardmode";
 }
 
-with (zui_create(zui_get_width() * .1, zui_get_height() * .7, objUIButton)) {
+network_button_width = map_play_button_width * 1.5;
+network_button_height = map_play_button_height;
+network_center_x = zui_get_width() * .5;
+host_button_y = zui_get_height() * .7;
+join_row_y = zui_get_height() * .8;
+network_control_gap = 12 * global.GUIMultiplier;
+ip_label_text = "IP address: ";
+ip_label_width = string_width(ip_label_text);
+ip_input_width = 128 * global.GUIMultiplier;
+ip_input_height = 32;
+join_row_width = ip_label_width + network_control_gap + ip_input_width + network_control_gap + network_button_width;
+join_row_x = network_center_x - join_row_width * .5;
+ip_input_x = join_row_x + ip_label_width + network_control_gap;
+join_button_x = ip_input_x + ip_input_width + network_control_gap;
+
+with (zui_create(network_center_x - network_button_width * .5, host_button_y, objUIButton)) {
 	zui_set_anchor(0, 0);
-	zui_set_size(other.map_play_button_width * 1.5, other.map_play_button_height);
+	zui_set_size(other.network_button_width, other.network_button_height);
 
 	caption = "Host server";
 	callback = function(){
@@ -106,9 +121,22 @@ with (zui_create(zui_get_width() * .1, zui_get_height() * .7, objUIButton)) {
 	};
 }
 
-with (zui_create(zui_get_width() * .1, zui_get_height() * .8, objUIButton)) {
+with (zui_create(join_row_x, join_row_y + network_button_height * .5, objUILabel)) {
+	color = c_white;
+	caption = other.ip_label_text;
+}
+
+ip_address_input = zui_create(ip_input_x, join_row_y + (network_button_height - ip_input_height) * .5, objUITextInput);
+with (ip_address_input) {
 	zui_set_anchor(0, 0);
-	zui_set_size(other.map_play_button_width * 1.5, other.map_play_button_height);
+	zui_set_size(other.ip_input_width, other.ip_input_height);
+	init_text = global.saved_server_ip;
+	max_string_length = 15;
+}
+
+with (zui_create(join_button_x, join_row_y, objUIButton)) {
+	zui_set_anchor(0, 0);
+	zui_set_size(other.network_button_width, other.network_button_height);
 
 	caption = "Join server";
 	callback = function(){
@@ -117,7 +145,12 @@ with (zui_create(zui_get_width() * .1, zui_get_height() * .8, objUIButton)) {
 		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
 		}
     
-		var ip_address = "127.0.0.1"; // For local testing
+		var ip_address = string_trim(oPlayRankedTab.ip_address_input.text);
+		if(ip_address == ""){
+			ip_address = "127.0.0.1";
+		}
+		global.saved_server_ip = ip_address;
+		save_game();
 		var port = 50000;  
     
 		// Connect to server

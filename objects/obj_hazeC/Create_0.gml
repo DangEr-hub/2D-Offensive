@@ -30,6 +30,8 @@ surfH = surface_get_height(application_surface);
 
 hazeSurf = surface_create(surfW, surfH);
 haze_surf_clear(hazeSurf);
+hazePointSurf = surface_create(surfW, surfH);
+haze_surf_clear(hazePointSurf);
 
 //points
 hazePoints = ds_list_create();

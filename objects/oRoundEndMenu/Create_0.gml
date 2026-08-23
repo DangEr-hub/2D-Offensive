@@ -16,37 +16,44 @@ title_position_x = zui_get_width() * .5;
 title_position_y = zui_get_height() * .1 + 24/global.GUIMultiplier;
 base_position_y = zui_get_height() * .2 + 24/global.GUIMultiplier;
 gap = 128;
+test_respawn = IS_NET
+	&& instance_exists(global.local_player)
+	&& global.local_player.stats.Health_points <= 0
+	&& (!oNetworkManager.is_server || !oNetworkManager.round_resolved);
 
-if(oRatingController.player_win == false){
+if(test_respawn){
+	title_color = c_gray;
+	title_string = "Spectating";
+}else if(instance_exists(oRatingController) && oRatingController.player_win == false){
 	title_color = c_red;
 	title_string = "Round lost";	
 }
 
 #region Rank callbacks
 rank_callbacks = [    
-    function(){ ui_show_popup(global.RankIndex[# RankType.Unranked, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.Unranked, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverI, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverIII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverIV, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverIV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverV, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SilverMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SilverMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GoldI, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GoldI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GoldII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GoldII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GoldIII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GoldIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GoldIV, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GoldIV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GoldMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GoldMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondI, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.DiamondI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.DiamondII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondIII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.DiamondIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.DiamondMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultEliteI, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.AssaultEliteI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultEliteII, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.AssaultEliteII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.AssaultMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.VersatileMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.VersatileMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.ExperiencedVersatileMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.ExperiencedVersatileMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.SupremeMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.SupremeMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
-    function(){ ui_show_popup(global.RankIndex[# RankType.GlobalMaster, RankStat.Name], "Min eggy points: " + string(global.RankIndex[# RankType.GlobalMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); }
+    function(){ ui_show_popup(global.RankIndex[# RankType.Unranked, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.Unranked, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverI, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverIII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverIV, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverIV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverV, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SilverMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SilverMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GoldI, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GoldI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GoldII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GoldII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GoldIII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GoldIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GoldIV, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GoldIV, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GoldMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GoldMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondI, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.DiamondI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.DiamondII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondIII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.DiamondIII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.DiamondMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.DiamondMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultEliteI, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.AssaultEliteI, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultEliteII, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.AssaultEliteII, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.AssaultMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.AssaultMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.VersatileMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.VersatileMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.ExperiencedVersatileMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.ExperiencedVersatileMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.SupremeMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.SupremeMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); },
+    function(){ ui_show_popup(global.RankIndex[# RankType.GlobalMaster, RankStat.Name], "Min R: " + string(global.RankIndex[# RankType.GlobalMaster, RankStat.Ep]), "OK", -1, 288 * global.GUIMultiplier, 64 * global.GUIMultiplier, -1, -1); }
 ];
 
 #endregion
@@ -90,6 +97,7 @@ popup_main_menu_callback_positive = function(){
 	}
 	save_game();
 	audio_stop_all();
+	with (oNetworkManager) instance_destroy();
 	room_goto(rm_main_menu);
 };
 
@@ -109,8 +117,8 @@ draw_set_font(set_font("GUI_small"));
 #region Current player rank
 text_gap = sprite_get_height(spr_Icons) * global.GUIMultiplier;
 rank_position = 0;
-if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
-	rank_position = get_rank(global.rating_struct.Player_ep);
+if(global.game_struct.Played_games >= TRACKING_PERIOD/2){
+	rank_position = get_rank(global.game_struct.Player_ep);
 }
 
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
@@ -133,7 +141,7 @@ with (zui_create(current_rank_x - string_width("VS")/2, base_position_y + rank_i
 	caption = "VS";
 }
 
-rank_position = get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+rank_position = get_rank(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
 rank_image_size_width = sprite_get_width(spr_ranks) * global.GUIMultiplier;
 rank_image_size_height = sprite_get_height(spr_ranks) * global.GUIMultiplier;
 current_rank_x = zui_get_width() * .5;
@@ -153,7 +161,9 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y + ran
 offset_y = clamp(128 * global.GUIMultiplier, 144, 224);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y, objUIButton)){
+button_spacing = round(button_height * 1.4);
+button_start_y = round(zui_get_height() * .7 - offset_y);
+with(zui_create(zui_get_width() * .5, button_start_y, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -170,7 +180,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y, objUIBut
 	};
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_height*1.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -187,15 +197,25 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_
 	};
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_height*3, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*2, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Respawn";
+	caption = "Settings";
+	callback = function(){
+		open_ingame_settings();
+	};
+}
+
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIButton, -999)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = other.test_respawn ? "Respawn" : "Next round";
 	callback = other.respawn_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_height*4.5, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -203,7 +223,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .7 - offset_y + button_height*6, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

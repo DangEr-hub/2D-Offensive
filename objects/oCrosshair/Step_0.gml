@@ -26,7 +26,7 @@ if(instance_exists(global.local_player)){
 		WobbleCrosshairMultiplier = lerp(WobbleCrosshairMultiplier, 0, WobbleResetSpeed);
 	}
 	
-	if (global.local_player.stats.Stamina_points <= global.player_stats_struct.Max_stamina * 0.75) {
+	if (global.local_player.stats.Stamina_points <= global.player_stats.Max_stamina * 0.75) {
 	    if (global.local_player.ScopeIn == true) {
 	        WobbleX += 5*max(100/(global.local_player.stats.Stamina_points + 1), 3);
 	        WobbleY += 5*max(100/(global.local_player.stats.Stamina_points + 1), 3) * 1.5;
@@ -191,8 +191,29 @@ if(instance_exists(global.local_player)){
 		#endregion
 		
 	}
-	x = clamp(x,0,room_width-sprite_width);
-	y = clamp(y,0,room_height-sprite_height);
+	// Fade only the recoil offset near the opposite viewport edge. This keeps
+	// the spray pattern intact while allowing the crosshair to reach every edge.
+	var view_left = oDraw.ViewX;
+	var view_top = oDraw.ViewY;
+	var view_right = view_left + oDraw.ViewW;
+	var view_bottom = view_top + oDraw.ViewH;
+	var recoil_from_mouse_x = x - mouse_x;
+	var recoil_from_mouse_y = y - mouse_y;
+
+	if(recoil_from_mouse_x < 0){
+		recoil_from_mouse_x *= clamp((view_right - mouse_x) / max(1, abs(recoil_from_mouse_x)), 0, 1);
+	}else if(recoil_from_mouse_x > 0){
+		recoil_from_mouse_x *= clamp((mouse_x - view_left) / max(1, abs(recoil_from_mouse_x)), 0, 1);
+	}
+
+	if(recoil_from_mouse_y < 0){
+		recoil_from_mouse_y *= clamp((view_bottom - mouse_y) / max(1, abs(recoil_from_mouse_y)), 0, 1);
+	}else if(recoil_from_mouse_y > 0){
+		recoil_from_mouse_y *= clamp((mouse_y - view_top) / max(1, abs(recoil_from_mouse_y)), 0, 1);
+	}
+
+	x = clamp(mouse_x + recoil_from_mouse_x, view_left, view_right);
+	y = clamp(mouse_y + recoil_from_mouse_y, view_top, view_bottom);
 	#endregion
 	
 }
@@ -203,3 +224,6 @@ if(global.DynamicCrosshair == true){
 	AlphaMul = .25;
 }
 #endregion
+
+x = round(x);
+y = round(y);

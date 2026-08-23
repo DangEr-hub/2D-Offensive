@@ -1,5 +1,9 @@
 /// @description Create objects
 if(is_local == true){
+	if (!instance_exists(oEconomics)) {
+		instance_create_layer(x, y, "OtherO", oEconomics);
+	}
+
 	if(global.DrawParticles == true){
 		instance_create_layer(x, y, "ItemsO", oParticleSurface);
 		instance_create_layer(x, y, "OtherO", oParticleSystem);

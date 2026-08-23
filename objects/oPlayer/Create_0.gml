@@ -1,4 +1,6 @@
-//haze_start(true, false);
+if(!instance_exists(obj_hazeC)){
+	haze_start(true, false);
+}
 event_inherited();
 current_building_id = -1;
 door_cooldown = -1;
@@ -8,7 +10,6 @@ equip_time_max = -1;
 prev_anim_base = anim_base;
 near_explosion_timer = -1;
 WeaponDistance = 0;
-team = TEAM.POLICE;
 selected_bot = noone;
 bot_select_index = -1;
 bot_select_list = ds_list_create();
@@ -61,10 +62,18 @@ ReloadTimer = -1;
 FlashedAlpha = 0;
 FlashedBackGround = -1;
 ToggleNightVision = false;
-BaseHealingPower = round(global.player_stats_struct.Max_health/50);
+BaseHealingPower = round(global.player_stats.Max_health/50);
 HealingTime = -1;
 HealingItemId = Item.None;
 Healing = false;
+planting = false;
+planting_value = 0;
+planting_max = 3 * game_get_speed(gamespeed_fps);
+planting_slot = -1;
+planting_pending = false;
+planting_request_timer = -1;
+planting_x = x;
+planting_y = y;
 ToggleInfraVision = false;
 AimPunchDir = 0;
 KickBack = 0;
@@ -90,7 +99,11 @@ triangle_point_distance = 1024;
 Name = "DangEr";
 WX = 8;
 WY = 8;
-stats = create_player(global.player_stats_struct.Max_health, global.player_stats_struct.Max_stamina, global.player_stats_struct.Name);
+can_plant = false;
+stats = create_player(global.player_stats.Max_health, global.player_stats.Max_stamina, global.player_stats.Name, global.player_stats.Player_team);
+character_sprite_team = stats.Team;
+character_sprite_seed = global.player_character_seed;
+sprite_index = get_player_team_sprite(character_sprite_team, character_sprite_seed);
 
 global.Hostage = false;
 
@@ -193,6 +206,8 @@ if(global.ranked_game == true){
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 Shield = instance_create_depth(x + WX, y + WY, depth - 1, oShield);
+
+instance_create_depth(x, y, 200, oBombArea);
 
 global.local_player = get_local_player();
 

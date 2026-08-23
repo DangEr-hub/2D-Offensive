@@ -3,7 +3,7 @@ var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
 
 
-if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !instance_exists(oBuyMenu)){
+if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !spectating && !instance_exists(oBuyMenu)){
 	
 	
 	#region Draw lens flare
@@ -39,15 +39,21 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var captureHeight = ScopeRadius * 4;
 			var captureX = (oCrosshair.crosshair_x - captureWidth / 2);
 			var captureY = (oCrosshair.crosshair_y - captureHeight / 2);
-
-			// Check if surface exists and then set its target
-			if (surface_exists(zoomSurface)) {
-			    surface_set_target(zoomSurface);
-			    draw_surface_part_ext(application_surface, captureX, captureY, captureWidth, captureHeight, 0, 0, 1, 1, c_olive, 1);
-			    surface_reset_target();
-			} else {
-			    zoomSurface = surface_create(captureWidth, captureHeight);
+			var scope_source_surface = application_surface;
+			if(surface_exists(final_surface)){
+				scope_source_surface = final_surface;
 			}
+
+			if(!surface_exists(zoomSurface)){
+				zoomSurface = surface_create(captureWidth, captureHeight);
+			}else if(surface_get_width(zoomSurface) != captureWidth || surface_get_height(zoomSurface) != captureHeight){
+				surface_resize(zoomSurface, captureWidth, captureHeight);
+			}
+
+			surface_set_target(zoomSurface);
+			draw_clear_alpha(c_black, 0);
+			draw_surface_part_ext(scope_source_surface, captureX, captureY, captureWidth, captureHeight, 0, 0, 1, 1, c_olive, 1);
+			surface_reset_target();
 
 			// Set the fish-eye shader
 			shader_set(shd_FishEye);
@@ -96,6 +102,10 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		}
 		if(surface_exists(BlackoutSurface)){
 			surface_free(BlackoutSurface);	
+		}
+		if(surface_exists(final_surface)){
+			surface_free(final_surface);
+			final_surface = -1;
 		}
 		if(ZoomValue != 1){
 			ZoomValue = 1;	
@@ -295,45 +305,53 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				var select_x = (headshot_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				var select_y = (headshot_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-				var default_xx = HealthX - sprite_width/2;
-				var default_yy = HealthY - sprite_height*.75 - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1;
-				var bar_spacing = sprite_get_height(spr_ranks)*.5 * global.GUIMultiplier;
+				var default_xx = round(HealthX - sprite_width/2);
+				var default_yy = round(HealthY - sprite_height*.75 - sprite_get_height(spr_HealthBar)*global.GUIMultiplier*1.1);
+				var bar_spacing = round(sprite_get_height(spr_ranks)*.5 * global.GUIMultiplier);
 				draw_set_font(set_font("Console"));
 				draw_set_color(c_black);
 				
 				if(global.draw_damage == true){
-					draw_sprite_ext(spr_HealthBar, 0, HealthX - round(sprite_width/2), HealthY - sprite_height/2, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 3, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Damage_health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
-					draw_sprite_ext(spr_HealthBar, 2, HealthX - round(sprite_width/2), HealthY - sprite_height/2, (stats.Health_points/stats.Max_health_points) * global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);	
+					var health_bar_x = round(HealthX - sprite_width/2);
+					var health_bar_y = round(HealthY - sprite_height/2);
+					draw_sprite_ext(spr_HealthBar, 0, health_bar_x, health_bar_y, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+					draw_health_bar_fill(3, health_bar_x, health_bar_y, stats.Damage_health_points/stats.Max_health_points);
+					draw_health_bar_fill(2, health_bar_x, health_bar_y, stats.Health_points/stats.Max_health_points);
 				}
 				
 				if(id == global.local_player.selected_bot){
 					draw_sprite_ext(spr_BotSelect, 0, select_x, select_y, 0.5 * global.GUIMultiplier, 0.5 * global.GUIMultiplier, false, c_white, 1);
 				}
 
+				if (planting) {
+					draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+					draw_health_bar_fill(6, default_xx, default_yy, planting_value / max(1, planting_max), global.GUIMultiplier, c_orange);
+					default_yy -= bar_spacing;
+				}
+
 				if(healing == true){
 					draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 5, default_xx, default_yy,
-					(healing_time/global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					var healing_duration = max(1, global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]);
+					draw_health_bar_fill(5, default_xx, default_yy, healing_time/healing_duration);
 					default_yy -= bar_spacing;
 				}
 
 				if(Reloading == true){
+					var reload_duration = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
 					draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 1, default_xx, default_yy,
-					(ReloadTime/global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					draw_health_bar_fill(1, default_xx, default_yy, ReloadTime/reload_duration);
 					default_yy -= bar_spacing;
 				}
 			
 				if(equip_timer > -1){
+					var equip_duration = max(1, global.ItemIndex[#WeaponID[1 - WeaponPositionID], ItemStat.EquipTime]);
 					draw_sprite_ext(spr_HealthBar, 0, default_xx, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
-					draw_sprite_ext(spr_HealthBar, 7, default_xx, default_yy,
-					(equip_time/global.ItemIndex[# WeaponID[1 - WeaponPositionID], ItemStat.EquipTime]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
+					draw_health_bar_fill(7, default_xx, default_yy, equip_time/equip_duration);
 					default_yy -= bar_spacing;
 				}
 					
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, get_rank(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_ranks, get_rank(global.game_struct.Enemy_ep[global.game_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
 				}
 			}
 		}
@@ -353,7 +371,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		
 	
 		#region Draw use button
-		if!(instance_exists(oInventory)){
+		if(!instance_exists(oInventory) && global.draw_hud){
 			if(instance_exists(oItems)){
 				with(oItems){
 					var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
@@ -399,7 +417,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 		}
 		#endregion	
 
-		if!(instance_exists(oInventory)){
+		if(!instance_exists(oInventory) && global.draw_hud){
 			
 			#region Draw shooting mode
 			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
@@ -439,7 +457,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var AmmoDrawValue = min(round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]), 10);
 			var AmmoRemain = round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]) - AmmoDrawValue;
 			var Value = 0;
-			var money_string = "Money: " + string(global.player_stats_struct.Money);
+			var money_string = "Money: " + string(global.player_stats.Money);
 			var money_x = HUDShift;
 			var money_y = StaminaY - bar_gap*4.5;
 			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
@@ -456,26 +474,26 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			}
 			
 			draw_text_outlined(money_x, money_y, "Money: ", c_white, c_black, 1);
-			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats_struct.Money), MAIN_COLOR, c_black, 1);
+			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats.Money), MAIN_COLOR, c_black, 1);
 			draw_sprite_ext(spr_Coin, 0, money_x + string_width(money_string) * .9, money_y, 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 
 			draw_set_color(c_black);
 		
 			#region Health bar
 			draw_sprite_ext(spr_HealthBar, 0, HealthX, HealthY, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
-			draw_sprite_ext(spr_HealthBar, 3, HealthX, HealthY, (global.local_player.stats.Damage_health_points/global.player_stats_struct.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
-			draw_sprite_ext(spr_HealthBar, 2, HealthX, HealthY, (global.local_player.stats.Health_points/global.player_stats_struct.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+			draw_sprite_ext(spr_HealthBar, 3, HealthX, HealthY, (global.local_player.stats.Damage_health_points/global.player_stats.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
+			draw_sprite_ext(spr_HealthBar, 2, HealthX, HealthY, (global.local_player.stats.Health_points/global.player_stats.Max_health) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 			#endregion
 			
 			#region Stamina bar
 			draw_sprite_ext(spr_HealthBar, 0, StaminaX, StaminaY, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
-			draw_sprite_ext(spr_HealthBar, 3, StaminaX, StaminaY, (global.local_player.stats.Damage_stamina_points/global.player_stats_struct.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
-			draw_sprite_ext(spr_HealthBar, 6, StaminaX, StaminaY, (global.local_player.stats.Stamina_points/global.player_stats_struct.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+			draw_sprite_ext(spr_HealthBar, 3, StaminaX, StaminaY, (global.local_player.stats.Damage_stamina_points/global.player_stats.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);	
+			draw_sprite_ext(spr_HealthBar, 6, StaminaX, StaminaY, (global.local_player.stats.Stamina_points/global.player_stats.Max_stamina) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 			#endregion
 		
 			#region Experience bar
 			draw_sprite_ext(spr_HealthBar, 0, xp_x, xp_y, global.GUIMultiplier * 2, 2 * global.GUIMultiplier, 0, c_white, 1);
-			draw_sprite_ext(spr_HealthBar, 8, xp_x, xp_y, (global.player_stats_struct.Xp/global.player_stats_struct.Max_xp) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
+			draw_sprite_ext(spr_HealthBar, 8, xp_x, xp_y, (global.player_stats.Xp/global.player_stats.Max_xp) * 2 * global.GUIMultiplier, 2 * global.GUIMultiplier, 0, c_white, 1);
 			#endregion
 			
 			#endregion
@@ -577,20 +595,27 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 			var default_yy = yy;
 			var bar_spacing = sprite_get_height(spr_HealthBar) * global.GUIMultiplier;
 			
-			if(command[0] != -1){
+			if(command[0] != -1 && global.draw_hud){
 				var cx = (command[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				var cy = (command[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				draw_sprite_ext(spr_CommandPoint, 0, cx, cy, 0.5 * global.GUIMultiplier, 0.5 * global.GUIMultiplier, 0, c_white, command[2]);	
 			}
 			
-			if(Reloading == true){
+			if(Reloading == true && (!is_local || global.draw_hud)){
 				draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 				draw_sprite_ext(spr_HealthBar, 1, xx - sprite_width/2, default_yy,
 				(ReloadTime/global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_id], ItemStat.ReloadSpeed]) * global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 				default_yy -= bar_spacing;
 			}
+
+			if (planting && (!is_local || global.draw_hud)) {
+				var planting_bar_x = xx - sprite_width/2;
+				draw_sprite_ext(spr_HealthBar, 0, planting_bar_x, default_yy, global.GUIMultiplier, global.GUIMultiplier, 0, c_white, 1);
+				draw_health_bar_fill(6, planting_bar_x, default_yy, planting_value / max(1, planting_max), global.GUIMultiplier, c_orange);
+				default_yy -= bar_spacing;
+			}
 			
-			if(is_local){
+			if(is_local && global.draw_hud){
 				if(Healing == true){
 				    draw_sprite_ext(spr_HealthBar, 0, xx - sprite_width/2, default_yy, 1*global.GUIMultiplier, 1*global.GUIMultiplier, 0, c_white, 1);
 				    draw_sprite_ext(spr_HealthBar, 5, xx - sprite_width/2, default_yy,
@@ -607,8 +632,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 				}
 			
 				var rank_position = 0;
-				if(global.rating_struct.Played_games >= TRACKING_PERIOD/2){
-					rank_position = get_rank(global.rating_struct.Player_ep);	
+				if(global.game_struct.Played_games >= TRACKING_PERIOD/2){
+					rank_position = get_rank(global.game_struct.Player_ep);
 				}
 				if!(instance_exists(oInventory)){
 					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
@@ -620,7 +645,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !in
 	}
 
 }
-if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments)){
+if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && global.draw_hud){
 	
 	#region Fps
 	draw_set_font(set_font("Console"));
@@ -636,14 +661,25 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		draw_text_outlined(50, 50 + TextHeightSmall*2, "Time: " + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);
 	}
 	#endregion
+
+	#region Bomb timer
+	if (global.bomb_planted) {
+		draw_set_font(set_font("Console"));
+		var bomb_seconds = max(0, ceil(global.bomb_timer / game_get_speed(gamespeed_fps)));
+		var bomb_timer_text = "Bomb planted: " + string(bomb_seconds) + " s";
+		var bomb_timer_x = round(global.GuiW * 0.5 - string_width(bomb_timer_text) * 0.5);
+		var bomb_timer_y = round(global.GuiH * 0.2);
+		draw_text_outlined(bomb_timer_x, bomb_timer_y, bomb_timer_text, c_orange, c_black, 1);
+	}
+	#endregion
 	
 	if(instance_exists(global.local_player) && RespawnMenu == false && PauseMenu == false){
 	
 		#region Draw ranked score
 		if(global.ranked_game == true){
 			draw_set_font(set_font("Title"));
-			var player_score = string(global.rating_struct.Rounds_win);
-			var enemy_score = string(global.rating_struct.Rounds_lost);
+			var player_score = string(global.game_struct.Rounds_win);
+			var enemy_score = string(global.game_struct.Rounds_lost);
 			var separator = "/";
 			var score_string_width = string_width(player_score + enemy_score + separator);
 			var player_score_string_width = string_width(player_score);
@@ -696,8 +732,8 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		
 			if(global.ranked_game == true){
 				//Ep
-				var player_r = global.rating_struct.Player_ep;
-				var player_rd = global.rating_struct.Player_rd;
+				var player_r = global.game_struct.Player_ep;
+				var player_rd = global.game_struct.Player_rd;
 				var r_string = "R: " + string(round(convert_back(player_r)));
 				var r_string_es = "R (ES): " + string_format(player_r, 0, 1);
 				var rd_string = "RD: " + string_format(convert_back(player_rd, true), 0, 1);
@@ -708,10 +744,10 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 				draw_text_outlined(AdminHUDX - string_width(rd_string_es), AdminHUDY + TextHeightSmall*7, rd_string_es, c_white, c_black, 1);	
 		
 				//Volatility
-				var gv = global.rating_struct.Game_volatility;
-				var pv = global.rating_struct.Predictive_volatility;
+				var gv = global.game_struct.Game_volatility;
+				var pv = global.game_struct.Predictive_volatility;
 				var pv_string = "Predictive volatility: " + string_format(pv, 0, 2);
-				var gv_string = "Game volatility: " + string(global.rating_struct.Game_volatility);
+				var gv_string = "Game volatility: " + string(global.game_struct.Game_volatility);
 
 				draw_text_outlined(AdminHUDX - string_width(gv_string), AdminHUDY + TextHeightSmall * 8, gv_string, c_white, c_black, 1);
 				draw_text_outlined(AdminHUDX - string_width(pv_string), AdminHUDY + TextHeightSmall * 9, pv_string, c_white, c_black, 1);
@@ -719,15 +755,15 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 			
 				//Enemy elos
 				var enemy_elos_string = "Enemy R: [ ";
-				var enemy_elos_string_eggy_scale = "Enemy R (ES): " + string(global.rating_struct.Enemy_ep);
+				var enemy_elos_string_eggy_scale = "Enemy R (ES): " + string(global.game_struct.Enemy_ep);
 				var enemy_rd_string = "Enemy RD: [ ";
-				var enemy_rd_string_es = "Enemy RD (ES) " + string(global.rating_struct.Enemy_rd);
+				var enemy_rd_string_es = "Enemy RD (ES) " + string(global.game_struct.Enemy_rd);
 			
-				for (var i = 0; i < array_length(global.rating_struct.Enemy_ep); i++) {
-				    var converted_elo = convert_back(global.rating_struct.Enemy_ep[i]);
-					var converted_rd = convert_back(global.rating_struct.Enemy_rd[i], true);
-				    enemy_elos_string += string(round(converted_elo)) + (i < array_length(global.rating_struct.Enemy_ep) - 1 ? "," : "");
-					enemy_rd_string += string(converted_rd) + (i < array_length(global.rating_struct.Enemy_rd) - 1 ? "," : "");
+				for (var i = 0; i < array_length(global.game_struct.Enemy_ep); i++) {
+				    var converted_elo = convert_back(global.game_struct.Enemy_ep[i]);
+					var converted_rd = convert_back(global.game_struct.Enemy_rd[i], true);
+				    enemy_elos_string += string(round(converted_elo)) + (i < array_length(global.game_struct.Enemy_ep) - 1 ? "," : "");
+					enemy_rd_string += string(converted_rd) + (i < array_length(global.game_struct.Enemy_rd) - 1 ? "," : "");
 				}
 				enemy_elos_string += " ]";
 				enemy_rd_string += " ]";
@@ -1007,9 +1043,8 @@ with(oSlot){
 }
 
 #endregion
-
 #region Flashed
-if(RespawnMenu == false){
+if(RespawnMenu == false && !spectating){
 	if(instance_exists(global.local_player)){	
 		if(global.local_player.Flashed == true){
 			draw_set_alpha(global.local_player.FlashedAlpha);
@@ -1021,86 +1056,10 @@ if(RespawnMenu == false){
 }
 #endregion
 
-#region Crosshair
-with(oCrosshair){
-	var x_scale = image_xscale * .5 * global.crosshair_scale;
-	var y_scale = image_yscale * .5 * global.crosshair_scale;
-	crosshair_x = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-	crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-	if(instance_exists(global.local_player)){
-		if(HitMarker > -1){
-			draw_sprite_ext(spr_HitMarker, HitMarker, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);	
-		}
-		if(global.local_player.player_can_shoot == true && !global.my_console[? "active"] && global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != WEAPON_CLASS.SNIPER_RIFLE && global.local_player.ScopeIn == false){
-			draw_sprite_ext(spr_StaticCrosshair, 0, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
-			if(global.DynamicCrosshair == true){
-				Gap = 25;
-				draw_sprite_ext(
-					spr_DynamicCrosshair, 
-					0, 
-					crosshair_x - Gap - inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*2 + x_offset, 
-					crosshair_y, 
-					y_scale, 
-					x_scale, 
-					0, 
-					global.crosshair_color, 
-					global.CrosshairAlpha
-				); ///Left
-				draw_sprite_ext(
-					spr_DynamicCrosshair, 
-					0, 
-					crosshair_x + Gap + inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*2 + x_offset, 
-					crosshair_y, 
-					y_scale, 
-					x_scale, 
-					0, 
-					global.crosshair_color, 
-					global.CrosshairAlpha
-				); ///Right
-				draw_sprite_ext(
-					spr_DynamicCrosshair, 
-					0, 
-					crosshair_x, 
-					crosshair_y - Gap - inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*2 + y_offset, 
-					y_scale, 
-					x_scale, 
-					90, 
-					global.crosshair_color, 
-					global.CrosshairAlpha
-				); ///Top
-				draw_sprite_ext(
-					spr_DynamicCrosshair, 
-					0, 
-					crosshair_x, 
-					crosshair_y + Gap + inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*2 + y_offset, 
-					y_scale, 
-					x_scale, 
-					90, 
-					global.crosshair_color, 
-					global.CrosshairAlpha
-				); ///Down
-			}
-		}
-	}else{
-		draw_sprite_ext(spr_StaticCrosshair, 0, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
-		if(global.DynamicCrosshair == true){
-			Gap = 25;
-			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x - Gap - 1 + x_offset, crosshair_y, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Left
-			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x + Gap + 1 + x_offset, crosshair_y, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Right
-			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y - Gap - 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Top
-			draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y + Gap + 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Down
-		}
-	}
-	
-	if(has_attachment(Item.range_finder, Index.slot_barrel) && global.local_player.player_can_shoot == true){
-		var text = "?";
-		var col = c_red;
-		if(global.local_player.Range <= global.ItemIndex[# global.local_player.wpn_id, ItemStat.Range]){
-			text = string_format(global.local_player.Range, 0, 1) + " u";	
-			col = c_green;
-		}
-			
-		draw_text_outlined(crosshair_x + max(64 * x_scale, 64), crosshair_y, text, col, c_black, 1);	
-	}
+if (spectating) {
+	draw_set_alpha(0.05);
+	draw_set_color(c_gray);
+	draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
+	draw_set_alpha(1);
+	draw_set_color(c_white);
 }
-#endregion

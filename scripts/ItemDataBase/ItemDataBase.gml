@@ -183,6 +183,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.MP9, ["Auto", "Safety"]);
 	add_shooting_modes(Item.CZ75, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.MP7, ["Auto", "Burst", "Safety"]);
+	add_shooting_modes(Item.P90, ["Auto", "Safety"]);
 
 	// assault rifles + snipers
 	global.ItemIndex[# Item.AKM, ItemStat.attachments]  = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
@@ -198,6 +199,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.MAC11, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.MP9, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.MP7, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
+	global.ItemIndex[# Item.P90, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
 	// pistole
 	global.ItemIndex[# Item.DesertEagle, ItemStat.attachments] = [ATTACHMENTS.slot_barrel];
 	global.ItemIndex[# Item.Glock, ItemStat.attachments]       = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
@@ -230,7 +232,8 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.MAC11, ItemStat.attach_sockets] = { barrel: [10, -8], grip: [10, 1], suppressor: [30, -11] };
 	global.ItemIndex[# Item.MP9, ItemStat.attach_sockets] = { barrel: [15, -11], suppressor: [38, -10.5] };
-	global.ItemIndex[# Item.MP7, ItemStat.attach_sockets] = { barrel: [15, -11], suppressor: [38, -10.5] };
+	global.ItemIndex[# Item.MP7, ItemStat.attach_sockets] = { barrel: [15, -10], suppressor: [38, -9.5] };
+	global.ItemIndex[# Item.P90, ItemStat.attach_sockets] = { barrel: [20, 0], suppressor: [38, -2] };
 
 	global.ItemIndex[# Item.Spas, ItemStat.attach_sockets] = { barrel: [23, -2], grip: [24, 12] };
 	
@@ -246,7 +249,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.None, ItemStat.KickBackPower] = 1;	
 	
 	global.ItemIndex[# Item.AKM, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 36, 270, 30, WEAPON_TYPE.PRIMARY, 9, 6, snd_AKM, 5, 1.25, true,
+	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 36, 270, 30, WEAPON_TYPE.PRIMARY, 10, 6, snd_AKM, 5, 1.25, true,
 	10, 20, 10, 5.9, .015, 10, 3.5, 1, 7, .25, 1, WEAPON_CLASS.ASSAULT_RIFLE, .81, .795, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5, true, "7.62x39 mm", CALIBER.HIGH);
 	global.ItemIndex[# Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
@@ -260,8 +263,8 @@ function ItemDataBase(){
 		    dist,
 		    global.ItemIndex[# Item.AKM, ItemStat.Range],
 		    0.35, 0.57,
-		    0.94, 0.91,
-		    0.86, 5.0
+		    0.94, 0.92,
+		    0.89, 5.0
 		);
 	}
 	global.ItemIndex[# Item.AKM, ItemStat.accuracy_drop] = function(dist)  {
@@ -450,8 +453,8 @@ function ItemDataBase(){
 
 
 	global.ItemIndex[# Item.MP9, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 685, 28, 280, 30, WEAPON_TYPE.PRIMARY, 4, 5, snd_MP9, 1.5, 0.8, true,
-	8, 18, 14, 7, 0.02, 1.75, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .88, .7, 1 * game_get_speed(gamespeed_fps), .5, 155, 1, 9, false, "9x19 mm", CALIBER.LOW);
+	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 690, 28, 280, 30, WEAPON_TYPE.PRIMARY, 4, 5, snd_MP9, 1.5, 0.8, true,
+	8, 18, 14, 7, 0.02, 1.75, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .91, .7, 1 * game_get_speed(gamespeed_fps), .5, 155, 1, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.MP9, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MP9, ItemStat.disadvantages] = "-Slow equip\n-High recoil\n-High damage drop-off";
 	global.ItemIndex[# Item.MP9, ItemStat.advantages] = "+Great penetration power\n+Great range for SMG\n+Great rate of fire";
@@ -509,6 +512,36 @@ function ItemDataBase(){
 		);
 	}	
 	
+	global.ItemIndex[# Item.P90, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.P90, "P90", 1.95 * game_get_speed(gamespeed_fps), 650, 32, 550, 55, WEAPON_TYPE.PRIMARY, 5, 6, snd_p90, 2, 1, true,
+	10, 30, 5, 4, 0.015, 2, 1.5, 8, 2, .8, 0, WEAPON_CLASS.SUBMACHINE_GUN, .795, .72, 1 * game_get_speed(gamespeed_fps), .5, 180, 1, 8, false, "5.7x28 mm", CALIBER.LOW);
+	global.ItemIndex[# Item.P90, ItemStat.difficulty] = 2;
+	global.ItemIndex[# Item.P90, ItemStat.disadvantages] = "-High horizontal recoil\n-High range inaccuracy\n-Bad mobility for SMG";
+	global.ItemIndex[# Item.P90, ItemStat.advantages] = "+High ammo capacity\n+High penetration power";
+	global.ItemIndex[# Item.P90, ItemStat.ItemColor] = c_orange;
+	global.ItemIndex[# Item.P90, ItemStat.AmmoSpriteID] = 20;
+	global.ItemIndex[# Item.P90, ItemStat.Rarity] = RARITY.COMMON;
+	global.ItemIndex[# Item.P90, ItemStat.EnemyInaccuracyCompensation] = 1.5;
+	global.ItemIndex[# Item.P90, ItemStat.Description] = "P90 combines a massive magazine with low damage drop-off and reliable accuracy while moving, making it ideal for aggressive engagements. Its high price, reduced mobility, and rapidly declining accuracy limit its effectiveness at longer ranges.";
+	global.ItemIndex[# Item.P90, ItemStat.damage_drop] = function(dist)  {
+		return curve_loglinexp(
+		    dist,
+		    global.ItemIndex[# Item.P90, ItemStat.Range],
+		    0.35, 0.5,
+		    0.83, 0.61,
+		    0.55, 5.0, 4.0
+		);
+	}
+	global.ItemIndex[# Item.P90, ItemStat.accuracy_drop] = function(dist)  {
+		return curve_loglinexp(
+		    dist,
+		    global.ItemIndex[# Item.P90, ItemStat.Range],
+		    0.25, 0.5, 
+			0.5, -1.45, -3.5,   // -3.5 - 550% spread na max range
+		    5.0, 4.0
+		);
+	}	
+	
 	global.ItemIndex[# Item.HEGrenade, ItemStat.Type] = "Grenade";
 	global.ItemIndex[# Item.HEGrenade, ItemStat.Name] = "HE grenade";
 	global.ItemIndex[# Item.HEGrenade, ItemStat.Cost] = 25;
@@ -520,6 +553,43 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.HEGrenade, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[# Item.HEGrenade, ItemStat.Description] = "Designed for maximum impact, it delivers lethal damage over a broad radius, perfect for neutralizing enemy clusters or securing critical spaces. Handle with care; its potent blast is as swift as it is fierce.";
 	global.ItemIndex[# Item.HEGrenade, ItemStat.damage_drop] = function(dist)  {
+		return curve_lin(
+		    dist,
+		    1000,
+		    0.5, 0.75,
+			0.95
+		);
+	}
+	
+	global.ItemIndex[# Item.Bomb, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.Bomb, ItemStat.Name] = "Bomb";
+	global.ItemIndex[# Item.Bomb, ItemStat.Cost] = 25;
+	//global.ItemIndex[# Item.Bomb, ItemStat.ReloadSpeed] = 2.5;
+	global.ItemIndex[# Item.Bomb, ItemStat.Damage] = 196;
+	global.ItemIndex[# Item.Bomb, ItemStat.PenetrationPower] = .95;
+	//global.ItemIndex[# Item.Bomb, ItemStat.damage_drop] = .001;
+	global.ItemIndex[# Item.Bomb, ItemStat.BulletCasingID] = 0;
+	global.ItemIndex[# Item.Bomb, ItemStat.ItemColor] = c_green;
+	global.ItemIndex[# Item.Bomb, ItemStat.Description] = "Designed for devastating objective attacks, this bomb delivers extreme damage and penetration power across a massive blast radius. Terrorists must plant and defend it, while opposing forces race to defuse it before detonation.";
+	global.ItemIndex[# Item.Bomb, ItemStat.damage_drop] = function(dist)  {
+		return curve_lin(
+		    dist,
+		    1000,
+		    0.5, 0.75,
+			0.95
+		);
+	}
+
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.Type] = "Grenade";
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.Name] = "Molotov";
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.Cost] = 45;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.ReloadSpeed] = 2.5;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.Damage] = 18;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.PenetrationPower] = .75;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.BulletCasingID] = 4;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.ItemColor] = c_green;
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.Description] = "A simple incendiary bottle that bursts on impact and spreads fire across the ground. Useful for blocking paths, forcing enemies out of cover, or punishing anyone who stays inside the flames.";
+	global.ItemIndex[# Item.MolotovGrenade, ItemStat.damage_drop] = function(dist)  {
 		return curve_lin(
 		    dist,
 		    1000,
@@ -812,7 +882,7 @@ function ItemDataBase(){
 		    global.ItemIndex[# Item.Dragunov, ItemStat.Range],
 		    0.5, 0.8, 
 			0.81, 0.55, 0.15,
-		    7.0, 4.0
+		    7.0, 4.0,
 		);
 	}	
 

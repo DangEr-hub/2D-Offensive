@@ -45,6 +45,8 @@ function save_game(){
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	ini_write_real("Vars", "anti_aliasing", global.anti_aliasing);
 	ini_write_real("Vars", "crosshair_scale", global.crosshair_scale);
+	ini_write_real("Vars", "sv_cheats", global.sv_cheats);
+	ini_write_string("Network", "server_ip", global.saved_server_ip);
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -82,7 +84,7 @@ function save_game(){
 	if(file_exists("rating.json")){
 		file_delete("rating.json");
 	}
-	var json_string = json_stringify(global.rating_struct);
+	var json_string = json_stringify(global.game_struct);
 	var file = file_text_open_write("rating.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
@@ -102,7 +104,7 @@ function save_game(){
 	if(file_exists("player_stats.json")){
 		file_delete("player_stats.json");
 	}
-	json_string = json_stringify(global.player_stats_struct);
+	json_string = json_stringify(global.player_stats);
 	file = file_text_open_write("player_stats.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
@@ -111,6 +113,7 @@ function save_game(){
 
 function load_game(){
 	
+
 	global.draw_damage = true;
 	global.aberration_level = 0;
 	global.saturation_level = 1.8;
@@ -135,6 +138,9 @@ function load_game(){
 	global.window_width = 1920;
 	global.window_height = 1080;
 	global.anti_aliasing = 0;
+	global.draw_hud = true;
+	global.sv_cheats = false;
+	global.saved_server_ip = "127.0.0.1";
 	global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 	
 	#region Load game
@@ -164,6 +170,8 @@ function load_game(){
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		global.anti_aliasing = ini_read_real("Vars", "anti_aliasing", global.anti_aliasing);
 		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
+		global.sv_cheats = ini_read_real("Vars", "sv_cheats", global.sv_cheats);
+		global.saved_server_ip = ini_read_string("Network", "server_ip", global.saved_server_ip);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
 		global.map_rounds = array_create(MAP.Total);
@@ -187,7 +195,11 @@ function load_game(){
 		for (var i = 0; i < list_size; i++){
 		    var item_value = ini_read_string("keyboard_inputs", "ds_list_key_bind_" + string(i), "");
 		    ds_list_add(global.KeyBinds, item_value);
-		}		
+		}
+		while(ds_list_size(global.KeyBinds) < KEY.Total){
+			var missing_index = ds_list_size(global.KeyBinds);
+			ds_list_add(global.KeyBinds, global.DefaultKeyBinds[| missing_index]);
+		}
 		ini_close();
 	}
 	#endregion
@@ -215,7 +227,8 @@ function load_game(){
 	    var file = file_text_open_read("rating.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
-	    global.rating_struct = json_parse(json_string);
+	    global.game_struct = json_parse(json_string);
+		set_current_enemy();
 	}
 	#endregion
 	
@@ -248,16 +261,18 @@ function load_game(){
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
 		var loaded_stats = json_parse(json_string);
-	    struct_merge_data(global.player_stats_struct, loaded_stats);
+	    struct_merge_data(global.player_stats, loaded_stats);
 		
-	    global.player_stats_struct.Get_KD = function() {
-	        return (global.player_stats_struct.Deaths != 0) ? (global.player_stats_struct.Kills / global.player_stats_struct.Deaths) : 0;
+	    global.player_stats.Get_KD = function() {
+	        return (global.player_stats.Deaths != 0) ? (global.player_stats.Kills / global.player_stats.Deaths) : 0;
 	    }
-		global.player_stats_struct.Get_headshot_percentage = function() {
-			return (global.player_stats_struct.Kills != 0) ? (global.player_stats_struct.Headshots / global.player_stats_struct.Kills) * 100 : 0;
+		global.player_stats.Get_headshot_percentage = function() {
+			return (global.player_stats.Kills != 0) ? (global.player_stats.Headshots / global.player_stats.Kills) * 100 : 0;
 		}
-		global.player_stats_struct.Get_accuracy = function() {
-			return (global.player_stats_struct.All_shots != 0) ? global.player_stats_struct.Hit_shots / global.player_stats_struct.All_shots * 100 : 0;
+		global.player_stats.Get_accuracy = function() {
+			return (global.player_stats.All_shots > 0)
+				? clamp(global.player_stats.Hit_shots / global.player_stats.All_shots * 100, 0, 100)
+				: 0;
 		}
 	}
 	#endregion

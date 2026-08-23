@@ -84,9 +84,9 @@ if(is_local){
 		var NearestTargetY = stats.Shot_y;
 		var MotorAngle = direction - 180;
 		if(instance_exists(oParticleSystem)){
-			part_type_orientation(oParticleSystem.FlameParticle, MotorAngle, MotorAngle, 0, 0, 0);
-			part_type_direction(oParticleSystem.FlameParticle,MotorAngle,MotorAngle,0,0);
-			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.FlameParticle, 50);
+			part_type_orientation(oParticleSystem.flame_particle, MotorAngle, MotorAngle, 0, 0, 0);
+			part_type_direction(oParticleSystem.flame_particle,MotorAngle,MotorAngle,0,0);
+			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.flame_particle, 50);
 		}
 		if(PointDistance <= global.ItemIndex[#stats.Item_id, ItemStat.Range]){
 			if(instance_exists(stats.Nearest_enemy) && stats.Nearest_enemy != noone){

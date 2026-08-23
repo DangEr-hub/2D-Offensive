@@ -42,8 +42,8 @@
   "properties": [],
   "solid": false,
   "spriteId": {
-    "name": "spr_Player",
-    "path": "sprites/spr_Player/spr_Player.yy",
+    "name": "spr_PoliceChar",
+    "path": "sprites/spr_PoliceChar/spr_PoliceChar.yy",
   },
   "spriteMaskId": null,
   "visible": true,

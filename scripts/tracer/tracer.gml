@@ -369,18 +369,22 @@ function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage
         return;
     }
 
+	if (item_id == Item.MolotovGrenade) {
+		create_molotov_impact(x_pos, y_pos, explosion_damage, noone, item_id, "Noone", -1, false);
+		return;
+	}
+
     var explosion = instance_create_depth(x_pos, y_pos, -99, oExplosion);
     explosion.ExplosionPower = min(explosion_damage / 10, 2);
     explosion.Angle = random(360);
     explosion.ExplosionWidth = sprite_get_width(spr_Explosion);
     explosion.ExplosionHeight = sprite_get_height(spr_Explosion);
     explosion.LightObject = new BulbLight(oLightRenderer.lighting, sLight128, 0, x_pos, y_pos);
+    explosion.LightObject.blend = c_orange;
     explosion.LightObject.xscale = explosion_damage / 10;
     explosion.LightObject.yscale = explosion_damage / 10;
 
-    if (!audio_is_playing(snd_Explosion)) {
-        play_sound(x_pos, y_pos, snd_Explosion, explosion, 100, 2500, .75);
-    }
+	play_sound(x_pos, y_pos, snd_Explosion, explosion, 100, 2500, .75);
 
     create_fog(
         x_pos,

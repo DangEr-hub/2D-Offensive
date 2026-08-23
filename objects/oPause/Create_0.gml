@@ -36,6 +36,7 @@ popup_main_menu_callback_positive = function(){
 	}
 	save_game();
 	audio_stop_all();
+	with (oNetworkManager) instance_destroy();
 	room_goto(rm_main_menu);
 };
 
@@ -45,7 +46,9 @@ main_menu_callback = function(){
 
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-with(zui_create(zui_get_width() * .5, zui_get_height() * .2, objUIButton, -999)){
+button_spacing = round(button_height * 1.25);
+button_start_y = round(zui_get_height() * .2);
+with(zui_create(zui_get_width() * .5, button_start_y, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -53,7 +56,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .2, objUIButton, -999))
 	callback = other.continue_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .2 + button_height*1.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -70,7 +73,17 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .2 + button_height*1.5,
 	};
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .2 + button_height*3, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*2, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Settings";
+	callback = function(){
+		open_ingame_settings();
+	};
+}
+
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -78,7 +91,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() * .2 + button_height*3, o
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, zui_get_height() * .2 + button_height*4.5, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

@@ -54,7 +54,7 @@ if(check_vis_timer == -1){
 	var is_target = (object_index == oBot) || (object_index == oPlayer && is_remote);
 
 	// lokální hráč je vždy viditelný
-	if (id == observer || team == observer.team) {
+	if (id == observer || stats.Team == observer.stats.Team) {
 	    Visible = true;
 	}else if (is_target) {
 

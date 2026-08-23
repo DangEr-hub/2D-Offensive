@@ -4,8 +4,134 @@ global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
 
+var audio_listener_target = get_audio_listener_target();
+if (instance_exists(audio_listener_target)) {
+	audio_listener_position(audio_listener_target.x, audio_listener_target.y, 0);
+}
+
+#region Bomb timer
+var has_bomb_authority = !IS_NET || oNetworkManager.is_server;
+if (has_bomb_authority && global.bomb_planted) {
+	var bomb_round_resolved = IS_NET && oNetworkManager.round_resolved;
+	if (bomb_round_resolved) {
+		global.bomb_planted = false;
+		global.bomb_timer = 0;
+		global.bomb_planter_pid = -1;
+		with (oBomb) {
+			instance_destroy();
+		}
+	} else {
+		global.bomb_timer = max(0, global.bomb_timer - 1);
+	}
+
+	if (global.bomb_planted && global.bomb_timer <= 0) {
+		bomb_detonation_pending = true;
+		global.bomb_planted = false;
+		var exploded_bomb_planter_pid = global.bomb_planter_pid;
+
+		with (oBomb) {
+			explosion_create(
+				32,
+				[x, y],
+				500,
+				false,
+				noone,
+				stats.Item_id,
+				2,
+				max(power(500 / 10, 2), 256),
+				{
+					owner_id: exploded_bomb_planter_pid,
+					owner_name: "Bomb",
+					object_index: oBomb
+				},
+				5
+			);
+			image_alpha = 0;
+			instance_destroy();
+		}
+		global.bomb_planter_pid = -1;
+
+		if(round_end_timer == -1){
+			round_end_timer = ROUND_END_TIMER;
+		}
+	}
+}
+
+if(round_end_timer > 0){ round_end_timer --;}
+if(round_end_timer == 0){
+	var bomb_round_result = "Loss";
+	if (instance_exists(global.local_player) && global.local_player.stats.Team == TEAM.TERRORIST) {
+		bomb_round_result = "Win";
+	}
+
+	round_end_timer = -1;
+	round_end(bomb_round_result, TEAM.TERRORIST);
+}
+#endregion
+
 if(instance_exists(global.local_player)){
 	
+	#region Decoration spawning
+	if(!decor_spawned){
+		var decor_clearance = sprite_get_width(spr_Decor) * .5;
+		var decor_spawn_attempts = 25;
+		var first_decor_frame = global.MapID == MAP.Desert ? 6 : 0;
+		var last_decor_frame = sprite_get_number(spr_Decor) - 1;
+		var decor_collision_list = ds_list_create();
+
+		for(var i = 0; i < decor_n; i++){
+			var decor_frame = irandom_range(first_decor_frame, last_decor_frame);
+
+			for(var attempt = 0; attempt < decor_spawn_attempts; attempt++){
+				var decor_x = random_range(decor_clearance, room_width - decor_clearance);
+				var decor_y = random_range(decor_clearance, room_height - decor_clearance);
+				var can_spawn_decor = true;
+
+				ds_list_clear(decor_collision_list);
+				var decor_collision_count = collision_circle_list(
+					decor_x,
+					decor_y,
+					decor_clearance,
+					all,
+					false,
+					true,
+					decor_collision_list,
+					false
+				);
+
+				for(var collision_i = 0; collision_i < decor_collision_count; collision_i++){
+					var collision_instance = decor_collision_list[| collision_i];
+					var collision_object = collision_instance.object_index;
+
+					while(collision_object != oParentTile && object_exists(collision_object)){
+						collision_object = object_get_parent(collision_object);
+					}
+
+					if(collision_object != oParentTile || decor_frame <= 4){
+						can_spawn_decor = false;
+						break;
+					}
+				}
+
+				if(can_spawn_decor){
+					var decor = instance_create_layer(decor_x, decor_y, "ItemsO", oDecor);
+					decor.image_index = decor_frame;
+					break;
+				}
+			}
+		}
+
+		ds_list_destroy(decor_collision_list);
+		decor_spawned = true;
+	}
+	#endregion
+
+	if (spectating) {
+		if (!instance_exists(spectate_target) || spectate_target.stats.Health_points <= 0) {
+			spectate_target = find_living_player_teammate(global.local_player.stats.Team, global.local_player);
+		}
+	}
+
 	#region Buy time
 	if(buy_time > 0){
 		buy_time --;
@@ -123,7 +249,18 @@ if(instance_exists(global.local_player)){
 		item_description_destroy();
 	}
 
-	if(PauseMenu == true || RespawnMenu == true || GameEndMenu == true || show_weapon_attachments == true || instance_exists(oInventory) || global.my_console[? "active"] || global.local_player.player_can_shoot == false){
+	if(PauseMenu == true
+	|| RespawnMenu == true
+	|| GameEndMenu == true
+	|| show_weapon_attachments == true
+	|| instance_exists(oWeaponAttachments)
+	|| instance_exists(oInventory)
+	|| instance_exists(oBuyMenu)
+	|| instance_exists(oMortarMenu)
+	|| instance_exists(oStatisticsTable)
+	|| keyboard_check(global.KeyBinds[| KEY.Scoreboard])
+	|| global.my_console[? "active"]
+	|| global.local_player.player_can_shoot == false){
 		window_set_cursor(cr_default);
 	}else{
 		window_set_cursor(cr_none);	

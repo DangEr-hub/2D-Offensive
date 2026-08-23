@@ -56,9 +56,7 @@ if(wall_collision != noone){
 			#region Bullet and shrapnel hits wall
 		
 				
-			if!(audio_is_playing(wall_sound)){
-				play_sound(wall_collision.xx, wall_collision.yy, wall_sound, stats.Object);
-			}
+			play_sound(wall_collision.xx, wall_collision.yy, wall_sound, stats.Object);
 				
 			#region Barrel
 			if(wall_collision.inst_id.object_index == oBarrel){
@@ -169,7 +167,7 @@ if(wall_collision != noone){
 				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
 			}
 		
-			if!(audio_is_playing(wall_sound)){play_sound(x, y, wall_sound, stats.Object);}
+		play_sound(x, y, wall_sound, stats.Object);
 		
 			instance_destroy(self);
 			exit;

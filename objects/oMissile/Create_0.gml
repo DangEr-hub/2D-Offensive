@@ -18,7 +18,18 @@ network_id = -1;
 network_authority = (!IS_NET || (instance_exists(oNetworkManager) && oNetworkManager.is_server));
 network_visual_only = (IS_NET && !network_authority);
 bomb_explosion_broadcasted = false;
-play_sound(x, y, snd_FallingBomb);
+missile_sound = -1;
+if (audio_emitter_exists(Emitter)) {
+	var listener_target = get_audio_listener_target();
+	var emitter_x = instance_exists(listener_target) ? get_spatial_audio_x(x, listener_target) : x;
+	audio_emitter_position(Emitter, emitter_x, y - z, 0);
+	audio_emitter_falloff(Emitter, 100, 2500, 1.5);
+	if (instance_exists(global.local_player)) {
+		audio_emitter_gain(Emitter, clamp(global.local_player.muffled_sounds, 0, 1));
+		audio_emitter_pitch(Emitter, max(1 / 256, global.local_player.muffled_sounds * global.time_step));
+	}
+	missile_sound = audio_play_sound_on(Emitter, snd_FallingBomb, false, 0);
+}
 depth = -1100;
 
 
@@ -27,5 +38,6 @@ stats = {
 	Damage: global.ItemIndex[#Item.base_explosion, ItemStat.Damage],
 	Object_index: -1,
 	Owner_name: "Aircraft",
+	Owner_id: -1,
 	Object: noone,
 };

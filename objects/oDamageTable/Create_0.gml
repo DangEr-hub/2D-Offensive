@@ -13,7 +13,9 @@ offset_position_x = 32;
 grid_height = min((ds_map_size(global.local_player.HitMap) + 2), 10) * (32 * global.GUIMultiplier);
 button_width = 128 * global.GUIMultiplier;
 button_height = 32 * global.GUIMultiplier;
-if(oRatingController.player_win == false){
+var local_player_died = instance_exists(global.local_player)
+	&& global.local_player.stats.Health_points <= 0;
+if(local_player_died){
 	offset_position_y = 128;
 	killed_by_weapon = oDraw.KilledByWeapon;
 	killed_by_name = oDraw.KilledByName;
@@ -21,6 +23,10 @@ if(oRatingController.player_win == false){
 	
 	with (zui_create(zui_get_width() * .5 - string_width(KilledByString)/1.75, killed_by_y, objUILabel)) {
 		caption = "You died - " + other.KilledByString;
+	}
+}else{
+	with (zui_create(zui_get_width() * .5, killed_by_y, objUILabel)) {
+		caption = "";
 	}
 }
 

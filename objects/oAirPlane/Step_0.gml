@@ -8,10 +8,20 @@ if (network_visual_only) {
 	image_angle = lerp(image_angle, network_target_direction, INTERPOLATION_SPD);
 }
 
+if (audio_emitter_exists(Emitter)) {
+	var listener_target = get_audio_listener_target();
+	var emitter_x = instance_exists(listener_target) ? get_spatial_audio_x(x, listener_target) : x;
+	audio_emitter_position(Emitter, emitter_x, y, 0);
+	if (instance_exists(global.local_player)) {
+		audio_emitter_gain(Emitter, clamp(global.local_player.muffled_sounds, 0, 1));
+		audio_emitter_pitch(Emitter, max(1 / 256, global.local_player.muffled_sounds * global.time_step));
+	}
+}
+
 part_particles_create(global.ParticleSystem, part_pos[0][0], part_pos[0][1], oParticleSystem.fire_particle, 2);
 part_particles_create(global.ParticleSystem, part_pos[1][0], part_pos[1][1], oParticleSystem.fire_particle, 2);
-part_particles_create(global.ParticleSystem, part_pos[0][0], part_pos[0][1], oParticleSystem.FlameParticle, 2);
-part_particles_create(global.ParticleSystem, part_pos[1][0], part_pos[1][1], oParticleSystem.FlameParticle, 2);
+part_particles_create(global.ParticleSystem, part_pos[0][0], part_pos[0][1], oParticleSystem.flame_particle, 2);
+part_particles_create(global.ParticleSystem, part_pos[1][0], part_pos[1][1], oParticleSystem.flame_particle, 2);
 
 if(fog_timer > -1){ fog_timer -= global.time_step; }
 

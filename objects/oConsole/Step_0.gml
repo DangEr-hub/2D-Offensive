@@ -5,6 +5,6 @@ if(console_submit(global.my_console)){
     }
 }
 
-if(keyboard_check_pressed(global.KeyBinds[| KEY.Console])){
+if(keyboard_check_pressed(global.KeyBinds[| KEY.Console]) && !instance_exists(objUILottery)){
     console_toggle(global.my_console);
 }

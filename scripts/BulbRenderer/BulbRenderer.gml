@@ -721,6 +721,9 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
                         //If this light is active, do some drawing
                         if (__IsOnScreen(_cameraL, _cameraT, _cameraR, _cameraB))
                         {
+                            if (is_undefined(blend)) blend = c_white;
+                            if (is_undefined(alpha)) alpha = 1;
+
                             if (castShadows)
                             {
                                 //Only write into the alpha channel
@@ -883,6 +886,9 @@ function BulbRenderer(_ambientColour, _mode, _smooth) constructor
                         //If this light is active, do some drawing
                         if (__IsOnScreen(_cameraL, _cameraT, _cameraR, _cameraB))
                         {
+                            if (is_undefined(blend)) blend = c_white;
+                            if (is_undefined(alpha)) alpha = 1;
+
                             if (castShadows)
                             {
                                 //Turn off all RGBA writing, leaving only z-writing

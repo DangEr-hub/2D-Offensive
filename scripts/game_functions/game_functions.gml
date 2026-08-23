@@ -172,8 +172,8 @@ function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_t
 }
 
 function buy_item(ItemID){
-	if(global.player_stats_struct.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ItemStat.is_locked] == false){
-		global.player_stats_struct.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
+	if(global.player_stats.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ItemStat.is_locked] == false){
+		global.player_stats.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
 		gain_item(
 			ItemID,
 			1,
@@ -590,6 +590,8 @@ function create_shooting_effects(object){
 			[lengthdir_x(5, RotationAngle - 180), lengthdir_y(5, RotationAngle - 180), true]
 		);
 		#endregion
+		
+		//create_haze_effect(FlashLightX, FlashLightY, 0.5 * game_get_speed(gamespeed_fps), self, "Circle", true, 32);
 						
 		#region Create bullet casing
 		if(global.ItemIndex[#wpn_id, ItemStat.BulletCasingID] != -1){
@@ -621,9 +623,11 @@ function create_shooting_effects(object){
 
 function player_shooting(){
 	
-	if(global.ranked_game == true){
-		global.player_stats_struct.All_shots ++;
-		oRatingController.all_shots ++;
+	if(global.ranked_game == true
+	&& global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
+		var projectiles_fired = max(1, global.ItemIndex[#wpn_id, ItemStat.Bullets]);
+		global.player_stats.All_shots += projectiles_fired;
+		oRatingController.all_shots += projectiles_fired;
 	}
 	
 	create_shooting_effects(id);
@@ -805,17 +809,46 @@ function inaccuracy_formula(WID, ObjectType){
 	return 0;
 }
 
+function get_audio_listener_target() {
+	var listener_target = global.local_player;
+	if (instance_exists(oDraw) && oDraw.spectating && instance_exists(oDraw.spectate_target)) {
+		listener_target = oDraw.spectate_target;
+	}
+	return listener_target;
+}
+
+function get_spatial_audio_x(_source_x, _listener) {
+	return _listener.x - (_source_x - _listener.x);
+}
+
 function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist = 100, falloff_max_dist = 2500, falloff_factor = 1.5, Priority = 0) {
-    if (instance_exists(inst_id)) {
-        var playerInstance = global.local_player;  
-        // Výpočet finálního pitche: ohlušení * zpomalení času
-        var final_pitch = playerInstance.muffled_sounds * global.time_step;
-        audio_emitter_gain(inst_id.Emitter, playerInstance.muffled_sounds);
-        audio_emitter_pitch(inst_id.Emitter, final_pitch);        
-        audio_emitter_position(inst_id.Emitter, playerInstance.x - (PositionX - playerInstance.x), PositionY, 0);
-        audio_emitter_falloff(inst_id.Emitter, falloff_ref_dist, falloff_max_dist, falloff_factor);        
-        audio_play_sound_on(inst_id.Emitter, Sound, Priority, false);
-    }
+	var listener_instance = get_audio_listener_target();
+	if (!instance_exists(global.local_player) || !instance_exists(listener_instance)) {
+		return -1;
+	}
+
+	var player_instance = global.local_player;
+	var sound_gain = clamp(player_instance.muffled_sounds, 0, 1);
+	var sound_pitch = max(1 / 256, player_instance.muffled_sounds * global.time_step);
+	var sound_x = get_spatial_audio_x(PositionX, listener_instance);
+	var sound_instance = audio_play_sound_at(
+		Sound,
+		sound_x,
+		PositionY,
+		0,
+		falloff_ref_dist,
+		falloff_max_dist,
+		falloff_factor,
+		false,
+		Priority
+	);
+
+	if (sound_instance != -1) {
+		audio_sound_gain(sound_instance, sound_gain, 0);
+		audio_sound_pitch(sound_instance, sound_pitch);
+	}
+
+	return sound_instance;
 }
 	
 function smoke_setup(Radius, MoveDirection, MoveSpeed, RotateSpeed, Num, Alpha, Fade, Time, move = false){
@@ -891,14 +924,43 @@ function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBase
     return enemy_struct;
 }
 
-function create_player(PlayerHP, PlayerStamina, PlayerName){
+function create_player(PlayerHP, PlayerStamina, PlayerName, PlayerTeam){
     var player_struct = {
 		Name: PlayerName,
         Health_points: PlayerHP,
 		Damage_health_points: PlayerHP,
 		Stamina_points: PlayerStamina,
-		Damage_stamina_points: PlayerStamina
+		Damage_stamina_points: PlayerStamina,
+		Team: PlayerTeam,
+		Kills: 0,
+		Assists: 0,
+		Deaths: 0
     };
 	
-    return player_struct;
+	return player_struct;
+}
+
+function get_player_team_sprite(_team, _variant_seed = -1) {
+	if (_team == TEAM.TERRORIST) {
+		if (_variant_seed < 0) {
+			return choose(spr_TerroristChar, spr_TerroristChar2, spr_TerroristChar3, spr_TerroristChar4);
+		}
+
+		switch (abs(floor(_variant_seed)) mod 4) {
+			case 0: return spr_TerroristChar;
+			case 1: return spr_TerroristChar2;
+			case 2: return spr_TerroristChar3;
+			default: return spr_TerroristChar4;
+		}
+	}
+
+	if (_variant_seed < 0) {
+		return choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
+	}
+
+	switch (abs(floor(_variant_seed)) mod 3) {
+		case 0: return spr_PoliceChar;
+		case 1: return spr_PoliceChar2;
+		default: return spr_PoliceChar3;
+	}
 }

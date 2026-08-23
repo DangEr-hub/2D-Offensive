@@ -71,11 +71,6 @@ if(stats.Health_points <= 0){
 if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1 && trigger_texture_timer > -1){
 	
 	#region Weapon texture
-	/*ssssvar weapon_indexes = { "AKM":1, "Desert Eagle":2, "Spas-12":3, "SSG 08":4, "MAC11":5, "SIG SG550":6, "FGM-148":7,"Glock-17":8, 
-							"M4A1":9, "AWM":10, "USP":11, "Galil":12, "P250":13, "MK18":14,"FAMAS":15, "TEC-9":16};
-		
-		
-	Weapon.image_index = weapon_indexes[$ global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.Name]] ?? 0;		*/
 	
 	var weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.AmmoSpriteID] + 1;		
 	Weapon.image_index = WeaponID[WeaponPositionID] != Item.None ? weapon_index : 0;		
@@ -145,13 +140,87 @@ if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
 }
 #endregion
 
+#region Danger reaction
+if(danger_reaction_timer > 0){
+	danger_reaction_timer = max(0, danger_reaction_timer - global.time_step);
+}
+
+if(check_danger_timer <= 0){
+	check_danger_timer = check_danger_time;
+	var nearby_danger = find_bot_danger();
+
+	if(nearby_danger != noone){
+		NearestDangerX = nearby_danger.x;
+		NearestDangerY = nearby_danger.y;
+		NearestDangerObject = nearby_danger.source;
+
+		if(State == STATES.FleeDanger){
+			SpottedDanger = true;
+		}else{
+			SpottedDanger = false;
+			if(danger_reaction_source != nearby_danger.source){
+				danger_reaction_source = nearby_danger.source;
+				danger_reaction_timer = random_range(.35, .8)
+					* game_get_speed(gamespeed_fps)
+					* clamp(rank_less, .5, 1.5);
+				var danger_flee_chance = clamp(15 + rank_boost * 50, 55, 95);
+				danger_will_flee = percent_chance(danger_flee_chance);
+			}
+		}
+	}else{
+		NearestDangerX = -1;
+		NearestDangerY = -1;
+		NearestDangerObject = noone;
+		SpottedDanger = false;
+		danger_reaction_source = noone;
+		danger_reaction_timer = -1;
+		danger_will_flee = false;
+
+		if(State == STATES.FleeDanger){
+			var resume_state = danger_state_before_flee;
+			if(Flashed){
+				resume_state = STATES.MoveFlashed;
+			}else if(resume_state == STATES.FleeDanger
+			|| resume_state == STATES.ThrowGrenade
+			|| resume_state == STATES.LayDownLandMine
+			|| resume_state == STATES.NoMove){
+				resume_state = STATES.Idle;
+			}else if(resume_state == STATES.MoveCommand && command_timer == -1){
+				resume_state = STATES.Idle;
+			}
+
+			MoveTime = 0;
+			mv_timer = 0;
+			set_state(resume_state);
+		}
+	}
+}
+
+if(State != STATES.FleeDanger
+&& danger_reaction_timer == 0
+&& instance_exists(danger_reaction_source)){
+	danger_reaction_timer = -1;
+	if(danger_will_flee){
+		danger_state_before_flee = State;
+		SpottedDanger = true;
+		MoveTime = 0;
+		mv_timer = 0;
+		set_state(STATES.FleeDanger);
+	}
+}
+#endregion
+
 #region States 
 
 if(State == STATES.MoveCommand && global.EnemyCanMove == true){
 	MoveTowards(target_x, target_y, Acceleration*3, 0, 0);
 }
 
-if(global.EnemyCanMove == true && mv_timer <= 1){
+if(State == STATES.FleeDanger && global.EnemyCanMove == true){
+	if(MoveTime <= 0){
+		bot_flee_from_danger(NearestDangerX, NearestDangerY);
+	}
+}else if(global.EnemyCanMove == true && mv_timer <= 1){
 	
 	if(instance_exists(ChasingObject) && State != STATES.MoveCommand){
 		target_x = ChasingObject.x;
@@ -291,7 +360,15 @@ if(State == STATES.MoveCommand){
 #endregion
 	
 #region Shooting state
-if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
+if (ChasingObject != noone && !bot_target_is_enemy(ChasingObject)) {
+	ChasingObject = noone;
+	ChasingObjectSpotted = false;
+	chasing_available = false;
+	shoot_accumulator = 0;
+	search_timer = 1;
+}
+
+if(global.EnemyCanMove == true && bot_target_is_enemy(ChasingObject)){
     if(ReactionTimer <= 0){
 		var shoot_chance = .1 * rank_boost;
 		if(chasing_available == true){ shoot_chance = 1; }
@@ -302,6 +379,7 @@ if(global.EnemyCanMove == true && instance_exists(ChasingObject)){
             case STATES.Move:
             case STATES.MoveToward:
             case STATES.MoveAwayFromGrenade:
+			case STATES.FleeDanger:
 			case STATES.MovePredictive:
 			case STATES.MoveCommand:
                 try_shoot(0.15 * shoot_chance);
@@ -344,7 +422,16 @@ if (ReactionTimer > -1) {ReactionTimer -= global.time_step;}
 if (FlashedTimer > -1) {FlashedTimer -= global.time_step;}
 if (search_timer > -1) {search_timer -= 1;}
 if (chasing_timer > -1) {chasing_timer -= 1; }
-if (Reloading == true){ ReloadTime += global.time_step;}
+if(reload_timer > 0){
+	reload_timer = max(0, reload_timer - global.time_step);
+}
+if(Reloading == true){
+	var active_reload_time = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
+	ReloadTime = min(ReloadTime + global.time_step, active_reload_time);
+}else{
+	ReloadTime = 0;
+	reload_timer = -1;
+}
 
 if(search_timer == 0){
 	ChasingObject = pick_chasing_object(1024);
@@ -409,7 +496,7 @@ if(ArmourDurability[1] <= 0){
 	
 #region Movement
 
-if(mv_timer <= 0 && State != STATES.MoveCommand){
+if(mv_timer <= 0 && State != STATES.MoveCommand && State != STATES.FleeDanger){
 	var rand = random(100);    
 	if(ChasingObjectSpotted == true && Flashed == false){
 		if(ReactionTimer <= 0){
@@ -589,13 +676,14 @@ if (WeaponID[WeaponPositionID] != Item.None) {
 			
 		if (should_reload) {
 			trigger_texture_timer = trigger_texture_time;
-		    Reloading = true;
-		    reload_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed] * global.time_step;
+			ReloadTime = 0;
+			Reloading = true;
+			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
 		}
 	}
 }
 
-if(reload_timer == 0){
+if(Reloading && reload_timer <= 0){
 	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BaseDurability] != 1){
 		
 		#region Normal reloading
@@ -617,6 +705,7 @@ if(reload_timer == 0){
 		}
 		Reloading = false;
 		ReloadTime = 0;
+		reload_timer = -1;
 		#endregion
 		
 	}else{
@@ -628,9 +717,11 @@ if(reload_timer == 0){
 			ClipAmmo[WeaponPositionID] -= 1;
 			Ammo[WeaponPositionID] += 1;
 		}
-		if(Ammo[WeaponPositionID] < MaxAmmo[WeaponPositionID]){
+		if(Ammo[WeaponPositionID] < MaxAmmo[WeaponPositionID] && ClipAmmo[WeaponPositionID] > 0){
 			Reloading = true;
-			reload_timer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed];
+			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
+		}else{
+			reload_timer = -1;
 		}
 		#endregion
 		
@@ -668,7 +759,7 @@ if!(instance_exists(ChasingObject)){
 	ChasingObjectSpotted = false;
 }else if(chasing_available){
 	ChasingObjectSpot(chasing_timer);
-}else if(ChasingObjectSpotted == false && State != STATES.MoveCommand){
+}else if(ChasingObjectSpotted == false && State != STATES.MoveCommand && State != STATES.FleeDanger){
 	if(Flashed == false){
 		set_state(STATES.Idle);			
 	}else{
@@ -676,7 +767,7 @@ if!(instance_exists(ChasingObject)){
 	}
 }
 
-if(Flashed == true){
+if(Flashed == true && State != STATES.FleeDanger){
 	set_state(STATES.MoveFlashed);
 }
 
@@ -703,7 +794,7 @@ if(instance_exists(ChasingObjectBullet) && instance_exists(ChasingObjectBullet.s
 }
 
 // Hear the target
-if(instance_exists(ChasingObject) && ChasingObject.team != team && distance_to_object(ChasingObject) <= ChasingDistance){
+if(instance_exists(ChasingObject) && ChasingObject.stats.Team != stats.Team && distance_to_object(ChasingObject) <= ChasingDistance){
 	var velocity = sqrt(power(ChasingObject.XSpeed, 2) + power(ChasingObject.YSpeed, 2)) * game_get_speed(gamespeed_fps);
 	if(ChasingObject.Moving == true && velocity >= MOVE_SPD/3 && percent_chance(1 * rank_boost)){
 		if(ChasingObjectSpotted == false){
@@ -715,7 +806,14 @@ if(instance_exists(ChasingObject) && ChasingObject.team != team && distance_to_o
 
 #region Throw grenade or lay land mine
 if(global.EnemyCanMove == true){
-	if(State == STATES.ThrowGrenade && EquippedGrenadeTimer == -1){
+	if (State == STATES.ThrowGrenade && !bot_target_is_enemy(ChasingObject)) {
+		EquippedGrenade = Item.None;
+		EquippedGrenadeID = Item.None;
+		EquippedGrenadeTimer = -1;
+		set_state(STATES.Idle);
+	}
+
+	if(State == STATES.ThrowGrenade && EquippedGrenadeTimer == -1 && bot_target_is_enemy(ChasingObject)){
 		var Target_x, Target_y, GrenadeSpd;
 		switch(EquippedGrenadeID){
 			case Item.HEGrenade:
@@ -793,70 +891,6 @@ if(XSpeed > 0 || YSpeed > 0){
 }else{
 	Legs.image_speed = 0;
 }
-#endregion
-
-#region Spot grenade, landmine, bomb
-
-if(check_danger_timer == -1){
-	check_danger_timer = check_danger_time;
-	NearestDangerX = -1;
-	NearestDangerY = -1;
-	NearestDangerObject = noone;
-	SpottedDanger = false;
-
-	// maximální vzdálenost reakce
-	var danger_dist = 192 * rank_boost;
-
-	// pomocné proměnné
-	var best_dist = danger_dist + 1;
-	var best_inst = noone;
-
-	// ===== GRENADE =====
-	var g = instance_nearest(x, y, oGrenade);
-	if(instance_exists(g)){
-	    var d = point_distance(x, y, g.x, g.y);
-	    if(d <= danger_dist && d < best_dist && g.stats.Object_index != oBot){
-	        best_dist = d;
-	        best_inst = g;
-	    }
-	}
-
-	// ===== LANDMINE =====
-	var m = instance_nearest(x, y, oLandMine);
-	if(instance_exists(m)){
-		var d = point_distance(x, y, m.x, m.y);
-		if(d <= danger_dist && d < best_dist && m.stats.Object_index != oBot){
-		    best_dist = d;
-		    best_inst = m;
-		}
-	}
-
-	// ===== BOMB / MISSILE =====
-	var b = instance_nearest(x, y, oMissile);
-	if(instance_exists(b)){
-		var d = point_distance(x, y, b.x, b.y);
-		if(d <= danger_dist && d < best_dist && b.stats.Object_index != oBot){
-		    best_dist = d;
-		    best_inst = b;
-		}
-	}
-
-	// ===== VÝSLEDEK =====
-	if(best_inst != noone){
-	    if(!ChasingObjectSpotted){
-	        ChasingObjectSpot(chasing_timer);
-	    }
-
-	    SpottedDanger = true;
-	    NearestDangerX = best_inst.x;
-	    NearestDangerY = best_inst.y;
-	    NearestDangerObject = best_inst.stats.Object;
-	}else{
-	    SpottedDanger = false;
-	}
-
-}
-
 #endregion
 
 #region Facing

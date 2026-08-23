@@ -5,16 +5,19 @@ enum PLAYER_FLAGS {
     RELOADING = 4,   // 0b00000100 1 << 2
 	FLASHED = 8,
 	PRONE = 16,
-	THROWING_GRENADE = 32
+	THROWING_GRENADE = 32,
+	PLANTING = 64
 }
 
 network_set_config(network_config_use_non_blocking_socket, true);
 persistent = true;
 network_type = network_socket_udp;
 server_port = 50000;
-server_ip = "127.0.0.1"; // localhost
+server_ip = variable_global_exists("saved_server_ip") ? global.saved_server_ip : "127.0.0.1";
 max_clients = 4;
 server_max_damage_per_hit = 500;
+round_resolved = false;
+team_round_wins = array_create(TEAM.TERRORIST + 1, 0);
 
 // Network state
 
@@ -28,6 +31,9 @@ my_player_id = -1;
 clients = ds_map_create();
 client_timeout = ds_map_create();
 timeout_threshold = 5000; // 5 seconds without heartbeat = disconnect
+server_timeout_threshold = 5000;
+last_server_packet_time = current_time;
+server_disconnect_handled = false;
 
 // Network buffers
 send_buffer = buffer_create(1024, buffer_grow, 1);
@@ -69,7 +75,16 @@ enum PACKET {
 	PING,
 	BIRD_SYNC,
 	GRENADE_SYNC,
-	AIRPLANE_SYNC
+	AIRPLANE_SYNC,
+	STATS_SYNC,
+	ROUND_END,
+	BOMB_SYNC,
+	ITEM_USE_SYNC
+}
+
+enum BOMB_SYNC_ACTION {
+	REQUEST_PLANT,
+	PLANTED
 }
 
 enum GRENADE_SYNC_ACTION {
@@ -93,11 +108,16 @@ send_rate = 1/30; // Send updates 30 times per second
 send_timer = 0;
 accum_server = 0;   //  TICK_UPDATE serveru
 hb_client    = 0;   // heartbeat of client
+last_item_use_id = -1;
+item_use_resync_timer = 0;
+item_use_resync_interval = 2;
 
 /// ping
 ping_interval = 1;  // how often to measure latency
 ping_timer = 0;
 ping_ms = 0;
+stats_sync_timer = 0;
+stats_sync_interval = .25;
 ping_send_time = 0;
 
 // Sequence numbers for packet ordering

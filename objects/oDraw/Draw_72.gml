@@ -3,15 +3,13 @@
 surfW = surface_get_width(application_surface);
 surfH = surface_get_height(application_surface);
 
-var guiW = display_get_gui_width();
-var guiH = display_get_gui_height();
+// Keep the game and post-processing surfaces at one stable render size.
+var target_surf_w = global.GuiW;
+var target_surf_h = global.GuiH;
 
-//Aspect Ratio
-var rW = surfW/surfH;
-
-//Set app surf size to GUI layer
-surface_resize(application_surface, guiH * rW,
-    guiH);
+if (surface_get_width(application_surface) != target_surf_w || surface_get_height(application_surface) != target_surf_h) {
+    surface_resize(application_surface, target_surf_w, target_surf_h);
+}
 
 //Update app surf size
 surfW = surface_get_width(application_surface);
@@ -21,7 +19,7 @@ if (!surface_exists(haze_final_surface)){
     haze_final_surface = surface_create(surfW, surfH);
     haze_surf_clear(haze_final_surface);
 }
-else{
+else if (surface_get_width(haze_final_surface) != surfW || surface_get_height(haze_final_surface) != surfH){
     surface_resize(haze_final_surface, surfW, surfH);
 }
 

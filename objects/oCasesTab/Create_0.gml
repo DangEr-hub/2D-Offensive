@@ -1,6 +1,6 @@
 event_inherited();
-tab_width = 784 * global.GUIMultiplier;
-tab_height = 405 * global.GUIMultiplier;
+tab_width = max(784 * global.GUIMultiplier, 1200);
+tab_height = max(405 * global.GUIMultiplier, 590);
 bw = 64 * global.GUIMultiplier;
 bh = 32 * global.GUIMultiplier;
 image_size = 64 * global.GUIMultiplier;
@@ -10,12 +10,12 @@ zui_set_size(tab_width, tab_height);
 
 text_h = string_height("a") * 1.1;
 
-ar_cases_x = zui_get_width() * .05;
-sniper_cases_x = zui_get_width() * .2;
-pistol_cases_x = zui_get_width() * .35;
-smg_cases_x = zui_get_width() * 0.5;
-heavy_cases_x = zui_get_width() * 0.65;
-cases_y = zui_get_height() * .125;
+ar_cases_x = zui_get_width() * .075;
+sniper_cases_x = zui_get_width() * .225;
+pistol_cases_x = zui_get_width() * .375;
+smg_cases_x = zui_get_width() * 0.525;
+heavy_cases_x = zui_get_width() * 0.675;
+cases_y = zui_get_height() * .175;
 
 #region AR case
 ar_case_callback = function(){
@@ -41,11 +41,11 @@ ar_case_callback = function(){
 				Item.galil
 			];
 		}
-		global.player_stats_struct.AR_cases --;
+		global.player_stats.AR_cases --;
 	}
 };
 
-ar_count_str = "Assault rifles - " + string(global.player_stats_struct.AR_cases) + "x";
+ar_count_str = "Assault rifles - " + string(global.player_stats.AR_cases) + "x";
 ar_count = zui_create(ar_cases_x + bw/2 - string_width(ar_count_str)/2, cases_y - text_h*2, objUILabel);
 with(ar_count){caption = oCasesTab.ar_count_str; }
 
@@ -67,9 +67,9 @@ with(zui_create(ar_cases_x, cases_y + image_size/4 + text_h*1.5, objUIButton)){
 
 	caption = "Buy";
 	callback = function(){
-		if(global.player_stats_struct.Diamonds >= global.cases_cost.AR_cases){
-			global.player_stats_struct.AR_cases += 1;	
-			global.player_stats_struct.Diamonds -= global.cases_cost.AR_cases;
+		if(global.player_stats.Diamonds >= global.cases_cost.AR_cases){
+			global.player_stats.AR_cases += 1;	
+			global.player_stats.Diamonds -= global.cases_cost.AR_cases;
 		}
 	};
 }
@@ -106,11 +106,11 @@ sniper_case_callback = function(){
 				Item.Dragunov
 			];
 		}
-		global.player_stats_struct.Sniper_cases --;
+		global.player_stats.Sniper_cases --;
 	}
 };
 
-sniper_count_str = "Sniper rifles - " + string(global.player_stats_struct.Sniper_cases) + "x";
+sniper_count_str = "Sniper rifles - " + string(global.player_stats.Sniper_cases) + "x";
 sniper_count = zui_create(sniper_cases_x + bw/2 - string_width(sniper_count_str)/2, cases_y - text_h*2, objUILabel);
 with(sniper_count){caption = oCasesTab.sniper_count_str; }
 
@@ -132,9 +132,9 @@ with(zui_create(sniper_cases_x, cases_y + image_size/4 + text_h*1.5, objUIButton
 
 	caption = "Buy";
 	callback = function(){
-		if(global.player_stats_struct.Diamonds >= global.cases_cost.Sniper_cases){
-			global.player_stats_struct.Sniper_cases += 1;	
-			global.player_stats_struct.Diamonds -= global.cases_cost.Sniper_cases;
+		if(global.player_stats.Diamonds >= global.cases_cost.Sniper_cases){
+			global.player_stats.Sniper_cases += 1;	
+			global.player_stats.Diamonds -= global.cases_cost.Sniper_cases;
 		}
 	};
 }
@@ -175,11 +175,11 @@ pistol_case_callback = function(){
 				Item.p250
 			];
 		}
-		global.player_stats_struct.Pistol_cases --;
+		global.player_stats.Pistol_cases --;
 	}
 };
 
-pistol_count_str = "Pistols - " + string(global.player_stats_struct.Pistol_cases) + "x";
+pistol_count_str = "Pistols - " + string(global.player_stats.Pistol_cases) + "x";
 pistol_count = zui_create(pistol_cases_x + bw/2 - string_width(pistol_count_str)/2, cases_y - text_h*2, objUILabel);
 with(pistol_count){caption = oCasesTab.pistol_count_str; }
 
@@ -201,9 +201,9 @@ with(zui_create(pistol_cases_x, cases_y + image_size/4 + text_h*1.5, objUIButton
 
 	caption = "Buy";
 	callback = function(){
-		if(global.player_stats_struct.Diamonds >= global.cases_cost.Pistol_cases){
-			global.player_stats_struct.Pistol_cases += 1;	
-			global.player_stats_struct.Diamonds -= global.cases_cost.Pistol_cases;
+		if(global.player_stats.Diamonds >= global.cases_cost.Pistol_cases){
+			global.player_stats.Pistol_cases += 1;	
+			global.player_stats.Diamonds -= global.cases_cost.Pistol_cases;
 		}
 	};
 }
@@ -238,13 +238,14 @@ smg_case_callback = function(){
 				Item.MAC11,
 				Item.MP9,
 				Item.MP7,
+				Item.P90
 			];
 		}
-		global.player_stats_struct.Smg_cases --;
+		global.player_stats.Smg_cases --;
 	}
 };
 
-smg_count_str = "Submachine guns - " + string(global.player_stats_struct.Smg_cases) + "x";
+smg_count_str = "Submachine guns - " + string(global.player_stats.Smg_cases) + "x";
 smg_count = zui_create(smg_cases_x + bw/2 - string_width(smg_count_str)/2, cases_y - text_h*2, objUILabel);
 with(smg_count){caption = oCasesTab.smg_count_str; }
 
@@ -266,9 +267,9 @@ with(zui_create(smg_cases_x, cases_y + image_size/4 + text_h*1.5, objUIButton)){
 
 	caption = "Buy";
 	callback = function(){
-		if(global.player_stats_struct.Diamonds >= global.cases_cost.Smg_cases){
-			global.player_stats_struct.Smg_cases += 1;	
-			global.player_stats_struct.Diamonds -= global.cases_cost.Smg_cases;
+		if(global.player_stats.Diamonds >= global.cases_cost.Smg_cases){
+			global.player_stats.Smg_cases += 1;	
+			global.player_stats.Diamonds -= global.cases_cost.Smg_cases;
 		}
 	};
 }
@@ -303,11 +304,11 @@ heavy_case_callback = function(){
 				Item.Javelin,
 			];
 		}
-		global.player_stats_struct.Heavy_cases --;
+		global.player_stats.Heavy_cases --;
 	}
 };
 
-heavy_count_str = "Heavy guns - " + string(global.player_stats_struct.Heavy_cases) + "x";
+heavy_count_str = "Heavy guns - " + string(global.player_stats.Heavy_cases) + "x";
 heavy_count = zui_create(heavy_cases_x + bw/2 - string_width(heavy_count_str)/2, cases_y - text_h*2, objUILabel);
 with(heavy_count){caption = oCasesTab.heavy_count_str; }
 
@@ -329,9 +330,9 @@ with(zui_create(heavy_cases_x, cases_y + image_size/4 + text_h*1.5, objUIButton)
 
 	caption = "Buy";
 	callback = function(){
-		if(global.player_stats_struct.Diamonds >= global.cases_cost.Heavy_cases){
-			global.player_stats_struct.Heavy_cases += 1;	
-			global.player_stats_struct.Diamonds -= global.cases_cost.Heavy_cases;
+		if(global.player_stats.Diamonds >= global.cases_cost.Heavy_cases){
+			global.player_stats.Heavy_cases += 1;	
+			global.player_stats.Diamonds -= global.cases_cost.Heavy_cases;
 		}
 	};
 }

@@ -7,8 +7,12 @@ shoot_accumulator = 0;
 chasing_available = false;
 trigger_texture_timer = 1;
 trigger_texture_time = 1 * game_get_speed(gamespeed_fps);
-check_danger_timer = -1;
-check_danger_time = .25 * game_get_speed(gamespeed_fps);
+check_danger_timer = 0;
+check_danger_time = .1 * game_get_speed(gamespeed_fps);
+danger_state_before_flee = STATES.Idle;
+danger_reaction_source = noone;
+danger_reaction_timer = -1;
+danger_will_flee = false;
 target_x = x;
 target_y = y;
 command_time = 6 * game_get_speed(gamespeed_fps);
@@ -20,7 +24,6 @@ command_last_y = y;
 has_suppressor = false;
 refresh_target_timer = 5 * game_get_speed(gamespeed_fps);
 search_timer = 1;
-team = percent_chance(15) ? TEAM.POLICE : TEAM.TERRORIST;
 NearestDangerObject = noone;
 AmmoNeeded = 0;
 check_other_enemies_time = game_get_speed(gamespeed_fps);
@@ -31,9 +34,16 @@ EquippedLandMine = Item.None;
 stats = {};
 NearestDangerX = -1;
 NearestDangerY = -1;
-stats = create_enemy(80, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
+stats = create_enemy(75, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
 stats.Max_health_points = stats.Health_points;
 stats.Max_stamina_points = stats.Stamina_points;
+stats.Kills = 0;
+stats.Assists = 0;
+stats.Deaths = 0;
+stats.Money = ROUND_STARTING_MONEY;
+stats.Team = choose(TEAM.TERRORIST, TEAM.POLICE);
+stats.Room = room;
+array_push(global.BotMatchStats, stats);
 WeaponID = [0, 0];
 WeaponDistance = 0;
 RotationAngle = 0;
@@ -73,6 +83,9 @@ healing = false;
 equip_time = 0;
 equip_timer = -1;
 healing_time = -1;
+planting = false;
+planting_value = 0;
+planting_max = 3 * game_get_speed(gamespeed_fps);
 health_packs = 3;
 EquippedLandMineID = Item.None;
 LandMineAngle = random(360);
@@ -84,7 +97,7 @@ Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, SmokeGrenades, MolotovGren
 GrenadeObject = noone;
 check_chasing_timer = 1 * game_get_speed(gamespeed_fps);
 alarm[6] = 1;
-sprite_index = team == TEAM.TERRORIST ? choose(spr_TerroristBot, spr_TerroristBot3, spr_TerroristBot2) : choose(spr_PoliceBot, spr_PoliceBot2);
+sprite_index = stats.Team == TEAM.TERRORIST ? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4) : choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3); ///fallback
 mv_timer = 5;
 
 #region Flashed
@@ -92,8 +105,8 @@ FlashedTimer = -1;
 FlashedTime = 7 * game_get_speed(gamespeed_fps);
 #endregion
 
-rank_boost = get_rank_boost(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
-rank_less = get_rank_less(global.rating_struct.Enemy_ep[global.rating_struct.Current_game]);
+rank_boost = get_rank_boost(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
+rank_less = get_rank_less(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
 chasing_timer = round(5 * game_get_speed(gamespeed_fps) * rank_boost);
 
 #region Set armour

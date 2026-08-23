@@ -9,8 +9,9 @@ if(!IS_NET){
 	instance_activate_object(oRoundEndMenu);
 	instance_activate_object(oWeapon);
 	instance_activate_object(objUIGrid);
-	instance_activate_object(oDamageTable);
-	instance_activate_object(objUILabel);
+instance_activate_object(oDamageTable);
+instance_activate_object(oStatisticsTable);
+instance_activate_object(objUILabel);
 	instance_activate_object(objUISliderHandle);
 	instance_activate_object(objUISlider);
 	instance_activate_object(objUIButton);

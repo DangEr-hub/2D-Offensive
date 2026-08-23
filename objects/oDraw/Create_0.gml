@@ -1,5 +1,7 @@
 application_surface_draw_enable(false);
 draw_texture_flush();
+decor_n = irandom_range(50, 100);
+decor_spawned = false;
 aberration_level = 0;
 saturation_level = 0;
 bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
@@ -10,6 +12,8 @@ item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.PickUp])) + "]";
 HUDShift = 16;
 buy_time = 0;
+round_end_timer = -1;
+bomb_detonation_pending = false;
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;
@@ -69,6 +73,8 @@ KilledBy = noone;
 GameEndMenu = false;
 PauseMenu = false;
 RespawnMenu = false;
+spectating = false;
+spectate_target = noone;
 BackGround = -1;
 #endregion
 
@@ -82,6 +88,7 @@ BlurValue = 0;
 
 // hlavní postprocessing surface
 post_surface = -1;
+haze_source_surface = -1;
 
 // Nightvision
 nightvision_surface = -1;

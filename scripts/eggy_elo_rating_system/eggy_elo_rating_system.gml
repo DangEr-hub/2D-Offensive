@@ -26,7 +26,7 @@ function calculate_probability(player_ep, enemy_ep, rd_player, rd_enemy) {
 function calculate_games_information(rd_enemy){
 	var information_sum = 0;
 	for(var i = 0; i < TRACKING_PERIOD; i ++){
-		prob_win = global.rating_struct.Expected_results[i];
+		prob_win = global.game_struct.Expected_results[i];
 		information_sum += rd_weight(rd_enemy[i]) * prob_win * (1 - prob_win);
 	}
 	
@@ -34,14 +34,18 @@ function calculate_games_information(rd_enemy){
 }
 
 function set_current_enemy(){
-	if(global.rating_struct.Enemy_ep[global.rating_struct.Current_game] == -1){
-		global.rating_struct.Enemy_ep[global.rating_struct.Current_game] = get_enemy_ep(global.rating_struct.Player_ep, global.rating_struct.Player_rd);
-		global.rating_struct.Enemy_rd[global.rating_struct.Current_game] = get_enemy_rd(global.rating_struct.Player_rd);
+	for(var i = 0; i < TRACKING_PERIOD; i++){
+		if(global.game_struct.Enemy_ep[i] == -1){
+			global.game_struct.Enemy_ep[i] = get_enemy_ep(global.game_struct.Player_ep, global.game_struct.Player_rd);
+			global.game_struct.Enemy_rd[i] = get_enemy_rd(global.game_struct.Player_rd);
+		}else if(global.game_struct.Enemy_rd[i] < 0){
+			global.game_struct.Enemy_rd[i] = get_enemy_rd(global.game_struct.Player_rd);
+		}
 	}
 }
 
-function ini_player_struct_create(){
-	var player_struct = {
+function game_struct_create(){
+	var return_struct = {
 		"Previous_ep": convert_to_eggy_scale(MIN_EP),
 		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
 		"Predictive_volatility": PLAYER_STARTING_VOLATILITY,
@@ -51,6 +55,9 @@ function ini_player_struct_create(){
 		"Current_round": 0,
 		"Rounds_win": 0,
 		"Rounds_lost": 0,
+		"Match_kills": 0,
+		"Match_assists": 0,
+		"Match_deaths": 0,
 		"Played_games": 0,
 		"Winned_rounds": array_create(TRACKING_PERIOD, 0),
 		"Lost_rounds": array_create(TRACKING_PERIOD, 0),
@@ -65,38 +72,50 @@ function ini_player_struct_create(){
 		"Enemy_ep": array_create(TRACKING_PERIOD, -1),
 		"Enemy_rd": array_create(TRACKING_PERIOD, 0)
 	}
+
+	for(var i = 0; i < TRACKING_PERIOD; i++){
+		return_struct.Enemy_ep[i] = get_enemy_ep(return_struct.Player_ep, return_struct.Player_rd);
+		return_struct.Enemy_rd[i] = get_enemy_rd(return_struct.Player_rd);
+	}
 	
-	return player_struct;
+	return return_struct;
 }
 
-function set_map_rounds(Map){
+function map_init(Map){
+	if(global.player_stats.Player_team == TEAM.NONE){
+		global.player_stats.Player_team = choose(TEAM.POLICE, TEAM.TERRORIST);
+	}
+	global.game_struct.Match_kills = 0;
+	global.game_struct.Match_assists = 0;
+	global.game_struct.Match_deaths = 0;
 	global.MapID = Map;
 	if(global.map_rounds[Map][2] == -1){
-		global.map_rounds[Map][2] = global.rating_struct.Enemy_ep[global.rating_struct.Current_game];
+		global.map_rounds[Map][2] = global.game_struct.Enemy_ep[global.game_struct.Current_game];
 	}
 	if(global.map_rounds[Map][0] != -1){
-		global.rating_struct.Rounds_win = global.map_rounds[Map][0];
-		global.rating_struct.Rounds_lost = global.map_rounds[Map][1];
+		global.game_struct.Rounds_win = global.map_rounds[Map][0];
+		global.game_struct.Rounds_lost = global.map_rounds[Map][1];
 	}
 }
 
 function clear_player_statistics(total_rounds){
-	global.rating_struct.Rounds_win = 0;
-	global.rating_struct.Rounds_lost = 0;
-	global.rating_struct.Current_round = 0;
+	global.game_struct.Rounds_win = 0;
+	global.game_struct.Rounds_lost = 0;
+	global.game_struct.Current_round = 0;
+	global.player_stats.Player_team = TEAM.NONE;
 	for(var i=0;i<total_rounds;i++){
-		global.rating_struct.Headshots_per_round[i] = 0;
-		global.rating_struct.Kills_per_round[i] = 0;
-		global.rating_struct.Playing_time_per_round[i] = 0;
+		global.game_struct.Headshots_per_round[i] = 0;
+		global.game_struct.Kills_per_round[i] = 0;
+		global.game_struct.Playing_time_per_round[i] = 0;
 	}
 }
 
 function clear_tracking_period(){
 	for(var i=0;i<TRACKING_PERIOD;i++){
-		global.rating_struct.Recent_results[i] = -1;
-		global.rating_struct.Expected_results[i] = -1;
-		global.rating_struct.Enemy_ep[i] = -1;
-		global.rating_struct.Enemy_rd[i] = -1;
+		global.game_struct.Recent_results[i] = -1;
+		global.game_struct.Expected_results[i] = -1;
+		global.game_struct.Enemy_ep[i] = -1;
+		global.game_struct.Enemy_rd[i] = -1;
 	}
 }
 
@@ -106,69 +125,75 @@ function calculate_volatility(local_volatility_array, predictive_volatility, loc
 }
 
 function update_eggy_rating_system(game_result, map){
-	var enemy_ep = global.rating_struct.Enemy_ep[global.rating_struct.Current_game];
-	var enemy_rd = global.rating_struct.Enemy_rd[global.rating_struct.Current_game];
-	var winned_rounds = global.rating_struct.Rounds_win;
-	var lost_rounds = global.rating_struct.Rounds_lost;
-	var expected_result = calculate_probability(global.rating_struct.Player_ep, enemy_ep, global.rating_struct.Player_rd, enemy_rd);
+	var enemy_ep = global.game_struct.Enemy_ep[global.game_struct.Current_game];
+	var enemy_rd = global.game_struct.Enemy_rd[global.game_struct.Current_game];
+	var winned_rounds = global.game_struct.Rounds_win;
+	var lost_rounds = global.game_struct.Rounds_lost;
+	var expected_result = calculate_probability(global.game_struct.Player_ep, enemy_ep, global.game_struct.Player_rd, enemy_rd);
 	var game_volatility = calculate_game_volatility(
-														global.rating_struct.Headshots_per_round, 
-														global.rating_struct.Kills_per_round,
+														global.game_struct.Headshots_per_round, 
+														global.game_struct.Kills_per_round,
 														winned_rounds + lost_rounds
 													);
 	
-	global.rating_struct.Recent_results = array_shift_left(global.rating_struct.Recent_results, game_result);
-	global.rating_struct.Expected_results = array_shift_left(global.rating_struct.Expected_results, expected_result);	
-	global.rating_struct.Game_volatility = array_shift_left(global.rating_struct.Game_volatility, game_volatility);
-	global.rating_struct.Winned_rounds = array_shift_left(global.rating_struct.Winned_rounds, winned_rounds);
-	global.rating_struct.Lost_rounds = array_shift_left(global.rating_struct.Lost_rounds, lost_rounds);
+	global.game_struct.Recent_results = array_shift_left(global.game_struct.Recent_results, game_result);
+	global.game_struct.Expected_results = array_shift_left(global.game_struct.Expected_results, expected_result);	
+	global.game_struct.Game_volatility = array_shift_left(global.game_struct.Game_volatility, game_volatility);
+	global.game_struct.Winned_rounds = array_shift_left(global.game_struct.Winned_rounds, winned_rounds);
+	global.game_struct.Lost_rounds = array_shift_left(global.game_struct.Lost_rounds, lost_rounds);
+	var tracking_period_completed = false;
 	
-	if (global.rating_struct.Current_game > 0 && (global.rating_struct.Current_game + 1) % TRACKING_PERIOD == 0){
-		global.rating_struct.Predictive_volatility = calculate_predictive_volatility(global.rating_struct.Recent_results, global.rating_struct.Expected_results);
+	if (global.game_struct.Current_game > 0 && (global.game_struct.Current_game + 1) % TRACKING_PERIOD == 0){
+		global.game_struct.Predictive_volatility = calculate_predictive_volatility(global.game_struct.Recent_results, global.game_struct.Expected_results);
 		var played_rounds = array_create(TRACKING_PERIOD, -1);
 		
 		for(var i=0;i<array_length(played_rounds);i++){
-			played_rounds[i] = global.rating_struct.Winned_rounds[i] + global.rating_struct.Lost_rounds[i];
+			played_rounds[i] = global.game_struct.Winned_rounds[i] + global.game_struct.Lost_rounds[i];
 		}
 		var volatility = calculate_volatility(
-												global.rating_struct.Game_volatility, 
-												global.rating_struct.Predictive_volatility, 
+												global.game_struct.Game_volatility, 
+												global.game_struct.Predictive_volatility, 
 												played_rounds
 											);	
-		global.rating_struct.Player_rd = calculate_new_rd(global.rating_struct.Player_rd, volatility, global.rating_struct.Enemy_rd);
-		global.rating_struct.Current_game = 0;
+		global.game_struct.Player_rd = calculate_new_rd(global.game_struct.Player_rd, volatility, global.game_struct.Enemy_rd);
+		global.game_struct.Current_game = 0;
 		clear_tracking_period();
+		tracking_period_completed = true;
 	}else{
-		global.rating_struct.Current_game ++;
+		global.game_struct.Current_game ++;
 	}
 
-	global.rating_struct.Played_games ++;
+	global.game_struct.Played_games ++;
 	
 	if(game_result < 0.5){
-		global.rating_struct.Lost_games ++;
+		global.game_struct.Lost_games ++;
 	}else if(game_result == 0.5){
-		global.rating_struct.Tied_games ++;
+		global.game_struct.Tied_games ++;
 	}else{
-		global.rating_struct.Won_games ++;
+		global.game_struct.Won_games ++;
 	}
 
-	var hs_sum = sum(global.rating_struct.Headshots_per_round);
-	var kills_sum = sum(global.rating_struct.Kills_per_round);
+	var hs_sum = sum(global.game_struct.Headshots_per_round);
+	var kills_sum = sum(global.game_struct.Kills_per_round);
 	var ep_change = calculate_ep_change(
 		expected_result,
 		game_result, 
 		kills_sum, 
 		hs_sum, 
-		global.rating_struct.Player_ep, 
-		global.rating_struct.Player_rd,
+		global.game_struct.Player_ep, 
+		global.game_struct.Player_rd,
 		enemy_ep,
 		enemy_rd,
 		map	
 	);
 	
-	global.rating_struct.Previous_ep = global.rating_struct.Player_ep;
-	global.rating_struct.Player_ep += ep_change;
-	global.rating_struct.Player_ep = max(global.rating_struct.Player_ep, 0);
+	global.game_struct.Previous_ep = global.game_struct.Player_ep;
+	global.game_struct.Player_ep += ep_change;
+	global.game_struct.Player_ep = max(global.game_struct.Player_ep, 0);
+
+	if(tracking_period_completed){
+		set_current_enemy();
+	}
 }
 
 function get_enemy_ep(player_ep, player_rd){
@@ -271,12 +296,12 @@ function calculate_ep_change(prob_win, game_result, your_kills, your_hs, A_ep, A
 	var A_eggy_points = A_ep;
 	var A_rating_d = A_rd;
 	
-	// Pokud je A team, vypočti jejich EP na základě jejich RD
+	// Pokud je A stats.Team, vypočti jejich EP na základě jejich RD
 	if(is_array(A_ep) && is_array(A_rd)){
 		A_eggy_points = calculate_team_ep(A_ep, A_rd);
 	}
 	
-	// Pokud je B team, vypočti jejich EP na základě jejich RD
+	// Pokud je B stats.Team, vypočti jejich EP na základě jejich RD
 	if(is_array(B_ep) && is_array(B_rd)){
 		B_eggy_points = calculate_team_ep(B_ep, B_rd);
 		B_rating_d = calculate_team_rd(B_rd);
@@ -406,10 +431,60 @@ function calculate_game_result(player_win_rounds, enemy_win_rounds) {
 	return game_result;
 }
 
-function round_end(round_result){
+function round_end(round_result, winning_team = -1){
 	with(oMortarMenu){
 		zui_destroy();
 	}
+
+	var local_player = global.local_player;
+	if ((winning_team != TEAM.POLICE && winning_team != TEAM.TERRORIST) && instance_exists(local_player)) {
+		winning_team = round_result == "Win"
+			? local_player.stats.Team
+			: (local_player.stats.Team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE);
+	}
+
+	if (IS_NET) {
+		if (!oNetworkManager.is_server) return false;
+		if (winning_team != TEAM.POLICE && winning_team != TEAM.TERRORIST) return false;
+		if (oNetworkManager.round_resolved) return false;
+
+		oNetworkManager.round_resolved = true;
+		oNetworkManager.team_round_wins[winning_team]++;
+
+		if (instance_exists(local_player)) {
+			global.game_struct.Rounds_win = oNetworkManager.team_round_wins[local_player.stats.Team];
+			var local_enemy_team = local_player.stats.Team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE;
+			global.game_struct.Rounds_lost = oNetworkManager.team_round_wins[local_enemy_team];
+		}
+
+		var network_round_number = oNetworkManager.team_round_wins[TEAM.POLICE]
+			+ oNetworkManager.team_round_wins[TEAM.TERRORIST];
+		if (instance_exists(oEconomics)) {
+			oEconomics.resolve_round(winning_team, network_round_number);
+		}
+
+		if (instance_exists(oRatingController) && instance_exists(local_player)) {
+			oRatingController.player_win = winning_team == local_player.stats.Team;
+		}
+		if (instance_exists(oDraw)) {
+			oDraw.spectating = false;
+			oDraw.spectate_target = noone;
+			oDraw.GameEndMenu = oNetworkManager.team_round_wins[winning_team] >= (MAX_ROUNDS / 2 + 1);
+			oDraw.RespawnMenu = true;
+		}
+
+		server_round_end_broadcast(winning_team);
+		camera_set_view_angle(CAM, 0);
+		return true;
+	}
+
+	if (winning_team == TEAM.POLICE || winning_team == TEAM.TERRORIST) {
+		var next_round_number = global.game_struct.Rounds_win + global.game_struct.Rounds_lost + 1;
+		if (instance_exists(oEconomics)) {
+			oEconomics.resolve_round(winning_team, next_round_number);
+		}
+	}
+
 	if(!instance_exists(oNetworkManager)){
 		save_game();
 		oRatingController.round_ended = true;
@@ -417,7 +492,6 @@ function round_end(round_result){
 			if(round_result == "Win"){
 				oRatingController.player_win = true;
 			}else{
-				global.player_stats_struct.Deaths ++;
 				oRatingController.player_win = false;
 			}
 		}else{
@@ -426,6 +500,8 @@ function round_end(round_result){
 	}else{
 		oDraw.RespawnMenu = true;
 	}
+	camera_set_view_angle(CAM, 0);
+	return true;
 }
 
 function RankStats(RankID, LessMod, BoostMod, RankName, MinElo){

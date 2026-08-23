@@ -8,14 +8,16 @@ if(other.is_remote == false){
 			ObjectHelmetID = MainObject.HelmetID;
 			ObjectShieldID = MainObject.ShieldID;
 			MainObject.enemy_aimpunch_direction = point_direction(other.stats.Starting_x, other.stats.Starting_y, other.x, other.y);
-			if(instance_exists(MainObject.ChasingObject)){
-				if(other.stats.Object != global.local_player){
-					if(MainObject.ChasingObject != other.stats.Object){
-						MainObject.ChasingObject = other.stats.Object;
-					}
-				}else{
-					MainObject.ChasingObject = global.local_player;
-				}
+
+			var attacker = other.stats.Object;
+			if (instance_exists(attacker)
+			&& variable_instance_exists(attacker, "stats")
+			&& is_struct(attacker.stats)
+			&& variable_struct_exists(attacker.stats, "Team")
+			&& variable_struct_exists(attacker.stats, "Health_points")
+			&& attacker.stats.Team != MainObject.stats.Team
+			&& attacker.stats.Health_points > 0) {
+				MainObject.ChasingObject = attacker;
 			}
 		}
 		hit_living_object(MainObject, image_index, other, ObjectArmourID, ObjectHelmetID, ObjectShieldID, other.x, other.y);

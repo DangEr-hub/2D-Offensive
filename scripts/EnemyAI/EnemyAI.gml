@@ -48,6 +48,21 @@ function choose_offensive_action() {
     }
 }
 
+function bot_target_is_enemy(_target) {
+	if (!instance_exists(_target) || !variable_instance_exists(_target, "stats")) {
+		return false;
+	}
+
+	var target_stats = _target.stats;
+	if (!is_struct(target_stats)
+	|| !variable_struct_exists(target_stats, "Health_points")
+	|| !variable_struct_exists(target_stats, "Team")) {
+		return false;
+	}
+
+	return target_stats.Health_points > 0 && target_stats.Team != stats.Team;
+}
+
 
 function pick_chasing_object(range){
     var best_target = noone;
@@ -67,8 +82,7 @@ function pick_chasing_object(range){
         var inst = list[| i];
         if (!instance_exists(inst)) continue;
         if (inst == id) continue;
-        if (inst.team == team) continue;
-        if (inst.stats.Health_points <= 0) continue;
+        if (!bot_target_is_enemy(inst)) continue;
 
         var dist = point_distance(x, y, inst.x, inst.y);
         if (dist > range) continue;
@@ -83,7 +97,7 @@ function pick_chasing_object(range){
             importance += 100;
 		}
 		
-		if(team == TEAM.POLICE && (instance_exists(inst.ChasingObject) && inst.ChasingObject.object_index == oPlayer)){
+		if(stats.Team == TEAM.POLICE && (instance_exists(inst.ChasingObject) && inst.ChasingObject.object_index == oPlayer)){
 			importance += 300;
 		}
 
@@ -100,14 +114,14 @@ function pick_chasing_object(range){
 		}
 
         // 5) dorážení zraněných
-		var max_hp = global.player_stats_struct.Max_health;
+		var max_hp = global.player_stats.Max_health;
 		if(inst.object_index != oPlayer){
 			max_hp = inst.stats.Max_health_points;
 		}
         importance += (max_hp - inst.stats.Health_points) * 1.5;
 
         // 6) typová preference
-        if (team == TEAM.TERRORIST && inst.object_index == oPlayer){
+        if (stats.Team == TEAM.TERRORIST && inst.object_index == oPlayer){
             importance += 200;
 		}
 
@@ -124,6 +138,11 @@ function pick_chasing_object(range){
 }
 
 function try_shoot(base){
+	if (!bot_target_is_enemy(ChasingObject)) {
+		shoot_accumulator = 0;
+		return;
+	}
+
     var shoot_timer = min(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer], 30);
     var gain = (base / shoot_timer) * rank_boost / 10;
 
@@ -145,6 +164,10 @@ function try_shoot(base){
 }
 
 function bot_bullet_create(DangerShotX, DangerShotY){
+	if (!bot_target_is_enemy(ChasingObject)) {
+		return;
+	}
+
 	
 	var weapon = WeaponID[WeaponPositionID];
 	var shoot_inaccuracy = .5;
@@ -216,9 +239,9 @@ function check_enemy_rotation(EnemyObject, ChasingObject){
 }
 	
 function check_if_available(ObjectType) {
-    if!(instance_exists(ObjectType)) { return; }
+	if (!bot_target_is_enemy(ObjectType)) { return false; }
 	var shoot_chance = 100;
-	var collision_tile = collision_line(x, y, ChasingObject.x, ChasingObject.y, oParentTile, true, false);
+	var collision_tile = collision_line(x, y, ObjectType.x, ObjectType.y, oParentTile, true, false);
 	var collision = false;
 	if(collision_tile){
 		collision = true;
@@ -240,6 +263,11 @@ function ChasingObjectSpot(Time){
 }
 
 function EnemyShooting(DangerX, DangerY){
+	if (!bot_target_is_enemy(ChasingObject)) {
+		shoot_accumulator = 0;
+		return;
+	}
+
 	if(CanShoot == true && ChasingObjectSpotted == true && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0){
 
 		if(Visible == true && Ammo[WeaponPositionID] % 2 == 0){
@@ -329,6 +357,103 @@ function MoveRunAway(DangerX, DangerY){
 	YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	Speed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
 	MoveTime = round(random_range(DangerDistance/Speed, DangerDistance/Speed));
+}
+
+function find_bot_danger(){
+	var best_danger = noone;
+	var best_urgency = 0;
+	var base_radius = 224 * clamp(rank_boost, .8, 1.35);
+
+	for(var i = 0; i < instance_number(oGrenade); i++){
+		var grenade = instance_find(oGrenade, i);
+		if(!instance_exists(grenade)) continue;
+
+		var grenade_distance = point_distance(x, y, grenade.x, grenade.y);
+		var grenade_urgency = base_radius - grenade_distance;
+		if(grenade_urgency > best_urgency){
+			best_urgency = grenade_urgency;
+			best_danger = {
+				source: grenade,
+				x: grenade.x,
+				y: grenade.y
+			};
+		}
+	}
+
+	for(var i = 0; i < instance_number(oMolotovImpact); i++){
+		var molotov = instance_find(oMolotovImpact, i);
+		if(!instance_exists(molotov)) continue;
+
+		var fire_safe_radius = molotov.max_radius * .75 + 72;
+		var fire_distance = point_distance(x, y, molotov.x, molotov.y);
+		var fire_urgency = fire_safe_radius - fire_distance;
+		if(fire_urgency > best_urgency){
+			best_urgency = fire_urgency;
+			best_danger = {
+				source: molotov,
+				x: molotov.x,
+				y: molotov.y
+			};
+		}
+	}
+
+	var static_danger_types = [oLandMine, oMissile];
+	for(var type_index = 0; type_index < array_length(static_danger_types); type_index++){
+		var danger_type = static_danger_types[type_index];
+		for(var i = 0; i < instance_number(danger_type); i++){
+			var static_danger = instance_find(danger_type, i);
+			if(!instance_exists(static_danger)) continue;
+
+			var danger_owner_type = -1;
+			if(is_struct(static_danger.stats) && variable_struct_exists(static_danger.stats, "Object_index")){
+				danger_owner_type = static_danger.stats.Object_index;
+			}
+			if(danger_owner_type == oBot) continue;
+
+			var static_distance = point_distance(x, y, static_danger.x, static_danger.y);
+			var static_urgency = base_radius - static_distance;
+			if(static_urgency > best_urgency){
+				best_urgency = static_urgency;
+				best_danger = {
+					source: static_danger,
+					x: static_danger.x,
+					y: static_danger.y
+				};
+			}
+		}
+	}
+
+	return best_danger;
+}
+
+function bot_flee_from_danger(danger_x, danger_y){
+	var away_direction = point_direction(danger_x, danger_y, x, y);
+	var direction_offsets = [0, 35, -35, 70, -70, 105, -105, 145, -145];
+	var best_direction = away_direction;
+	var best_clearance = -1;
+
+	for(var i = 0; i < array_length(direction_offsets); i++){
+		var candidate_direction = away_direction + direction_offsets[i];
+		var clearance = 0;
+
+		for(var probe_distance = 16; probe_distance <= 64; probe_distance += 16){
+			var probe_x = x + lengthdir_x(probe_distance, candidate_direction);
+			var probe_y = y + lengthdir_y(probe_distance, candidate_direction);
+			if(place_meeting(probe_x, probe_y, oParentTile)) break;
+			clearance += 1;
+		}
+
+		var direction_score = clearance * 100 - abs(direction_offsets[i]);
+		if(direction_score > best_clearance){
+			best_clearance = direction_score;
+			best_direction = candidate_direction;
+		}
+	}
+
+	MoveDirection = best_direction;
+	MoveTime = round(random_range(10, 16));
+	XSpeed += lengthdir_x(Acceleration * 3, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+	YSpeed += lengthdir_y(Acceleration * 3, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
 }
 
 function bot_move_shooting(DangerX, DangerY){

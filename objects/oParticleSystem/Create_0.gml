@@ -25,21 +25,31 @@ part_type_colour1(fire_particle,c_orange);
 part_type_alpha3(fire_particle,1,1,0);
 part_type_blend(fire_particle,1);
 part_type_direction(fire_particle,0,360,0,0);
-part_type_speed(fire_particle,1,5,-.1,0);
-part_type_life(fire_particle,10,15);
+part_type_speed(fire_particle,0.25,1,-.05,0);
+part_type_life(fire_particle,30,60);
 
 
 //Flame
-FlameParticle = part_type_create();
-part_type_shape(FlameParticle,pt_shape_line);
-part_type_size(FlameParticle,.25,1,0,0);
-part_type_scale(FlameParticle,0.5,1);
-part_type_color3(FlameParticle,16749459,c_orange,255);
-part_type_alpha3(FlameParticle,0.04,0.06,0.07);
-part_type_speed(FlameParticle,0.70,2.60,-0.02,0);
-part_type_direction(FlameParticle,85,95,0,9);
-part_type_blend(FlameParticle,1);
-part_type_life(FlameParticle,10,20);
+flame_particle = part_type_create();
+part_type_shape(flame_particle,pt_shape_line);
+part_type_size(flame_particle,.25,1,0,0);
+part_type_scale(flame_particle,0.5,1);
+part_type_color3(flame_particle,16749459,c_orange,255);
+part_type_alpha3(flame_particle,0.04,0.06,0.07);
+part_type_speed(flame_particle,0.25,1.5,-0.02,0);
+part_type_direction(flame_particle,0,360,0,9);
+part_type_blend(flame_particle,1);
+part_type_life(flame_particle,10,20);
+
+fog_particle = part_type_create();
+part_type_shape(fog_particle, pt_shape_cloud);
+part_type_size(fog_particle, .5, 1, 0, .05);
+part_type_alpha1(fog_particle, .25);
+part_type_speed(fog_particle, 1, 2, 0, .5);
+part_type_direction(fog_particle, 0, 360, 0, 0);
+part_type_orientation(fog_particle, 0, 360, 0, 0, 0);
+part_type_color1(fog_particle, c_white);
+part_type_life(fog_particle, camera_get_view_width(CAM), camera_get_view_width(CAM));
 
 //Blood
 BloodParticle = part_type_create();

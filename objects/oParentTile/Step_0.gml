@@ -22,9 +22,7 @@
 						}else if(Type == MATERIAL.GLASS){
 							wall_sound = snd_BulletGlass;	
 						}
-						if!(audio_is_playing(wall_sound)){
-							play_sound(knife_object.x, knife_object.y, wall_sound, knife_object.stats.Object);
-						}
+						play_sound(knife_object.x, knife_object.y, wall_sound, knife_object.stats.Object);
 						
 						#region Particles
 						if(instance_exists(oParticleSystem)){

@@ -1,5 +1,35 @@
 /* oNetworkManager - Step */
+if (instance_exists(global.local_player)) {
+	item_use_resync_timer += delta_time / 1000000;
+	var current_item_use_id = global.Inventory[# global.local_player.item_use_position, Index.slot_id];
+	var item_use_changed = current_item_use_id != last_item_use_id;
+	if (item_use_changed || item_use_resync_timer >= item_use_resync_interval) {
+		last_item_use_id = current_item_use_id;
+		item_use_resync_timer = 0;
+
+		if (is_server) {
+			var local_data = ds_map_find_value(player_states, global.local_player.network_id);
+			if (is_undefined(local_data)) {
+				local_data = ds_map_create();
+				ds_map_add(player_states, global.local_player.network_id, local_data);
+			}
+			ds_map_set(local_data, "item_use_id", current_item_use_id);
+			server_item_use_broadcast(global.local_player.network_id, current_item_use_id);
+		} else if (is_connected) {
+			send_item_use_update_client(current_item_use_id);
+		}
+	}
+}
+
 if (is_server) {
+	server_update_health_regeneration();
+
+	stats_sync_timer += delta_time / 1000000;
+	if(stats_sync_timer >= stats_sync_interval){
+		send_stats_broadcast();
+		stats_sync_timer = 0;
+	}
+
     // ~20 Hz broadcast
     accum_server += delta_time / 1000000;
     if (accum_server >= 1/20) {
@@ -10,7 +40,7 @@ if (is_server) {
                 data = ds_map_create();
                 ds_map_add(player_states, 0, data);
             }
-            with (srv) {
+			with (srv) {
                 ds_map_set(data, "x", x);
                 ds_map_set(data, "y", y);
                 ds_map_set(data, "dir", RotationAngle);
@@ -23,10 +53,17 @@ if (is_server) {
 				if(Flashed){ bit_states |= PLAYER_FLAGS.FLASHED; }
 				if(moving_state == STATES_PLAYER.prone_state){ bit_states |= PLAYER_FLAGS.PRONE; }
 				if(EquippedGrenadeTimer > -1){ bit_states |= PLAYER_FLAGS.THROWING_GRENADE; }
+				if(planting){ bit_states |= PLAYER_FLAGS.PLANTING; }
 				ds_map_set(data, "state",  bit_states);
 				ds_map_set(data, "moving_state", moving_state);
-				ds_map_set(data, "team", team);
-				ds_map_set(data, "item_use_id", global.Inventory[# item_use_position, Index.slot_id]);
+				ds_map_set(data, "Team", stats.Team);
+				ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);
+				ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, Index.slot_scope]);
+				ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, Index.slot_barrel]);
+				ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, Index.slot_grip]);
+				ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, Index.slot_suppressor]);
+				ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, Index.slot_ammo]);
+				ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, Index.slot_clip_ammo]);
 				server_update_reload_state(0, bit_states);
             }
             ds_map_set(data, "timestamp", current_time);
@@ -67,6 +104,11 @@ if (is_server) {
 }
 
 if (!is_server && is_connected) {
+	if (current_time - last_server_packet_time > server_timeout_threshold) {
+		handle_server_disconnect();
+		exit;
+	}
+
     // player update ~30 Hz
     send_timer += delta_time / 1000000;
     if (send_timer >= send_rate) {

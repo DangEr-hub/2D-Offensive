@@ -1,4 +1,12 @@
 #macro BUY_TIME 60 * game_get_speed(gamespeed_fps)
+#macro ROUND_STARTING_MONEY 100
+#macro ROUND_END_TIMER 5 * game_get_speed(gamespeed_fps)
+#macro ROUND_WIN_REWARD 200
+#macro ROUND_LOSS_REWARD 50
+#macro HOSTAGE_RANGE 24
+#macro BOMB_TIMER 5 * game_get_speed(gamespeed_fps)
+#macro HITMAP_KEY_BOMB -1000000
+#macro ROUND_LOSS_STREAK_BONUS 50
 #macro IS_NET instance_exists(oNetworkManager)
 #macro AMMO_UPG 1.25
 #macro RELOAD_UPG 0.75

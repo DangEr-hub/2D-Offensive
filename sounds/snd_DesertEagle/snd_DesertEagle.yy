@@ -10,7 +10,7 @@
   "bitRate": 192,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.834396,
+  "duration": 0.741146,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_DesertEagle.wav",
   "type": 0,
-  "volume": 0.5,
+  "volume": 1.0,
 }

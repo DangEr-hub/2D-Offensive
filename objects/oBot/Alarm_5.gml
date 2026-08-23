@@ -13,15 +13,15 @@ for (var i = 0; i < bot_count; i++){
     // neřeš sám sebe
     if (other_bot == id){ continue };
 
-    // jen stejný team
-    if (other_bot.team != team){ continue };
+    // jen stejný stats.Team
+    if (other_bot.stats.Team != stats.Team){ continue };
 
     // vzdálenost
     var dist = point_distance(x, y, other_bot.x, other_bot.y);
     if (dist > share_range){ continue };
 
-    // bot v okolí má cíl, já ne
-    if (instance_exists(other_bot.ChasingObject) && !instance_exists(ChasingObject)){
+    // Bot v okolí sdílí pouze stále živý nepřátelský cíl.
+    if (bot_target_is_enemy(other_bot.ChasingObject) && !bot_target_is_enemy(ChasingObject)){
         ChasingObject = other_bot.ChasingObject;
         ChasingObjectSpot(chasing_timer);
         break; // stačí jeden bot z okolí

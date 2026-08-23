@@ -1,5 +1,20 @@
 event_inherited();
 
+var current_character_seed = (IS_NET && network_id >= 0) ? network_id : global.player_character_seed;
+if (character_sprite_team != stats.Team || character_sprite_seed != current_character_seed) {
+	character_sprite_team = stats.Team;
+	character_sprite_seed = current_character_seed;
+	sprite_index = get_player_team_sprite(character_sprite_team, character_sprite_seed);
+}
+
+if(is_local){
+	if(keyboard_check(global.KeyBinds[| KEY.Scoreboard])){
+		statistics_table_open();
+	}else{
+		statistics_table_close();
+	}
+}
+
 wpn_id = global.Inventory[# WeaponID, Index.slot_id];
 
 #region Remote player
@@ -19,6 +34,12 @@ if (is_remote) {
 	Moving = (network_bit_state & PLAYER_FLAGS.MOVING) != 0;
 	Reloading = (network_bit_state & PLAYER_FLAGS.RELOADING) != 0;
 	Flashed = (network_bit_state & PLAYER_FLAGS.FLASHED) != 0;
+	planting = (network_bit_state & PLAYER_FLAGS.PLANTING) != 0;
+	if (planting) {
+		planting_value = min(planting_max, planting_value + global.time_step);
+	} else {
+		planting_value = 0;
+	}
 	Legs.image_speed = Moving ? (1 * global.time_step) : 0;
 			
 	if(network_shoot_timer > -1){
@@ -62,13 +83,30 @@ if (is_remote) {
 
     x = lerp(x, target_x, INTERPOLATION_SPD);
     y = lerp(y, target_y, INTERPOLATION_SPD);
-    RotationAngle = lerp(RotationAngle, target_direction, INTERPOLATION_SPD);
+	var remote_rotation_delta = ((target_direction - RotationAngle + 540) mod 360) - 180;
+	RotationAngle = (RotationAngle + remote_rotation_delta * INTERPOLATION_SPD + 360) mod 360;
 	Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 	KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
+
+	// Remote players keep the same hitbox set as local players. Prone animation
+	// and collision code expects LegHB to remain alive.
+	if (!instance_exists(LegHB)) {
+		LegHB = instance_create_depth(x, y, depth - 1, oHitBox);
+		LegHB.image_index = HITBOX.LegProne;
+		LegHB.MainObject = id;
+	}
+
+	var remote_is_prone = moving_state == STATES_PLAYER.prone_state;
+	LegHB.visible = remote_is_prone;
+	if (instance_exists(Legs)) {
+		Legs.visible = !remote_is_prone;
+	}
+	WX = remote_is_prone ? 64 : 8;
+	WY = remote_is_prone ? 64 : 8;
+
 	Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
 	Weapon.y = y + lengthdir_y(WY, RotationAngle) - lengthdir_y(Weapon.KickBackEffect, RotationAngle);
 	Weapon.image_angle = RotationAngle + KickBackAngle * .5;
-	instance_destroy(LegHB);
 	
 }
 
@@ -76,6 +114,18 @@ if (is_remote) {
 
 if (instance_exists(oDraw) && stats.Health_points > 0){
 	
+	#region Bomb region
+	can_plant = is_local
+		&& stats.Team == TEAM.TERRORIST
+		&& position_in_bomb_area(x, y);
+	#endregion
+
+	#region Pick up hostage
+	if(distance_to_object(oHostage) <= HOSTAGE_RANGE){
+
+	}
+	#endregion
+
 	#region Shield
 	if(global.ItemIndex[# wpn_id, ItemStat.Type] == "Shield"){
 		shield_equip = true;	
@@ -349,12 +399,11 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			
 			
 			#region Timers and variables
-			stats.Health_points = clamp(stats.Health_points, -1, global.player_stats_struct.Max_health);
-			stats.Damage_health_points = clamp(stats.Damage_health_points, 1, global.player_stats_struct.Max_health);
-			stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats_struct.Max_stamina);
-			stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats_struct.Max_stamina);
+			stats.Health_points = clamp(stats.Health_points, -1, global.player_stats.Max_health);
+			stats.Damage_health_points = clamp(stats.Damage_health_points, 1, global.player_stats.Max_health);
+			stats.Stamina_points = clamp(stats.Stamina_points, 0, global.player_stats.Max_stamina);
+			stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, global.player_stats.Max_stamina);
 			ShootTimer = max(ShootTimer, -1);
-			audio_listener_position(x, y, 0);
 			if(HPTimer > 0){HPTimer -= global.time_step;}
 			if(StaminaTimer > 0){StaminaTimer -= global.time_step;}
 			if(HPHealingTimer > -1){HPHealingTimer -= global.time_step;}
@@ -388,20 +437,20 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(HPTimer == 0){
 				var points = stats.Health_points - attack_damage;
 			    if(stats.Damage_health_points > points){
-			        stats.Damage_health_points -= max(global.player_stats_struct.Max_health/100, .25);
+			        stats.Damage_health_points -= max(global.player_stats.Max_health/100, .25);
 			    }else{ HPTimer = -1;}
 			}
 	
 			if(StaminaTimer == 0){
 				var points = stats.Stamina_points - attack_damage;
 			    if(stats.Damage_health_points > points){
-			        stats.Damage_health_points -= max(global.player_stats_struct.Max_stamina/100, .25);
+			        stats.Damage_health_points -= max(global.player_stats.Max_stamina/100, .25);
 			    }else{ StaminaTimer = -1;}
 			}
 	
-			if(HPHealingTimer == -1){
+			if(!IS_NET && HPHealingTimer == -1){
 				if(HPTimer == -1){
-					if(stats.Health_points >= 0 && stats.Health_points < global.player_stats_struct.Max_health){
+					if(stats.Health_points >= 0 && stats.Health_points < global.player_stats.Max_health){
 						var HealingPower = BaseHealingPower;
 						stats.Health_points += HealingPower;	
 						stats.Damage_health_points = stats.Health_points;
@@ -411,15 +460,15 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			}	
 	
 			if(StaminaHealingTimer == -1){
-				if(stats.Stamina_points >= 0 && stats.Stamina_points < global.player_stats_struct.Max_stamina){
-					var stamina_healing_power = round(global.player_stats_struct.Max_stamina/50);
+				if(stats.Stamina_points >= 0 && stats.Stamina_points < global.player_stats.Max_stamina){
+					var stamina_healing_power = round(global.player_stats.Max_stamina/50);
 					if(moving_state == STATES_PLAYER.prone_state){
-						stamina_healing_power = round(global.player_stats_struct.Max_stamina/10);
+						stamina_healing_power = round(global.player_stats.Max_stamina/10);
 					}
-					if(stats.Stamina_points <= global.player_stats_struct.Max_stamina - stamina_healing_power){
+					if(stats.Stamina_points <= global.player_stats.Max_stamina - stamina_healing_power){
 						stats.Stamina_points += stamina_healing_power;
 					}else{
-						stats.Stamina_points += (global.player_stats_struct.Max_stamina - stats.Stamina_points);
+						stats.Stamina_points += (global.player_stats.Max_stamina - stats.Stamina_points);
 					}
 					stats.Damage_stamina_points = stats.Stamina_points;
 					StaminaHealingTimer = HealingTimer;
@@ -456,10 +505,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			        true
 			    );
 
-			    // filtr POLICE botů
+			    // Keep only living bots from the player's stats.Team.
 			    for(var i = bot_count - 1; i >= 0; i--){
 			        var bot = bot_select_list[| i];
-			        if(!instance_exists(bot) || bot.team != TEAM.POLICE || bot.stats.Health_points <= 0){
+			        if(!instance_exists(bot) || bot.stats.Team != stats.Team || bot.stats.Health_points <= 0){
 			            ds_list_delete(bot_select_list, i);
 			        }
 			    }
@@ -480,7 +529,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!instance_exists(selected_bot)){
 			    selected_bot = noone;
 			    bot_select_index = -1;
-			}else if(selected_bot.team != TEAM.POLICE || selected_bot.stats.Health_points <= 0){
+			}else if(selected_bot.stats.Team != stats.Team || selected_bot.stats.Health_points <= 0){
 			    selected_bot = noone;
 			    bot_select_index = -1;
 			}
@@ -607,9 +656,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#endregion
 		
 					#region Low stamina camera shake
-					if(stats.Stamina_points <= global.player_stats_struct.Max_stamina * .75){
-						LowStaminaViewAngleFrequency = 2 - ((stats.Stamina_points/global.player_stats_struct.Max_stamina));
-						ViewAngleAmplitude += 1 - (stats.Stamina_points/global.player_stats_struct.Max_stamina);
+					if(stats.Stamina_points <= global.player_stats.Max_stamina * .75){
+						LowStaminaViewAngleFrequency = 2 - ((stats.Stamina_points/global.player_stats.Max_stamina));
+						ViewAngleAmplitude += 1 - (stats.Stamina_points/global.player_stats.Max_stamina);
 					}
 					#endregion
 		
@@ -648,7 +697,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#endregion
 		
 					#region Low health camera shake
-					if(stats.Health_points <= round(global.player_stats_struct.Max_health/2)){
+					if(stats.Health_points <= round(global.player_stats.Max_health/2)){
 						LowHPCrossShake = 1;
 						ViewAngleAmplitude += 0.5;
 						LowHPViewAngleFrequency = 75;
@@ -955,7 +1004,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				var ShootingSpeedMultiplier = 1;
 				var ReloadingSpeedMultiplier = 1;
 				var moving_speed_multiplier = 1;
-				var WeightSpeedMultiplier = 1 / (global.player_stats_struct.Weight/75 + 1);
+				var WeightSpeedMultiplier = 1 / (global.player_stats.Weight/75 + 1);
 				var WeaponSpeedMultiplier = 1;
 				
 				if(AimPunchTimer == -1){ aimpunch_speed_multiplier = 1; }
@@ -1363,21 +1412,88 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(HealingTime >= global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]){
 				damage_indicator("+" + string(global.ItemIndex[#HealingItemId, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, ICON.health);
 				CanShoot = true;
-				stats.Health_points += min(global.ItemIndex[#HealingItemId, ItemStat.Damage], global.player_stats_struct.Max_health - stats.Health_points);
+				stats.Health_points += min(global.ItemIndex[#HealingItemId, ItemStat.Damage], global.player_stats.Max_health - stats.Health_points);
 				stats.Damage_health_points = stats.Health_points;
 				Healing = false;
 				HealingTime = -1;
 			}
 			#endregion
-	
+
+			#region Bomb planting
+			if (planting_pending && IS_NET && !oNetworkManager.is_server && !global.bomb_planted) {
+				CanShoot = false;
+				player_can_shoot = false;
+				Moving = false;
+				RelativeSpeedX = 0;
+				RelativeSpeedY = 0;
+				XSpeed = 0;
+				YSpeed = 0;
+				Legs.image_speed = 0;
+				planting_request_timer -= global.time_step;
+				if (planting_request_timer <= 0) {
+					send_bomb_plant_request(planting_x, planting_y);
+					planting_request_timer = 0.25 * game_get_speed(gamespeed_fps);
+				}
+			}
+
+			if (planting) {
+				var planting_item_valid = planting_slot >= 0
+					&& global.Inventory[# planting_slot, Index.slot_id] == Item.Bomb
+					&& item_use_position == planting_slot
+					&& stats.Team == TEAM.TERRORIST
+					&& !global.bomb_planted;
+
+				if (!planting_item_valid) {
+					planting = false;
+					planting_value = 0;
+					planting_slot = -1;
+					CanShoot = true;
+					player_can_shoot = true;
+				} else {
+					CanShoot = false;
+					player_can_shoot = false;
+					Moving = false;
+					RelativeSpeedX = 0;
+					RelativeSpeedY = 0;
+					XSpeed = 0;
+					YSpeed = 0;
+					Legs.image_speed = 0;
+					planting_value = min(planting_max, planting_value + global.time_step);
+
+					if (planting_value >= planting_max) {
+						planting = false;
+						planting_value = planting_max;
+						CanShoot = true;
+						player_can_shoot = true;
+
+						if (!IS_NET) {
+							instance_create_layer(x, y, "ItemsO", oBomb);
+							ItemAmountSubstract(planting_slot, 1);
+							planting_slot = -1;
+						} else if (oNetworkManager.is_server) {
+							if (server_process_bomb_plant(0, x, y)) {
+								ItemAmountSubstract(planting_slot, 1);
+							}
+							planting_slot = -1;
+						} else {
+							planting_pending = true;
+							planting_x = x;
+							planting_y = y;
+							planting_request_timer = 0;
+						}
+					}
+				}
+			}
+			#endregion
+
 			#region Level
-			if(global.player_stats_struct.Xp >= global.player_stats_struct.Max_xp){
+			if(global.player_stats.Xp >= global.player_stats.Max_xp){
 				damage_indicator("Level up!", x - string_width("Level up!")/2, y, MAIN_COLOR, spr_Icons, 0, set_font("Title"));
-				global.player_stats_struct.Xp = 0;
-				global.player_stats_struct.Lvl ++;
-				global.player_stats_struct.Max_stamina *= power(STATS_LVL_UP, ln(global.player_stats_struct.Lvl));
-				global.player_stats_struct.Max_health *= power(STATS_LVL_UP, ln(global.player_stats_struct.Lvl));
-				global.player_stats_struct.Max_xp *= XP_LVL_UP_MUL;
+				global.player_stats.Xp = 0;
+				global.player_stats.Lvl ++;
+				global.player_stats.Max_stamina *= power(STATS_LVL_UP, ln(global.player_stats.Lvl));
+				global.player_stats.Max_health *= power(STATS_LVL_UP, ln(global.player_stats.Lvl));
+				global.player_stats.Max_xp *= XP_LVL_UP_MUL;
 			}
 			#endregion
 
@@ -1417,6 +1533,13 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				
 				#region Item cycling
 				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleRight])){
+					if (planting) {
+						planting = false;
+						planting_value = 0;
+						planting_slot = -1;
+						CanShoot = true;
+						player_can_shoot = true;
+					}
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
@@ -1428,6 +1551,13 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					item_use_position = max(item_use_position, 0);
 				}			
 				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleLeft])){
+					if (planting) {
+						planting = false;
+						planting_value = 0;
+						planting_slot = -1;
+						CanShoot = true;
+						player_can_shoot = true;
+					}
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
@@ -1611,6 +1741,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oWeaponDescription);
 			instance_activate_object(oLightRenderer);
 			instance_activate_object(oDamageTable);
+			instance_activate_object(oStatisticsTable);
 			instance_activate_object(oItemDescription);
 			instance_activate_object(objUIWindowCaption);
 			instance_activate_object(objZUIMain);
@@ -1635,6 +1766,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oAirPlane);
 			instance_activate_object(oMissile);
 			instance_activate_object(oBloodSplash);
+			instance_activate_object(oBomb);
+			instance_activate_object(oBombArea);
 			#endregion
 		
 		}
@@ -1657,21 +1790,57 @@ if (!IS_NET) {
 
 
 if (should_handle_death) {
+	if(is_local){
+		stats.Deaths++;
+		if(!IS_NET){
+			global.game_struct.Match_deaths++;
+			if(global.ranked_game){
+				global.player_stats.Deaths++;
+			}
+		}
+	}
+
     oDraw.KilledByWeapon = KilledByWeapon;
     oDraw.KilledByName = KilledByName;
     Weapon.image_index = 0;
     image_index = 3;
 	ScopeIn = false;
 	depth += 1;
-	if(is_local || !IS_NET){
-	    round_end("Loss");
-	    camera_set_view_angle(CAM, 0);
-	}
-	
+	player_can_shoot = false;
+	Moving = false;
+	planting = false;
+	planting_pending = false;
+	planting_value = 0;
+	planting_slot = -1;
+
 	with(oBuyMenuDescription){
 		zui_destroy();	
 	}
 
     play_sound(x, y, choose(snd_Death1, snd_Death2));
+
+	if(!IS_NET){
+		var bomb_decides_round = global.bomb_planted
+			|| (instance_exists(oDraw) && oDraw.bomb_detonation_pending);
+		if (!bomb_decides_round) {
+			round_end("Loss");
+		}
+	}else if(is_local){
+		var teammate = find_living_player_teammate(stats.Team, id);
+		var round_already_resolved = oNetworkManager.is_server && oNetworkManager.round_resolved;
+
+		if (!round_already_resolved) {
+			oDraw.RespawnMenu = true;
+			oDraw.GameEndMenu = false;
+		}
+
+		if (instance_exists(teammate) && !round_already_resolved) {
+			oDraw.spectating = true;
+			oDraw.spectate_target = teammate;
+		} else if (!round_already_resolved) {
+			oDraw.spectating = false;
+			oDraw.spectate_target = noone;
+		}
+	}
 }
 #endregion

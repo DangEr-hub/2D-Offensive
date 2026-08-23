@@ -46,6 +46,16 @@ if(stats.Item_id == Item.StickyGrenade){
 	}
 }
 
+if(stats.Item_id == Item.MolotovGrenade && image_index == 4 && instance_exists(oParticleSystem)){
+	var flame_offset = 13 * max(image_xscale, image_yscale);
+	var flame_x = x + lengthdir_x(flame_offset, image_angle - 90);
+	var flame_y = y - z + lengthdir_y(flame_offset, image_angle - 90);
+	part_type_direction(oParticleSystem.flame_particle, image_angle - 120, image_angle - 60, 0, 6);
+	part_particles_create(global.ParticleSystem, flame_x, flame_y, oParticleSystem.flame_particle, 1);
+	part_type_direction(oParticleSystem.flame_particle, 0, 360, 0, 9);
+	part_particles_create(global.ParticleSystem, flame_x, flame_y, oParticleSystem.fire_particle, 1);
+}
+
 if(ExplodeTimer > -1){
 	ExplodeTimer -= global.time_step;
 }
@@ -121,6 +131,8 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 							angular_diff = 360 - angular_diff;
 						}
 						oBot.Reloading = false;
+						oBot.ReloadTime = 0;
+						oBot.reload_timer = -1;
 						oBot.Flashed = true;
 						oBot.trigger_texture_timer = oBot.trigger_texture_time;
 						oBot.FlashedTimer = round(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
@@ -141,6 +153,23 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			);
 			#endregion
 				
+		}else if(stats.Item_id == Item.MolotovGrenade){
+			var owner_id = -1;
+			if(is_struct(stats) && variable_struct_exists(stats, "Owner_id")){
+				owner_id = stats.Owner_id;
+			}
+			create_molotov_impact(
+				x,
+				y,
+				global.ItemIndex[#stats.Item_id, ItemStat.Damage],
+				stats.Object,
+				stats.Item_id,
+				stats.Owner_name,
+				owner_id,
+				true
+			);
+			instance_destroy(id);
+
 		}else if(stats.Item_id == Item.StickyGrenade){
 			
 			#region Create explosion effect
