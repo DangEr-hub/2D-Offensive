@@ -6,7 +6,9 @@
 /// @param text_color1
 /// @param text_color2
 /// @param alpha
-function console_draw(c,h,b1,b2,t1,t2,a,w) {
+/// @param width
+/// @param [x_position]
+function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined) {
 	gpu_set_tex_filter(false);
 	/*var c,h,b1,b2,t1,t2,a;
 
@@ -23,7 +25,7 @@ function console_draw(c,h,b1,b2,t1,t2,a,w) {
 		draw_set_font(set_font("Console"));
 	    l = string_height("W");
 	    p = 36; // Padding
-		ws = surface_get_width(application_surface)*0.15;
+		ws = is_undefined(x_position) ? surface_get_width(application_surface) * .15 : x_position;
 		o = 4;
 		gsw = string_width("> ");
 		sw = string_width(string_copy(c[? "string"],1,c[? "string_pos"]-1));

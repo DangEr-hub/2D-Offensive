@@ -166,6 +166,8 @@ if(is_local){
 				stats.Owner_id,
 				bullet_network_id
 			);
+			b.hideable_col = hideable_col;
+			b.shooter_prone = shooter_prone;
 
 		    // Update tracking for the last bullet created
 		    last_bullet_x = bullet_x;
@@ -197,6 +199,8 @@ if(image_index == 0){
 			bullet_network_id
 		);
 		bullet.is_remote = is_remote;
+		bullet.hideable_col = hideable_col;
+		bullet.shooter_prone = shooter_prone;
 		instance_destroy(id);
 	}
 }

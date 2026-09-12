@@ -221,7 +221,8 @@ global.ItemIndex[# item_variable, ItemStat.Type] == "Shield"){
 	}
 	#endregion
 	
-}else if(global.ItemIndex[# item_variable, ItemStat.Type] == "Grenade"){
+}else if(global.ItemIndex[# item_variable, ItemStat.Type] == "Grenade" || global.ItemIndex[# item_variable, ItemStat.Type] == "Landmine"
+|| global.ItemIndex[# item_variable, ItemStat.Type] == "Bomb"){
 	offset_y = text_gap*1.5;
 
 	#region Damage

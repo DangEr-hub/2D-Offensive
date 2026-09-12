@@ -1,6 +1,6 @@
 
 
-Floor = instance_create_layer(x, y, "ItemsO", oMachineGunFloor);
+Floor = instance_create_depth(x, y, depth + 10, oMachineGunFloor);
 stats = {
 	"Slot_scope": Item.None,
 	"Slot_barrel": Item.None,
@@ -12,4 +12,5 @@ stats = {
 	"Object": noone
 };
 Floor.stats = stats;
+operator_pid = -1;
 image_speed = 0;

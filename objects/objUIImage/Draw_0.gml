@@ -20,8 +20,7 @@ if(drawable == true){
 	}
 
 	if(healthbar == true){
-		draw_sprite_ext(spr_HealthBar, 0, 0, 0, global.GUIMultiplier, global.GUIMultiplier, sprite_image_angle, c_white, alpha * alpha_value);
-		draw_sprite_ext(spr_HealthBar, sprite_image_index, 0, 0, (global.player_stats.Xp/global.player_stats.Max_xp) * global.GUIMultiplier, global.GUIMultiplier, sprite_image_angle, c_white, alpha * alpha_value);
+		draw_health_bar_fill(0, 0, global.player_stats.Xp/global.player_stats.Max_xp, global.gui_scale, bar_color, alpha * alpha_value);
 	}else if(circular_bar == true){
 		draw_circular_bar(
 			zui_get_width() * .5,

@@ -19,3 +19,4 @@ network_owner_pid = 255;
 network_authority = true;
 network_visual_only = false;
 grenade_explosion_broadcasted = false;
+network_id_reserved_for_impact = false;

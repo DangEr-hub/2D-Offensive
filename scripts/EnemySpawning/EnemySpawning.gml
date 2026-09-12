@@ -36,6 +36,74 @@ function is_place_free(xx, yy) {
     return collision_free;
 }
 
+function get_bot_spawn_count(map_index, spawn_friendly) {
+	var area_stat = spawn_friendly ? MAP_STAT.FriendAreas : MAP_STAT.EnemyAreas;
+	var maximum_stat = spawn_friendly ? MAP_STAT.MaxFriends : MAP_STAT.MaxEnemies;
+	var spawn_areas = global.MapProperties[# map_index, area_stat];
+	if(!ds_exists(spawn_areas, ds_type_map)) return 0;
+
+	var bot_count = 0;
+	var area_keys = ds_map_keys_to_array(spawn_areas);
+	for(var i = 0; i < array_length(area_keys); i++){
+		var area = spawn_areas[? area_keys[i]];
+		bot_count += area[4];
+	}
+
+	return min(bot_count, global.MapProperties[# map_index, maximum_stat]);
+}
+
+function initialize_bot_database(map_index) {
+	if(array_length(global.BotMatchStats) > 0) return;
+
+	var names = [
+		"John", "Joe", "Jorge de Guzman", "Lalo Salamanca", "Elvis",
+		"Stuart", "Lewis", "Tommy Hilfiger", "Hector", "Cortez",
+		"Rico", "Nico", "Leo", "Mike", "Victor", "Alex", "Roman",
+		"Oscar", "Bruno", "Marco", "Leon", "Tobias", "Frank", "Diego", "Henry"
+	];
+	var player_team = global.player_stats.Player_team;
+	var enemy_team = player_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE;
+	var friendly_count = get_bot_spawn_count(map_index, true);
+	var enemy_count = get_bot_spawn_count(map_index, false);
+	var total_count = friendly_count + enemy_count;
+
+	for(var i = 0; i < total_count; i++){
+		var bot_name = "Bot " + string(i + 1);
+		if(array_length(names) > 0){
+			var name_index = irandom(array_length(names) - 1);
+			bot_name = names[name_index];
+			array_delete(names, name_index, 1);
+		}
+
+		var bot_stats = create_enemy(
+			88, [random_range(170, 200), random_range(70, 120)], irandom_range(25, 50),
+			bot_name,
+			85
+		);
+		bot_stats.Max_health_points = bot_stats.Health_points;
+		bot_stats.Max_stamina_points = bot_stats.Stamina_points;
+		bot_stats.Kills = 0;
+		bot_stats.Assists = 0;
+		bot_stats.Deaths = 0;
+		bot_stats.Money = ROUND_STARTING_MONEY;
+		bot_stats.Team = i < friendly_count ? player_team : enemy_team;
+		array_push(global.BotMatchStats, bot_stats);
+	}
+}
+
+function get_bot_database_stats(team, team_position) {
+	var current_position = 0;
+	for(var i = 0; i < array_length(global.BotMatchStats); i++){
+		var bot_stats = global.BotMatchStats[i];
+		if(bot_stats.Team != team) continue;
+
+		if(current_position == team_position) return bot_stats;
+		current_position++;
+	}
+
+	return undefined;
+}
+
 function spawn_bots(map_index, spawn_friendly = false) {
     var area_stat = spawn_friendly ? MAP_STAT.FriendAreas : MAP_STAT.EnemyAreas;
     var maximum_stat = spawn_friendly ? MAP_STAT.MaxFriends : MAP_STAT.MaxEnemies;
@@ -50,6 +118,11 @@ function spawn_bots(map_index, spawn_friendly = false) {
     var spawned_team = spawn_friendly
         ? player_team
         : (player_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE);
+	var team_bot_position = 0;
+
+	if(!IS_NET){
+		initialize_bot_database(map_index);
+	}
 
     for (var j = 0; j < num_areas; j += 1) {
         var area_key = area_keys[j];
@@ -80,10 +153,23 @@ function spawn_bots(map_index, spawn_friendly = false) {
 
 	            if (attempts < max_attempts) {
 	                var bot = instance_create_layer(spawn_x, spawn_y, "LivingO", oBot);
+				if(!IS_NET){
+					var database_stats = get_bot_database_stats(spawned_team, team_bot_position);
+					if(!is_undefined(database_stats)){
+						bot.stats = database_stats;
+						bot.stats.Health_points = bot.stats.Max_health_points;
+						bot.stats.Damage_health_points = bot.stats.Max_health_points;
+						bot.stats.Stamina_points = bot.stats.Max_stamina_points;
+						bot.stats.Damage_stamina_points = bot.stats.Max_stamina_points;
+						bot.stats.Room = room;
+					}
+				}
 				bot.stats.Team = spawned_team;
+				bot.has_defuse_kit = spawned_team == TEAM.POLICE && percent_chance(25);
 				bot.sprite_index = spawned_team == TEAM.TERRORIST
 					? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4)
 					: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
+				team_bot_position++;
 	            } else {
 					return false;
 	            }

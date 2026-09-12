@@ -1,3 +1,62 @@
+function get_weapon_price_weight(item_id, equipment_level) {
+    var price = global.ItemIndex[# item_id, ItemStat.Cost];
+    if (price <= 0) { return 0; }
+
+	/// target_price+-price_range = price for weapon
+    var target_price = 0; var price_range = 0;
+
+	if(global.ItemIndex[# item_id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY){
+		switch(equipment_level){
+			case EQUIPMENT_LEVEL.FIRST: target_price = 35; price_range = 40; break;
+			case EQUIPMENT_LEVEL.LOW:   target_price = 55; price_range = 40; break;
+			case EQUIPMENT_LEVEL.MED:   target_price = 75; price_range = 30; break;
+			case EQUIPMENT_LEVEL.HIGH:  target_price = 95; price_range = 25; break;
+		}
+	}else{
+		switch(equipment_level){
+			case EQUIPMENT_LEVEL.FIRST: target_price = 50;  price_range = 60;  break;
+			case EQUIPMENT_LEVEL.LOW:   target_price = 130; price_range = 70;  break;
+			case EQUIPMENT_LEVEL.MED:   target_price = 230; price_range = 80;  break;
+			case EQUIPMENT_LEVEL.HIGH:  target_price = 270; price_range = 100; break;
+		}
+	}
+
+    var price_difference = abs(price - target_price);
+    if (price_difference > price_range) { return 0;    }
+    return max(1, price_range - price_difference);
+}
+
+function choose_weighted_weapon(equipment_level, weapon_type) {
+    var weapons = [];
+    var weights = [];
+    var total_weight = 0;
+
+    for (var item_id = 1; item_id < Item.Total; item_id++) {
+        if (global.ItemIndex[# item_id, ItemStat.Type] != "Weapon" || global.ItemIndex[# item_id, ItemStat.WeaponType] != weapon_type) {
+            continue;
+        }
+        var weight = get_weapon_price_weight(item_id, equipment_level);
+
+        if (weight > 0) {
+            array_push(weapons, item_id);
+            array_push(weights, weight);
+            total_weight += weight;
+        }
+    }
+
+    if (total_weight <= 0) {  return Item.None;   }
+
+    var roll = random(total_weight);
+    for (var i = 0; i < array_length(weapons); i++) {
+        roll -= weights[i];
+        if (roll <= 0) {
+            return weapons[i];
+        }
+    }
+    return Item.None;
+}
+
+
 function apply_prone_texture(){
 	/* player function */
 	HeadHB.image_index = HITBOX.HeadProne;
@@ -213,7 +272,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	if(remote == false){
 		var random_x = 0;
 		var random_y = 0;
-		if(point_distance(pos[0], pos[1], shot_pos[0], shot_pos[1]) > item_dir_spd_dist[3]){
+		if(!explosion && point_distance(pos[0], pos[1], shot_pos[0], shot_pos[1]) > item_dir_spd_dist[3]){
 			random_x = random_range(
 				shot_pos[0] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
 				shot_pos[0] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
@@ -264,6 +323,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	bullet_tracer.is_remote = local_remote[1];		   
 	bullet_tracer.stats.Owner_name = name_vis[0];
 	bullet_tracer.stats.Owner_visible = name_vis[1];
+	bullet_tracer.shooter_prone = BulletImage != 2 && target_is_prone(BulletObject);
 	
 	with(bullet_tracer){
 		image_index = BulletImage;
@@ -282,7 +342,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
 	}
 
-	if(instance_exists(instance_emitter)){
+	if(!explosion && instance_exists(instance_emitter)){
 		if(instance_emitter.object_index == oPlayer){
 			if(IS_NET){
 			    instance_emitter = find_instance_by_network_id(oPlayer, bullet_tracer.stats.Owner_id);
@@ -313,6 +373,10 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	
 		if(sound_id != -1){
 			play_sound(pos[0], pos[1], sound_id, instance_emitter);
+		}
+
+		if(!IS_NET || (instance_exists(oNetworkManager) && oNetworkManager.is_server)){
+			alert_bots_near_shot(instance_emitter, pos[0], pos[1], bullet_x, bullet_y, has_suppressor);
 		}
 	}
 	
@@ -393,6 +457,37 @@ function process_bullet_collision(starting_x, starting_y, current_x, current_y, 
     }
     
     return noone;
+}
+
+function shot_hits_machine_gun_operator(machine_gun_floor, start_x, start_y, target_x, target_y){
+	if(!instance_exists(machine_gun_floor)
+	|| machine_gun_floor.object_index != oMachineGunFloor
+	|| !is_struct(machine_gun_floor.stats)
+	|| !variable_struct_exists(machine_gun_floor.stats, "Object")){
+		return false;
+	}
+
+	var machine_gun_operator = machine_gun_floor.stats.Object;
+	if(!instance_exists(machine_gun_operator) || machine_gun_operator.stats.Health_points <= 0){
+		return false;
+	}
+
+	var operator_is_mounted = (machine_gun_operator.object_index == oPlayer
+		&& machine_gun_operator.moving_state == STATES_PLAYER.machine_gun_state)
+		|| (machine_gun_operator.object_index == oBot
+		&& machine_gun_operator.State == STATES.MACHINE_GUN);
+	if(!operator_is_mounted){
+		return false;
+	}
+
+	return (instance_exists(machine_gun_operator.HeadHB)
+		&& collision_line(start_x, start_y, target_x, target_y, machine_gun_operator.HeadHB, true, false) != noone)
+		|| (instance_exists(machine_gun_operator.BodyHB)
+		&& collision_line(start_x, start_y, target_x, target_y, machine_gun_operator.BodyHB, true, false) != noone)
+		|| (instance_exists(machine_gun_operator.ArmHB)
+		&& collision_line(start_x, start_y, target_x, target_y, machine_gun_operator.ArmHB, true, false) != noone)
+		|| (instance_exists(machine_gun_operator.LegHB)
+		&& collision_line(start_x, start_y, target_x, target_y, machine_gun_operator.LegHB, true, false) != noone);
 }
 
 
@@ -627,7 +722,7 @@ function player_shooting(){
 	&& global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
 		var projectiles_fired = max(1, global.ItemIndex[#wpn_id, ItemStat.Bullets]);
 		global.player_stats.All_shots += projectiles_fired;
-		oRatingController.all_shots += projectiles_fired;
+		oGameController.all_shots += projectiles_fired;
 	}
 	
 	create_shooting_effects(id);
@@ -650,33 +745,35 @@ function player_shooting(){
 		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
 		var recoil_offset_y = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetY];
 		var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
-		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackPower];		
+		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackPower];
+		var crosshair_aim_x = oCrosshair.aim_x;
+		var crosshair_aim_y = oCrosshair.aim_y;
 
 		if (global.ItemIndex[#wpn_id, ItemStat.random_bullet_spread] == true) {
 			ShotX = random_range(
-				oCrosshair.x - inaccuracy_formula(current_weapon_id, id), 
-				oCrosshair.x + inaccuracy_formula(current_weapon_id, id)
+				crosshair_aim_x - inaccuracy_formula(current_weapon_id, id),
+				crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)
 			);
 			ShotY = random_range(
-				oCrosshair.y - inaccuracy_formula(current_weapon_id, id), 
-				oCrosshair.y + inaccuracy_formula(current_weapon_id, id)
+				crosshair_aim_y - inaccuracy_formula(current_weapon_id, id),
+				crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)
 			);
 		} else {
 			if (KickBack <= kb_phase_1) {
-				ShotX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id), oCrosshair.x + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
-				ShotY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id), oCrosshair.y + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
+				ShotX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id), crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
+				ShotY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id), crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
 
 				if (KickBack == kb_phase_1) {
-					DeltaX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id), oCrosshair.x + inaccuracy_formula(current_weapon_id, id)) - ShotX;
-					DeltaY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id), oCrosshair.y + inaccuracy_formula(current_weapon_id, id)) - ShotY;
+					DeltaX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id), crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)) - ShotX;
+					DeltaY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id), crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)) - ShotY;
 				}
 			} else {
-				ShotX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.x + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaX;
-				ShotY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.y + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaY;
+				ShotX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_x + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaX;
+				ShotY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_y + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaY;
 
 				if (KickBack == kb_phase_2) {
-					DeltaX = random_range(oCrosshair.x - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.x + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotX;
-					DeltaY = random_range(oCrosshair.y - inaccuracy_formula(current_weapon_id, id) * 0.25, oCrosshair.y + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotY;
+					DeltaX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_x + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotX;
+					DeltaY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_y + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotY;
 				}
 			}
 		}
@@ -697,7 +794,7 @@ function player_shooting(){
 				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
-				instance_nearest(oCrosshair.x, oCrosshair.y, oBot),
+				instance_nearest(crosshair_aim_x, crosshair_aim_y, oBot),
 				[id.x, id.y],
 				false
 			);
@@ -732,6 +829,8 @@ function inaccuracy_formula(WID, ObjectType){
 			if(instance_exists(oPlayer)){
 				var MovingIn = 1;
 				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
+				var run_modifier = ObjectType.running ? 2 : 1;
+				var walk_modifier = ObjectType.walking ? .75 : 1;
 				
 				var range_inaccuracy = 1;
 				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
@@ -768,7 +867,7 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 				return
 				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
-				(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy  * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][WPN_ATTACHMENTS.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1) * ObjectType.stamina_inaccuracy), 175);
+				(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy * run_modifier * walk_modifier * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][WPN_ATTACHMENTS.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1)), 175);
 			}
 		}else if(ObjectType.object_index == oBot){
 			if(instance_exists(oBot)){
@@ -777,6 +876,7 @@ function inaccuracy_formula(WID, ObjectType){
 				var InSmokeInaccuracy = 1;
 				var EnemyMovingInaccuracy = 1;
 				var EnemyRangeInaccuracy = 1;
+				var bot_walk_modifier = ObjectType.walking ? .75 : 1;
 				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
 				if(is_callable(accuracy_func) && !is_real(accuracy_func) && is_method(accuracy_func)){
 				 EnemyRangeInaccuracy = 1 + (1 -  accuracy_func(point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x)));
@@ -800,7 +900,7 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 				
 				var inaccuracy_value = min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
-				EnemyMovingInaccuracy * EnemyRangeInaccuracy * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
+				EnemyMovingInaccuracy * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
 				return inaccuracy_value;
 
 			}
@@ -831,6 +931,9 @@ function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist 
 	var sound_gain = clamp(player_instance.muffled_sounds, 0, 1);
 	var sound_pitch = max(1 / 256, player_instance.muffled_sounds * global.time_step);
 	var sound_x = get_spatial_audio_x(PositionX, listener_instance);
+	
+	var dist = point_distance(PositionX, PositionY, player_instance.x, player_instance.y);
+	
 	var sound_instance = audio_play_sound_at(
 		Sound,
 		sound_x,
@@ -844,8 +947,41 @@ function play_sound(PositionX, PositionY, Sound, inst_id = id, falloff_ref_dist 
 	);
 
 	if (sound_instance != -1) {
-		audio_sound_gain(sound_instance, sound_gain, 0);
+		audio_sound_gain(sound_instance, sound_gain / (1 + dist/500), 0);
 		audio_sound_pitch(sound_instance, sound_pitch);
+	}
+
+	return sound_instance;
+}
+
+function play_impact_sound(PositionX, PositionY, Sound, inst_id = id, impact_group = noone, cooldown_ms = 75, merge_radius = 128) {
+	static history_size = 16;
+	static history_sound = array_create(16, -1);
+	static history_group = array_create(16, noone);
+	static history_x = array_create(16, 0);
+	static history_y = array_create(16, 0);
+	static history_time = array_create(16, -1000);
+	static history_position = 0;
+
+	for (var history_index = 0; history_index < history_size; history_index++) {
+		if (history_sound[history_index] != Sound
+		|| current_time - history_time[history_index] >= cooldown_ms) {
+			continue;
+		}
+
+		var same_group = impact_group != noone && history_group[history_index] == impact_group;
+		var same_area = point_distance(PositionX, PositionY, history_x[history_index], history_y[history_index]) <= merge_radius;
+		if (same_group || same_area) return -1;
+	}
+
+	var sound_instance = play_sound(PositionX, PositionY, Sound, inst_id);
+	if (sound_instance != -1) {
+		history_sound[history_position] = Sound;
+		history_group[history_position] = impact_group;
+		history_x[history_position] = PositionX;
+		history_y[history_position] = PositionY;
+		history_time[history_position] = current_time;
+		history_position = (history_position + 1) mod history_size;
 	}
 
 	return sound_instance;
@@ -901,26 +1037,39 @@ function drop_experience(number, value, xx, yy, position_range){
 		xp_object.value = value;
 	}
 }
+
 	
-function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBaseStamina) {
+function create_enemy(EnemyBaseHP, EnemyPhysical, EnemyAge, EnemyName, EnemyBaseStamina){
     var height = EnemyPhysical[0];
     var weight = EnemyPhysical[1];
     var age = EnemyAge;
-	
-	var Stamina = round(EnemyBaseStamina * 1.1*exp(-(power(age - 40, 2)/2)));
-    var Health = round(EnemyBaseHP + height / 10 + weight / 10 * 1.1 * exp(-(power(age - 40, 2) / 2)));
+
+    var peak_age = 35;
+    var edge_age = age < peak_age ? 25 : 50;
+    var sigma = age < peak_age ? 4.66 : 6.99;
+
+    var gaussian = exp(-0.5 * sqr((age - peak_age) / sigma));
+    var edge_gaussian = exp(-0.5 * sqr((edge_age - peak_age) / sigma));
+
+    var t = (gaussian - edge_gaussian) / (1 - edge_gaussian);
+    t = clamp(t, 0, 1);
+
+    var age_multiplier = clamp(1 + 0.1 * t, 1, 1.1);
+
+    var Stamina = round((EnemyBaseStamina + height * 0.025 + weight * 0.04) * age_multiplier);
+    var Health = round((EnemyBaseHP + height * 0.025 + weight * 0.04) * age_multiplier);
 
     var enemy_struct = {
         Health_points: Health,
         Height: height,
         Weight: weight,
         Age: age,
-        Name: EnemyName, 
+        Name: EnemyName,
         Damage_health_points: Health,
-		Stamina_points: Stamina,
-		Damage_stamina_points: Stamina,
+        Stamina_points: Stamina,
+        Damage_stamina_points: Stamina,
     };
-	
+
     return enemy_struct;
 }
 

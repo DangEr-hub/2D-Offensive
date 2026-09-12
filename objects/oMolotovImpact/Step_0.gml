@@ -7,6 +7,10 @@ var impact_scale = (current_radius * 2) / sprite_get_width(sprite_index);
 image_xscale = impact_scale;
 image_yscale = impact_scale;
 
+if!(audio_is_playing(snd_Fire)){
+	play_sound(x, y, snd_Fire);	
+}
+
 if(age > life_time){
 	image_alpha = lerp(.22, 0, clamp((age - life_time) / fade_time, 0, 1));
 }

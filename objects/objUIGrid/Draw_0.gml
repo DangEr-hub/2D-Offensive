@@ -2,7 +2,7 @@ draw_set_alpha(alpha * alpha_value);
 if(show_stats){
 	var grid_width = __width;
 	var grid_height = __height;
-	var row_height = clamp(30 * global.GUIMultiplier, 34, 42);
+	var row_height = clamp(30 * global.gui_scale, 34, 42);
 	var section_height = grid_height * .5;
 	var columns = ["Player", "K", "A", "D", "K/D", "Money"];
 	var column_ratios = [.38, .1, .1, .1, .14, .18];
@@ -55,7 +55,6 @@ if(show_stats){
 		var enemy_bot_rows = [];
 		for(var bot_index = 0; bot_index < array_length(global.BotMatchStats); bot_index++){
 			var bot_stats = global.BotMatchStats[bot_index];
-			if(bot_stats.Room != room) continue;
 
 			var bot_row = [
 				bot_stats.Name,
@@ -126,7 +125,7 @@ if(show_stats){
 				var value = _rows[row][col];
 				var value_string = (col == 4 && is_real(value)) ? string_format(value, 0, 2) : string(value);
 				var text_x = current_x + (width - string_width(value_string)) * .5;
-				if(col == 0) text_x = current_x + max(8 * global.GUIMultiplier, 10);
+				if(col == 0) text_x = current_x + max(8 * global.gui_scale, 10);
 				draw_text_outlined(text_x, row_top + (_row_height - string_height(value_string)) * .5, value_string, c_white, c_black, 1);
 				draw_set_color(MAIN_COLOR);
 				draw_rectangle(current_x, row_top, current_x + width, row_top + _row_height, true);
@@ -145,7 +144,7 @@ if(show_stats){
 	var Columns = ["Opponent(alive)", "Hits from", "Damage from", "Hits given", "Damage given"];
 	var NumColumns = array_length(Columns);
 	var CellWidth = string_width("Opponent(alive)");
-	var CellHeight = 32 * global.GUIMultiplier;
+	var CellHeight = 32 * global.gui_scale;
 	var cell_x = x;
 	var cell_y = y;
 	var Keys = ds_map_keys_to_array(global.local_player.HitMap);
@@ -242,7 +241,7 @@ if(show_stats){
 	#region Weapon description	
 	var rows = 3;
 	var columns = 3;
-	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
+	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
 	var statTitles = [
 		"Damage: ", "Ammo: ", "Reload time: ", "Max. range: ", "RPM: ",
 		"Class: ", "Moving speed: ", "Penetration: ", ""
@@ -317,7 +316,7 @@ if(show_stats){
 	#region Armour description
 	var rows = 1;
 	var columns = 3;
-	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
+	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
 	var statTitles = ["Weight: ", "Defense: ", "Durability: "];
 						
 	#region Draw grid
@@ -373,7 +372,7 @@ if(show_stats){
 
 	#region Item description
 	var rows = 1;
-	var cell_height = ITEM_CELL_HEIGHT * global.GUIMultiplier;
+	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
 	var statTitles = ["Damage: ", "Penetration power: "];
 	var columns = array_length(statTitles);
 						

@@ -214,7 +214,7 @@ function draw_compass(xx, yy, w, h){
     draw_set_color(c_black);
     draw_rectangle(xx, yy, xx + w, yy + h, true);
 
-    draw_set_color(c_gray);
+    draw_set_color(MENU_COLOR);
     draw_rectangle(xx + 1, yy + 1, xx + w - 1, yy + h - 1, false);
 
     var center_x = xx + w * 0.5;
@@ -222,7 +222,7 @@ function draw_compass(xx, yy, w, h){
     var v_angle = 180;
     var player_angle = global.local_player.RotationAngle;
 
-    draw_set_color(c_white);
+    draw_set_color(MAIN_COLOR);
 
     var n = 18;
     var spacing = w / n;
@@ -235,6 +235,7 @@ function draw_compass(xx, yy, w, h){
 
     var directions = ["E", "NE", "N", "NW", "W", "SW", "S", "SE"];
 
+	draw_set_alpha(1);
     for(var i = 0; i < array_length(directions); i++){
         var direction_angle = i * 45;
         var angle_diff = angle_difference(player_angle, direction_angle);
@@ -267,6 +268,32 @@ function draw_compass(xx, yy, w, h){
             }
         }
     }
+
+	with(oHostage){
+		if(global.local_player.stats.Team != TEAM.POLICE || Visible){
+			var hostage_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
+			var angle_diff = angle_difference(global.local_player.RotationAngle, hostage_dir);
+			var marker_x = center_x + (angle_diff / v_angle) * (w * 0.5);
+
+			if(abs(angle_diff) <= v_angle){
+				draw_set_color(c_green);
+				draw_circle(marker_x, center_y, 8, false);
+			}
+		}
+	}
+
+	with(oBomb){
+		if(global.local_player.stats.Team != TEAM.POLICE || Visible){
+			var bomb_dir = point_direction(global.local_player.x, global.local_player.y, x, y);
+			var angle_diff = angle_difference(global.local_player.RotationAngle, bomb_dir);
+			var marker_x = center_x + (angle_diff / v_angle) * (w * 0.5);
+
+			if(abs(angle_diff) <= v_angle){
+				draw_set_color(c_red);
+				draw_rectangle(marker_x - 4, center_y - 4, marker_x + 4, center_y + 4, false);
+			}
+		}
+	}
 
 	if(instance_exists(global.local_player)){
 	    with(oPlayer){

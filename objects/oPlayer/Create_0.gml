@@ -2,8 +2,10 @@ if(!instance_exists(obj_hazeC)){
 	haze_start(true, false);
 }
 event_inherited();
+dilatation_timer = -1;
 current_building_id = -1;
 door_cooldown = -1;
+terminal_opened = false;
 command = array_create(4, -1);
 anim_base = TEXTURES.prone;
 equip_time_max = -1;
@@ -29,7 +31,6 @@ item_equip_timer = -1;
 item_equip_time = 10; //Offset kvůli tomu, aby hráč nevystřelil při použití itemu
 mortar_coordinates = [x, y];
 ViewShakeMagnitude = 0;
-stamina_inaccuracy = 1;
 MoveDirection = 0;
 ax = 0;
 ay = 0;
@@ -62,10 +63,17 @@ ReloadTimer = -1;
 FlashedAlpha = 0;
 FlashedBackGround = -1;
 ToggleNightVision = false;
-BaseHealingPower = round(global.player_stats.Max_health/50);
+BaseHealingPower = round(global.player_stats.Max_health/25);
 HealingTime = -1;
 HealingItemId = Item.None;
 Healing = false;
+healing_pending = false;
+healing_request_timer = 0;
+defusing = false;
+defusing_time = 0;
+defusing_max = DEFUSE_TIME;
+defusing_target = DEFUSE_TARGET.NONE;
+defusing_hostage = noone;
 planting = false;
 planting_value = 0;
 planting_max = 3 * game_get_speed(gamespeed_fps);
@@ -86,6 +94,8 @@ KickBackTime = round(.08 * game_get_speed(gamespeed_fps));
 Range = 0;
 Reloading = false;
 ReloadTime = 0;
+remote_reload_active = false;
+remote_reload_effect_played = false;
 image_speed = 0;
 moving_timer = -1;
 equip_time = 0;
@@ -105,7 +115,6 @@ character_sprite_team = stats.Team;
 character_sprite_seed = global.player_character_seed;
 sprite_index = get_player_team_sprite(character_sprite_team, character_sprite_seed);
 
-global.Hostage = false;
 
 #region Burstfire
 burst_fire = false;
@@ -140,6 +149,9 @@ RelativeSpeedX = 0;
 RelativeSpeedY = 0;
 MovingStabilizationTime = round(.025 * game_get_speed(gamespeed_fps));
 MovingStabilizationTimer = -1;
+running = false;
+walking = false;
+shield_equip = false;
 
 #endregion
 
@@ -179,6 +191,7 @@ target_direction = 0;
 
 death_from_server = false;
 death_attacker_pid = -1;
+death_handled = false;
 
 // Network state
 network_bit_state = 0;
@@ -197,14 +210,17 @@ network_scope = Item.None;
 network_grip = Item.None;
 network_throw_grenade = false;
 network_item_use_id = Item.None;
+network_item_use_restore_id = Item.None;
+network_item_action_timer = -1;
 
 #endregion
 
 if(global.ranked_game == true){
-	instance_create_layer(x, y, "OtherO", oRatingController);
+	instance_create_layer(x, y, "OtherO", oGameController);
 }
 
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
+Weapon.Owner = id;
 Shield = instance_create_depth(x + WX, y + WY, depth - 1, oShield);
 
 instance_create_depth(x, y, 200, oBombArea);

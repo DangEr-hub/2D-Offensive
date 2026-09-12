@@ -1,6 +1,6 @@
 event_inherited();
-statistics_width_tab = clamp(768 * global.GUIMultiplier, 768, 1080);
-statistics_height_tab = max(240 * global.GUIMultiplier, 272);
+statistics_width_tab = clamp(768 * global.gui_scale, 768, 1080);
+statistics_height_tab = max(240 * global.gui_scale, 272);
 alpha = 1;
 black = -1;
 
@@ -9,12 +9,12 @@ zui_set_size(statistics_width_tab, statistics_height_tab);
 
 statistics_x = zui_get_width() * .25;
 statistics_y = max(zui_get_height() * .2, 64);
-button_width = 128 * global.GUIMultiplier;
-button_height = 32 * global.GUIMultiplier;
+button_width = 128 * global.gui_scale;
+button_height = 32 * global.gui_scale;
 
 #region Statistics
 statistics_number = 4;
-text_gap = sprite_get_height(spr_Icons)*1.1 * global.GUIMultiplier;
+text_gap = sprite_get_height(spr_Icons)*1.1 * global.gui_scale;
 average_playing_time = average(global.game_struct.Playing_time_per_round, false);
 total_headshots = sum(global.game_struct.Headshots_per_round);
 total_kills = sum(global.game_struct.Kills_per_round);
@@ -22,28 +22,28 @@ with (zui_create(statistics_x, statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.kills;
 	color = c_white;
-	caption = "Kills: " + string(oRatingController.kills);
+	caption = "Kills: " + string(oGameController.kills);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.assists;
 	color = c_white;
-	caption = "Assists: " + string(oRatingController.assists);
+	caption = "Assists: " + string(oGameController.assists);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap * 2, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.headshot_percentage;
 	color = c_white;
-	caption = "Headshots: " + string(oRatingController.headshots);
+	caption = "Headshots: " + string(oGameController.headshots);
 }
 
 with (zui_create(statistics_x, statistics_y + text_gap * 3, objUILabel)) {
 	icon_sprite_index = spr_Icons;
 	icon_image_index = ICON.time;
 	color = c_white;
-	caption = "Time alive: " + string(oRatingController.playing_time/game_get_speed(gamespeed_fps)) + " s";
+	caption = "Time alive: " + string(oGameController.playing_time/game_get_speed(gamespeed_fps)) + " s";
 }
 with (zui_create(zui_get_width() * .75 - string_width("Total kills: " + string(other.total_kills)), statistics_y, objUILabel)) {
 	icon_sprite_index = spr_Icons;
@@ -70,7 +70,7 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 	caption = "Statistics";
 	draggable = 1;
 }
-with(zui_create(zui_get_width() * .5, statistics_y + statistics_number*sprite_get_height(spr_Icons)*global.GUIMultiplier, objUIButton)){
+with(zui_create(zui_get_width() * .5, statistics_y + statistics_number*sprite_get_height(spr_Icons)*global.gui_scale, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

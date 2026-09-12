@@ -6,7 +6,7 @@ zui_set_size(tab_width, tab_height);
 
 stat_x = zui_get_width() * .5;
 stat_y = zui_get_height() * .1;
-gap = 170 * global.GUIMultiplier;
+gap = 170 * global.gui_scale;
 c_x = zui_get_width() * .5;
 c_y = zui_get_height() * .5;
 text_height = string_height("a")*1.25;
@@ -264,12 +264,21 @@ refresh_weapon_ui = function(){
 };
 
 draw_set_font(set_font("Console"));
-weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
+/*weapons = [Item.AKM, Item.MK18, Item.m4a1, Item.SG550, Item.galil, 
 			Item.famas, Item.awm, Item.SSG08, Item.Dragunov, Item.MAC11, Item.MP9, Item.MP7, Item.P90, Item.DesertEagle, Item.Glock, Item.usp, Item.p250, Item.tec9, Item.CZ75,
 			Item.Spas, Item.Javelin
-		  ];
+		  ];*/
+		  
+		  
+weapons = [];
+for(var i = 0; i < ds_grid_width(global.ItemIndex); i ++){
+	if(global.ItemIndex[# i, ItemStat.Type] == "Weapon" && global.ItemIndex[# i, ItemStat.Cost] > 0){
+		array_push(weapons, i);
+	}
+}
+		  
 wpn = weapons[0];
-wpn_x = global.GUIMultiplier >= 2 ? zui_get_width() * .25 : zui_get_width() * .2;
+wpn_x = global.gui_scale >= 2 ? zui_get_width() * .25 : zui_get_width() * .2;
 wpn_y = zui_get_height() * .3;
 
 /* INIT */
@@ -455,29 +464,29 @@ with(wpn_desc){
 	caption = other.wpn_desc_txt;
 	item_id = other.wpn;
 	description = "Inventory";
-	max_width = 350 * global.GUIMultiplier;
+	max_width = 350 * global.gui_scale;
 }
 
 with(wpn_sprite){
-	zui_set_size(sprite_get_width(spr_Items) * 2 * global.GUIMultiplier, sprite_get_height(spr_Items) * 2 * global.GUIMultiplier);
+	zui_set_size(sprite_get_width(spr_Items) * 2 * global.gui_scale, sprite_get_height(spr_Items) * 2 * global.gui_scale);
 	sprite = spr_Items;
 	clickable = false;
 	sprite_image_index = oWeaponsTab.wpn;
-	sprite_width_size = sprite_get_width(spr_Items) * 2 * global.GUIMultiplier;
-	sprite_height_size = sprite_get_height(spr_Items) * 2 * global.GUIMultiplier;
+	sprite_width_size = sprite_get_width(spr_Items) * 2 * global.gui_scale;
+	sprite_height_size = sprite_get_height(spr_Items) * 2 * global.gui_scale;
 }
 
 with(img_lock){
 	var lock = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.is_locked];
-	zui_set_size(180 * global.GUIMultiplier, 180 * global.GUIMultiplier);
+	zui_set_size(180 * global.gui_scale, 180 * global.gui_scale);
 	zui_set_depth(lock ? -1000 : 1000);
 	sprite = spr_Lock;
 	clickable = false;
 	drawable = other.is_locked;
 	alpha = .9;
 	sprite_image_index = 0;
-	sprite_width_size = 180 * global.GUIMultiplier;
-	sprite_height_size = 180 * global.GUIMultiplier;
+	sprite_width_size = 180 * global.gui_scale;
+	sprite_height_size = 180 * global.gui_scale;
 }
 with(img_lockbg){
 	var lock = global.ItemIndex[# oWeaponsTab.wpn, ItemStat.is_locked];
@@ -497,8 +506,8 @@ refresh_weapon_ui();
 /***************************************************/
 
 /* --- UI SETUP --- */
-b_w = max(96 * global.GUIMultiplier, 140);
-b_h = max(32 * global.GUIMultiplier, 48);
+b_w = max(96 * global.gui_scale, 140);
+b_h = max(32 * global.gui_scale, 48);
 upg_gap = b_w * 1.25;
 upg_x = zui_get_width() * .075;
 upg1_y = zui_get_height() * .175;
@@ -580,11 +589,11 @@ with(dmg_upg){
 
 
 /* Arrows */
-var arrow_w = 48 * global.GUIMultiplier;
+var arrow_w = 48 * global.gui_scale;
 with(zui_create(zui_get_width() * .25 + arrow_w/1.95, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(arrow_w);
-    zui_set_height(16 * global.GUIMultiplier);
+    zui_set_height(16 * global.gui_scale);
 	zui_set_depth(-1001);
 	caption = "->";
     callback = function(){
@@ -601,7 +610,7 @@ with(zui_create(zui_get_width() * .25 + arrow_w/1.95, zui_get_height() * .9, obj
 with(zui_create(zui_get_width() * .25 - arrow_w/1.95, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
     zui_set_width(arrow_w);
-    zui_set_height(16 * global.GUIMultiplier);
+    zui_set_height(16 * global.gui_scale);
 	zui_set_depth(-1001);
 	caption = "<-";
     callback = function(){

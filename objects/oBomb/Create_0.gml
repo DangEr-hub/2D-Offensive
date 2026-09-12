@@ -1,5 +1,10 @@
 event_inherited();
-timer = BOMB_TIMER;
+timer = global.bomb_time;
+Visible = false;
+VisibilityTime = 10 * game_get_speed(gamespeed_fps);
+VisibilityTimer = 0;
+check_vis_time = 10;
+check_vis_timer = irandom_range(1, check_vis_time);
 
 if (instance_exists(oDraw)) {
 	oDraw.bomb_detonation_pending = false;
@@ -12,7 +17,7 @@ stats = {
 
 if (!IS_NET || oNetworkManager.is_server) {
 	global.bomb_planted = true;
-	global.bomb_timer = BOMB_TIMER;
+	global.bomb_timer = global.bomb_time;
 }
 
 stats = {

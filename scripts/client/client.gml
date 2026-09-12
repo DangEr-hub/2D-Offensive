@@ -1,6 +1,7 @@
 /* Client-side networking functions */
 function connect_to_server(ip, port) {
     with (oNetworkManager) {
+		global.sudo = false;
         server_ip = ip;
         server_port = port;
         client_socket = network_create_socket(network_type);
@@ -72,9 +73,158 @@ function handle_client_receive() {
 			case PACKET.BOMB_SYNC: handle_bomb_sync_client(); break;
 
 			case PACKET.ITEM_USE_SYNC: handle_item_use_update_client(); break;
+
+			case PACKET.HOSTAGE_SYNC: handle_hostage_sync_client(); break;
+
+			case PACKET.ITEM_ACTION_SYNC: handle_item_action_client(); break;
+
+			case PACKET.MACHINE_GUN_SYNC: handle_machine_gun_sync_client(); break;
+
+			case PACKET.SUDO_SYNC: handle_sudo_sync_client(); break;
 			
         }
     }
+}
+
+function handle_sudo_sync_client(){
+	with(oNetworkManager){
+		var player_id = buffer_read(receive_buffer, buffer_u8);
+		var enabled = buffer_read(receive_buffer, buffer_u8) == 1;
+		if(player_id != my_pid) return;
+
+		global.sudo = enabled;
+		console_write_debug("[CONSOLE] sudo = " + string(global.sudo));
+	}
+}
+
+function send_machine_gun_request_client(action, gun) {
+	with (oNetworkManager) {
+		if (!is_connected || client_socket < 0 || !instance_exists(gun)) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.MACHINE_GUN_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, action);
+		buffer_write(send_buffer, buffer_f16, gun.x);
+		buffer_write(send_buffer, buffer_f16, gun.y);
+		network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+	}
+}
+
+function handle_machine_gun_sync_client() {
+	with (oNetworkManager) {
+		var action = buffer_read(receive_buffer, buffer_u8);
+		var gun_x = buffer_read(receive_buffer, buffer_f16);
+		var gun_y = buffer_read(receive_buffer, buffer_f16);
+		var gun = find_machine_gun_at(gun_x, gun_y);
+		if (!instance_exists(gun)) return;
+
+		if (action == MACHINE_GUN_SYNC_ACTION.AMMO) {
+			gun.stats.Ammo = buffer_read(receive_buffer, buffer_u16);
+			gun.stats.Clip_ammo = buffer_read(receive_buffer, buffer_u16);
+			if (gun.operator_pid == my_pid && instance_exists(global.local_player)) {
+				global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = gun.stats.Ammo;
+				global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = gun.stats.Clip_ammo;
+			}
+			return;
+		}
+
+		if (action != MACHINE_GUN_SYNC_ACTION.STATE) return;
+		var gun_angle = buffer_read(receive_buffer, buffer_f16);
+		var operator_pid = buffer_read(receive_buffer, buffer_s16);
+		var ammo = buffer_read(receive_buffer, buffer_u16);
+		var clip_ammo = buffer_read(receive_buffer, buffer_u16);
+		var scope = buffer_read(receive_buffer, buffer_u8);
+		var barrel = buffer_read(receive_buffer, buffer_u8);
+		var grip = buffer_read(receive_buffer, buffer_u8);
+		var suppressor = buffer_read(receive_buffer, buffer_u8);
+
+		var previous_pid = gun.operator_pid;
+		var previous_operator = gun.stats.Object;
+		if (!instance_exists(previous_operator) && previous_pid >= 0) {
+			previous_operator = find_instance_by_network_id(oPlayer, previous_pid);
+		}
+		if (instance_exists(previous_operator) && previous_operator.network_id != operator_pid) {
+			if (previous_operator.network_id == my_pid) {
+				dismount_local_player_from_machine_gun(previous_operator, gun);
+			} else {
+				previous_operator.moving_state = STATES_PLAYER.none_state;
+				previous_operator.network_moving_state = STATES_PLAYER.none_state;
+				previous_operator.network_weapon_id = Item.None;
+			}
+		}
+
+		gun.image_angle = gun_angle;
+		gun.operator_pid = operator_pid;
+		gun.stats.Object = noone;
+		gun.stats.Ammo = ammo;
+		gun.stats.Clip_ammo = clip_ammo;
+		gun.stats.Slot_scope = scope;
+		gun.stats.Slot_barrel = barrel;
+		gun.stats.Slot_grip = grip;
+		gun.stats.Slot_suppressor = suppressor;
+
+		if (operator_pid < 0) return;
+		var player = find_instance_by_network_id(oPlayer, operator_pid);
+		if (!instance_exists(player)) return;
+
+		gun.stats.Object = player;
+		if (operator_pid == my_pid) {
+			mount_local_player_to_machine_gun(player, gun);
+		} else {
+			var mount_pos = local_to_world(0, 96, gun.image_angle, gun);
+			player.x = mount_pos[0];
+			player.y = mount_pos[1];
+			player.target_x = player.x;
+			player.target_y = player.y;
+			player.moving_state = STATES_PLAYER.machine_gun_state;
+			player.network_moving_state = STATES_PLAYER.machine_gun_state;
+			player.network_weapon_id = Item.basic_machine_gun;
+			player.network_scope = scope;
+			player.network_barrel = barrel;
+			player.network_grip = grip;
+			player.network_suppressor = suppressor;
+		}
+	}
+}
+
+function handle_hostage_sync_client() {
+	with (oNetworkManager) {
+		var action = buffer_read(receive_buffer, buffer_u8);
+		var hostage_x = buffer_read(receive_buffer, buffer_f16);
+		var hostage_y = buffer_read(receive_buffer, buffer_f16);
+		var hostage = instance_nearest(hostage_x, hostage_y, oHostage);
+
+		switch (action) {
+			case HOSTAGE_SYNC_ACTION.TAKEN:
+				var rescuer_pid = buffer_read(receive_buffer, buffer_u8);
+				var rescuer = find_instance_by_network_id(oPlayer, rescuer_pid);
+
+				if (instance_exists(hostage) && instance_exists(rescuer)) {
+					hostage.rescuing = true;
+					hostage.rescuing_player = rescuer;
+				}
+			break;
+
+			case HOSTAGE_SYNC_ACTION.DAMAGE:
+				var hostage_hp = buffer_read(receive_buffer, buffer_u8);
+				var damage = buffer_read(receive_buffer, buffer_u8);
+				var body_part = buffer_read(receive_buffer, buffer_u8);
+				var impact_x = buffer_read(receive_buffer, buffer_f16);
+				var impact_y = buffer_read(receive_buffer, buffer_f16);
+
+				if (instance_exists(hostage)) {
+					hostage.stats.Health_points = hostage_hp;
+					hostage.HPTimer = .5 * game_get_speed(gamespeed_fps);
+
+					var blood_color = body_part <= HITBOX.HeadProne ? c_maroon : c_red;
+					create_blood(max(1, round(damage / 5)), impact_x, impact_y, blood_color, max(1, round(damage / 2)));
+					damage_indicator("-" + string(damage), impact_x, impact_y, c_white, spr_Icons, ICON.health);
+					play_sound(impact_x, impact_y, body_part <= HITBOX.HeadProne ? choose(snd_HeadShot1, snd_HeadShot2) : snd_BulletHit);
+				}
+			break;
+		}
+	}
 }
 
 function send_bomb_plant_request(plant_x, plant_y) {
@@ -118,7 +268,73 @@ function handle_item_use_update_client() {
 
 		var player = find_instance_by_network_id(oPlayer, pid);
 		if (instance_exists(player)) {
-			player.network_item_use_id = item_use_id;
+			if (player.network_item_action_timer > -1) {
+				player.network_item_use_restore_id = item_use_id;
+			} else {
+				player.network_item_use_id = item_use_id;
+			}
+		}
+	}
+}
+
+function send_item_action_complete_client(item_id, value = 0) {
+	with (oNetworkManager) {
+		if (is_server || !is_connected || client_socket < 0) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.ITEM_ACTION_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u16, item_id);
+		buffer_write(send_buffer, buffer_f16, value);
+		network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+	}
+}
+
+function handle_item_action_client() {
+	with (oNetworkManager) {
+		var pid = buffer_read(receive_buffer, buffer_u8);
+		var item_id = buffer_read(receive_buffer, buffer_u16);
+		var amount = buffer_read(receive_buffer, buffer_f16);
+		var value = buffer_read(receive_buffer, buffer_f16);
+		var player = find_instance_by_network_id(oPlayer, pid);
+
+		if (item_id == Item.dilatation_pill) {
+			global.time_step = .5;
+			if (instance_exists(global.local_player)) {
+				global.local_player.dilatation_timer = DILATATION_TIME;
+			}
+		}
+
+		if (!instance_exists(player)) return;
+
+		with (player) {
+			if (is_remote && item_id != Item.HealingKit) {
+				if (network_item_action_timer <= -1) network_item_use_restore_id = network_item_use_id;
+				network_item_use_id = item_id;
+				network_item_action_timer = 0.25 * game_get_speed(gamespeed_fps);
+			}
+
+			if (item_id == Item.HealingKit) {
+				stats.Health_points = value;
+				stats.Damage_health_points = value;
+				Healing = false;
+				HealingTime = -1;
+				HealingItemId = Item.None;
+				healing_pending = false;
+				healing_request_timer = 0;
+				CanShoot = true;
+
+				if (amount > 0) {
+					damage_indicator("+" + string(round(amount)), x, y - 30, c_green, spr_Icons, ICON.health);
+				}
+			} else if (is_caliber_box_item(item_id)) {
+				if (is_local) {
+					global.Inventory[# WeaponID, Index.slot_clip_ammo] = round(value);
+				}
+				if (amount > 0) {
+					damage_indicator("+" + string(round(amount)), x, y - 30, c_white, spr_Icons, ICON.ammo);
+				}
+			}
 		}
 	}
 }
@@ -132,9 +348,14 @@ function handle_bomb_sync_client() {
 		var plant_x = buffer_read(receive_buffer, buffer_f16);
 		var plant_y = buffer_read(receive_buffer, buffer_f16);
 		var bomb_timer = buffer_read(receive_buffer, buffer_u32);
+		var bomb_angle = buffer_read(receive_buffer, buffer_u16);
 
+		var planted_bomb = instance_find(oBomb, 0);
 		if (!instance_exists(oBomb) && layer_exists("ItemsO")) {
-			instance_create_layer(plant_x, plant_y, "ItemsO", oBomb);
+			planted_bomb = instance_create_layer(plant_x, plant_y, "ItemsO", oBomb);
+		}
+		if (instance_exists(planted_bomb)) {
+			planted_bomb.image_angle = bomb_angle;
 		}
 		global.bomb_planted = true;
 		global.bomb_timer = bomb_timer;
@@ -500,11 +721,19 @@ function handle_round_end_client() {
 		var terrorist_score = buffer_read(receive_buffer, buffer_u8);
 		var local_player = find_instance_by_network_id(oPlayer, my_pid);
 		round_resolved = true;
+		reset_player_door_keys();
 		global.bomb_planted = false;
 		global.bomb_timer = 0;
 		global.bomb_planter_pid = -1;
 		with (oBomb) {
 			instance_destroy();
+		}
+		with (oPlayer) {
+			defusing = false;
+			defusing_time = 0;
+			defusing_max = DEFUSE_TIME;
+			defusing_target = DEFUSE_TARGET.NONE;
+			defusing_hostage = noone;
 		}
 
 		if (instance_exists(local_player)) {
@@ -514,16 +743,26 @@ function handle_round_end_client() {
 			local_player.planting_slot = -1;
 			global.game_struct.Rounds_win = local_player.stats.Team == TEAM.POLICE ? police_score : terrorist_score;
 			global.game_struct.Rounds_lost = local_player.stats.Team == TEAM.POLICE ? terrorist_score : police_score;
-			if (instance_exists(oRatingController)) {
-				oRatingController.player_win = winning_team == local_player.stats.Team;
+			if (instance_exists(oGameController)) {
+				oGameController.player_win = winning_team == local_player.stats.Team;
 			}
+		}
+
+		var game_ended = max(police_score, terrorist_score) >= (MAX_ROUNDS / 2 + 1);
+		if (game_ended && !game_win_diamond_granted) {
+			if (instance_exists(local_player) && local_player.stats.Team == winning_team) {
+				global.player_stats.Diamonds += global.game_struct.Rounds_win*2;
+				save_game();
+			}
+			game_win_diamond_granted = true;
 		}
 
 		if (instance_exists(oDraw)) {
 			oDraw.spectating = false;
 			oDraw.spectate_target = noone;
-			oDraw.GameEndMenu = max(police_score, terrorist_score) >= (MAX_ROUNDS / 2 + 1);
+			oDraw.GameEndMenu = game_ended;
 			oDraw.RespawnMenu = true;
+			reset_gui();
 		}
 		camera_set_view_angle(CAM, 0);
 	}
@@ -545,15 +784,22 @@ function handle_player_respawn_client() {
 			oDraw.spectate_target = noone;
 			with(objUIBlack){zui_destroy();}
 			with(objUIWindow){ zui_destroy();}
-		}
+        }
         if (instance_exists(player)) {
+			reset_hit_map(player);
             with (player) {
                 stats.Health_points = new_hp;
                 death_from_server = false;
                 death_attacker_pid = -1;
+				death_handled = false;
                 KilledByName = "No one";
-                KilledByWeapon = "Nothing";
+				KilledByWeapon = "Nothing";
 				player_can_shoot = true;
+				defusing = false;
+				defusing_time = 0;
+				defusing_max = DEFUSE_TIME;
+				defusing_target = DEFUSE_TARGET.NONE;
+				defusing_hostage = noone;
 				x = respawn_pos_x;
 				y = respawn_pos_y;
                 target_x = respawn_pos_x;
@@ -914,10 +1160,12 @@ function handle_tick_update_client() {
             var x_pos = buffer_read(receive_buffer, buffer_f16);
             var y_pos = buffer_read(receive_buffer, buffer_f16);
             var direction_facing = buffer_read(receive_buffer, buffer_f16);
-			var bit_states = buffer_read(receive_buffer, buffer_u8);
+			var bit_states = buffer_read(receive_buffer, buffer_u16);
 			var moving_state_id = buffer_read(receive_buffer, buffer_u8);
 			var team_id = buffer_read(receive_buffer, buffer_u8);
 			var hp = buffer_read(receive_buffer, buffer_f16);
+			var authoritative_defusing_time = buffer_read(receive_buffer, buffer_f16);
+			var authoritative_defusing_max = buffer_read(receive_buffer, buffer_f16);
 			moving_state_id = clamp(moving_state_id, STATES_PLAYER.none_state, STATES_PLAYER.mortar_state);
 			team_id = clamp(team_id, TEAM.POLICE, TEAM.TERRORIST);
 			
@@ -930,8 +1178,10 @@ function handle_tick_update_client() {
 						local_player.stats.Damage_health_points = hp;
 						local_player.HPTimer = -1;
 					}
-                    local_player.stats.Health_points = hp;
-                }
+					local_player.stats.Health_points = hp;
+					local_player.defusing_time = authoritative_defusing_time;
+					local_player.defusing_max = authoritative_defusing_max;
+				}
                 continue;
             }
 
@@ -957,6 +1207,9 @@ function handle_tick_update_client() {
                     network_bit_state = bit_states;
 					network_moving_state = moving_state_id;
 					network_throw_grenade = (bit_states & PLAYER_FLAGS.THROWING_GRENADE) != 0;
+					defusing = (bit_states & PLAYER_FLAGS.DEFUSING) != 0;
+					defusing_time = authoritative_defusing_time;
+					defusing_max = authoritative_defusing_max;
 					moving_state = moving_state_id;
 					stats.Team = team_id;
 					if(!is_undefined(stats)){
@@ -1196,11 +1449,17 @@ function send_tick_update_client() {
 			if(moving_state == STATES_PLAYER.prone_state){bit_states |= PLAYER_FLAGS.PRONE; }
 			if(EquippedGrenadeTimer > -1){bit_states |= PLAYER_FLAGS.THROWING_GRENADE; }
 			if(planting){bit_states |= PLAYER_FLAGS.PLANTING; }
+			if(defusing){bit_states |= PLAYER_FLAGS.DEFUSING; }
+			if(Healing){bit_states |= PLAYER_FLAGS.HEALING; }
+			if(walking){bit_states |= PLAYER_FLAGS.WALKING; }
+			if(running){bit_states |= PLAYER_FLAGS.RUNNING; }
 				
-			buffer_write(other.send_buffer, buffer_u8, bit_states);
+			buffer_write(other.send_buffer, buffer_u16, bit_states);
 			buffer_write(other.send_buffer, buffer_u8, moving_state);
 			buffer_write(other.send_buffer, buffer_u8, stats.Team);
 			buffer_write(other.send_buffer, buffer_f16, stats.Health_points);
+			buffer_write(other.send_buffer, buffer_bool, find_item(Item.DefuseKit) != -1);
+			buffer_write(other.send_buffer, buffer_u8, defusing_target);
         }
         
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
@@ -1243,6 +1502,12 @@ function client_spawn_disconnected_weapon(drop_x, drop_y, item_id, ammo, clip_am
 
 function client_remove_remote_player(pid) {
 	with (oNetworkManager) {
+		var machine_gun = find_machine_gun_by_pid(pid);
+		if (instance_exists(machine_gun)) {
+			machine_gun.stats.Object = noone;
+			machine_gun.operator_pid = -1;
+		}
+
 		var player = find_instance_by_network_id(oPlayer, pid);
 		if (instance_exists(player)) instance_destroy(player);
 
@@ -1300,6 +1565,7 @@ function handle_server_disconnect() {
 
 		client_drop_cached_remote_weapon(0);
 		client_remove_remote_player(0);
+		global.sudo = false;
         is_connected = false;
         
         if (client_socket >= 0) {
@@ -1331,7 +1597,8 @@ function disconnect_from_server() {
             client_socket = -1;
         }
         
-        is_connected = false;
+		global.sudo = false;
+		is_connected = false;
         show_debug_message("Disconnected from server");
     }
 }
@@ -1344,6 +1611,7 @@ function handle_player_disconnect_client() {
         show_debug_message("Player " + string(pid) + " disconnected");
 
 		if (is_server_shutdown) {
+			global.sudo = false;
 			var has_weapon_snapshot = buffer_read(receive_buffer, buffer_u8);
 			if (has_weapon_snapshot) {
 				var drop_x = buffer_read(receive_buffer, buffer_f16);

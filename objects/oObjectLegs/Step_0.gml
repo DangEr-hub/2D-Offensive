@@ -2,22 +2,36 @@
 if(instance_exists(Object)){
 	x = Object.x;
 	y = Object.y;
-	image_angle = Object.RotationAngle;
+	image_angle = variable_instance_exists(Object, "RotationAngle") ? Object.RotationAngle : Object.image_angle;
 
-	//Stops the animation if the player stops moving
-	if (image_speed = 0)
-	{
-	image_index = 6;	
+	var owner_is_dead = variable_instance_exists(Object, "stats")
+		&& is_struct(Object.stats)
+		&& variable_struct_exists(Object.stats, "Health_points")
+		&& Object.stats.Health_points <= 0;
+	if(owner_is_dead){
+		Visible = false;
+		image_speed = 0;
+		image_index = first_frame;
+		footstep_progress = 0;
+		exit;
 	}
 
-	//Plays footstep sound when the foot hits the ground during the animation
-	if(Object != noone){
-		if (image_index = 10){
-			play_sound(x, y, choose(snd_FootStep1, snd_FootStep2, snd_FootStep3), Object);
-		}
+	//Stops the animation if the player stops moving
+	if(image_speed <= 0){
+		image_index = first_frame;
+		footstep_progress = 0;
+	}else{
+		var animation_frames = sprite_get_number(spr_ObjectLegs);
+		image_index = image_index mod animation_frames;
+		var half_animation = animation_frames * .5;
+		footstep_progress += abs(image_speed);
 
-		if (image_index = 19){
-			play_sound(x, y, choose(snd_FootStep1, snd_FootStep2, snd_FootStep3), Object);
+		if(footstep_progress >= half_animation){
+			footstep_progress -= half_animation;
+			var silent_movement = variable_instance_exists(Object, "walking") && Object.walking;
+			if(!silent_movement){
+				play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
+			}
 		}
 	}
 }

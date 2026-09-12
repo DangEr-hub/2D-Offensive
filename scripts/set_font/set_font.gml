@@ -4,49 +4,49 @@ function set_font(Font){
 	var draw_font;
 	switch(Font){
 		case "Console":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_ConsoleMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_ConsoleSmall;
 			}
 		break;
 		
 		case "GUI_grid":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_GUIGridMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_GUIGridSmall;
 			}
 		break;
 		
 		case "Title":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_GUITitleMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_GUITitleSmall;
 			}
 		break;
 		
 		case "GUI_small":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_GUISmallMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_GUISmallSmall;
 			}
 		break;
 		
 		case "Title_large":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_GUITitleLargeMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_GUITitleLargeSmall;
 			}
 		break;
 		
 		case "GUI_medium":
-			if(global.GUIMultiplier >= 2){
+			if(global.gui_scale >= 2){
 				draw_font = fnt_GUIMediumMedium;
-			}else if(global.GUIMultiplier < 2){
+			}else if(global.gui_scale < 2){
 				draw_font = fnt_GUIMediumSmall;
 			}
 		break;

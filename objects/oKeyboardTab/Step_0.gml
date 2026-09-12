@@ -9,7 +9,7 @@ if(waiting_keybind){
         if(instance_exists(waiting_button)){
             with(waiting_button){
                 caption = keycode_to_string(key);
-                zui_set_width(min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier));
+                zui_set_width(min(string_width(caption) * global.gui_scale, 128 * global.gui_scale));
             }
         }
 

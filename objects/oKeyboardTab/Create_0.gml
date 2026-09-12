@@ -1,13 +1,13 @@
 event_inherited();
-tab_width = 768 * global.GUIMultiplier;
-tab_height = 512 * global.GUIMultiplier;
+tab_width = 768 * global.gui_scale;
+tab_height = 512 * global.gui_scale;
 draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);
 
 pos_x = zui_get_width() * .01;
 pos_y = zui_get_height() * .1;
-gap = 170 * global.GUIMultiplier;
-text_height = string_height("a")*1.75;
+gap = 170 * global.gui_scale;
+text_height = string_height("a") * 1.4;
 popup = noone;
 
 waiting_keybind = false;
@@ -27,13 +27,14 @@ captions = [
 	"Cycle item right", "Shoot", "Reload",
 	"Grenade throw", "Pause", "Toggle night vision", "Change shooting mode",
 	"Prone", "Show attachments", "Select bot", "Command bot",
-	"Open buy menu", "Hold stamina", "Drop weapon",
+	"Open buy menu", "Drop weapon",
 	"Open console", "Knife light attack", "Knife heavy attack", "Use item",
-	"Scope", "Show scoreboard",
+	"Scope", "Show scoreboard", "Take hostage", "Defuse bomb", "Open door",
+	"Bot info", "Run", "Walk",
 ];
 
-var rows = floor(tab_height/text_height) - 2;
 var count = array_length(captions);
+var rows = ceil(count / 2);
 
 for(i = 0;i < rows;i ++){
 
@@ -46,8 +47,8 @@ for(i = 0;i < rows;i ++){
 		zui_set_anchor(0.5, 0);
 		idx = other.i;
 		caption = keycode_to_string(global.KeyBinds[| other.i]);
-		zui_set_width(min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier));
-		zui_set_height(16 * global.GUIMultiplier);
+		zui_set_width(min(string_width(caption) * global.gui_scale, 128 * global.gui_scale));
+		zui_set_height(16 * global.gui_scale);
 	
 	    callback = function(){
 	        oKeyboardTab.waiting_keybind = true;
@@ -72,8 +73,8 @@ for(var k = 0; k < rows; k++){
         zui_set_anchor(0.5, 0);
 		idx = other.idx;
         caption = keycode_to_string(global.KeyBinds[| idx]);
-        zui_set_width(min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier));
-        zui_set_height(16 * global.GUIMultiplier);
+        zui_set_width(min(string_width(caption) * global.gui_scale, 128 * global.gui_scale));
+        zui_set_height(16 * global.gui_scale);
 	    callback = function(){
 	        oKeyboardTab.waiting_keybind = true;
 	        oKeyboardTab.waiting_index = idx;
@@ -84,7 +85,7 @@ for(var k = 0; k < rows; k++){
 }
 
 reset_callback = function(){
-	oKeyboardTab.popup = ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_reset_callback_positive, -1);
+	oKeyboardTab.popup = ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_reset_callback_positive, -1);
 }
 
 popup_reset_callback_positive = function(){
@@ -96,7 +97,7 @@ popup_reset_callback_positive = function(){
 		if(idx != -1){
 		    caption = keycode_to_string(global.KeyBinds[| idx]);
 		    zui_set_width(
-		        min(string_width(caption) * global.GUIMultiplier, 128 * global.GUIMultiplier)
+		        min(string_width(caption) * global.gui_scale, 128 * global.gui_scale)
 		    );
 		}
 	}	
@@ -112,8 +113,8 @@ popup_reset_callback_positive = function(){
 
 with(zui_create(zui_get_width() * .5, zui_get_height() * .9, objUIButton)){
     zui_set_anchor(0.5, 0);
-    zui_set_width(128 * global.GUIMultiplier);
-    zui_set_height(16 * global.GUIMultiplier);
+    zui_set_width(128 * global.gui_scale);
+    zui_set_height(16 * global.gui_scale);
 	caption = "Reset";
 	callback = oKeyboardTab.reset_callback;
 }

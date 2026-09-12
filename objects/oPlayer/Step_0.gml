@@ -1,5 +1,16 @@
 event_inherited();
 
+if (is_local && dilatation_timer > -1) {
+	dilatation_timer -= 1;
+	if (dilatation_timer <= 0) {
+		dilatation_timer = -1;
+		global.time_step = 1;
+	}
+}
+
+var reload_time_scale = (global.time_step == 1) ? 1 : 0.5;
+var reload_frame_step = max(0, delta_time * game_get_speed(gamespeed_fps) / 1000000) * reload_time_scale;
+
 var current_character_seed = (IS_NET && network_id >= 0) ? network_id : global.player_character_seed;
 if (character_sprite_team != stats.Team || character_sprite_seed != current_character_seed) {
 	character_sprite_team = stats.Team;
@@ -8,10 +19,44 @@ if (character_sprite_team != stats.Team || character_sprite_seed != current_char
 }
 
 if(is_local){
+	#region Running and walking input
+	var can_change_move_speed = !global.my_console[? "active"]
+		&& moving_state == STATES_PLAYER.none_state
+		&& !shield_equip;
+	var movement_key_down = keyboard_check(global.KeyBinds[| KEY.Up])
+		|| keyboard_check(global.KeyBinds[| KEY.Left])
+		|| keyboard_check(global.KeyBinds[| KEY.Down])
+		|| keyboard_check(global.KeyBinds[| KEY.Right]);
+	var run_key = real(global.KeyBinds[| KEY.Run]);
+	var run_key_down = run_key == vk_lcontrol
+		? keyboard_check_direct(vk_lcontrol)
+		: keyboard_check(run_key);
+	walking = can_change_move_speed && movement_key_down && keyboard_check(global.KeyBinds[| KEY.Walk]);
+	running = can_change_move_speed && movement_key_down && !walking && stats.Stamina_points > 0 && run_key_down;
+	#endregion
+
 	if(keyboard_check(global.KeyBinds[| KEY.Scoreboard])){
 		statistics_table_open();
 	}else{
 		statistics_table_close();
+	}
+
+	var bot_info_allowed = real(global.KeyBinds[| KEY.BotInfo]) != real(global.KeyBinds[| KEY.Walk])
+		|| !movement_key_down;
+	if(bot_info_allowed && keyboard_check_pressed(global.KeyBinds[| KEY.BotInfo]) && instance_exists(oCrosshair)){
+		if(instance_exists(oBotTab)){
+			with(oBotTab) zui_destroy();
+		}else if(!global.my_console[? "active"] && instance_exists(oDraw) && !oDraw.PauseMenu && !oDraw.RespawnMenu && !oDraw.GameEndMenu){
+			var info_bot = collision_point(oCrosshair.x, oCrosshair.y, oBot, true, true);
+			if(instance_exists(info_bot) && info_bot.Visible && (info_bot.stats.Team == stats.Team || global.sudo)){
+				var bot_tab_x = (oCrosshair.x + oCrosshair.x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+				var bot_tab_y = (oCrosshair.y + oCrosshair.y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+				with(zui_main()){
+					var bot_tab = zui_create(bot_tab_x, bot_tab_y, oBotTab, -2000);
+					bot_tab.target_bot = info_bot;
+				}
+			}
+		}
 	}
 }
 
@@ -23,7 +68,14 @@ wpn_id = global.Inventory[# WeaponID, Index.slot_id];
 if (is_remote) {
 	wpn_id = network_weapon_id;
 	moving_state = network_moving_state;
-	
+	if (network_item_action_timer > -1) {
+		network_item_action_timer -= global.time_step;
+		if (network_item_action_timer <= 0) {
+			network_item_action_timer = -1;
+			network_item_use_id = network_item_use_restore_id;
+		}
+	}
+
 	if(network_shoot_timer == 0){
 		create_shooting_effects(id);
 	}
@@ -35,12 +87,26 @@ if (is_remote) {
 	Reloading = (network_bit_state & PLAYER_FLAGS.RELOADING) != 0;
 	Flashed = (network_bit_state & PLAYER_FLAGS.FLASHED) != 0;
 	planting = (network_bit_state & PLAYER_FLAGS.PLANTING) != 0;
+	defusing = (network_bit_state & PLAYER_FLAGS.DEFUSING) != 0;
+	walking = (network_bit_state & PLAYER_FLAGS.WALKING) != 0;
+	running = (network_bit_state & PLAYER_FLAGS.RUNNING) != 0;
+	var was_healing = Healing;
+	Healing = (network_bit_state & PLAYER_FLAGS.HEALING) != 0;
+	if (Healing) {
+		if (!was_healing) HealingTime = 0;
+		HealingItemId = Item.HealingKit;
+		HealingTime = min(global.ItemIndex[# Item.HealingKit, ItemStat.ReloadSpeed], HealingTime + global.time_step);
+	} else if (was_healing) {
+		HealingTime = -1;
+		HealingItemId = Item.None;
+	}
 	if (planting) {
 		planting_value = min(planting_max, planting_value + global.time_step);
 	} else {
 		planting_value = 0;
 	}
-	Legs.image_speed = Moving ? (1 * global.time_step) : 0;
+	var remote_leg_speed = walking ? (WALK_SPD * Legs.spd) : (running ? (RUN_SPD * Legs.spd) : (1.0 * Legs.spd));
+	Legs.image_speed = Moving ? (remote_leg_speed * global.time_step) : 0;
 			
 	if(network_shoot_timer > -1){
 		Weapon.KickBackEffect = global.ItemIndex[# wpn_id, ItemStat.KickBackPower];
@@ -51,7 +117,7 @@ if (is_remote) {
 	if(Weapon != noone && (wpn_id != Item.None && (global.Inventory[# item_use_position, Index.slot_id] == Item.None || is_remote))){
 		var suppressor_len = 1;
 		if(network_suppressor != Item.None){
-			suppressor_len = 1.25;
+			suppressor_len = 1.1;
 		}
 		FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppressor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 	}else{
@@ -62,19 +128,24 @@ if (is_remote) {
 		FlashLight.angle = RotationAngle; FlashLight.x = FlashLightX; FlashLight.y = FlashLightY;
 	}
 
-	if(ReloadTimer > -1){
-		ReloadTimer -= (global.time_step == 1 ? 1 : 0.5);	
-	}
-	
-	
-	if(Reloading == true){
-		if(ReloadTimer <= -1) { ReloadTimer = global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed]; }
-		ReloadTime += global.time_step;
-	}else{
+	var remote_reload_duration = max(1, global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed]);
+	if (Reloading) {
+		if (!remote_reload_active) {
+			remote_reload_active = true;
+			remote_reload_effect_played = false;
+			ReloadTime = 0;
+		}
+		ReloadTime = min(remote_reload_duration, ReloadTime + reload_frame_step);
+		ReloadTimer = max(0, remote_reload_duration - ReloadTime);
+	} else {
+		remote_reload_active = false;
+		remote_reload_effect_played = false;
 		ReloadTime = 0;
+		ReloadTimer = -1;
 	}
 	
-	if(wpn_id != Item.None && wpn_id != Item.Javelin && ReloadTimer == 0){
+	if (wpn_id != Item.None && wpn_id != Item.Javelin && ReloadTimer == 0 && !remote_reload_effect_played) {
+		remote_reload_effect_played = true;
 		if(wpn_id != Item.Javelin){
 			particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
 			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ItemStat.AmmoSpriteID], x, y);		
@@ -120,12 +191,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 		&& position_in_bomb_area(x, y);
 	#endregion
 
-	#region Pick up hostage
-	if(distance_to_object(oHostage) <= HOSTAGE_RANGE){
-
-	}
-	#endregion
-
 	#region Shield
 	if(global.ItemIndex[# wpn_id, ItemStat.Type] == "Shield"){
 		shield_equip = true;	
@@ -137,6 +202,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 	#endregion
 
 	var equipped_use_item_id = is_remote ? network_item_use_id : global.Inventory[# item_use_position, Index.slot_id];
+	if (!is_remote && Healing && HealingItemId != Item.None) {
+		equipped_use_item_id = HealingItemId;
+	}
 
 	#region Weapon texture
 	var weapon_index = global.ItemIndex[# wpn_id, ItemStat.AmmoSpriteID] + 1;		
@@ -160,6 +228,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					apply_weapon_texture(TEXTURES.assault_rifle, HITBOX.BodyAR, HITBOX.ArmAR);
 				}
 				WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.85;
+				if(global.ItemIndex[# wpn_id, ItemStat.WeaponTypeClass] != WEAPON_CLASS.SUBMACHINE_GUN){
+					WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.95;
+				}
 			break;
 	
 			case WEAPON_CLASS.PISTOL:
@@ -168,7 +239,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}else{
 					apply_weapon_texture(TEXTURES.pistol, HITBOX.BodyPistol, HITBOX.ArmPistol);
 				}
-				WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.775;
+				WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.75;
 			break;
 			
 			#region Machine gun texture
@@ -318,7 +389,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					
 			}
 				
-				WeaponDistance = sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon) * .85;
+				WeaponDistance = sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon) * .75;
 			break;
 			#endregion
 			
@@ -392,6 +463,96 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			
 	}
 	#endregion
+
+	#region Defusing
+	if (is_local) {
+		var was_defusing = defusing;
+		var planted_bomb = instance_find(oBomb, 0);
+		var common_interaction_allowed = stats.Team == TEAM.POLICE
+			&& stats.Health_points > 0
+			&& !Healing
+			&& !planting
+			&& !planting_pending
+			&& !Reloading;
+		var can_defuse_bomb = common_interaction_allowed
+			&& instance_exists(planted_bomb)
+			&& global.bomb_planted
+			&& point_distance(x, y, planted_bomb.x, planted_bomb.y) <= HOSTAGE_RANGE / 2;
+
+		if (defusing_target != DEFUSE_TARGET.HOSTAGE
+		|| !instance_exists(defusing_hostage)
+		|| defusing_hostage.rescuing) {
+			defusing_hostage = find_nearest_available_hostage(x, y);
+		}
+		var can_take_hostage = common_interaction_allowed
+			&& instance_exists(defusing_hostage)
+			&& !defusing_hostage.rescuing
+			&& point_distance(x, y, defusing_hostage.x, defusing_hostage.y) <= HOSTAGE_RANGE;
+
+		var requested_target = DEFUSE_TARGET.NONE;
+		if (can_defuse_bomb && keyboard_check(global.KeyBinds[| KEY.Defuse])) {
+			requested_target = DEFUSE_TARGET.BOMB;
+		} else if (can_take_hostage && keyboard_check(global.KeyBinds[| KEY.HostageTake])) {
+			requested_target = DEFUSE_TARGET.HOSTAGE;
+		}
+
+		if (requested_target != defusing_target) {
+			defusing_time = 0;
+		}
+		defusing_target = requested_target;
+		defusing = defusing_target != DEFUSE_TARGET.NONE;
+
+		if (defusing) {
+			if (defusing_target == DEFUSE_TARGET.BOMB) {
+				var has_defuse_kit = find_item(Item.DefuseKit) != -1;
+				defusing_max = DEFUSE_TIME * (has_defuse_kit ? 1 : 2);
+			} else {
+				defusing_max = DEFUSE_TIME;
+			}
+			CanShoot = false;
+			player_can_shoot = false;
+			Moving = false;
+			RelativeSpeedX = 0;
+			RelativeSpeedY = 0;
+			XSpeed = 0;
+			YSpeed = 0;
+			Legs.image_speed = 0;
+
+			if (!IS_NET) {
+				defusing_time = min(defusing_max, defusing_time + global.time_step);
+				if (defusing_time >= defusing_max) {
+					defusing = false;
+					defusing_time = 0;
+					if (defusing_target == DEFUSE_TARGET.HOSTAGE) {
+						if (instance_exists(defusing_hostage)) {
+							defusing_hostage.rescuing = true;
+							defusing_hostage.rescuing_player = id;
+						}
+						CanShoot = ShootTimer <= 0;
+						player_can_shoot = true;
+					} else {
+						if (instance_exists(oGameController)) {
+							oGameController.bomb_defused = true;
+						}
+						global.bomb_planted = false;
+						global.bomb_timer = 0;
+						global.bomb_planter_pid = -1;
+						with (oBomb) instance_destroy();
+						round_end("Win", TEAM.POLICE);
+					}
+					defusing_target = DEFUSE_TARGET.NONE;
+				}
+			}
+		} else {
+			defusing_time = 0;
+			defusing_target = DEFUSE_TARGET.NONE;
+			if (was_defusing) {
+				CanShoot = ShootTimer <= 0;
+				player_can_shoot = true;
+			}
+		}
+	}
+	#endregion
 			
 	if(oDraw.RespawnMenu == false && oDraw.PauseMenu == false){
 	
@@ -423,7 +584,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(kick_back_timer > -1){kick_back_timer -= global.time_step;}
 			if(MovingStabilizationTimer > -1){MovingStabilizationTimer -= (global.time_step == 1 ? 1 : 0.5); }
 			if(equip_timer > -1){equip_time += (global.time_step == 1 ? 1 : 0.5); equip_timer -= (global.time_step == 1 ? 1 : 0.5); }
-			if(ReloadTimer > -1){ReloadTimer -=  (global.time_step == 1 ? 1 : 0.5);}
+			if(ReloadTimer > 0){ReloadTimer = max(0, ReloadTimer - reload_frame_step);}
 			MovingStabilizationTimer = max(MovingStabilizationTimer, -1); // Kvůli problémum s časováním global.time_step (bullet time efekt)
 			ReloadTimer = clamp(ReloadTimer, -1, global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed]); ///Kvůli problémum s bullet time efektem
 			
@@ -600,19 +761,11 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			}
 			#endregion	
 	
-			#region Hold stamina
-			stamina_inaccuracy = 1;
-			if (!global.my_console[? "active"] && wpn_id != Item.None){
-				if(keyboard_check(global.KeyBinds[| KEY.HoldStamina]) && stats.Stamina_points > 0){
-					statistics_hit("Stamina", STAMINA_HOLD_VALUE, id);
-					stamina_inaccuracy = .5;
-				}
-			}
-			#endregion
 	
 			#region Legs animation
+			var leg_movement_speed = walking ? (WALK_SPD * Legs.spd) : (running ? (RUN_SPD * Legs.spd) : (1.0 * Legs.spd));
 			Legs.image_speed = (global.my_console[$ "active"] || moving_state == STATES_PLAYER.prone_state || moving_state == STATES_PLAYER.machine_gun_state || 
-			moving_state == STATES_PLAYER.mortar_state || instance_exists(oInventory) || Moving == false) ? 0 : (global.time_step == 1 ? 1 : 0.5);
+			moving_state == STATES_PLAYER.mortar_state || instance_exists(oInventory) || Moving == false) ? 0 : (global.time_step == 1 ? leg_movement_speed : leg_movement_speed * 0.5);
 			#endregion
 	
 			#region Scope attachments
@@ -833,7 +986,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(Weapon != noone && (wpn_id != Item.None && global.Inventory[# item_use_position, Index.slot_id] == Item.None)){
 				var suppressor_len = 1;
 				if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None){
-					suppressor_len = 1.25;
+					suppressor_len = 1.1;
 				}
 				FlashLightX = Weapon.x + lengthdir_x(WeaponDistance * suppressor_len, RotationAngle); FlashLightY = Weapon.y + lengthdir_y(WeaponDistance * suppressor_len, RotationAngle);
 			}else{
@@ -844,10 +997,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			}
 			Weapon.FlashLightX = FlashLightX; Weapon.FlashLightY = FlashLightY;
 			cx = Weapon.FlashLightX; cy = Weapon.FlashLightY;
-			ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-			ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) - global.FieldOfView);
-			bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);
-			by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.x + oCrosshair.x_offset, oCrosshair.y + oCrosshair.y_offset) + global.FieldOfView);	
+			ax = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.visual_x, oCrosshair.visual_y) - global.FieldOfView);
+			ay = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.visual_x, oCrosshair.visual_y) - global.FieldOfView);
+			bx = cx + triangle_point_distance * dcos(point_direction(cx, cy, oCrosshair.visual_x, oCrosshair.visual_y) + global.FieldOfView);
+			by = cy - triangle_point_distance * dsin(point_direction(cx, cy, oCrosshair.visual_x, oCrosshair.visual_y) + global.FieldOfView);
 			#endregion
 	
 			#region Knife texture
@@ -922,13 +1075,13 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						if(input_check(global.KeyBinds[| KEY.ShootMouse], true, false) && global.Inventory[# WeaponID, Index.slot_ammo] <= 0){
 							play_sound(x, y, snd_empty_magazine);
 						}
-					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[# wpn_id, ItemStat.Defense] == 1))){
+					    if(Shoot == 1 && (Reloading == false || (Reloading == true && global.ItemIndex[# wpn_id, ItemStat.BaseDurability] == 1))){
 				
 							if(global.Inventory[# WeaponID, Index.slot_ammo] > 0){
 								shooting = true;
 				
 								#region Fractionating reloading stop
-								if(global.ItemIndex[#wpn_id, ItemStat.Defense] == 1){
+								if(global.ItemIndex[#wpn_id, ItemStat.BaseDurability] == 1){
 									ReloadTimer = -1;
 									Reloading = false;
 									ReloadTime = 0;
@@ -1010,7 +1163,13 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(AimPunchTimer == -1){ aimpunch_speed_multiplier = 1; }
 				if(CanShoot == false && ShootTimer >= global.ItemIndex[#wpn_id, ItemStat.ShootTimer]/2){ ShootingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ShootSpdMul]; }
 				if(Reloading == true){ ReloadingSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.ReloadSpdMul]; }
-				if(moving_state == STATES_PLAYER.prone_state){ moving_speed_multiplier = .135; }
+				if(moving_state == STATES_PLAYER.prone_state){
+					moving_speed_multiplier = PRONE_SPD;
+				}else if(walking){
+					moving_speed_multiplier = WALK_SPD;
+				}else if(running){
+					moving_speed_multiplier = RUN_SPD;
+				}
 	
 				if(global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul] != 0 && global.Inventory[# item_use_position, Index.slot_id] == Item.None){
 					WeaponSpeedMultiplier = global.ItemIndex[#wpn_id, ItemStat.MovingSpdMul];
@@ -1036,7 +1195,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if!(Up || Down){ RelativeSpeedY = max(0, RelativeSpeedY - (RelativeSpeedValue * 2)); }
 
 				if(Moving == true){
-					if(moving_state != STATES_PLAYER.prone_state){
+					if(walking){
+						FootSteps = 0;
+						FootStepTimer = -1;
+					}else if(moving_state != STATES_PLAYER.prone_state){
 						if(FootStepTimer == -1){
 							FootStepTimer = 5; FootSteps ++;
 						}
@@ -1053,7 +1215,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							if(RelativeSpeedX < MOVE_SPD){ RelativeSpeedX += RelativeSpeedValue; }
 							x += min(XSpeed, MOVE_SPD);
 						}
-						if(moving_state != STATES_PLAYER.prone_state && Visible == true){
+						if(moving_state != STATES_PLAYER.prone_state && !walking && Visible == true){
 							particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
 						}
 				
@@ -1067,7 +1229,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							if(RelativeSpeedY < MOVE_SPD){ RelativeSpeedY += RelativeSpeedValue; }
 							y += min(YSpeed, MOVE_SPD);
 						}
-						if(moving_state != STATES_PLAYER.prone_state && Visible == true){
+						if(moving_state != STATES_PLAYER.prone_state && !walking && Visible == true){
 							particle_create(round(abs(YSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(YSpeed) * -1, abs(YSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
 						}
 					}
@@ -1100,6 +1262,59 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 			
 			#region Door logic
+			if(!instance_exists(oInventory) && keyboard_check_pressed(global.KeyBinds[| KEY.Door])){
+				var nearby_door = instance_nearest(x, y, oDoor);
+				var has_key = false;
+				if(instance_exists(nearby_door)){
+					switch(nearby_door.image_index){
+						case 0: has_key = find_item(Item.gold_card) != -1; break;
+						case 1: has_key = find_item(Item.magenta_card) != -1; break;
+						case 2: has_key = find_item(Item.red_card) != -1; break;
+						case 3: has_key = find_item(Item.aqua_card) != -1; break;
+						case 4: has_key = find_item(Item.green_card) != -1; break;
+						case 5: has_key = find_item(Item.black_card) != -1; break;
+						case 6: has_key = find_item(Item.white_card) != -1; break;
+					}
+				}
+
+				if(instance_exists(nearby_door) && point_distance(x, y, nearby_door.x, nearby_door.y) <= 128 && has_key == true){
+					with(nearby_door){
+						var previous_angle = image_angle;
+						var target_angle = main_angle;
+
+						if(!opened){
+							var door_center_x = (bbox_left + bbox_right) * 0.5;
+							var door_center_y = (bbox_top + bbox_bottom) * 0.5;
+							var dx = other.x - door_center_x;
+							var dy = other.y - door_center_y;
+
+							if(main_angle == 0 || main_angle == 180){
+								target_angle = dy < 0 ? 270 : 90;
+							}else{
+								target_angle = dx < 0 ? 0 : 180;
+							}
+						}
+
+						image_angle = target_angle;
+						var blocked = place_meeting(x, y, oPlayer) || place_meeting(x, y, oBot);
+
+						if(blocked){
+							image_angle = previous_angle;
+						}else{
+							opened = !opened;
+							if(door_light != undefined){
+								door_light.blend = opened ? c_lime : c_red;
+							}
+							if(opened){
+								var beep_x = x + lengthdir_x(49 * image_xscale, image_angle);
+								var beep_y = y + lengthdir_y(49 * image_xscale, image_angle);
+								play_sound(beep_x, beep_y, snd_Beep);
+							}
+						}
+					}
+				}
+			}
+
 			if(door_cooldown > 0){ door_cooldown--; }
 			var door = collision_line(xprevious, yprevious, x, y, oRoofTrigger, false, true);
 
@@ -1179,7 +1394,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Object push player
-			var objects = [oBot, oBird];
+			var objects = [oBot, oBird, oHostage];
 			
 			if(player_can_shoot == true){
 				for(var i = 0;i < array_length(objects); i ++){
@@ -1188,12 +1403,25 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						var dir = point_direction(obj.x, obj.y, x, y);
 					
 						if(obj.object_index != oBird){
-							AccelX = 5 * cos(degtorad(dir));
-							AccelY = -5 * sin(degtorad(dir));
+							if(obj.object_index != oHostage){
+								AccelX = 2 * cos(degtorad(dir));
+								AccelY = -2 * sin(degtorad(dir));
+							}
+							AccelX = 0.5 * cos(degtorad(dir));
+							AccelY = -0.5 * sin(degtorad(dir));
 						}else if(obj.state == 0){
 							AccelX = 1 * cos(degtorad(dir));
 							AccelY = -1 * sin(degtorad(dir));
 						}
+					}
+				}
+
+				if (IS_NET && moving_state != STATES_PLAYER.machine_gun_state) {
+					var remote_player = instance_place(x, y, oPlayer);
+					if (instance_exists(remote_player) && remote_player.is_remote) {
+						var remote_dir = point_direction(remote_player.x, remote_player.y, x, y);
+						AccelX = 2 * cos(degtorad(remote_dir));
+						AccelY = -2 * sin(degtorad(remote_dir));
 					}
 				}
 			}
@@ -1231,8 +1459,11 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			AccelY = 0;		
 			#endregion
 
-			#region Running and prone and machine gun
+			#region Running, walking, prone and machine gun
 			if(!global.my_console[? "active"] && shield_equip == false){
+				if(running){
+					statistics_hit("Stamina", STAMINA_RUN_VALUE, id);
+				}
 	
 				if(keyboard_check_pressed(global.KeyBinds[| KEY.Prone]) && Moving == false){
 					if(moving_state == STATES_PLAYER.none_state){
@@ -1264,54 +1495,35 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					}
 				}
 	
-				if(instance_exists(oMachineGun)){
-					var machine_gun = instance_nearest(x, y, oMachineGun);		
-					if(distance_to_object(machine_gun) <= PickUpDistance){
-						if(keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
-							if(moving_state == STATES_PLAYER.none_state && global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None){ /// Pokud neběži ani se neplazí
-						
-								#region Equip machine gun
-								global.Inventory[# OtherSlot.Primary, Index.slot_id] = machine_gun.stats.Id;
-								global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope] = machine_gun.stats.Slot_scope;
-								global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel] = machine_gun.stats.Slot_barrel;
-								global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip] = machine_gun.stats.Slot_grip;
-								global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor] = machine_gun.stats.Slot_suppressor;
-								global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = machine_gun.stats.Ammo;
-								global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = machine_gun.stats.Clip_ammo;
-								global.ItemIndex[# global.Inventory[# OtherSlot.Primary, Index.slot_id], ItemStat.MaxAmmo] = global.ItemIndex[#machine_gun.stats.Id, ItemStat.MaxAmmo];
-								#endregion
-						
-								Moving = false;
-								var m_pos = local_to_world(0, 96, machine_gun.image_angle, machine_gun);
-								x = m_pos[0];
-								y = m_pos[1];
-								machine_gun.stats.Object = id;
-								moving_state = STATES_PLAYER.machine_gun_state;	
-								weapon_network_propagate();
-							}else if(moving_state == STATES_PLAYER.machine_gun_state){
-								ReloadTime = 0;
-								moving_state = STATES_PLAYER.none_state;
-								Reloading = false;
-						
-								#region Dequip machine gun
-								global.Inventory[# OtherSlot.Primary, Index.slot_id] = Item.None;
-								machine_gun.stats.Slot_scope = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope];
-								machine_gun.stats.Slot_barrel = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel];
-								machine_gun.stats.Slot_grip = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip];
-								machine_gun.stats.Slot_suppressor = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor];
-								machine_gun.stats.Ammo = global.Inventory[# OtherSlot.Primary, Index.slot_ammo];
-								machine_gun.stats.Clip_ammo = global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo];
-								if(oDraw.show_weapon_attachments == true){
-									player_can_shoot = true;
-									oDraw.show_weapon_attachments = false;
-								}
-								player_has_scope = -1;
-								ScopeIn = false;	
-								WeaponDrop(1, id);
-								weapon_network_propagate();
-								#endregion
-						
+				if (instance_exists(oMachineGun) && keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])) {
+					var machine_gun = instance_nearest(x, y, oMachineGun);
+					var mounted_machine_gun = IS_NET ? find_machine_gun_by_pid(network_id) : noone;
+					if (!IS_NET && moving_state == STATES_PLAYER.machine_gun_state && machine_gun.stats.Object == id) {
+						mounted_machine_gun = machine_gun;
+					}
+
+					if (instance_exists(mounted_machine_gun)) {
+						if (IS_NET) {
+							if (oNetworkManager.is_server) {
+								server_release_machine_gun(network_id);
+							} else {
+								send_machine_gun_request_client(MACHINE_GUN_SYNC_ACTION.REQUEST_DISMOUNT, mounted_machine_gun);
 							}
+						} else {
+							dismount_local_player_from_machine_gun(id, mounted_machine_gun);
+						}
+					} else if (distance_to_object(machine_gun) <= PickUpDistance
+					&& moving_state == STATES_PLAYER.none_state
+					&& global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.None
+					&& !instance_exists(machine_gun.stats.Object)) {
+						if (IS_NET) {
+							if (oNetworkManager.is_server) {
+								server_mount_machine_gun(network_id, machine_gun.x, machine_gun.y);
+							} else {
+								send_machine_gun_request_client(MACHINE_GUN_SYNC_ACTION.REQUEST_MOUNT, machine_gun);
+							}
+						} else {
+							mount_local_player_to_machine_gun(id, machine_gun);
 						}
 					}
 				}
@@ -1335,7 +1547,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Facing
 			if(instance_exists(oCrosshair)){
 				if(player_can_shoot == true){
-					var pointdir = point_direction(x,y,oCrosshair.x,oCrosshair.y);
+					var pointdir = point_direction(x, y, oCrosshair.aim_x, oCrosshair.aim_y);
 					Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 					Weapon.x = x + lengthdir_x(WX, RotationAngle) - lengthdir_x(Weapon.KickBackEffect, RotationAngle);
 					Weapon.y = y + lengthdir_y(WY, RotationAngle) - lengthdir_y(Weapon.KickBackEffect, RotationAngle);
@@ -1407,15 +1619,37 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#region Healing kit
 			if(Healing == true){
 				CanShoot = false;
-				HealingTime += global.time_step;
+				if (!healing_pending) {
+					HealingTime += global.time_step;
+				} else {
+					healing_request_timer -= global.time_step;
+					if (healing_request_timer <= 0 && IS_NET && !oNetworkManager.is_server && oNetworkManager.is_connected) {
+						send_item_action_complete_client(HealingItemId);
+						healing_request_timer = 0.25 * game_get_speed(gamespeed_fps);
+					}
+				}
 			}
 			if(HealingTime >= global.ItemIndex[#HealingItemId, ItemStat.ReloadSpeed]){
-				damage_indicator("+" + string(global.ItemIndex[#HealingItemId, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, ICON.health);
-				CanShoot = true;
-				stats.Health_points += min(global.ItemIndex[#HealingItemId, ItemStat.Damage], global.player_stats.Max_health - stats.Health_points);
-				stats.Damage_health_points = stats.Health_points;
-				Healing = false;
-				HealingTime = -1;
+				if (!IS_NET) {
+					var healing_amount = min(global.ItemIndex[#HealingItemId, ItemStat.Damage], global.player_stats.Max_health - stats.Health_points);
+					stats.Health_points += healing_amount;
+					stats.Damage_health_points = stats.Health_points;
+					damage_indicator("+" + string(round(healing_amount)), x, y - 30, c_green, spr_Icons, ICON.health);
+					CanShoot = true;
+				} else if (oNetworkManager.is_server) {
+					server_process_item_action(network_id, HealingItemId);
+				} else if (oNetworkManager.is_connected) {
+					if (!healing_pending) {
+						healing_pending = true;
+						healing_request_timer = 0;
+					}
+				}
+
+				if (!healing_pending) {
+					Healing = false;
+					HealingTime = -1;
+					HealingItemId = Item.None;
+				}
 			}
 			#endregion
 
@@ -1467,7 +1701,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						player_can_shoot = true;
 
 						if (!IS_NET) {
-							instance_create_layer(x, y, "ItemsO", oBomb);
+							var bomb = instance_create_layer(x, y, "ItemsO", oBomb);
+							bomb.image_angle = random(359);
 							ItemAmountSubstract(planting_slot, 1);
 							planting_slot = -1;
 						} else if (oNetworkManager.is_server) {
@@ -1483,6 +1718,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 						}
 					}
 				}
+
 			}
 			#endregion
 
@@ -1500,7 +1736,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!global.my_console[? "active"] && !instance_exists(oBuyMenu) && moving_state != STATES_PLAYER.mortar_state){
 		
 				#region Inventory
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.Inventory])){
+				if(!defusing && keyboard_check_pressed(global.KeyBinds[| KEY.Inventory])){
 					if(player_can_shoot == true){
 						instance_create_layer(x, y, "OtherO", oInventory);
 						player_can_shoot = false;
@@ -1522,7 +1758,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(instance_exists(oItems)){
 				    var Items = instance_nearest(x, y, oItems);
 				    if(distance_to_object(Items) <= PickUpDistance){   
-				        if(keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
+					if(!defusing && keyboard_check_pressed(global.KeyBinds[| KEY.PickUp])){
 				            with(Items){
 				                gain_item(image_index, Amount, Ammo, ClipAmmo, Durability, scope_attachment, barrel_attachment, grip_attachment, suppressor_attachment);
 				            }
@@ -1532,7 +1768,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 				
 				#region Item cycling
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleRight])){
+				if(!defusing && keyboard_check_pressed(global.KeyBinds[| KEY.CycleRight])){
 					if (planting) {
 						planting = false;
 						planting_value = 0;
@@ -1543,6 +1779,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
+						healing_pending = false;
 					}
 					item_use_position ++;
 					if(item_use_position > HOTBAR_SIZE - 1){
@@ -1550,7 +1787,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					}
 					item_use_position = max(item_use_position, 0);
 				}			
-				if(keyboard_check_pressed(global.KeyBinds[| KEY.CycleLeft])){
+				if(!defusing && keyboard_check_pressed(global.KeyBinds[| KEY.CycleLeft])){
 					if (planting) {
 						planting = false;
 						planting_value = 0;
@@ -1561,6 +1798,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					if(Healing == true){
 						HealingTime = 0;
 						Healing = false;
+						healing_pending = false;
 					}
 					if(item_use_position == 0){ 
 						item_use_position = HOTBAR_SIZE - 1;
@@ -1572,7 +1810,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				#endregion
 
 				if(input_check(global.KeyBinds[| KEY.UseItem], true, false) && !instance_exists(oInventory) && moving_state != STATES_PLAYER.machine_gun_state
-				 && !instance_exists(oWeaponAttachments) ){
+				 && !instance_exists(oWeaponAttachments) && !defusing){
 					item_equip(item_use_position, "item_use_position", WeaponID);
 				 }
 		
@@ -1637,7 +1875,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Range 
 			if(instance_exists(oCrosshair)){
-				Range = point_distance(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), oCrosshair.x, oCrosshair.y);
+				Range = point_distance(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), oCrosshair.aim_x, oCrosshair.aim_y);
 			}
 			#endregion
 
@@ -1647,6 +1885,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			}
 	
 			if(ReloadTimer == 0){
+				ReloadTimer = -1;
 				if(global.ItemIndex[#wpn_id, ItemStat.BaseDurability] != 1){
 			
 					#region Normal reloading
@@ -1686,6 +1925,12 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#endregion
 			
 				}
+
+				if (IS_NET && oNetworkManager.is_server && wpn_id == Item.basic_machine_gun) {
+					server_machine_gun_ammo_changed(network_id,
+						global.Inventory[# WeaponID, Index.slot_ammo],
+						global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+				}
 			}
 	
 			if (global.Inventory[# WeaponID, Index.slot_id] != -1) {
@@ -1694,14 +1939,15 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			  }
 			 AmmoNeeded = global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] - global.Inventory[# WeaponID, Index.slot_ammo];
 
-			  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading = false && keyboard_check_pressed(global.KeyBinds[| KEY.Reload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None && FlashedAlpha <= 0){
+			  if (global.Inventory[# WeaponID, Index.slot_ammo] < global.ItemIndex[# wpn_id, ItemStat.MaxAmmo] && global.Inventory[# WeaponID, Index.slot_clip_ammo] > 0 && Reloading == false && !defusing && keyboard_check_pressed(global.KeyBinds[| KEY.Reload]) && shooting == false && !global.my_console[? "active"] && global.Inventory[# item_use_position, Index.slot_id] == Item.None && FlashedAlpha <= 0){
 			    Reloading = true;
 			    ReloadTimer = global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed];
 			  }
 			}
 
 			if(Reloading == true){
-			    ReloadTime += (global.time_step == 1 ? 1 : 0.5);
+				var local_reload_duration = max(1, global.ItemIndex[# wpn_id, ItemStat.ReloadSpeed]);
+			    ReloadTime = min(local_reload_duration, ReloadTime + reload_frame_step);
 			}
 			#endregion
 	
@@ -1729,6 +1975,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				camera_get_view_height(CAM) + 2 * ACTIVATE_MARGIN,
 				true
 			);
+			instance_activate_object(oGameController);
 			instance_activate_object(oNetworkManager);
 			instance_activate_object(obj_hazeC);
 			instance_activate_object(oParentTile);
@@ -1736,12 +1983,14 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oMortarMenu);
 			instance_activate_object(oWeaponAttachments);
 			instance_activate_object(oBuyMenuDescription);
+			instance_activate_object(oBotTab);
 			instance_activate_object(objUIImage);
 			instance_activate_object(oBuyMenu);
 			instance_activate_object(oWeaponDescription);
 			instance_activate_object(oLightRenderer);
 			instance_activate_object(oDamageTable);
 			instance_activate_object(oStatisticsTable);
+			instance_activate_object(oBotTab);
 			instance_activate_object(oItemDescription);
 			instance_activate_object(objUIWindowCaption);
 			instance_activate_object(objZUIMain);
@@ -1749,13 +1998,14 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(objUILabel);
 			instance_activate_object(objUIGrid);
 			instance_activate_object(oArmourDescription);
-			instance_activate_object(oRatingController);
+			instance_activate_object(oUsableItemDescription);
 			instance_activate_object(oCrosshair);
 			instance_activate_object(oDamageIndicator);
 			instance_activate_object(oDraw);
 			instance_activate_object(oBulletTracer);
 			instance_activate_object(oBullet);
 			instance_activate_object(oParticleSystem);
+			instance_activate_object(oParticle);
 			instance_activate_object(oParticleSurface);
 			instance_activate_object(oConsole);
 			instance_activate_object(oCamera);
@@ -1778,11 +2028,11 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 #region Death
 var should_handle_death = false;
 if (!IS_NET) {
-    if (stats.Health_points <= 0 && oDraw.RespawnMenu == false) {
+    if (stats.Health_points <= 0 && !death_handled) {
         should_handle_death = true;
     }
 } else {
-    if (death_from_server) {
+    if (death_from_server && !death_handled) {
         should_handle_death = true;
         death_from_server = false;
     }
@@ -1790,7 +2040,35 @@ if (!IS_NET) {
 
 
 if (should_handle_death) {
-	if(is_local){
+    death_handled = true;
+    if(is_local){
+		if(instance_exists(oTerminal)){
+			with(oTerminal) zui_destroy();
+		}
+        with (oInventory) instance_destroy();
+        with (oSlot) instance_destroy();
+        item_description_destroy();
+
+		ds_grid_clear(global.Inventory, 0);
+		ds_grid_clear(global.MouseSlot, 0);
+		global.player_stats.Weight = 0;
+
+        audio_stop_sound(snd_EarRing);
+        muffled_sounds = 1;
+		near_explosion_timer = -1;
+		ViewAngle = 0;
+		ViewShake = false;
+		ViewShakeTimer = -1;
+		ViewShakeMagnitude = 0;
+		ViewShakeValuePower = 0;
+		CrosshairShake = 0;
+		AimPunchTimer = -1;
+		AimPunchMultiplier = 1;
+		rotation_angle = 0;
+		rotation_target = 0;
+		rotation_direction = 1;
+		camera_set_view_angle(CAM, 0);
+
 		stats.Deaths++;
 		if(!IS_NET){
 			global.game_struct.Match_deaths++;
@@ -1804,6 +2082,12 @@ if (should_handle_death) {
     oDraw.KilledByName = KilledByName;
     Weapon.image_index = 0;
     image_index = 3;
+	if(instance_exists(Legs)){
+		Legs.Visible = false;
+		Legs.image_speed = 0;
+		Legs.image_index = Legs.first_frame;
+		Legs.footstep_progress = 0;
+	}
 	ScopeIn = false;
 	depth += 1;
 	player_can_shoot = false;
@@ -1812,22 +2096,34 @@ if (should_handle_death) {
 	planting_pending = false;
 	planting_value = 0;
 	planting_slot = -1;
+	defusing = false;
+	defusing_time = 0;
+	defusing_target = DEFUSE_TARGET.NONE;
+	defusing_hostage = noone;
+	Healing = false;
+	HealingTime = -1;
+	HealingItemId = Item.None;
+	healing_pending = false;
+	healing_request_timer = 0;
 
 	with(oBuyMenuDescription){
 		zui_destroy();	
 	}
 
-    play_sound(x, y, choose(snd_Death1, snd_Death2));
+	play_sound(x, y, choose(snd_Death1, snd_Death2));
 
 	if(!IS_NET){
-		var bomb_decides_round = global.bomb_planted
-			|| (instance_exists(oDraw) && oDraw.bomb_detonation_pending);
-		if (!bomb_decides_round) {
+		if (!oDraw.bomb_detonation_pending) {
+			global.bomb_planted = false;
+			global.bomb_timer = 0;
+			global.bomb_planter_pid = -1;
+			oDraw.round_end_timer = -1;
+			with (oBomb) instance_destroy();
 			round_end("Loss");
 		}
 	}else if(is_local){
 		var teammate = find_living_player_teammate(stats.Team, id);
-		var round_already_resolved = oNetworkManager.is_server && oNetworkManager.round_resolved;
+		var round_already_resolved = oNetworkManager.round_resolved;
 
 		if (!round_already_resolved) {
 			oDraw.RespawnMenu = true;

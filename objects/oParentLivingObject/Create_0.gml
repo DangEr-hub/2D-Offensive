@@ -49,3 +49,4 @@ KickBackAngle = 0;
 Flashed = false;
 HitMap = ds_map_create();
 Moving = false;
+next_shot_intel_time = 0;

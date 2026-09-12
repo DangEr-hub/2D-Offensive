@@ -256,6 +256,7 @@ function apply_remote_player_network_state(player, pid) {
         if (!is_undefined(bit_state)) {
             network_bit_state = bit_state;
             network_throw_grenade = (bit_state & PLAYER_FLAGS.THROWING_GRENADE) != 0;
+			defusing = (bit_state & PLAYER_FLAGS.DEFUSING) != 0;
         }
         if (!is_undefined(moving_state_id)) {
             network_moving_state = moving_state_id;
@@ -278,6 +279,100 @@ function apply_remote_player_network_state(player, pid) {
         if (!is_undefined(weapon_grip)) network_grip = weapon_grip;
         if (!is_undefined(weapon_suppressor)) network_suppressor = weapon_suppressor;
     }
+}
+
+function find_machine_gun_at(_x, _y) {
+	var nearest_gun = instance_nearest(_x, _y, oMachineGun);
+	if (instance_exists(nearest_gun) && point_distance(_x, _y, nearest_gun.x, nearest_gun.y) <= 2) {
+		return nearest_gun;
+	}
+	return noone;
+}
+
+function find_machine_gun_by_pid(_pid) {
+	var gun_count = instance_number(oMachineGun);
+	for (var i = 0; i < gun_count; i++) {
+		var gun = instance_find(oMachineGun, i);
+		if (instance_exists(gun) && gun.operator_pid == _pid) return gun;
+	}
+	return noone;
+}
+
+function mount_local_player_to_machine_gun(_player, _gun) {
+	if (!instance_exists(_player) || !instance_exists(_gun)) return false;
+
+	global.Inventory[# OtherSlot.Primary, Index.slot_id] = _gun.stats.Id;
+	global.Inventory[# OtherSlot.Primary, Index.slot_scope] = _gun.stats.Slot_scope;
+	global.Inventory[# OtherSlot.Primary, Index.slot_barrel] = _gun.stats.Slot_barrel;
+	global.Inventory[# OtherSlot.Primary, Index.slot_grip] = _gun.stats.Slot_grip;
+	global.Inventory[# OtherSlot.Primary, Index.slot_suppressor] = _gun.stats.Slot_suppressor;
+	global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = _gun.stats.Ammo;
+	global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = _gun.stats.Clip_ammo;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope] = _gun.stats.Slot_scope;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel] = _gun.stats.Slot_barrel;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip] = _gun.stats.Slot_grip;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor] = _gun.stats.Slot_suppressor;
+
+	_player.WeaponID = OtherSlot.Primary;
+	_player.WeaponNumber = 0;
+	_player.Moving = false;
+	_player.Reloading = false;
+	_player.ReloadTime = 0;
+	_player.ReloadTimer = -1;
+	_player.moving_state = STATES_PLAYER.machine_gun_state;
+
+	var mount_pos = local_to_world(0, 96, _gun.image_angle, _gun);
+	_player.x = mount_pos[0];
+	_player.y = mount_pos[1];
+	_gun.stats.Object = _player;
+	return true;
+}
+
+function dismount_local_player_from_machine_gun(_player, _gun) {
+	if (!instance_exists(_player) || !instance_exists(_gun)) return false;
+
+	_gun.stats.Slot_scope = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope];
+	_gun.stats.Slot_barrel = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel];
+	_gun.stats.Slot_grip = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip];
+	_gun.stats.Slot_suppressor = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor];
+	_gun.stats.Ammo = global.Inventory[# OtherSlot.Primary, Index.slot_ammo];
+	_gun.stats.Clip_ammo = global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo];
+
+	for (var i = 0; i < Index.Total; i++) {
+		global.Inventory[# OtherSlot.Primary, i] = 0;
+	}
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope] = Item.None;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel] = Item.None;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip] = Item.None;
+	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor] = Item.None;
+
+	_player.Reloading = false;
+	_player.ReloadTime = 0;
+	_player.ReloadTimer = -1;
+	_player.player_has_scope = -1;
+	_player.ScopeIn = false;
+	_player.moving_state = STATES_PLAYER.none_state;
+	_gun.stats.Object = noone;
+	return true;
+}
+
+function find_nearest_available_hostage(xpos, ypos) {
+	var nearest_hostage = noone;
+	var nearest_distance = infinity;
+	var hostage_count = instance_number(oHostage);
+
+	for (var i = 0; i < hostage_count; i++) {
+		var hostage = instance_find(oHostage, i);
+		if (instance_exists(hostage) && !hostage.rescuing) {
+			var hostage_distance = point_distance(xpos, ypos, hostage.x, hostage.y);
+			if (hostage_distance < nearest_distance) {
+				nearest_distance = hostage_distance;
+				nearest_hostage = hostage;
+			}
+		}
+	}
+
+	return nearest_hostage;
 }
 
 function position_in_bomb_area(_x, _y, _map_id = global.MapID){

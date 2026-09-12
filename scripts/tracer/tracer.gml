@@ -306,9 +306,33 @@ function handle_grenade_sync_client() {
                     instance_destroy(visual_grenade);
                 }
 
-                create_grenade_explosion_visual(explode_x, explode_y, explode_item_id, explode_damage);
-            break;
-        }
+				create_grenade_explosion_visual(explode_x, explode_y, explode_item_id, explode_damage, explode_net_id);
+			break;
+
+			case GRENADE_SYNC_ACTION.MOLOTOV_STATE:
+				var impact_count = buffer_read(receive_buffer, buffer_u8);
+				for(var impact_i = 0; impact_i < impact_count; impact_i++){
+					var impact_net_id = buffer_read(receive_buffer, buffer_u16);
+					var impact_x = buffer_read(receive_buffer, buffer_f16);
+					var impact_y = buffer_read(receive_buffer, buffer_f16);
+					var impact_age = buffer_read(receive_buffer, buffer_f16);
+
+					var stale_grenade = find_instance_by_network_id(oGrenade, impact_net_id);
+					if(instance_exists(stale_grenade)){
+						instance_destroy(stale_grenade);
+					}
+
+					create_grenade_explosion_visual(
+						impact_x,
+						impact_y,
+						Item.MolotovGrenade,
+						global.ItemIndex[# Item.MolotovGrenade, ItemStat.Damage],
+						impact_net_id,
+						impact_age
+					);
+				}
+			break;
+		}
     }
 }
 
@@ -363,15 +387,65 @@ function server_grenade_explosion_broadcast(grenade_inst) {
     }
 }
 
-function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage) {
+function server_molotov_state_broadcast() {
+	with(oNetworkManager){
+		if(!is_server || ds_map_size(clients) <= 0) return;
+
+		var active_impacts = [];
+		var impact_total = instance_number(oMolotovImpact);
+		for(var impact_i = 0; impact_i < impact_total; impact_i++){
+			var impact = instance_find(oMolotovImpact, impact_i);
+			if(instance_exists(impact) && impact.can_damage && impact.network_id >= 0){
+				array_push(active_impacts, impact);
+				if(array_length(active_impacts) >= 255) break;
+			}
+		}
+
+		var active_count = array_length(active_impacts);
+		if(active_count <= 0) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.GRENADE_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, GRENADE_SYNC_ACTION.MOLOTOV_STATE);
+		buffer_write(send_buffer, buffer_u8, active_count);
+
+		for(var state_i = 0; state_i < active_count; state_i++){
+			var state_impact = active_impacts[state_i];
+			buffer_write(send_buffer, buffer_u16, state_impact.network_id);
+			buffer_write(send_buffer, buffer_f16, state_impact.x);
+			buffer_write(send_buffer, buffer_f16, state_impact.y);
+			buffer_write(send_buffer, buffer_f16, state_impact.age);
+		}
+
+		var socket_key = ds_map_find_first(clients);
+		for(var client_i = 0; client_i < ds_map_size(clients); client_i++){
+			sent_server_udp(server_socket, socket_key, send_buffer);
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+}
+
+function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage, network_id = -1, initial_age = 0) {
     if (item_id == Item.SmokeGrenade) {
         create_fog(x_pos, y_pos, random_range(100, 150), random(360), 0.1, random_range(.1, .5), 11, .9, .75, SMOKE_TIME);
         return;
     }
 
 	if (item_id == Item.MolotovGrenade) {
-		create_molotov_impact(x_pos, y_pos, explosion_damage, noone, item_id, "Noone", -1, false);
-		return;
+		var impact = noone;
+		if(network_id >= 0){
+			impact = find_instance_by_network_id(oMolotovImpact, network_id);
+		}
+
+		if(!instance_exists(impact)){
+			impact = create_molotov_impact(x_pos, y_pos, explosion_damage, noone, item_id, "Noone", -1, false, network_id, initial_age);
+		}else{
+			impact.x = x_pos;
+			impact.y = y_pos;
+			impact.age = max(impact.age, initial_age);
+		}
+		return impact;
 	}
 
     var explosion = instance_create_depth(x_pos, y_pos, -99, oExplosion);

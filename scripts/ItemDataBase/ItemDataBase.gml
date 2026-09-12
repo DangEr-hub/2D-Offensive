@@ -161,8 +161,9 @@ function weapon_can_equip_attachment(weapon_id, attachment_slot){
 
 function ItemDataBase(){
 	///Define shooting modes for every weapon
-	add_shooting_modes(Item.Spas, ["Auto", "Semi", "Safety"]);
-	add_shooting_modes(Item.AKM, ["Auto", "Semi", "Burst", "Safety"]);
+	add_shooting_modes(Item.Spas, ["Semi", "Safety"]);
+	add_shooting_modes(Item.AKM, ["Auto", "Burst", "Safety"]);
+	add_shooting_modes(Item.Scar, ["Auto", "Semi", "Burst", "Safety"]);
 	add_shooting_modes(Item.DesertEagle, ["Semi", "Safety"]);
 	add_shooting_modes(Item.SG550, ["Auto", "Safety"]);
 	add_shooting_modes(Item.SSG08, ["Semi", "Safety"]);
@@ -184,6 +185,7 @@ function ItemDataBase(){
 	add_shooting_modes(Item.CZ75, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.MP7, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(Item.P90, ["Auto", "Safety"]);
+	add_shooting_modes(Item.m200, ["Semi", "Safety"]);
 
 	// assault rifles + snipers
 	global.ItemIndex[# Item.AKM, ItemStat.attachments]  = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
@@ -195,6 +197,8 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.awm, ItemStat.attachments]   = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.SSG08, ItemStat.attachments] = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.Dragunov, ItemStat.attachments] = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
+	global.ItemIndex[# Item.m200, ItemStat.attachments] = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip];
+	global.ItemIndex[# Item.Scar, ItemStat.attachments] = [ATTACHMENTS.slot_scope, ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	// smg
 	global.ItemIndex[# Item.MAC11, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_grip, ATTACHMENTS.slot_suppressor];
 	global.ItemIndex[# Item.MP9, ItemStat.attachments] = [ATTACHMENTS.slot_barrel, ATTACHMENTS.slot_suppressor];
@@ -222,6 +226,8 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.famas, ItemStat.attach_sockets] = { scope: [0, -14], barrel: [10, -2], grip: [12, 7], suppressor: [34, -1] };
 	global.ItemIndex[# Item.galil, ItemStat.attach_sockets] = { scope: [-7, -14], barrel: [14, -6], grip: [14, 2], suppressor: [47, -7] };
 	global.ItemIndex[# Item.MK18, ItemStat.attach_sockets] = { scope: [0, -14], barrel: [20, -8], grip: [20, 2], suppressor: [37, -8] };
+	global.ItemIndex[# Item.Scar, ItemStat.attach_sockets] = { scope: [-3, -9], barrel: [14, -4], grip: [14, 4], suppressor: [40, -4] };
+	global.ItemIndex[# Item.m200, ItemStat.attach_sockets] = { scope: [-17, -7], barrel: [3, -1], grip: [1, 7]};
 
 	global.ItemIndex[# Item.DesertEagle, ItemStat.attach_sockets] = { barrel: [14, -8]};
 	global.ItemIndex[# Item.Glock, ItemStat.attach_sockets] = { barrel: [8, -5], suppressor: [22, -5] };
@@ -249,7 +255,7 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.None, ItemStat.KickBackPower] = 1;	
 	
 	global.ItemIndex[# Item.AKM, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 36, 270, 30, WEAPON_TYPE.PRIMARY, 10, 6, snd_AKM, 5, 1.25, true,
+	WeaponStats(Item.AKM, "AKM", 2 * game_get_speed(gamespeed_fps), 775, 38, 270, 30, WEAPON_TYPE.PRIMARY, 10, 6, snd_AKM, 5, 1.25, true,
 	10, 20, 10, 5.9, .015, 10, 3.5, 1, 7, .25, 1, WEAPON_CLASS.ASSAULT_RIFLE, .81, .795, .5 * game_get_speed(gamespeed_fps), .85, 270, 1, 5, true, "7.62x39 mm", CALIBER.HIGH);
 	global.ItemIndex[# Item.AKM, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.AKM, ItemStat.disadvantages] = "-High bullet spread\n-High recoil\n-Long reloading";
@@ -276,6 +282,36 @@ function ItemDataBase(){
 		    2.0, 4.0
 		);
 	}
+	
+	global.ItemIndex[# Item.Scar, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.Scar, "SCAR-L", 2.25 * game_get_speed(gamespeed_fps), 800, 35, 200, 50, WEAPON_TYPE.PRIMARY, 8, 7, snd_Scar, 2, 1, true,
+	15, 30, 11, 7, .005, 10, 2, -4, 5, .2, 0, WEAPON_CLASS.ASSAULT_RIFLE, .7, .74, .75 * game_get_speed(gamespeed_fps), .5, 310, .5, 5, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	global.ItemIndex[# Item.Scar, ItemStat.difficulty] = 3;
+	global.ItemIndex[# Item.Scar, ItemStat.disadvantages] = "-Bad mobility\n-Low clip ammo\n-Low penetration power";
+	global.ItemIndex[# Item.Scar, ItemStat.advantages] = "+Very low accuracy drop\n+Very low damage drop-off\n+High ammo capacity";
+	global.ItemIndex[# Item.Scar, ItemStat.ItemColor] = c_yellow;
+	global.ItemIndex[# Item.Scar, ItemStat.AmmoSpriteID] = 21;
+	global.ItemIndex[# Item.Scar, ItemStat.Rarity] = RARITY.LEGENDARY;
+	global.ItemIndex[# Item.Scar, ItemStat.Description] = "Built for fast and precise eliminations, the SCAR-L combines a large magazine with exceptional accuracy and low damage drop-off. Limited reserve ammunition, low penetration, reduced mobility, and a higher price balance its reliable performance.";
+	global.ItemIndex[# Item.Scar, ItemStat.damage_drop] = function(dist)  {
+		return curve_loglinlog(
+		    dist,
+		    global.ItemIndex[# Item.Scar, ItemStat.Range],
+		    0.5, 0.75,
+		    0.95, 0.93,
+		    0.89, 4.0
+		);
+	}
+	global.ItemIndex[# Item.Scar, ItemStat.accuracy_drop] = function(dist)  {
+		return curve_loglinlog(
+		    dist,
+		    global.ItemIndex[# Item.Scar, ItemStat.Range],
+		    0.25, 0.55, 
+			0.88, 0.7, 0.5,   // 150% spread na max range
+		    3.0
+		);
+	}	
+
 	
 	global.ItemIndex[# Item.spec_ops_shield, ItemStat.Type] = "Shield";
 	WeaponStats(Item.spec_ops_shield, "Spec ops shield", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, false,
@@ -306,14 +342,14 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.kevlar_shield, ItemStat.Description] = "This kevlar shield blocks " + string_format((1 - global.ItemIndex[# Item.kevlar_shield, ItemStat.Defense]) * 100, 0, 1) + "% of incoming damage, offering superior frontal protection. Heavy weight reduces movement speed, prevents weapon use, and durability limits sustained defense.";
 
 	global.ItemIndex[# Item.KevlarHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .925, 25);
+	ArmourStats(Item.KevlarHelm, "Kevlar helmet", 3, .9, 50);
 	global.ItemIndex[# Item.KevlarHelm, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[# Item.KevlarHelm, ItemStat.BaseDurability] = 100;
 	global.ItemIndex[# Item.KevlarHelm, ItemStat.Description] = "This basic helmet provides " + string_format((1 - global.ItemIndex[# Item.KevlarHelm, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained.";
 	
 	global.ItemIndex[# Item.DesertEagle, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.DesertEagle, "Desert Eagle", 1.75 * game_get_speed(gamespeed_fps), 700, 53, 70, 7, WEAPON_TYPE.SECONDARY, 7, 11, snd_DesertEagle, 7, 2, false,
-	0, 0, 10, 30, 1.5, 9, 7.5, 0, 0, .5, 1, WEAPON_CLASS.PISTOL, .9, .932, .1 * game_get_speed(gamespeed_fps), .77, 75, 2, 7, true, ".50 AE", CALIBER.HIGH);
+	0, 0, 10, 30, 1.5, 9, 7.5, 0, 0, .5, 1, WEAPON_CLASS.PISTOL, .9, .932, .1 * game_get_speed(gamespeed_fps), .77, 95, 2, 7, true, ".50 AE", CALIBER.HIGH);
 	global.ItemIndex[# Item.DesertEagle, ItemStat.random_bullet_spread] = true;
 	global.ItemIndex[# Item.DesertEagle, ItemStat.difficulty] = 5;
 	global.ItemIndex[# Item.DesertEagle, ItemStat.disadvantages] = "-High recoil\n-Low magazine capacity";
@@ -342,7 +378,7 @@ function ItemDataBase(){
 	}
 
 	global.ItemIndex[# Item.KevlarVest, ItemStat.Type] = "Armour";
-	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .925, 50);
+	ArmourStats(Item.KevlarVest, "Kevlar vest", 4, .925, 75);
 	global.ItemIndex[# Item.KevlarVest, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[# Item.KevlarVest, ItemStat.BaseDurability] = 100;
 	global.ItemIndex[# Item.KevlarVest, ItemStat.Description] = "This lightweight vest offers a basic " + string_format((1 - global.ItemIndex[# Item.KevlarVest, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility.";
@@ -381,23 +417,23 @@ function ItemDataBase(){
 
 
 	global.ItemIndex[# Item.MilitaryHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.MilitaryHelm, "Military helmet", 3, .875, 50);
+	ArmourStats(Item.MilitaryHelm, "Military helmet", 3, .875, 75);
 	global.ItemIndex[# Item.MilitaryHelm, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[# Item.MilitaryHelm, ItemStat.BaseDurability] = 90;
 	global.ItemIndex[# Item.MilitaryHelm, ItemStat.Description] = "With a " + string_format((1 - global.ItemIndex[# Item.MilitaryHelm, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, the Military Helmet offers enhanced head protection against moderate threats. A balanced choice for defense and comfort.";
 	
 	global.ItemIndex[# Item.MilitaryVest, ItemStat.Type] = "Armour";
-	ArmourStats(Item.MilitaryVest, "Military vest", 7, .875, 75);
+	ArmourStats(Item.MilitaryVest, "Military vest", 7, .875, 100);
 	global.ItemIndex[# Item.MilitaryVest, ItemStat.ItemColor] = c_green;
 	global.ItemIndex[# Item.MilitaryVest, ItemStat.BaseDurability] = 90; 
 	global.ItemIndex[# Item.MilitaryVest, ItemStat.Description] = "Enhanced with " + string_format((1 - global.ItemIndex[# Item.MilitaryVest, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, this robust military vest provides significant protection against moderate threats, balancing defense with agility.";
 	
 	global.ItemIndex[# Item.SSG08, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.SSG08, "SSG 08", 3 * game_get_speed(gamespeed_fps), 825, 110, 100, 10, WEAPON_TYPE.PRIMARY, 2, 30, snd_SSG08, 15, 2, false,
-	0, 0, 10, 20, 50, 10, 10, 0, 0, .25, 1, WEAPON_CLASS.SNIPER_RIFLE, .87, .85, 1 * game_get_speed(gamespeed_fps), .5, 170, 2, 7, false, ".338 LM", CALIBER.HIGH);
+	WeaponStats(Item.SSG08, "SSG 08", 2 * game_get_speed(gamespeed_fps), 800, 107, 50, 10, WEAPON_TYPE.PRIMARY, 2, 30, snd_SSG08, 15, 2, false,
+	0, 0, 10, 20, 50, 10, 10, 0, 0, .9, 1, WEAPON_CLASS.SNIPER_RIFLE, .91, .85, 0.5 * game_get_speed(gamespeed_fps), .5, 170, 2, 7, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[# Item.SSG08, ItemStat.difficulty] = 5;
 	global.ItemIndex[# Item.SSG08, ItemStat.preattached] = { scope: Item.two_scope };
-	global.ItemIndex[# Item.SSG08, ItemStat.disadvantages] = "-Bad mobility\n-Limited view";
+	global.ItemIndex[# Item.SSG08, ItemStat.disadvantages] = "-Low penetration power\n-Limited view";
 	global.ItemIndex[# Item.SSG08, ItemStat.advantages] = "\n+High damage\n+High range";
 	global.ItemIndex[# Item.SSG08, ItemStat.ItemColor] = c_gray;
 	global.ItemIndex[# Item.SSG08, ItemStat.AmmoSpriteID] = 2;
@@ -423,7 +459,7 @@ function ItemDataBase(){
 	
 	
 	global.ItemIndex[# Item.MAC11, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 580, 29, 300, 30, WEAPON_TYPE.PRIMARY, 5, 6, snd_MAC11, 2, 1, true,
+	WeaponStats(Item.MAC11, "MAC11", 1.5 * game_get_speed(gamespeed_fps), 550, 27, 300, 30, WEAPON_TYPE.PRIMARY, 5, 6, snd_MAC11, 2, 1, true,
 	15, 20, -9, 9, 0.025, 1.5, 2, 1, 5, .9, 0, WEAPON_CLASS.SUBMACHINE_GUN, .9, .57, .1 * game_get_speed(gamespeed_fps), .89, 105, .5, 9, false, ".380 ACP", CALIBER.LOW);
 	global.ItemIndex[# Item.MAC11, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.MAC11, ItemStat.disadvantages] = "-Low penetration power\n-High bullet spread\n-Low range";
@@ -453,8 +489,8 @@ function ItemDataBase(){
 
 
 	global.ItemIndex[# Item.MP9, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 690, 28, 280, 30, WEAPON_TYPE.PRIMARY, 4, 5, snd_MP9, 1.5, 0.8, true,
-	8, 18, 14, 7, 0.02, 1.75, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .91, .7, 1 * game_get_speed(gamespeed_fps), .5, 155, 1, 9, false, "9x19 mm", CALIBER.LOW);
+	WeaponStats(Item.MP9, "MP9", 1.25 * game_get_speed(gamespeed_fps), 640, 26, 280, 30, WEAPON_TYPE.PRIMARY, 5, 5.5, snd_MP9, 1.5, 0.8, true,
+	8, 18, 14, 7, 0.02, 2, 1, 4, 7, .925, 0, WEAPON_CLASS.SUBMACHINE_GUN, .91, .7, 1 * game_get_speed(gamespeed_fps), .5, 155, 1, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.MP9, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MP9, ItemStat.disadvantages] = "-Slow equip\n-High recoil\n-High damage drop-off";
 	global.ItemIndex[# Item.MP9, ItemStat.advantages] = "+Great penetration power\n+Great range for SMG\n+Great rate of fire";
@@ -483,7 +519,7 @@ function ItemDataBase(){
 	}	
 	
 	global.ItemIndex[# Item.MP7, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.MP7, "MP7", 1.45 * game_get_speed(gamespeed_fps), 600, 34, 390, 35, WEAPON_TYPE.PRIMARY, 3, 6, snd_mp7, 1.75, 0.9, true,
+	WeaponStats(Item.MP7, "MP7", 1.45 * game_get_speed(gamespeed_fps), 590, 32, 390, 35, WEAPON_TYPE.PRIMARY, 3, 6, snd_mp7, 1.75, 0.9, true,
 	18, 28, 8, 7, 0.125, 2.25, 1.25, -2, 5, .87, 0, WEAPON_CLASS.SUBMACHINE_GUN, .825, .63, 0.7 * game_get_speed(gamespeed_fps), .8, 135, 1, 9, false, "4.6x30 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.MP7, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MP7, ItemStat.disadvantages] = "-Low penetration power\n-High kickback inaccuracy\n-High damage drop-off";
@@ -513,8 +549,8 @@ function ItemDataBase(){
 	}	
 	
 	global.ItemIndex[# Item.P90, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.P90, "P90", 1.95 * game_get_speed(gamespeed_fps), 650, 32, 550, 55, WEAPON_TYPE.PRIMARY, 5, 6, snd_p90, 2, 1, true,
-	10, 30, 5, 4, 0.015, 2, 1.5, 8, 2, .8, 0, WEAPON_CLASS.SUBMACHINE_GUN, .795, .72, 1 * game_get_speed(gamespeed_fps), .5, 180, 1, 8, false, "5.7x28 mm", CALIBER.LOW);
+	WeaponStats(Item.P90, "P90", 1.95 * game_get_speed(gamespeed_fps), 600, 30, 550, 55, WEAPON_TYPE.PRIMARY, 5, 6, snd_p90, 2, 1, true,
+	10, 30, 5, 4, 0.015, 1.7, 1.5, 8, 2, .8, 0, WEAPON_CLASS.SUBMACHINE_GUN, .795, .72, 1 * game_get_speed(gamespeed_fps), .5, 180, 1, 8, false, "5.7x28 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.P90, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.P90, ItemStat.disadvantages] = "-High horizontal recoil\n-High range inaccuracy\n-Bad mobility for SMG";
 	global.ItemIndex[# Item.P90, ItemStat.advantages] = "+High ammo capacity\n+High penetration power";
@@ -561,7 +597,7 @@ function ItemDataBase(){
 		);
 	}
 	
-	global.ItemIndex[# Item.Bomb, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.Bomb, ItemStat.Type] = "Bomb";
 	global.ItemIndex[# Item.Bomb, ItemStat.Name] = "Bomb";
 	global.ItemIndex[# Item.Bomb, ItemStat.Cost] = 25;
 	//global.ItemIndex[# Item.Bomb, ItemStat.ReloadSpeed] = 2.5;
@@ -649,7 +685,7 @@ function ItemDataBase(){
 	}
 
 	global.ItemIndex[# Item.SpecOpsHelm, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.SpecOpsHelm, "Spec ops helmet", 5, .825, 100);
+	ArmourStats(Item.SpecOpsHelm, "Spec ops helmet", 5, .85, 100);
 	global.ItemIndex[# Item.SpecOpsHelm, ItemStat.ItemColor] = c_dkgray;
 	global.ItemIndex[# Item.SpecOpsHelm, ItemStat.BaseDurability] = 50;
 	global.ItemIndex[# Item.SpecOpsHelm, ItemStat.Description] = "The Spec Ops Helmet, featuring a " + string_format((1 - global.ItemIndex[# Item.SpecOpsHelm, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, is designed for intense combat situations but has lower durability. Its heavier construction focuses on maximal protection, demanding strategic use to compensate for its shorter lifespan.";
@@ -660,21 +696,13 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.SpecOpsVest, ItemStat.BaseDurability] = 50; 
 	global.ItemIndex[# Item.SpecOpsVest, ItemStat.Description] = "Equipped with " + string_format((1 - global.ItemIndex[# Item.SpecOpsVest, ItemStat.Defense]) * 100, 0, 1) + "% damage reduction, the Spec Ops Vest offers advanced protection but with lower durability. Ideal for high-risk scenarios, its heavier build prioritizes maximum defense, requiring careful management due to its limited lifespan.";
 	
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.MilitaryNightVision, "Military night vision", 3, .975, 150);
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.ItemColor] = c_green;
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.BaseDurability] = 100;
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.NightVisionIntensityPower] = 2;
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.NightVisionNoisePower] = 1;
-	global.ItemIndex[# Item.MilitaryNightVision, ItemStat.Description] = "Upgrade your nighttime capabilities with Military Night Vision Goggles. Offering superior vision in low-light environments.";
-	
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.Type] = "Helmet";
-	ArmourStats(Item.BasicNightVision, "Basic night vision", 1, .99, 100);
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.ItemColor] = c_green;
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.BaseDurability] = 150;
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.NightVisionIntensityPower] = 1.5;
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.NightVisionNoisePower] = 2;
-	global.ItemIndex[# Item.BasicNightVision, ItemStat.Description] = "These goggles offer enhanced visibility in low-light conditions, allowing you to spot enemies and navigate with confidence. They're go-to choice for nighttime operations.";
+	global.ItemIndex[# Item.NightVision, ItemStat.Type] = "Helmet";
+	ArmourStats(Item.NightVision, "Night vision", 3, .975, 150);
+	global.ItemIndex[# Item.NightVision, ItemStat.ItemColor] = c_green;
+	global.ItemIndex[# Item.NightVision, ItemStat.BaseDurability] = 100;
+	global.ItemIndex[# Item.NightVision, ItemStat.NightVisionIntensityPower] = 2;
+	global.ItemIndex[# Item.NightVision, ItemStat.NightVisionNoisePower] = 1;
+	global.ItemIndex[# Item.NightVision, ItemStat.Description] = "Night Vision Goggles improve visibility in low-light environments.";
 	
 	global.ItemIndex[# Item.HealingKit, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.HealingKit, ItemStat.Name] = "Healing kit";
@@ -683,6 +711,41 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.HealingKit, ItemStat.Cost] = 25;
 	global.ItemIndex[# Item.HealingKit, ItemStat.ItemColor] = c_red;
 	global.ItemIndex[# Item.HealingKit, ItemStat.Description] = "The Healing kit restores a substantial amount of health, providing crucial support during intense combat situations.";
+	
+	global.ItemIndex[# Item.gold_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.gold_card, ItemStat.Name] = "Golden card";
+	global.ItemIndex[# Item.gold_card, ItemStat.ItemColor] = MAIN_COLOR;
+	global.ItemIndex[# Item.gold_card, ItemStat.Description] = "The Golden card grants access to golden security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.magenta_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.magenta_card, ItemStat.Name] = "Magenta card";
+	global.ItemIndex[# Item.magenta_card, ItemStat.ItemColor] = c_purple;
+	global.ItemIndex[# Item.magenta_card, ItemStat.Description] = "The Magenta card grants access to magenta security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.red_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.red_card, ItemStat.Name] = "Red card";
+	global.ItemIndex[# Item.red_card, ItemStat.ItemColor] = c_red;
+	global.ItemIndex[# Item.red_card, ItemStat.Description] = "The Red card grants access to red security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.aqua_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.aqua_card, ItemStat.Name] = "Cyan card";
+	global.ItemIndex[# Item.aqua_card, ItemStat.ItemColor] = c_aqua;
+	global.ItemIndex[# Item.aqua_card, ItemStat.Description] = "The Cyan card grants access to cyan security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.green_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.green_card, ItemStat.Name] = "Green card";
+	global.ItemIndex[# Item.green_card, ItemStat.ItemColor] = c_green;
+	global.ItemIndex[# Item.green_card, ItemStat.Description] = "The Green card grants access to green security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.black_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.black_card, ItemStat.Name] = "Black card";
+	global.ItemIndex[# Item.black_card, ItemStat.ItemColor] = c_black;
+	global.ItemIndex[# Item.black_card, ItemStat.Description] = "The Black card grants access to black security doors, allowing entry into otherwise restricted areas.";
+	
+	global.ItemIndex[# Item.white_card, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.white_card, ItemStat.Name] = "White card";
+	global.ItemIndex[# Item.white_card, ItemStat.ItemColor] = c_white;
+	global.ItemIndex[# Item.white_card, ItemStat.Description] = "The White card grants access to white security doors, allowing entry into otherwise restricted areas.";
 	
 	global.ItemIndex[# Item.InfraredVision, ItemStat.Type] = "Helmet";
 	ArmourStats(Item.InfraredVision, "Infrared vision", 3, .975, 150);
@@ -710,7 +773,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.Javelin, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Javelin, "FGM-148", 1.5 * game_get_speed(gamespeed_fps), 490, 138, 50, 1, WEAPON_TYPE.PRIMARY, 25, 15, snd_Javelin, 15, 5, false,
-	0, 0, 0, 0, 0, 5, 7.5, 15, 25, .25, -1, WEAPON_CLASS.MISSILE, .59, .99, 1 * game_get_speed(gamespeed_fps), .5, 350, 1, 4, false, "127 mm HEAT", CALIBER.ROCKET);
+	0, 0, 0, 0, 0, 5, 7.5, 15, 25, .25, -1, WEAPON_CLASS.MISSILE, .59, .99, 1 * game_get_speed(gamespeed_fps), .5, 390, 1, 4, false, "127 mm HEAT", CALIBER.ROCKET);
 	global.ItemIndex[# Item.Javelin, ItemStat.difficulty] = 1;
 	global.ItemIndex[# Item.Javelin, ItemStat.disadvantages] = "-Very bad mobility\n-Dangerous explosion\n-Only one rocket per shot";
 	global.ItemIndex[# Item.Javelin, ItemStat.advantages] = "+Homing projectiles\n+High damage";
@@ -737,7 +800,7 @@ function ItemDataBase(){
 	}
 
 	global.ItemIndex[# Item.Glock, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 500, 29, 240, 24, WEAPON_TYPE.SECONDARY, 4, 9, snd_Glock, 3, 1, false,
+	WeaponStats(Item.Glock, "Glock-17", 1.25 * game_get_speed(gamespeed_fps), 500, 29, 240, 24, WEAPON_TYPE.SECONDARY, 5, 9, snd_Glock, 3, 1, false,
 	24, 24, 5, 8, .1, 1.1, 1, 0, 5, .99, 0, WEAPON_CLASS.PISTOL, .97, .47, 0.05 * game_get_speed(gamespeed_fps), .9, 20, .5, 9, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.Glock, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.Glock, ItemStat.disadvantages] = "-Low damage\n-Low penetration power";
@@ -767,7 +830,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.MK18, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.MK18, "MK18", 2.1 * game_get_speed(gamespeed_fps), 715, 33, 700, 30, WEAPON_TYPE.PRIMARY, 7, 5.5, snd_MK18, 2, 1, true,
-	10, 20, 13, 9, .01, 8, 3.5, 0, 10, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .92, .71, .2 * game_get_speed(gamespeed_fps), .73, 300, .75, 5, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	10, 20, 13, 9, .01, 8, 3.5, 0, 10, .5, 0, WEAPON_CLASS.ASSAULT_RIFLE, .92, .71, .2 * game_get_speed(gamespeed_fps), .73, 290, .75, 5, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.MK18, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.MK18, ItemStat.disadvantages] = "-Low penetration power\n-High recoil";
 	global.ItemIndex[# Item.MK18, ItemStat.advantages] = "+Good mobility\n+Low bullet spread";
@@ -796,7 +859,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.m4a1, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.m4a1, "M4A1", 2.5 * game_get_speed(gamespeed_fps), 730, 34, 300, 25, WEAPON_TYPE.PRIMARY, 5, 6, snd_m4a1, 2.5, 1, true,
-	10, 15, -5, 3.9, .01, 8, 3.5, 1, 7.75, .9, 0, WEAPON_CLASS.ASSAULT_RIFLE, .85, .7, .1 * game_get_speed(gamespeed_fps), .73, 290, .75, 5, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	10, 15, -5, 3.9, .01, 8, 3.5, 1, 7.75, .55, 0, WEAPON_CLASS.ASSAULT_RIFLE, .85, .7, .1 * game_get_speed(gamespeed_fps), .73, 280, .75, 5, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.m4a1, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.m4a1, ItemStat.disadvantages] = "-Low penetration power\n-Long reloading";
 	global.ItemIndex[# Item.m4a1, ItemStat.advantages] = "+Good mobility\n+Low bullet spread\n+Low recoil";
@@ -823,10 +886,39 @@ function ItemDataBase(){
 		    3.0
 		);
 	}
+	
+	global.ItemIndex[# Item.m200, ItemStat.Type] = "Weapon";
+	WeaponStats(Item.m200, "M200", 2.75 * game_get_speed(gamespeed_fps), 900, 159, 30, 3, WEAPON_TYPE.PRIMARY, 1, 35, snd_M200, 50, 4, false,
+	0, 0, 35, 55, 75, 50, 15, 0, 0, .01, 1, WEAPON_CLASS.SNIPER_RIFLE, .7, .98, 1 * game_get_speed(gamespeed_fps), .15, 370, 2, 5, true, ".408 Chey Tac", CALIBER.HIGH);
+	global.ItemIndex[# Item.m200, ItemStat.difficulty] = 5;
+	global.ItemIndex[# Item.m200, ItemStat.preattached] = { scope: Item.two_scope };
+	global.ItemIndex[# Item.m200, ItemStat.disadvantages] = "-Ultra bad mobility\n-Limited view\n-Low ammo capacity";
+	global.ItemIndex[# Item.m200, ItemStat.advantages] = "\n+Very high damage\n+High range\n+Neglidible damage drop-off\n+Neglidible accuracy drop";
+	global.ItemIndex[# Item.m200, ItemStat.ItemColor] = c_dkgray;
+	global.ItemIndex[# Item.m200, ItemStat.AmmoSpriteID] = 22;
+	global.ItemIndex[# Item.m200, ItemStat.ScopeInaccuracyResetTimer] = 70;
+	global.ItemIndex[# Item.m200, ItemStat.Rarity] = RARITY.LEGENDARY;
+	global.ItemIndex[# Item.m200, ItemStat.Description] = "An uncompromising long-range weapon capable of delivering a fatal hit at any distance. Extreme recoil and poor mobility demand careful handling, while its three-round magazine and scarce reserve ammunition make every shot count.";
+	global.ItemIndex[# Item.m200, ItemStat.damage_drop] = function(dist)  {
+		return curve_explinlin(
+		    dist,
+		    global.ItemIndex[# Item.m200, ItemStat.Range],
+		    0.35, 0.7, 
+			0.98, 0.95, 0.93,
+		    5.0, 7.0
+		);
+	}
+	global.ItemIndex[# Item.m200, ItemStat.accuracy_drop] = function(dist)  {
+		return curve_lin(
+		    dist,
+		    global.ItemIndex[# Item.m200, ItemStat.Range],
+		    0.25, 0.55, 0.975   // 0.975 - 102.5% spread na max range
+		);
+	}
 
 	global.ItemIndex[# Item.awm, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 900, 118, 50, 5, WEAPON_TYPE.PRIMARY, 1, 30, snd_awm, 30, 2, false,
-	0, 0, 25, 50, 50, 25, 7.5, 0, 0, .05, 1, WEAPON_CLASS.SNIPER_RIFLE, .77, .99, 1.5 * game_get_speed(gamespeed_fps), .33, 440, 2, 5, false, ".338 LM", CALIBER.HIGH);
+	WeaponStats(Item.awm, "AWM", 3.25 * game_get_speed(gamespeed_fps), 850, 123, 75, 5, WEAPON_TYPE.PRIMARY, 1, 30, snd_awm, 30, 2, false,
+	0, 0, 25, 50, 50, 25, 7.5, 0, 0, .05, 1, WEAPON_CLASS.SNIPER_RIFLE, .77, .95, 1.5 * game_get_speed(gamespeed_fps), .33, 350, 2, 5, false, ".338 LM", CALIBER.HIGH);
 	global.ItemIndex[# Item.awm, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.awm, ItemStat.preattached] = { scope: Item.two_scope };
 	global.ItemIndex[# Item.awm, ItemStat.disadvantages] = "-Very bad mobility\n-Limited view\n-Long reloading\n-Slow equip";
@@ -841,7 +933,7 @@ function ItemDataBase(){
 		    dist,
 		    global.ItemIndex[# Item.awm, ItemStat.Range],
 		    0.4, 0.57, 
-			0.98, 0.95, 0.91,
+			0.95, 0.93, 0.91,
 		    5.0, 7.0
 		);
 	}
@@ -855,7 +947,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.Dragunov, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.Dragunov, "Dragunov", 3.75 * game_get_speed(gamespeed_fps), 890, 94, 45, 15, WEAPON_TYPE.PRIMARY, 2, 20, snd_Dragunov, 20, 1.5, false,
-	0, 0, 15, 25, 5, 25, 5, 0, 0, .15, 1, WEAPON_CLASS.SNIPER_RIFLE, .815, .975, 1 * game_get_speed(gamespeed_fps), .25, 500, 2, 5, false, "7.62x54 mm", CALIBER.HIGH);
+	0, 0, 15, 25, 5, 25, 5, 0, 0, .15, 1, WEAPON_CLASS.SNIPER_RIFLE, .815, .975, 1 * game_get_speed(gamespeed_fps), .25, 380, 2, 5, false, "7.62x54 mm", CALIBER.HIGH);
 	global.ItemIndex[# Item.Dragunov, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.Dragunov, ItemStat.random_bullet_spread] = true;
 	global.ItemIndex[# Item.Dragunov, ItemStat.preattached] = { scope: Item.two_scope };
@@ -888,8 +980,8 @@ function ItemDataBase(){
 
 
 	global.ItemIndex[# Item.usp, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 580, 35, 350, 15, WEAPON_TYPE.SECONDARY, 3, 8, snd_usp, 2, 1, false,
-	9, 12, 1, 1, .175, 5.5, 1, 0, 13, .93, 0, WEAPON_CLASS.PISTOL, .97, .44, 0.15 * game_get_speed(gamespeed_fps), .87, 35, .75, 8, false, "9x19 mm", CALIBER.LOW);
+	WeaponStats(Item.usp, "USP", 1.75 * game_get_speed(gamespeed_fps), 580, 37, 350, 15, WEAPON_TYPE.SECONDARY, 3, 8, snd_usp, 2, 1, false,
+	9, 12, 1, 1, .175, 5.5, 1, 0, 13, .93, 0, WEAPON_CLASS.PISTOL, .97, .44, 0.15 * game_get_speed(gamespeed_fps), .87, 25, .75, 8, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.usp, ItemStat.KBStabilization] = 10;
 	global.ItemIndex[# Item.usp, ItemStat.difficulty] = 4;
 	global.ItemIndex[# Item.usp, ItemStat.disadvantages] = "-Low penetration power";
@@ -904,8 +996,8 @@ function ItemDataBase(){
 		    dist,
 		    global.ItemIndex[# Item.usp, ItemStat.Range],
 		    0.7, 0.85,
-		    0.87, 0.82,
-		    0.79, 7.0, 5.0
+		    0.89, 0.87,
+		    0.82, 7.0, 5.0
 		);
 	}
 	global.ItemIndex[# Item.usp, ItemStat.accuracy_drop] = function(dist)  {
@@ -921,7 +1013,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.p250, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.p250, "P250", 1.75 * game_get_speed(gamespeed_fps), 600, 33, 105, 15, WEAPON_TYPE.SECONDARY, 4, 7, snd_p250, 2, 1, false,
-	15, 15, 1, 4, .5, 3.75, 2, 0, 5.9, .99, 0, WEAPON_CLASS.PISTOL, .93, .5, round(.23 * game_get_speed(gamespeed_fps)), .95, 40, 1, 7, false, "9x19 mm", CALIBER.LOW);
+	15, 15, 1, 4, .5, 3.75, 2, 0, 5.9, .99, 0, WEAPON_CLASS.PISTOL, .93, .5, round(.23 * game_get_speed(gamespeed_fps)), .95, 55, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.p250, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.p250, ItemStat.disadvantages] = "-Low penetration power";
 	global.ItemIndex[# Item.p250, ItemStat.advantages] = "+Great mobility\n+First shot accuracy";
@@ -949,7 +1041,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.tec9, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.tec9, "TEC-9", 1.9 * game_get_speed(gamespeed_fps), 615, 27, 180, 18, WEAPON_TYPE.SECONDARY, 5, 7, snd_Tec9, 2, 1.1, false,
-	7, 12, 1, 3, .025, 2.5, 3, 2, 10, .95, 0, WEAPON_CLASS.PISTOL, .975, .71, round(.37 * game_get_speed(gamespeed_fps)), .98, 70, 1, 7, false, "9x19 mm", CALIBER.LOW);
+	7, 12, 1, 3, .025, 2, 3, 2, 10, .95, 0, WEAPON_CLASS.PISTOL, .975, .71, round(.37 * game_get_speed(gamespeed_fps)), .98, 75, 1, 7, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.tec9, ItemStat.difficulty] = 2;
 	global.ItemIndex[# Item.tec9, ItemStat.disadvantages] = "-Low damage\n-Slow equip";
 	global.ItemIndex[# Item.tec9, ItemStat.advantages] = "+Great mobility\n+Good penetration power";
@@ -978,7 +1070,7 @@ function ItemDataBase(){
 
 	global.ItemIndex[# Item.CZ75, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.CZ75, "CZ-75", 2 * game_get_speed(gamespeed_fps), 585, 23, 75, 15, WEAPON_TYPE.SECONDARY, 3, 7, snd_CZ75, 1, 1, true,
-	5, 8, 7, 5, .0125, 5, 2, 5, 9, .75, 0, WEAPON_CLASS.PISTOL, .875, .67, round(.5 * game_get_speed(gamespeed_fps)), .75, 75, 1.25, 12, false, "9x19 mm", CALIBER.LOW);
+	5, 8, 7, 5, .0125, 5, 2, 5, 9, .75, 0, WEAPON_CLASS.PISTOL, .875, .67, round(.5 * game_get_speed(gamespeed_fps)), .75, 85, 1.25, 12, false, "9x19 mm", CALIBER.LOW);
 	global.ItemIndex[# Item.CZ75, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.CZ75, ItemStat.disadvantages] = "-Low damage\n-Slow equip\n-Worse range accuracy";
 	global.ItemIndex[# Item.CZ75, ItemStat.advantages] = "+Automatic pistol\n+Accurate recoil\n+High kill reward";
@@ -1025,7 +1117,7 @@ function ItemDataBase(){
 	}	
 	
 	global.ItemIndex[# Item.CELandMine, ItemStat.Type] = "Landmine";
-	global.ItemIndex[# Item.CELandMine, ItemStat.Name] = "Cluster-explosion landmine";
+	global.ItemIndex[# Item.CELandMine, ItemStat.Name] = "CE landmine";
 	global.ItemIndex[# Item.CELandMine, ItemStat.Cost] = 100;
 	global.ItemIndex[# Item.CELandMine, ItemStat.BulletCasingID] = 4;
 	global.ItemIndex[# Item.CELandMine, ItemStat.Damage] = 75;
@@ -1044,7 +1136,7 @@ function ItemDataBase(){
 
 
 	global.ItemIndex[# Item.LELandMine, ItemStat.Type] = "Landmine";
-	global.ItemIndex[# Item.LELandMine, ItemStat.Name] = "Low-explosive landmine";
+	global.ItemIndex[# Item.LELandMine, ItemStat.Name] = "LE landmine";
 	global.ItemIndex[# Item.LELandMine, ItemStat.Cost] = 50;
 	global.ItemIndex[# Item.LELandMine, ItemStat.BulletCasingID] = 8;
 	global.ItemIndex[# Item.LELandMine, ItemStat.Damage] = 46;
@@ -1087,6 +1179,11 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.red_dot_scope, ItemStat.slot] = Index.slot_scope;
 	global.ItemIndex[# Item.red_dot_scope, ItemStat.ItemColor] = c_red;
 	global.ItemIndex[# Item.red_dot_scope, ItemStat.Description] = "The red dot sight offers improved aiming, but is lacking magnification.";
+	
+	global.ItemIndex[# Item.DefuseKit, ItemStat.Type] = "Item";
+	global.ItemIndex[# Item.DefuseKit, ItemStat.Name] = "Defuse kit";
+	global.ItemIndex[# Item.DefuseKit, ItemStat.ItemColor] = c_blue;;
+	global.ItemIndex[# Item.DefuseKit, ItemStat.Description] = "This item is essential for defusing the bomb. It halves the defusing time.";
 
 	global.ItemIndex[# Item.two_scope, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.two_scope, ItemStat.Name] = "Sniper scope";
@@ -1157,7 +1254,7 @@ function ItemDataBase(){
 		
 	///Reprezentace základní machine gun
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.Type] = "Weapon";
-	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 600, 33, 500, 50, WEAPON_TYPE.PRIMARY, 10, 7, snd_machine_gun, 10, 2, false,
+	WeaponStats(Item.basic_machine_gun, "Basic machine gun", 3 * game_get_speed(gamespeed_fps), 600, 53, 500, 50, WEAPON_TYPE.PRIMARY, 7, 6, snd_machine_gun, 10, 2, false,
 	0, 0, 10, 30, .05, 1, 1, 0, 0, 1, 1, WEAPON_CLASS.MACHINE_GUN, .95, .775, 1.75 * game_get_speed(gamespeed_fps), 1, 0, 1, 4, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.ItemColor] = c_ltgray;
 	global.ItemIndex[# Item.basic_machine_gun, ItemStat.AmmoSpriteID] = 11;	
@@ -1182,7 +1279,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.famas, ItemStat.Type] = "Weapon";
 	WeaponStats(Item.famas, "FAMAS", round(1.89 * game_get_speed(gamespeed_fps)), 680, 30, 250, 25, WEAPON_TYPE.PRIMARY, 5, 7, snd_Famas, 2, 1, true,
-	5, 10, 10, 4, .03, 7, 3.5, -1, 9, .75, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, true, "5.56x45 mm NATO", CALIBER.MEDIUM);
+	5, 10, 10, 4, .03, 7, 3.5, -1, 9, .7, 0, WEAPON_CLASS.ASSAULT_RIFLE, .83, .69, .25 * game_get_speed(gamespeed_fps), .75, 200, 1, 8, false, "5.56x45 mm NATO", CALIBER.MEDIUM);
 	global.ItemIndex[# Item.famas, ItemStat.difficulty] = 3;
 	global.ItemIndex[# Item.famas, ItemStat.disadvantages] = "-Low magazine capacity\n-Low penetration power\n-High damage drop-off";
 	global.ItemIndex[# Item.famas, ItemStat.advantages] = "+Low bullet spread\n+Low vertical recoil";
@@ -1243,30 +1340,30 @@ function ItemDataBase(){
 	global.ItemIndex[# Item.steel_knife, ItemStat.disadvantages] = "";
 	global.ItemIndex[# Item.steel_knife, ItemStat.advantages] = "";
 	global.ItemIndex[# Item.steel_knife, ItemStat.ItemColor] = c_ltgray;
-	global.ItemIndex[# Item.steel_knife, ItemStat.Description] = "";
+	global.ItemIndex[# Item.steel_knife, ItemStat.Description] = "A reliable steel combat knife designed for close-quarters encounters. Lightweight and quick to use, it provides a dependable option when firearms are unavailable.";
 	
 	global.ItemIndex[# Item.low_cal_box, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.low_cal_box, ItemStat.Name] = "Low caliber ammunition box";
-	global.ItemIndex[# Item.low_cal_box, ItemStat.Description] = "";
+	global.ItemIndex[# Item.low_cal_box, ItemStat.Description] = "A box of low-caliber ammunition that adds 100 rounds to the currently held weapon, provided it uses a compatible caliber.";
 	global.ItemIndex[# Item.low_cal_box, ItemStat.MaxAmmo] = 100;
 	global.ItemIndex[# Item.low_cal_box, ItemStat.ItemColor] = c_aqua;
 	
 	global.ItemIndex[# Item.med_cal_box, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.med_cal_box, ItemStat.Name] = "Medium caliber ammunition box";
-	global.ItemIndex[# Item.med_cal_box, ItemStat.Description] = "";
+	global.ItemIndex[# Item.med_cal_box, ItemStat.Description] = "A box of medium-caliber ammunition that adds 75 rounds to the currently held weapon, provided it uses a compatible caliber.";
 	global.ItemIndex[# Item.med_cal_box, ItemStat.MaxAmmo] = 75;
 	global.ItemIndex[# Item.med_cal_box, ItemStat.ItemColor] = c_green;
 	
 	global.ItemIndex[# Item.high_cal_box, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.high_cal_box, ItemStat.Name] = "High caliber ammunition box";
-	global.ItemIndex[# Item.high_cal_box, ItemStat.Description] = "";
+	global.ItemIndex[# Item.high_cal_box, ItemStat.Description] = "A box of high-caliber ammunition that adds 25 rounds to the currently held weapon, provided it uses a compatible caliber.";
 	global.ItemIndex[# Item.high_cal_box, ItemStat.MaxAmmo] = 25;
 	global.ItemIndex[# Item.high_cal_box, ItemStat.ItemColor] = c_gray;
 	
 	global.ItemIndex[# Item.gauge_box, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.gauge_box, ItemStat.Name] = "Gauge ammunition box";
 	global.ItemIndex[# Item.gauge_box, ItemStat.Description] = "";
-	global.ItemIndex[# Item.gauge_box, ItemStat.MaxAmmo] = 50;
+	global.ItemIndex[# Item.gauge_box, ItemStat.Description] = "A box of shotgun ammunition that adds 50 shells to the currently held weapon, provided it uses a compatible gauge.";
 	global.ItemIndex[# Item.gauge_box, ItemStat.ItemColor] = c_lime;
 	
 	global.ItemIndex[# Item.range_finder, ItemStat.Type] = "Item";
@@ -1277,8 +1374,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# Item.dilatation_pill, ItemStat.Type] = "Item";
 	global.ItemIndex[# Item.dilatation_pill, ItemStat.Name] = "Dilatation pill";
-	global.ItemIndex[# Item.dilatation_pill, ItemStat.Description] = "";
-	global.ItemIndex[# Item.dilatation_pill, ItemStat.MaxAmmo] = 25;
+	global.ItemIndex[# Item.dilatation_pill, ItemStat.Description] = "A specialized pill that triggers bullet time for " + string(DILATATION_TIME) + " seconds, providing a critical advantage during intense combat situations.";
 	global.ItemIndex[# Item.dilatation_pill, ItemStat.ItemColor] = c_gray;
 	
 	for (var i = 0; i < Item.Total; i++) {

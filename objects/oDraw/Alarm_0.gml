@@ -4,7 +4,7 @@ if(!IS_NET){
 	instance_activate_object(oParticleSystem);
 	instance_activate_object(oCamera);
 	instance_activate_object(oGameEndMenu);
-	instance_activate_object(oRatingController);
+	instance_activate_object(oGameController);
 	instance_activate_object(objUIImage);
 	instance_activate_object(oRoundEndMenu);
 	instance_activate_object(oWeapon);

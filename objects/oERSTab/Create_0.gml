@@ -1,18 +1,18 @@
 event_inherited();
-tab_width = max(768 * global.GUIMultiplier, 896);
-tab_height = max(512 * global.GUIMultiplier, 768);
+tab_width = max(768 * global.gui_scale, 896);
+tab_height = max(512 * global.gui_scale, 768);
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);
 
 column_width = zui_get_width() / 3;
-column_padding = max(24 * global.GUIMultiplier, 32);
-rating_row_gap = max(24 * global.GUIMultiplier, 28);
-plot_button_width = max(56 * global.GUIMultiplier, 64);
-plot_button_height = max(20 * global.GUIMultiplier, 24);
+column_padding = max(24 * global.gui_scale, 32);
+rating_row_gap = max(24 * global.gui_scale, 28);
+plot_button_width = max(56 * global.gui_scale, 64);
+plot_button_height = max(20 * global.gui_scale, 24);
 plot_button_y_offset = -(plot_button_height - font_get_size(draw_get_font())) * .25;
-plot_control_gap = max(24 * global.GUIMultiplier, 32);
-rank_plot_gap = max(8 * global.GUIMultiplier, 12);
+plot_control_gap = max(24 * global.gui_scale, 32);
+rank_plot_gap = max(8 * global.gui_scale, 12);
 ratings_label_width = string_width("Ratings: ");
 
 rank_position = 0;
@@ -20,9 +20,9 @@ if(global.game_struct.Played_games >= TRACKING_PERIOD / 2){
 	rank_position = get_rank(global.game_struct.Player_ep);
 }
 
-rank_image_position_y = max(96, 64 * global.GUIMultiplier);
-rank_image_size_width = max(sprite_get_width(spr_ranks) / 2 * global.GUIMultiplier, sprite_get_width(spr_ranks) / 2 * 1.5);
-rank_image_size_height = max(sprite_get_height(spr_ranks) / 2 * global.GUIMultiplier, sprite_get_height(spr_ranks) / 2 * 1.5);
+rank_image_position_y = max(96, 64 * global.gui_scale);
+rank_image_size_width = max(sprite_get_width(spr_ranks) / 2 * global.gui_scale, sprite_get_width(spr_ranks) / 2 * 1.5);
+rank_image_size_height = max(sprite_get_height(spr_ranks) / 2 * global.gui_scale, sprite_get_height(spr_ranks) / 2 * 1.5);
 rank_image_position_x = round(column_width * .5 - rank_image_size_width * .5);
 rank_image_gap = rank_image_size_height * 1.1;
 rank_title_y = rank_image_position_y - rank_image_gap;
@@ -89,8 +89,8 @@ for(var i = 0; i < RankType.Total; i++){
 				"Min R: " + string(global.RankIndex[#_image.rank_id, RankStat.Ep]),
 				"OK",
 				-1,
-				288 * global.GUIMultiplier,
-				64 * global.GUIMultiplier,
+				288 * global.gui_scale,
+				64 * global.gui_scale,
 				-1,
 				-1
 			);
@@ -112,8 +112,8 @@ with(zui_create(rank_image_position_x, rank_image_position_y + rank_position * r
 			"Min R: " + string(global.RankIndex[#_image.rank_id, RankStat.Ep]),
 			"OK",
 			-1,
-			288 * global.GUIMultiplier,
-			64 * global.GUIMultiplier,
+			288 * global.gui_scale,
+			64 * global.gui_scale,
 			-1,
 			-1
 		);

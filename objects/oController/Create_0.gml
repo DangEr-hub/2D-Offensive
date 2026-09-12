@@ -15,7 +15,7 @@ popup_exit_callback_positive = function () {
 }
 				
 exit_callback = function(){
-	ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.GUIMultiplier, 128 * global.GUIMultiplier, popup_exit_callback_positive, -1);
+	ui_show_popup("Are you sure?", "Exit", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_exit_callback_positive, -1);
 }
 
 play_unranked_callback = function(){
@@ -168,8 +168,8 @@ title_w = string_width("2D offensive");
 
 with (zui_main()) {
 	var window_id = noone;
-	var button_width = max(128 * global.GUIMultiplier, 192);
-	var button_height = 32 * global.GUIMultiplier;
+	var button_width = max(128 * global.gui_scale, 192);
+	var button_height = 32 * global.gui_scale;
 	
 	
 	with (zui_create(zui_get_width() * .1 - oController.title_w/2, zui_get_height() * .05, objUILabel)) {

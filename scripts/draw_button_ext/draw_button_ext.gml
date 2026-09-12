@@ -50,7 +50,12 @@ function draw_button_ext(xx, yy, b_width, b_height, text, normal_color, hover_co
 						global.Inventory[#VarSlot, Index.slot_grip],
 						global.Inventory[#VarSlot, Index.slot_suppressor]
 					);
-					ItemAmountSubstract(VarSlot, 1);
+					if (VarSlot == global.local_player.WeaponID
+					&& global.Inventory[# VarSlot, Index.SlotAmount] <= 1) {
+						WeaponDrop(VarSlot, global.local_player);
+					} else {
+						ItemAmountSubstract(VarSlot, 1);
+					}
 				}
 			break;
 			

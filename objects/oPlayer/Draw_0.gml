@@ -1,9 +1,8 @@
 event_inherited();
-//draw_text(x, y - 20, "hard_mode " + string(global.hard_mode));
-//draw_text(x, y - 40, "kick_back_timer " + string(kick_back_timer));
+//draw_text(x, y - 20, "spd " + string(aimpunch_speed_multiplier));
+//draw_text(x, y - 40, "am " + string(AimPunchMultiplier));
 //draw_text(x, y - 60, "def " + string(global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_id], ItemStat.Defense]));
 //draw_text(x, y - 110, "rd " + string(global.game_struct.Player_rd));
-
 
 
 if(Visible == true){
@@ -11,6 +10,7 @@ if(Visible == true){
 	if (IS_NET && !is_local) {
 	    armour_id = network_armour_id;
 	}
+	if (stats.Health_points <= 0) armour_id = Item.None;
 
 	var armour_sprite_index = 0;
 	if (image_index == TEXTURES.no_weapon) {
@@ -65,13 +65,14 @@ if(Visible == true){
 	
 	var helmet_sprite_index = 0;
 	if((image_index >= TEXTURES.prone && image_index < TEXTURES.knife_attack) || image_index == TEXTURES.death){
-		helmet_sprite_index = 6;	
+		helmet_sprite_index = 5;	
 	}
 	
 	var helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
 	if(IS_NET && is_local == false){
 		helmet_id = network_helmet_id;
 	}
+	if (stats.Health_points <= 0) helmet_id = Item.None;
 
 	if(helmet_id == Item.KevlarHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);	
@@ -79,19 +80,19 @@ if(Visible == true){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 1, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}else if(helmet_id == Item.SpecOpsHelm){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 2, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(helmet_id == Item.MilitaryNightVision){
+	}else if(helmet_id == Item.NightVision){
 		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 3, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
-	}else if(helmet_id == Item.BasicNightVision){
-		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}else if(helmet_id == Item.InfraredVision){
-		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 5, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
+		draw_sprite_ext(spr_Helmet, helmet_sprite_index + 4, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);		
 	}
 		  
 	if(stats.Health_points > 0){
 		
 		#region Draw usable item
 		if(is_local == true){
-			if(global.Inventory[# item_use_position, Index.slot_id] != Item.None){
+			var local_item_use_id = global.Inventory[# item_use_position, Index.slot_id];
+			if (Healing && HealingItemId != Item.None) local_item_use_id = HealingItemId;
+			if(local_item_use_id != Item.None){
 				var item_offset_x = 35;
 				var item_offset_y = 40;
 					if!(throwing_grenade()){
@@ -108,7 +109,7 @@ if(Visible == true){
 				}
 				var rotated_x = x + lengthdir_x(item_offset_x, RotationAngle) - lengthdir_y(item_offset_y, RotationAngle);
 				var rotated_y = y + lengthdir_y(item_offset_x, RotationAngle) + lengthdir_x(item_offset_y, RotationAngle);
-			    draw_sprite_ext(spr_Items, global.Inventory[# item_use_position, Index.slot_id], rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1); 
+			    draw_sprite_ext(spr_Items, local_item_use_id, rotated_x, rotated_y, 1, 1, RotationAngle, c_white, 1);
 			}
 		}else if(is_remote && network_item_use_id != Item.None){
 			var remote_item_offset_x = 35;
@@ -161,8 +162,8 @@ if(Visible == true){
 			draw_sprite_ext(
 				spr_Items,
 				suppressor_id,
-				Weapon.x + lengthdir_x(WeaponDistance*.925, RotationAngle),
-				Weapon.y + lengthdir_y(WeaponDistance*.925, RotationAngle),
+				Weapon.x + lengthdir_x(WeaponDistance*.85, RotationAngle),
+				Weapon.y + lengthdir_y(WeaponDistance*.85, RotationAngle),
 				.5,
 				.5,
 				RotationAngle,

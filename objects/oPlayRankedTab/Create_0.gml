@@ -1,19 +1,19 @@
 event_inherited();
 global.ranked_game = true;
-play_unranked_tab_width = 720 * global.GUIMultiplier;
-play_unranked_tab_height = 405 * global.GUIMultiplier;
+play_unranked_tab_width = 720 * global.gui_scale;
+play_unranked_tab_height = 405 * global.gui_scale;
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(play_unranked_tab_width, play_unranked_tab_height);
 
 unranked_description_string = "Commit to a full scale match\nwhich affects your eggy points.\nEnemies have eggy points in\ncorrelation with your eggy points.";
-checkbox_gap = 8 * global.GUIMultiplier;
-hard_mode_checkbox_width = 16 * global.GUIMultiplier;
-hard_mode_checkbox_height = 16 * global.GUIMultiplier;
-map_play_button_width = 72 * global.GUIMultiplier;
-map_play_button_height = 16 * global.GUIMultiplier;
-map_image_sprite_height = 72 * global.GUIMultiplier;
-map_image_sprite_width = 128 * global.GUIMultiplier;
+checkbox_gap = 8 * global.gui_scale;
+hard_mode_checkbox_width = 16 * global.gui_scale;
+hard_mode_checkbox_height = 16 * global.gui_scale;
+map_play_button_width = 72 * global.gui_scale;
+map_play_button_height = 16 * global.gui_scale;
+map_image_sprite_height = 72 * global.gui_scale;
+map_image_sprite_width = 128 * global.gui_scale;
 map_image_position_x = 32;
 map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
@@ -32,10 +32,14 @@ for(var j=0;j<MAP.Total;j++){
 
 map_callbacks = [
     function() { 
+		if(global.MapID != MAP.Desert){ reset_singleplayer_game(); }
+		global.ranked_game = true;
 		map_init(MAP.Desert);
 		room_goto(rm_Desert);
 	},
     function() { 
+		if(global.MapID != MAP.RainForest){ reset_singleplayer_game(); }
+		global.ranked_game = true;
 		map_init(MAP.RainForest);
 		room_goto(rm_RainForest); 
 	}
@@ -90,10 +94,10 @@ network_button_height = map_play_button_height;
 network_center_x = zui_get_width() * .5;
 host_button_y = zui_get_height() * .7;
 join_row_y = zui_get_height() * .8;
-network_control_gap = 12 * global.GUIMultiplier;
+network_control_gap = 12 * global.gui_scale;
 ip_label_text = "IP address: ";
 ip_label_width = string_width(ip_label_text);
-ip_input_width = 128 * global.GUIMultiplier;
+ip_input_width = 128 * global.gui_scale;
 ip_input_height = 32;
 join_row_width = ip_label_width + network_control_gap + ip_input_width + network_control_gap + network_button_width;
 join_row_x = network_center_x - join_row_width * .5;
@@ -106,6 +110,7 @@ with (zui_create(network_center_x - network_button_width * .5, host_button_y, ob
 
 	caption = "Host server";
 	callback = function(){
+		global.ranked_game = true;
 		/* Creating server - Menu button */
 		if (!IS_NET) {
 		    instance_create_layer(100, 100, "OtherO", oNetworkManager);
@@ -140,6 +145,7 @@ with (zui_create(join_button_x, join_row_y, objUIButton)) {
 
 	caption = "Join server";
 	callback = function(){
+		global.ranked_game = true;
 		/* Joining the game - Menu button */
 		if (!IS_NET) {
 		    instance_create_layer(100, 100, "OtherO", oNetworkManager);

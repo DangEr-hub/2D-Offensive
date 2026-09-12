@@ -36,17 +36,17 @@ function save_game(){
 	ini_write_real("Vars", "crosshair_color", global.crosshair_color);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	ini_write_real("Vars", "sound_gain", global.sound_gain);
-	ini_write_real("Vars", "toggle_bloom_shader", global.BloomShader);
+	ini_write_real("Vars", "bloom_shader", global.bloom_shader);
 	ini_write_real("Vars", "enemy_visibility", global.enemy_visibility);
-	ini_write_real("Vars", "gui_scale", global.GUIMultiplier);
+	ini_write_real("Vars", "gui_scale", global.gui_scale);
 	ini_write_real("Vars", "window_width", global.window_width);
 	ini_write_real("Vars", "window_height", global.window_height);
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	ini_write_real("Vars", "anti_aliasing", global.anti_aliasing);
 	ini_write_real("Vars", "crosshair_scale", global.crosshair_scale);
-	ini_write_real("Vars", "sv_cheats", global.sv_cheats);
 	ini_write_string("Network", "server_ip", global.saved_server_ip);
+	ini_write_real("Vars", "saturation_shader", global.saturation_shader);
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -70,7 +70,7 @@ function save_game(){
 	#endregion
 	
 	#region Save inventory
-	if(file_exists("save_inventory,ini")){
+	if(file_exists("save_inventory.ini")){
 		file_delete("save_inventory.ini");
 	}
 	ini_open("save_inventory.ini");
@@ -81,11 +81,11 @@ function save_game(){
 	#endregion
 	
 	#region Save player ep stats
-	if(file_exists("rating.json")){
-		file_delete("rating.json");
+	if(file_exists("game.json")){
+		file_delete("game.json");
 	}
 	var json_string = json_stringify(global.game_struct);
-	var file = file_text_open_write("rating.json");
+	var file = file_text_open_write("game.json");
 	file_text_write_string(file, json_string);
 	file_text_close(file);
 	#endregion
@@ -114,11 +114,11 @@ function save_game(){
 function load_game(){
 	
 
-	global.draw_damage = true;
+	global.draw_damage = false;
 	global.aberration_level = 0;
-	global.saturation_level = 1.8;
+	global.saturation_level = 1.25;
 	global.TimeSpeed = 15;
-	global.GodMode = 0;
+	global.GodMode = false;
 	global.MapID = MAP.Desert;
 	global.CrosshairAlpha = 1;
 	global.DynamicCrosshair = 0;
@@ -132,16 +132,17 @@ function load_game(){
 	global.crosshair_color = c_white;
 	global.draw_other_models = 0;
 	global.sound_gain = 100;
-	global.BloomShader = 1;
+	global.bloom_shader = 1;
 	global.enemy_visibility = 0;
-	global.GUIMultiplier = 2;
+	global.gui_scale = 2;
 	global.window_width = 1920;
 	global.window_height = 1080;
 	global.anti_aliasing = 0;
 	global.draw_hud = true;
-	global.sv_cheats = false;
+	global.sudo = false;
 	global.saved_server_ip = "127.0.0.1";
 	global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
+	global.saturation_shader = true;
 	
 	#region Load game
 	if(file_exists("save_game.ini")){
@@ -162,16 +163,16 @@ function load_game(){
 		global.crosshair_color = ini_read_real("Vars", "crosshair_color", global.crosshair_color);
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
 		global.sound_gain = ini_read_real("Vars", "sound_gain", global.sound_gain);
-		global.BloomShader = ini_read_real("Vars", "toggle_bloom_shader", global.BloomShader);
+		global.bloom_shader = ini_read_real("Vars", "bloom_shader", ini_read_real("Vars", "toggle_bloom_shader", global.bloom_shader));
 		global.enemy_visibility = ini_read_real("Vars", "enemy_visibility", global.enemy_visibility);
-		global.GUIMultiplier = ini_read_real("Vars", "gui_scale", global.GUIMultiplier);
+		global.gui_scale = ini_read_real("Vars", "gui_scale", global.gui_scale);
 		global.window_width = ini_read_real("Vars", "window_width", global.window_width);
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		global.anti_aliasing = ini_read_real("Vars", "anti_aliasing", global.anti_aliasing);
 		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
-		global.sv_cheats = ini_read_real("Vars", "sv_cheats", global.sv_cheats);
 		global.saved_server_ip = ini_read_string("Network", "server_ip", global.saved_server_ip);
+		global.saturation_shader = ini_read_real("Vars", "saturation_shader", global.saturation_shader);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
 		global.map_rounds = array_create(MAP.Total);
@@ -215,6 +216,9 @@ function load_game(){
 		for(var i = 0; i < ds_list_size(unlocked); i++){
 			var item_id = unlocked[| i];
 			global.ItemIndex[# item_id, ItemStat.is_locked] = false;
+			if(ds_list_find_index(global.unlocked_items, item_id) == -1){
+				ds_list_add(global.unlocked_items, item_id);
+			}
 		}
 
 		ds_list_destroy(unlocked);
@@ -223,8 +227,8 @@ function load_game(){
 	#endregion
 	
 	#region Load player ep stats
-	if (file_exists("rating.json")) {
-	    var file = file_text_open_read("rating.json");
+	if (file_exists("game.json")) {
+	    var file = file_text_open_read("game.json");
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
 	    global.game_struct = json_parse(json_string);

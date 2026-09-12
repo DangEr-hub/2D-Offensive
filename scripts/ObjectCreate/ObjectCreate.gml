@@ -61,7 +61,7 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 	return GrenadeObject;
 }
 
-function create_molotov_impact(PositionX, PositionY, Damage, ObjectType, ItemID, OwnerName = "Noone", OwnerID = -1, CanDamage = true){
+function create_molotov_impact(PositionX, PositionY, Damage, ObjectType, ItemID, OwnerName = "Noone", OwnerID = -1, CanDamage = true, NetworkID = -1, InitialAge = 0){
 	var impact = instance_create_layer(PositionX, PositionY, "ItemsO", oMolotovImpact);
 	var object_index_value = -1;
 	if(instance_exists(ObjectType)){
@@ -69,6 +69,8 @@ function create_molotov_impact(PositionX, PositionY, Damage, ObjectType, ItemID,
 	}
 
 	impact.can_damage = CanDamage;
+	impact.network_id = NetworkID;
+	impact.age = max(0, InitialAge);
 	impact.stats = {
 		Damage: Damage,
 		Starting_x: PositionX,

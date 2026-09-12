@@ -92,7 +92,8 @@ if(DrawItemInfo == true){
 					alpha = global.GUIHUDAlpha * 3;
 				}
 			}
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"
+		 || global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
 			oDraw.var_slot = VarSlot;
 			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
 			item_description_destroy();

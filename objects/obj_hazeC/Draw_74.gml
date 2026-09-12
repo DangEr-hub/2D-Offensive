@@ -69,7 +69,7 @@ for(var i=0; i<ds_list_size(hazePoints); i++){
     var Arr = hazePoints[|i];
     
     //translate to surface coords
-    var sX, sY, sR;
+    var sX, sY, sR = 0;
     sX = Arr[0] - (cam_x*cameraUsed);
     sY = Arr[1] - (cam_y*cameraUsed);
     sR = Arr[2];
@@ -100,7 +100,7 @@ for(var i=0; i<ds_list_size(hazeAreas); i++){
     var Arr = hazeAreas[|i];
     
     //translate to surface coords
-    var sX, sY, sW, sH;
+    var sX, sY, sW, sH = 0;
     sX = Arr[0] - (cam_x*cameraUsed);
     sY = Arr[1] - (cam_y*cameraUsed);
     sW = Arr[2];

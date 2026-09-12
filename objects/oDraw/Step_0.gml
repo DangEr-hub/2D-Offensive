@@ -9,19 +9,21 @@ if (instance_exists(audio_listener_target)) {
 	audio_listener_position(audio_listener_target.x, audio_listener_target.y, 0);
 }
 
+
 #region Bomb timer
 var has_bomb_authority = !IS_NET || oNetworkManager.is_server;
 if (has_bomb_authority && global.bomb_planted) {
 	var bomb_round_resolved = IS_NET && oNetworkManager.round_resolved;
 	if (bomb_round_resolved) {
-		global.bomb_planted = false;
 		global.bomb_timer = 0;
 		global.bomb_planter_pid = -1;
 		with (oBomb) {
 			instance_destroy();
 		}
 	} else {
+		if(PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
 		global.bomb_timer = max(0, global.bomb_timer - 1);
+		}
 	}
 
 	if (global.bomb_planted && global.bomb_timer <= 0) {
@@ -136,6 +138,9 @@ if(instance_exists(global.local_player)){
 	if(buy_time > 0){
 		buy_time --;
 	}
+	if(buy_period_message_timer > 0){
+		buy_period_message_timer --;
+	}
 	#endregion
 	
 	#region Bird spawning
@@ -203,7 +208,7 @@ if(instance_exists(global.local_player)){
 		bloom_threshold = .35;
 	}
 	
-	if(keyboard_check_pressed(global.KeyBinds[| KEY.Pause]) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
+	if(keyboard_check_pressed(global.KeyBinds[| KEY.Pause]) && !global.local_player.terminal_opened && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
 		if(PauseMenu == false){
 
 			pause(id);
@@ -258,6 +263,7 @@ if(instance_exists(global.local_player)){
 	|| instance_exists(oBuyMenu)
 	|| instance_exists(oMortarMenu)
 	|| instance_exists(oStatisticsTable)
+	|| instance_exists(oBotTab)
 	|| keyboard_check(global.KeyBinds[| KEY.Scoreboard])
 	|| global.my_console[? "active"]
 	|| global.local_player.player_can_shoot == false){
@@ -296,16 +302,20 @@ if(instance_exists(global.local_player)){
 	}
 	
 	#region Buy menu
-	if (!global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state && 
-	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu]) && buy_time > 0) {
-		if (instance_exists(oBuyMenu)) {
-			global.local_player.player_can_shoot = true;
-			with (oBuyMenuDescription) zui_destroy();
-			with (oBuyMenu) zui_destroy();
-		} else {
-			global.local_player.player_can_shoot = false;
-			with(oWeaponAttachments) zui_destroy();
-			with (zui_main()) zui_create(zui_get_width()*.5, zui_get_height()*.5, oBuyMenu);
+	if (!global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state &&
+	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
+		if(buy_time <= 0){
+			buy_period_message_timer = game_get_speed(gamespeed_fps) * 2;
+		}else{
+			if (instance_exists(oBuyMenu)) {
+				global.local_player.player_can_shoot = true;
+				with (oBuyMenuDescription) zui_destroy();
+				with (oBuyMenu) zui_destroy();
+			} else {
+				global.local_player.player_can_shoot = false;
+				with(oWeaponAttachments) zui_destroy();
+				with (zui_main()) zui_create(zui_get_width()*.5, zui_get_height()*.5, oBuyMenu);
+			}
 		}
 	}
 	#endregion

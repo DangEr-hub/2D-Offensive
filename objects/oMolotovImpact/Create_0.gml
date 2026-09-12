@@ -5,6 +5,7 @@ image_speed = 0;
 image_index = 0;
 image_blend = c_orange;
 image_alpha = .22;
+network_id = -1;
 
 start_radius = 16;
 max_radius = 256;

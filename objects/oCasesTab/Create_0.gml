@@ -1,9 +1,9 @@
 event_inherited();
-tab_width = max(784 * global.GUIMultiplier, 1200);
-tab_height = max(405 * global.GUIMultiplier, 590);
-bw = 64 * global.GUIMultiplier;
-bh = 32 * global.GUIMultiplier;
-image_size = 64 * global.GUIMultiplier;
+tab_width = max(784 * global.gui_scale, 1200);
+tab_height = max(405 * global.gui_scale, 590);
+bw = 64 * global.gui_scale;
+bh = 32 * global.gui_scale;
+image_size = 64 * global.gui_scale;
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(tab_width, tab_height);

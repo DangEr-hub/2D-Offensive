@@ -14,6 +14,17 @@ if(hit_timer > -1){
 	hit_timer --;
 }
 
+if (stats.Health_points > 0
+&& (is_undefined(FlashLight) || FlashLight == noone)
+&& instance_exists(oLightRenderer)) {
+	FlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, x, y);
+	FlashLight.alpha = FLASHLIGHT_ALPHA;
+	FlashLight.penumbraSize = 30;
+	FlashLight.xscale = 2;
+	FlashLight.yscale = 2;
+	FlashLight.blend = c_white;
+}
+
 if(col_timer > -1){ col_timer --; }
 if(object_index == oBot && col_timer == -1){
 	
@@ -56,6 +67,7 @@ if(check_vis_timer == -1){
 	// lokální hráč je vždy viditelný
 	if (id == observer || stats.Team == observer.stats.Team) {
 	    Visible = true;
+		VisibilityTimer = -1;
 	}else if (is_target) {
 
 	    if (!global.enemy_visibility) {
@@ -68,31 +80,22 @@ if(check_vis_timer == -1){
 
 	        var force_visible = stats.Health_points <= 0 || (object_index == oBot && (State == STATES.ThrowGrenade || State == STATES.LayDownLandMine || HPTimer != -1));
 	        if (in_fov || force_visible) {
-				var col_tile  = collision_line(x, y, observer.x, observer.y, oParentTile, true, false);
+				var ignore_machine_gun_floor = observer.moving_state == STATES_PLAYER.machine_gun_state;
+				var tile_blocks_view = tile_blocks_target_view(
+					observer.x, observer.y,
+					x, y,
+					id,
+					ignore_machine_gun_floor,
+					observer
+				);
 				var col_smoke = collision_line(x, y, observer.x, observer.y, oSmokeTile,  true, false);
-				var col = noone;
 
-				if(col_tile != noone){
-					col = col_tile;
-				}else if(col_smoke != noone){
-					col = col_smoke;
-				}
-
-	            if (col != noone) {
-					if (instance_exists(col)) {
-	                    // Bezpečná kontrola transparentnosti
-	                    var is_transparent = variable_instance_exists(col, "transparent") && col.transparent == true;
-	                    var is_mg_floor = (observer.moving_state == STATES_PLAYER.machine_gun_state && col.object_index == oMachineGunFloor);
-
-	                    if (is_mg_floor || is_transparent) {
-	                        Visible = true;   
-	                    } else {
-	                        if (Visible && VisibilityTimer == -1)
-	                            VisibilityTimer = VisibilityTime;
-	                    }
-					}
+	            if (tile_blocks_view || col_smoke != noone) {
+					if (Visible && VisibilityTimer == -1)
+						VisibilityTimer = VisibilityTime;
 				}else{
 					Visible = true;
+					VisibilityTimer = -1;
 				}
 	        } else {
 	            if (Visible && VisibilityTimer == -1)
@@ -101,18 +104,19 @@ if(check_vis_timer == -1){
 
 	    } else {
 	        Visible = true;
+			VisibilityTimer = -1;
 	    }
 	}
 
 
-	if(FlashLight != undefined){
+	if(FlashLight != undefined && FlashLight.visible != Visible){
 		FlashLight.visible = Visible;
 	}
 	HeadHB.Visible  = Visible;
 	BodyHB.Visible  = Visible;
 	ArmHB.Visible   = Visible;
 	Weapon.Visible      = Visible;
-	Legs.Visible        = Visible;
+	Legs.Visible        = Visible && stats.Health_points > 0;
 
 }
 

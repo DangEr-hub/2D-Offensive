@@ -6,5 +6,10 @@ with(buy_time_cap){
 if(oDraw.buy_time <= 0){
 	global.local_player.player_can_move = true;
 	global.local_player.player_can_shoot = true;
+	
+	with(oBuyMenuDescription){
+		zui_destroy();	
+	}
+	
 	zui_destroy();
 }

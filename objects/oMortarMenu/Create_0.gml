@@ -1,6 +1,6 @@
 event_inherited();
-texture_width = 384 * global.GUIMultiplier;
-texture_height = 128 * global.GUIMultiplier;
+texture_width = 384 * global.gui_scale;
+texture_height = 128 * global.gui_scale;
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(texture_width, texture_height);
@@ -60,8 +60,8 @@ position_y = zui_get_height() * .25;
 launch_button = zui_create(zui_get_width() * .5, position_y + string_height("a")*3, objUIButton);
 with(launch_button){
 	zui_set_anchor(0.5, 0);
-	zui_set_width(128 * global.GUIMultiplier);
-	zui_set_height(32 * global.GUIMultiplier);
+	zui_set_width(128 * global.gui_scale);
+	zui_set_height(32 * global.gui_scale);
 	caption = "Launch!";
 	callback = function(){
 		var mortar = instance_nearest(global.local_player.x, global.local_player.y, oMortar);

@@ -2,6 +2,9 @@
 if (instance_exists(global.local_player)) {
 	item_use_resync_timer += delta_time / 1000000;
 	var current_item_use_id = global.Inventory[# global.local_player.item_use_position, Index.slot_id];
+	if (global.local_player.Healing && global.local_player.HealingItemId != Item.None) {
+		current_item_use_id = global.local_player.HealingItemId;
+	}
 	var item_use_changed = current_item_use_id != last_item_use_id;
 	if (item_use_changed || item_use_resync_timer >= item_use_resync_interval) {
 		last_item_use_id = current_item_use_id;
@@ -23,11 +26,18 @@ if (instance_exists(global.local_player)) {
 
 if (is_server) {
 	server_update_health_regeneration();
+	server_update_defusing();
 
 	stats_sync_timer += delta_time / 1000000;
 	if(stats_sync_timer >= stats_sync_interval){
 		send_stats_broadcast();
 		stats_sync_timer = 0;
+	}
+
+	molotov_sync_timer += delta_time / 1000000;
+	if(molotov_sync_timer >= molotov_sync_interval){
+		server_molotov_state_broadcast();
+		molotov_sync_timer = 0;
 	}
 
     // ~20 Hz broadcast
@@ -54,7 +64,17 @@ if (is_server) {
 				if(moving_state == STATES_PLAYER.prone_state){ bit_states |= PLAYER_FLAGS.PRONE; }
 				if(EquippedGrenadeTimer > -1){ bit_states |= PLAYER_FLAGS.THROWING_GRENADE; }
 				if(planting){ bit_states |= PLAYER_FLAGS.PLANTING; }
+				if(defusing){ bit_states |= PLAYER_FLAGS.DEFUSING; }
+				if(Healing){ bit_states |= PLAYER_FLAGS.HEALING; }
+				if(walking){ bit_states |= PLAYER_FLAGS.WALKING; }
+				if(running){ bit_states |= PLAYER_FLAGS.RUNNING; }
 				ds_map_set(data, "state",  bit_states);
+				ds_map_set(data, "defuse_has_kit", find_item(Item.DefuseKit) != -1);
+				var previous_defusing_target = ds_map_find_value(data, "defusing_target");
+				if (!is_undefined(previous_defusing_target) && previous_defusing_target != defusing_target) {
+					ds_map_set(data, "defusing_time", 0);
+				}
+				ds_map_set(data, "defusing_target", defusing_target);
 				ds_map_set(data, "moving_state", moving_state);
 				ds_map_set(data, "Team", stats.Team);
 				ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);

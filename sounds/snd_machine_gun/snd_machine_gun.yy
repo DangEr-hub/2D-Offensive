@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_machine_gun.wav",
   "type": 0,
-  "volume": 0.5,
+  "volume": 0.75,
 }

@@ -4,8 +4,8 @@ alpha = global.GUIHUDAlpha;
 values_x = [];
 values_y = [];
 
-g_width = 256 * global.GUIMultiplier;
-g_height = 128 * global.GUIMultiplier;
+g_width = 256 * global.gui_scale;
+g_height = 128 * global.gui_scale;
 
 zui_set_size(g_width, g_height);
 

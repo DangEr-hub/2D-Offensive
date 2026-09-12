@@ -14,19 +14,19 @@ if(drawable == true){
 		}
 	}else if(description == "Inventory"){
 		var Id = item_id;
-		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet"){
-			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
+		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
+			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.gui_scale);
 			var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item" || global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine" || global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
 			draw_set_font(set_font("GUI_grid"));
-			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
+			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.gui_scale);
 			var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 		
-			var offset_y = 64 * global.GUIMultiplier;
+			var offset_y = 64 * global.gui_scale;
 			var statistics_string = "";
 			var statistics_x = x;
 			var statistics_y = y + offset_y;
@@ -52,7 +52,7 @@ if(drawable == true){
 				draw_string_line(statistics_x, statistics_y + 20, "Vertical recoil: ", -vertical_recoil, c_red, " %");
 			}
 		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
-			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.GUIMultiplier);
+			var DescriptionString = string_wrap(global.ItemIndex[#Id, ItemStat.Description], 300 * global.gui_scale);
 			var DescriptionStringHeight = string_count_lines(DescriptionString) * font_get_size(draw_get_font());
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);

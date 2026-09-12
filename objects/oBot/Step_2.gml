@@ -11,10 +11,6 @@ if(XSpeed == 0 && YSpeed == 0){
 	}
 	exit;
 }
-if(hasLegs){
-	Legs.image_speed = (1 * global.time_step);
-}
-
 // --------------------
 // Y AXIS (hybrid move)
 // --------------------
@@ -108,9 +104,11 @@ if(xs != 0){
 	}
 }
 
-// stop legs if fully blocked
-if(hasLegs && XSpeed == 0 && YSpeed == 0){
-	Legs.image_speed = 0;
+// Match the animation speed to the bot's final movement after collisions.
+if(hasLegs){
+	Legs.image_speed = XSpeed == 0 && YSpeed == 0
+		? 0
+		: (walking ? WALK_SPD * Legs.spd : 1.0 * Legs.spd) * global.time_step;
 }
 
 // --------------------

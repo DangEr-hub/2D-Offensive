@@ -8,7 +8,7 @@ function is_inventory_full(Item = Item.None){
 		}
 		Slot ++;
 	}
-	
+
 	return true;
 }
 
@@ -82,8 +82,8 @@ function inventory_create() {
 	var SlotRowSize = 7;
 	var SlotColumnSize = 3;
 	
-	var slot_width = sprite_get_width(spr_Slot)/2*global.GUIMultiplier;
-	var slot_height = sprite_get_height(spr_Slot)/2*global.GUIMultiplier;
+	var slot_width = sprite_get_width(spr_Slot)/2*global.gui_scale;
+	var slot_height = sprite_get_height(spr_Slot)/2*global.gui_scale;
 	var start_x = camera_get_view_x(CAM) + camera_get_view_width(CAM)/2 - (SlotRowSize*slot_width/2);
 	var start_y = camera_get_view_y(CAM) + camera_get_view_height(CAM)/1.3 - (SlotColumnSize*slot_height/2);
 	
@@ -135,10 +135,11 @@ function InventoryInit() {
 
 	enum Item{
 	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
-		SpecOpsVest, MilitaryNightVision, BasicNightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
+		SpecOpsVest, NightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, advanced_suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Scar, MolotovGrenade, Bomb, Total
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Scar, MolotovGrenade, Bomb, DefuseKit, gold_card,
+		magenta_card, red_card, aqua_card, green_card, black_card, white_card, m200, Total
 	}
 
 	enum ItemStat{
@@ -208,6 +209,13 @@ function ItemAmountSubstract(ID, Amount){
 			global.Inventory[# ID, i] = 0;
 		}
 	}
+}
+
+function is_caliber_box_item(item_id) {
+	return item_id == Item.low_cal_box
+		|| item_id == Item.med_cal_box
+		|| item_id == Item.high_cal_box
+		|| item_id == Item.gauge_box;
 }
 
 function ItemAddWeight(ID, OtherID){
@@ -294,6 +302,7 @@ function WeaponDrop(ID, ObjectType){
 	if(ObjectType.object_index == oPlayer){
 		global.local_player.Reloading = false;
 		global.local_player.ReloadTime = 0;
+		global.local_player.ReloadTimer = -1;
 		for(var i = 0;i<Index.Total;i++){
 			global.Inventory[# ID, i] = 0;
 		}
@@ -404,26 +413,8 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 				
 		#region Item use
 		switch(Id){
-			case Item.Bomb:
-				if (stats.Team == TEAM.TERRORIST && !global.bomb_planted && !Healing && !planting_pending && can_plant) {
-					
-					if(planting == false){
-						planting = true;
-						planting_value = 0;
-						planting_slot = slot;
-						CanShoot = false;
-						player_can_shoot = false;
-					}else{
-						planting = false;
-						planting_value = 0;
-						planting_slot = slot;
-						CanShoot = true;
-						player_can_shoot = true;
-					}
-				}
-			break;
 			case Item.HealingKit:
-			    if(!Healing && stats.Health_points < global.player_stats.Max_health){
+			    if(!Healing && !defusing && stats.Health_points < global.player_stats.Max_health){
 			        global.local_player.item_equip_timer = global.local_player.item_equip_time;
 			        HealingItemId = Item.HealingKit; Healing = true; ItemAmountSubstract(slot, 1);
 			    }
@@ -436,7 +427,16 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 			    if(global.ItemIndex[# wpn_id, ItemStat.caliber_type] == cal_needed){
 			        var amt = global.ItemIndex[# Id, ItemStat.MaxAmmo];
 			        global.Inventory[# WeaponID, Index.slot_clip_ammo] += amt;
-			        damage_indicator("+" + string(amt), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
+
+					if (!IS_NET) {
+						damage_indicator("+" + string(amt), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
+					} else if (oNetworkManager.is_server) {
+						server_process_item_action(network_id, Id, global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+					} else if (oNetworkManager.is_connected) {
+						send_item_action_complete_client(Id, global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+					}
+
+					weapon_network_propagate();
 			        ItemAmountSubstract(slot, 1);
 			    }
 			break;			
@@ -447,6 +447,17 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 			case Item.horizontal_grip: weapon_attachment_equip(Id, Index.slot_grip); break;
 			case Item.advanced_suppressor: weapon_attachment_equip(Id, Index.slot_suppressor); break;	
 			case Item.range_finder: weapon_attachment_equip(Id, Index.slot_barrel); break;
+			case Item.dilatation_pill:
+				if (!IS_NET) {
+					global.time_step = .25;
+					dilatation_timer = DILATATION_TIME;
+				} else if (oNetworkManager.is_server) {
+					server_process_item_action(network_id, Id);
+				} else if (oNetworkManager.is_connected) {
+					send_item_action_complete_client(Id);
+				}
+				ItemAmountSubstract(slot, 1);
+			break;
 		}
 		#endregion
 				
@@ -543,7 +554,36 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 		}
 		#endregion
 				
+	}else if(global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
+		if (stats.Team == TEAM.TERRORIST && !global.bomb_planted && !Healing && !planting_pending && can_plant) {
+
+			if(planting == false){
+				planting = true;
+				planting_value = 0;
+				planting_slot = slot;
+				CanShoot = false;
+				player_can_shoot = false;
+			}else{
+				planting = false;
+				planting_value = 0;
+				planting_slot = slot;
+				CanShoot = true;
+				player_can_shoot = true;
+			}
+		}
 	}
+}
+
+function find_item(item_id, item_amount = 1){
+	for(var i=0;i<ds_grid_width(global.Inventory);i++){
+	    var item_to_find = global.Inventory[# i, Index.slot_id];
+		var item_to_find_amount = global.Inventory[# i, Index.SlotAmount];
+	    if(item_to_find == item_id && item_to_find_amount >= item_amount){
+			return i;
+	    }
+	}
+
+	return -1;
 }
 
 

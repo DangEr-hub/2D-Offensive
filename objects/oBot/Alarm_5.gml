@@ -20,12 +20,15 @@ for (var i = 0; i < bot_count; i++){
     var dist = point_distance(x, y, other_bot.x, other_bot.y);
     if (dist > share_range){ continue };
 
-    // Bot v okolí sdílí pouze stále živý nepřátelský cíl.
-    if (bot_target_is_enemy(other_bot.ChasingObject) && !bot_target_is_enemy(ChasingObject)){
-        ChasingObject = other_bot.ChasingObject;
-        ChasingObjectSpot(chasing_timer);
-        break; // stačí jeden bot z okolí
-    }
+    // Bot v okolí sdílí pouze cíl, o kterém skutečně ví.
+    if (other_bot.ChasingObjectSpotted
+	&& bot_target_is_enemy(other_bot.ChasingObject)
+	&& !ChasingObjectSpotted
+	&& percent_chance(clamp(40 * rank_boost, 10, 90))){
+		ChasingObject = other_bot.ChasingObject;
+		ChasingObjectSpot(chasing_time);
+		break; // stačí jeden bot z okolí
+	}
 }
 
 

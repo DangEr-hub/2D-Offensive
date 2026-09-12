@@ -1,7 +1,10 @@
 /* Create event */
 event_inherited();
+can_prone = true;
+walking = false;
 chasing_timer = -1;
 reload_timer = -1;
+death_timestamp = -1;
 predictive_side = choose(-1, 1);
 shoot_accumulator = 0;
 chasing_available = false;
@@ -34,16 +37,17 @@ EquippedLandMine = Item.None;
 stats = {};
 NearestDangerX = -1;
 NearestDangerY = -1;
-stats = create_enemy(75, [random_range(150, 200), random_range(70, 170)], irandom_range(15, 70), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 80);
+stats = create_enemy(88, [random_range(170, 200), random_range(70, 120)], irandom_range(25, 50), choose("John", "Joe", "Jorge de Guzman", "Lalo salamanca", "Elvis", "Stuart", "Lewis", "Tommy hilfiger", "Hector", "Cortez", "Rico", "Nico", "Leo"), 85);
 stats.Max_health_points = stats.Health_points;
 stats.Max_stamina_points = stats.Stamina_points;
+
 stats.Kills = 0;
 stats.Assists = 0;
 stats.Deaths = 0;
 stats.Money = ROUND_STARTING_MONEY;
 stats.Team = choose(TEAM.TERRORIST, TEAM.POLICE);
+has_defuse_kit = stats.Team == TEAM.POLICE && percent_chance(25);
 stats.Room = room;
-array_push(global.BotMatchStats, stats);
 WeaponID = [0, 0];
 WeaponDistance = 0;
 RotationAngle = 0;
@@ -62,6 +66,26 @@ WeaponNumberMax = 2;
 HPTimer = -1;
 ChasingObjectSpotted = false;
 State = STATES.Idle;
+prone_previous_state = STATES.Idle;
+prone_check_time = 10 * game_get_speed(gamespeed_fps);
+prone_check_timer = irandom_range(1, prone_check_time);
+prone_timer = -1;
+machine_gun_object = noone;
+machine_gun_candidate = noone;
+machine_gun_check_time = .5 * game_get_speed(gamespeed_fps);
+machine_gun_check_timer = irandom_range(3, max(3, machine_gun_check_time));
+machine_gun_mount_x = x;
+machine_gun_mount_y = y;
+machine_gun_slot = 0;
+machine_gun_previous_weapon_number = 0;
+machine_gun_previous_id = Item.None;
+machine_gun_previous_ammo = 0;
+machine_gun_previous_clip_ammo = 0;
+machine_gun_previous_max_ammo = 0;
+machine_gun_previous_scope = Item.None;
+machine_gun_previous_barrel = Item.None;
+machine_gun_previous_grip = Item.None;
+machine_gun_previous_suppressor = Item.None;
 CanShoot = true;
 ShootTimer = -1;
 Inaccuracy = 0;
@@ -100,6 +124,45 @@ alarm[6] = 1;
 sprite_index = stats.Team == TEAM.TERRORIST ? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4) : choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3); ///fallback
 mv_timer = 5;
 
+enum EQUIPMENT_LEVEL {
+    FIRST,
+    LOW,
+    MED,
+    HIGH
+}
+
+equipment_level = 0;
+alarm[0] = 2;
+var primary_weapons = [Item.None];
+var secondary_weapons = [];
+for(var item_id = 1; item_id < Item.Total; item_id++){
+	if(global.ItemIndex[# item_id, ItemStat.Type] != "Weapon"
+	|| global.ItemIndex[# item_id, ItemStat.Cost] <= 0){
+		continue;
+	}
+
+	if(global.ItemIndex[# item_id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY){
+		array_push(primary_weapons, item_id);
+	}else if(global.ItemIndex[# item_id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY){
+		array_push(secondary_weapons, item_id);
+	}
+}
+
+WeaponID[0] = primary_weapons[irandom(array_length(primary_weapons) - 1)];
+WeaponID[1] = array_length(secondary_weapons) > 0
+	? secondary_weapons[irandom(array_length(secondary_weapons) - 1)]
+	: Item.None;
+ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest, Item.SpecOpsVest);
+HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm, Item.SpecOpsHelm);
+ShieldID = Item.None;
+Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
+ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
+MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
+Ammo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
+ClipAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.ClipAmmo];
+MaxAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
+ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability], global.ItemIndex[# ShieldID, ItemStat.BaseDurability]];		
+
 #region Flashed
 FlashedTimer = -1;
 FlashedTime = 7 * game_get_speed(gamespeed_fps);
@@ -107,20 +170,15 @@ FlashedTime = 7 * game_get_speed(gamespeed_fps);
 
 rank_boost = get_rank_boost(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
 rank_less = get_rank_less(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
-chasing_timer = round(5 * game_get_speed(gamespeed_fps) * rank_boost);
+chasing_time = round(5 * game_get_speed(gamespeed_fps) * rank_boost);
+chasing_timer = -1;
 
-#region Set armour
-ArmourID = choose(Item.None, Item.KevlarVest, Item.MilitaryVest);
-HelmetID = choose(Item.None, Item.KevlarHelm, Item.MilitaryHelm);
-ShieldID = Item.None;
-ArmourDurability = [global.ItemIndex[#ArmourID, ItemStat.BaseDurability], global.ItemIndex[#HelmetID, ItemStat.BaseDurability], global.ItemIndex[# ShieldID, ItemStat.BaseDurability]];
-#endregion
 
 #region Movement engine
-Acceleration = min(.55 * rank_boost, .9);
+Acceleration = min(.75 * rank_boost, .9);
 Friction = .75;
-MaxSpeed = min(2.5 * rank_boost, 5);
-MoveDirection  = 0;
+MaxSpeed = min(3.5 * rank_boost, 5.5);
+MoveDirection = RotationAngle;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
@@ -138,47 +196,15 @@ Legs.Visible = false;
 #endregion
 
 
-#region Weapon equip
-WeaponID[0] = choose(Item.SG550, Item.AKM, Item.SSG08, Item.Spas, Item.m4a1, Item.awm, Item.galil, Item.MK18, Item.famas);
-WeaponID[1] = choose(Item.Glock, Item.DesertEagle, Item.usp, Item.p250, Item.tec9);
-Ammo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
-ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.ClipAmmo];
-MaxAmmo[0] = global.ItemIndex[#WeaponID[0], ItemStat.MaxAmmo];
-Ammo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
-ClipAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.ClipAmmo];
-MaxAmmo[1] = global.ItemIndex[#WeaponID[1], ItemStat.MaxAmmo];
-
 attachments = array_create(2);
 for(var i = 0; i < 2; i++){
 	attachments[i] = array_create(4, Item.None);
 }
 
-#region Attachments
-if(percent_chance(10 * rank_boost)){
-	weapon_attachment_equip(Item.advanced_suppressor, ATTACHMENTS.slot_suppressor, id, choose(0, 1));
-}
-
-if(percent_chance(10 * rank_boost)){
-	var item = choose(Item.adaptive_chambering, Item.range_finder);
-	weapon_attachment_equip(item, ATTACHMENTS.slot_barrel, id, choose(0, 1));
-}
-
-if(percent_chance(10 * rank_boost)){
-	var item = choose(Item.vertical_grip, Item.horizontal_grip);
-	weapon_attachment_equip(item, ATTACHMENTS.slot_grip, id, choose(0, 1));
-}
-
-if(percent_chance(10 * rank_boost)){
-	var item = choose(Item.red_dot_scope, Item.two_scope);
-	weapon_attachment_equip(item, ATTACHMENTS.slot_scope, id, 0);
-}
-
-#endregion
-
 Weapon = instance_create_depth(x + WX, y + WY, depth - 1, oWeapon);
 Weapon.Visible = false;
+Weapon.Owner = id;
 
-#endregion
 
 #region Flashlight
 FlashLightX = x;
@@ -195,7 +221,9 @@ BodyHB.MainObject = id;
 ArmHB = instance_create_depth(x, y, depth - 1, oHitBox);
 ArmHB.image_index = HITBOX.ArmNoWeapon;
 ArmHB.MainObject = id;
-LegHB = noone;
+LegHB = instance_create_depth(x, y, depth - 1, oHitBox);
+LegHB.image_index = HITBOX.LegProne;
+LegHB.MainObject = id;
+LegHB.visible = false;
 #endregion
-
 

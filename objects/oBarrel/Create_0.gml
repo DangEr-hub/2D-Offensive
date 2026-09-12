@@ -4,6 +4,7 @@ Visible = true;
 Type = MATERIAL.METAL;
 image_index = choose(0, 1);
 image_speed = 0;
+image_angle = random(360);
 stats = {
 	Item_id: image_index == 1 ? Item.nuclear_explosion : Item.base_explosion,
 	Damage: 0,

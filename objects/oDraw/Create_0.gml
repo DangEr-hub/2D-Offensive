@@ -12,8 +12,10 @@ item_description = "";
 Pick = "[" + string(keycode_to_string(global.KeyBinds[| KEY.PickUp])) + "]";
 HUDShift = 16;
 buy_time = 0;
+buy_period_message_timer = 0;
 round_end_timer = -1;
 bomb_detonation_pending = false;
+alarm[1] = audio_sound_length(snd_Wind);
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;

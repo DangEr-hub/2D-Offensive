@@ -7,7 +7,13 @@ if(instance_exists(MainObject)){
 	image_angle = MainObject.RotationAngle;
 	
 	
-	if(MainObject.object_index == oBot){
+	if(knife_check_timer > 0){
+		knife_check_timer--;
+	}
+
+	if((MainObject.object_index == oBot || MainObject.object_index == oHostage)
+	&& knife_check_timer <= 0){
+		knife_check_timer = knife_check_time;
 		
 		#region Knife hit
 		var knife_object = instance_nearest(x, y, oKnife);

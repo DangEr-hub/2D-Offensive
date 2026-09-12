@@ -12,4 +12,10 @@ if(LightObject != noone){
 	LightObject = noone;
 }
 
+if(IS_NET && can_damage && network_id >= 0 && instance_exists(oNetworkManager)){
+	if(oNetworkManager.free_grenade_ids != -1 && ds_exists(oNetworkManager.free_grenade_ids, ds_type_stack)){
+		ds_stack_push(oNetworkManager.free_grenade_ids, network_id);
+	}
+}
+
 event_inherited();

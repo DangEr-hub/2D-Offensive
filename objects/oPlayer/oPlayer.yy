@@ -40,7 +40,7 @@
   "physicsShapePoints": [],
   "physicsStartAwake": true,
   "properties": [],
-  "solid": false,
+  "solid": true,
   "spriteId": {
     "name": "spr_PoliceChar",
     "path": "sprites/spr_PoliceChar/spr_PoliceChar.yy",

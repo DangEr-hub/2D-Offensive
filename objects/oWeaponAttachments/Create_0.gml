@@ -1,6 +1,6 @@
 event_inherited();
-texture_width = min(384 * global.GUIMultiplier, 512);
-texture_height = min(192 * global.GUIMultiplier, 320);
+texture_width = min(384 * global.gui_scale, 512);
+texture_height = min(192 * global.gui_scale, 320);
 Id = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
 
 draw_set_font(set_font("GUI_small"));
@@ -11,7 +11,7 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
     draggable = 1;
 }
 
-var scale = global.GUIMultiplier;
+var scale = global.gui_scale;
 var w_width = 256 * scale;
 var w_height = 128 * scale;
 var weapon_x = zui_get_width() * 0.5;

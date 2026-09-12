@@ -1,19 +1,19 @@
 event_inherited();
 global.ranked_game = false;
-play_unranked_tab_width = 720 * global.GUIMultiplier;
-play_unranked_tab_height = 405 * global.GUIMultiplier;
+play_unranked_tab_width = 720 * global.gui_scale;
+play_unranked_tab_height = 405 * global.gui_scale;
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(play_unranked_tab_width, play_unranked_tab_height);
 
 unranked_description_string = "Commit to a full scale match\nwithout worrying to loose any eggy points.\nEnemies have randomized eggy points.";
-checkbox_gap = 8 * global.GUIMultiplier;
-hard_mode_checkbox_width = 16 * global.GUIMultiplier;
-hard_mode_checkbox_height = 16 * global.GUIMultiplier;
-map_play_button_width = 72 * global.GUIMultiplier;
-map_play_button_height = 16 * global.GUIMultiplier;
-map_image_sprite_height = 72 * global.GUIMultiplier;
-map_image_sprite_width = 128 * global.GUIMultiplier;
+checkbox_gap = 8 * global.gui_scale;
+hard_mode_checkbox_width = 16 * global.gui_scale;
+hard_mode_checkbox_height = 16 * global.gui_scale;
+map_play_button_width = 72 * global.gui_scale;
+map_play_button_height = 16 * global.gui_scale;
+map_image_sprite_height = 72 * global.gui_scale;
+map_image_sprite_width = 128 * global.gui_scale;
 map_image_position_x = 32;
 map_image_position_y = 64;
 map_image_gap = map_image_sprite_width * 1.1;
@@ -31,10 +31,14 @@ for(var j=0;j<MAP.Total;j++){
 
 map_callbacks = [
     function() {
+		if(global.MapID != MAP.Desert){ reset_singleplayer_game(); }
+		global.ranked_game = false;
 		map_init(MAP.Desert);
 		room_goto(rm_Desert);
 	},
     function() {
+		if(global.MapID != MAP.RainForest){ reset_singleplayer_game(); }
+		global.ranked_game = false;
 		map_init(MAP.RainForest);
 		room_goto(rm_RainForest);
 	}

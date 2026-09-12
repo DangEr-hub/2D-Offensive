@@ -10,7 +10,7 @@
   "bitRate": 128,
   "compression": 0,
   "conversionMode": 0,
-  "duration": 0.728208,
+  "duration": 0.397098,
   "parent": {
     "name": "Weapons",
     "path": "folders/Sounds/Weapons.yy",
@@ -19,5 +19,5 @@
   "sampleRate": 44100,
   "soundFile": "snd_MK18.wav",
   "type": 0,
-  "volume": 0.55,
+  "volume": 0.7,
 }

@@ -9,8 +9,8 @@ lottery_duration = 300;
 lottery_winner_index = -1;
 lottery_result = -1;
 
-g_width = 512 * global.GUIMultiplier;
-g_height = 128 * global.GUIMultiplier;
+g_width = 512 * global.gui_scale;
+g_height = 128 * global.gui_scale;
 
 alpha_value = 0;
 alpha = global.GUIHUDAlpha;

@@ -1,18 +1,16 @@
 randomize();
-if (!variable_global_exists("player_character_seed")) {
-	global.player_character_seed = irandom(2147483646);
-}
+global.bomb_time = 5 * game_get_speed(gamespeed_fps);
+global.player_character_seed = irandom(2147483646);
 global.my_console = console_create();
 global.unlocked_items = ds_list_create();
 global.local_player = oPlayer;
-global.sv_cheats = false;
+global.sudo = false;
 global.InventoryEquipLeftTopCorner = [-1, -1];
 global.InventoryEquipRightBottomCorner = [-1, -1];
 global.InventoryLeftTopCorner = [-1, -1];
 global.InventoryRightBottomCorner = [-1, -1];
 global.FlashBangMaxDistance = 512;
 global.HitBoxAlpha = .1;
-global.Hostage = false;
 global.ConsoleHeight = 384;
 global.ConsoleWidth = 768;
 global.GUIHUDAlpha = .75;
@@ -71,7 +69,14 @@ global.player_stats = {
 	Money: ROUND_STARTING_MONEY,
 	Weight: 0,
 	Max_weight: 15,
-	Armour: 0
+	Armour: 0,
+	Gold: false,
+	Magenta: false,
+	Red: false,
+	Aqua: false,
+	Green: false,
+	Gray: false,
+	White: false
 	
 };
 global.game_struct = game_struct_create();
@@ -161,7 +166,7 @@ for (var i = 0; i < MAP.Total; i++) {
 }
 
 
-global.MapID = MAP.Desert;//-1;
+global.MapID = MAP.Desert;
 global.BotMatchStats = [];
 global.MapProperties = ds_grid_create(MAP.Total, MAP_STAT.Total);
 global.MapProperties[# MAP.Desert, MAP_STAT.Name] = "Desert";
@@ -177,7 +182,7 @@ global.MapProperties[# MAP.Desert, MAP_STAT.MaxFriends] = 5;
 global.MapProperties[# MAP.Desert, MAP_STAT.Tile] = spr_Desert;
 
 var desert_enemy_areas = ds_map_create();
-ds_map_add(desert_enemy_areas, "area1", [800, 800, 1300, 1000, 2]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "area1", [100, 750, 450, 1200, 4]); //x1, y1, x2, y2, enemy number
 ds_map_add(desert_enemy_areas, "area2", [900, 1200, 1500, 1800, 3]);
 ds_map_add(desert_enemy_areas, "area3", [900, 100, 1900, 500, 5]);
 ds_map_add(desert_enemy_areas, "area4", [2300, 400, 3000, 1000, 5]);
@@ -193,6 +198,11 @@ var desert_bomb_areas = ds_map_create();
 ds_map_add(desert_bomb_areas, "area1", [3300, 1800, 3800, 2200]); //x1, y1, x2, y2
 ds_map_add(desert_bomb_areas, "area2", [2700, 0, 3800, 500]);
 global.MapProperties[# MAP.Desert, MAP_STAT.BombAreas] = desert_bomb_areas;
+
+var desert_hostage_areas = ds_map_create();
+ds_map_add(desert_hostage_areas, "area1", [200, 1200, 500, 1400]); //x1, y1, x2, y2
+ds_map_add(desert_hostage_areas, "area2", [800, 1700, 1000, 2000]);
+global.MapProperties[# MAP.Desert, MAP_STAT.HostageAreas] = desert_hostage_areas;
 
 
 global.MapProperties[# MAP.RainForest, MAP_STAT.Name] = "Rain forest";
@@ -225,6 +235,11 @@ ds_map_add(rainforest_bomb_areas, "area1", [3300, 1800, 3800, 2200]); //x1, y1, 
 ds_map_add(rainforest_bomb_areas, "area2", [2700, 0, 3800, 500]);
 global.MapProperties[# MAP.RainForest, MAP_STAT.BombAreas] = rainforest_bomb_areas;
 
+var rainforest_hostage_areas = ds_map_create();
+ds_map_add(rainforest_hostage_areas, "area1", [200, 1200, 500, 1400]); //x1, y1, x2, y2
+ds_map_add(rainforest_hostage_areas, "area2", [800, 1700, 1000, 2000]);
+global.MapProperties[# MAP.RainForest, MAP_STAT.HostageAreas] = rainforest_hostage_areas;
+
 global.MapProperties[# MAP.City, MAP_STAT.MapStartColor] = c_white;
 global.MapProperties[# MAP.City, MAP_STAT.Name] = "City";
 global.MapProperties[# MAP.City, MAP_STAT.MapEndColor] = c_orange;
@@ -253,6 +268,11 @@ var city_bomb_areas = ds_map_create();
 ds_map_add(city_bomb_areas, "area1", [3300, 1800, 3800, 2200]); //x1, y1, x2, y2
 ds_map_add(city_bomb_areas, "area2", [2700, 0, 3800, 500]);
 global.MapProperties[# MAP.City, MAP_STAT.BombAreas] = city_bomb_areas;
+
+var city_hostage_areas = ds_map_create();
+ds_map_add(city_hostage_areas, "area1", [200, 1200, 500, 1400]); //x1, y1, x2, y2
+ds_map_add(city_hostage_areas, "area2", [800, 1700, 1000, 2000]);
+global.MapProperties[# MAP.City, MAP_STAT.HostageAreas] = city_hostage_areas;
 
 
 global.MapProperties[# MAP.Nuclear, MAP_STAT.MapStartColor] = c_white;
@@ -284,6 +304,11 @@ ds_map_add(nuclear_bomb_areas, "area1", [3300, 1800, 3800, 2200]); //x1, y1, x2,
 ds_map_add(nuclear_bomb_areas, "area2", [2700, 0, 3800, 500]);
 global.MapProperties[# MAP.Nuclear, MAP_STAT.BombAreas] = nuclear_bomb_areas;
 
+var nuclear_hostage_areas = ds_map_create();
+ds_map_add(nuclear_hostage_areas, "area1", [200, 1200, 500, 1400]); //x1, y1, x2, y2
+ds_map_add(nuclear_hostage_areas, "area2", [800, 1700, 1000, 2000]);
+global.MapProperties[# MAP.Nuclear, MAP_STAT.HostageAreas] = nuclear_hostage_areas;
+
 
 
 enum KEY{
@@ -292,9 +317,10 @@ enum KEY{
 	CycleRight, ShootMouse, Reload,
 	GrenadeThrowMouse, Pause, ToggleNightVision, ChangeMode,
 	Prone, WeaponAttachments, SelectBot, CommandBot, 
-	BuyMenu, HoldStamina, DropWeapon, Console,
+	BuyMenu, DropWeapon, Console,
 	KnifeLight, KnifeHeavy, UseItem, Scope,
-	Scoreboard,
+	Scoreboard, HostageTake, Defuse, Door,
+	BotInfo, Run, Walk,
 	Total
 }
 
@@ -306,9 +332,10 @@ ds_list_add(
 	ord("E"), mb_left, ord("R"),
 	mb_left, vk_escape, ord("N"), ord("V"),
 	ord("Y"), ord("T"), ord("X"), ord("C"),
-	ord("B"), vk_shift, ord("G"), 192,
+	ord("B"), ord("G"), 192,
 	mb_left, mb_right, mb_left, mb_right,
-	vk_tab
+	vk_tab, vk_space, vk_space, vk_space,
+	vk_shift, vk_lcontrol, vk_shift
 );
 
 global.DefaultKeyBinds = ds_list_create();
@@ -374,7 +401,10 @@ enum STATES{
 	MovePredictive,
 	MoveCommand,
 	NoMove,
-	FleeDanger
+	FleeDanger,
+	Prone,
+	MACHINE_GUN,
+	Walk
 }
 
 rank_database();

@@ -1,7 +1,7 @@
 /// @description Create objects
 if(is_local == true){
-	if (!instance_exists(oEconomics)) {
-		instance_create_layer(x, y, "OtherO", oEconomics);
+	if (!instance_exists(oGameController)) {
+		instance_create_layer(x, y, "OtherO", oGameController);
 	}
 
 	if(global.DrawParticles == true){

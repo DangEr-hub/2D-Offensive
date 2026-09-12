@@ -1,4 +1,6 @@
 /* oNetworkManager clean up event */
+global.sudo = false;
+
 if(ds_exists(player_stats, ds_type_map)){
 	var stat_keys = ds_map_keys_to_array(player_stats);
 	for(var stat_index = 0; stat_index < array_length(stat_keys); stat_index++){

@@ -69,7 +69,7 @@ function lottery_start(){
 
 function draw_lottery(pos_x, pos_y, w, h){
     draw_set_alpha(global.GUIHUDAlpha);
-    draw_set_color(make_color_rgb(0, 76, 76));
+    draw_set_color(MENU_COLOR);
     draw_rectangle(pos_x, pos_y, pos_x + w, pos_y + h, false);
 		
 	draw_set_alpha(1);
@@ -77,8 +77,8 @@ function draw_lottery(pos_x, pos_y, w, h){
     var center_x = pos_x + w * 0.5;
     var center_y = pos_y + h * 0.5;
 
-    var slot_width = 64 * global.GUIMultiplier;
-    var slot_height = h - 8 * global.GUIMultiplier;
+    var slot_width = 64 * global.gui_scale;
+    var slot_height = h - 8 * global.gui_scale;
     var item_count = array_length(lottery_items);
 
     for(var i = 0; i < item_count; i++){
@@ -143,7 +143,7 @@ function draw_lottery(pos_x, pos_y, w, h){
 	        pos_y,
 	        center_x,
 	        pos_y + h,
-	        4 * global.GUIMultiplier
+	        4 * global.gui_scale
 	    );
 		
 		draw_set_alpha(1);

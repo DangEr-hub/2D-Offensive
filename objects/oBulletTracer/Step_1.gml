@@ -5,11 +5,42 @@ if(impact_ex != -1 && impact_ey != -1){ xx = impact_ex; yy = impact_ey; }
 
 
 var wall_collision = process_bullet_collision(xx, yy, x, y, stats.Shot_x, stats.Shot_y, oParentTile, false);
+if(wall_collision != noone
+&& shot_hits_machine_gun_operator(wall_collision.inst_id, xx, yy, stats.Shot_x, stats.Shot_y)){
+	wall_collision = noone;
+}
+if(wall_collision != noone && wall_collision.inst_id.hideable){
+	hideable_col = true;
+}
 
 // Pokud je zeď příliš tenká, je potřeba to řešit přes pozici a ne přes kolizi
 if(wall_collision == noone && instance_exists(stats.Object)){
 	var col = collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false)
-	if(col != noone && stats.Item_id != Item.basic_machine_gun){
+	var hits_machine_gun_operator = col != noone
+		&& shot_hits_machine_gun_operator(col, stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y);
+	if(col != noone && !hits_machine_gun_operator && stats.Item_id != Item.basic_machine_gun){
+		if(col.hideable){
+			var hideable_collision = find_collision_point(
+				stats.Object_x,
+				stats.Object_y,
+				stats.Shot_x,
+				stats.Shot_y,
+				col
+			);
+			if(array_length(hideable_collision) > 0){
+				var distance_to_cover = point_distance(
+					stats.Object_x,
+					stats.Object_y,
+					hideable_collision[0],
+					hideable_collision[1]
+				);
+				var tracer_distance = point_distance(stats.Object_x, stats.Object_y, x, y);
+				if(tracer_distance >= distance_to_cover){
+					hideable_col = true;
+				}
+			}
+		}
+
 		var glass_modifier = 1;
 		if(col.transparent){
 			glass_modifier = 50;
@@ -56,7 +87,7 @@ if(wall_collision != noone){
 			#region Bullet and shrapnel hits wall
 		
 				
-			play_sound(wall_collision.xx, wall_collision.yy, wall_sound, stats.Object);
+			play_impact_sound(wall_collision.xx, wall_collision.yy, wall_sound, stats.Object, wall_collision.inst_id);
 				
 			#region Barrel
 			if(wall_collision.inst_id.object_index == oBarrel){
@@ -167,7 +198,7 @@ if(wall_collision != noone){
 				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
 			}
 		
-		play_sound(x, y, wall_sound, stats.Object);
+		play_impact_sound(x, y, wall_sound, stats.Object, wall_collision.inst_id);
 		
 			instance_destroy(self);
 			exit;

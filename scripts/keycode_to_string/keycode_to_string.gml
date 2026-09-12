@@ -3,6 +3,7 @@ function keycode_to_string(keycode){
         // Modifikátory
         case vk_shift:     return "Shift";
         case vk_control:   return "Ctrl";
+        case vk_lcontrol:  return "Left Ctrl";
         case vk_alt:       return "Alt";
 
         // Speciální

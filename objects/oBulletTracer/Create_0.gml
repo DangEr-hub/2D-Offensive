@@ -36,6 +36,8 @@ xx = 0;
 yy = 0;
 impact_sx = -1;
 impact_sy = -1;
+hideable_col = false;
+shooter_prone = false;
 
 owner_id = -1;
 bullet_network_id = -1;

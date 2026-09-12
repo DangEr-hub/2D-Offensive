@@ -1,5 +1,5 @@
 draw_set_font(set_font("GUI_small"));
-zui_set_size(128 * global.GUIMultiplier, 32);
+zui_set_size(128 * global.gui_scale, 32);
 alpha_value = 0;
 cursor_pos = 0;
 callback = -1;

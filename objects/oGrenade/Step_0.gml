@@ -158,7 +158,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			if(is_struct(stats) && variable_struct_exists(stats, "Owner_id")){
 				owner_id = stats.Owner_id;
 			}
-			create_molotov_impact(
+			var molotov_impact = create_molotov_impact(
 				x,
 				y,
 				global.ItemIndex[#stats.Item_id, ItemStat.Damage],
@@ -166,8 +166,12 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 				stats.Item_id,
 				stats.Owner_name,
 				owner_id,
-				true
+				true,
+				network_id
 			);
+			if(IS_NET && network_authority && instance_exists(molotov_impact)){
+				network_id_reserved_for_impact = true;
+			}
 			instance_destroy(id);
 
 		}else if(stats.Item_id == Item.StickyGrenade){

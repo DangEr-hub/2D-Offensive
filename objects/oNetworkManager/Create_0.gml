@@ -6,7 +6,17 @@ enum PLAYER_FLAGS {
 	FLASHED = 8,
 	PRONE = 16,
 	THROWING_GRENADE = 32,
-	PLANTING = 64
+	PLANTING = 64,
+	DEFUSING = 128,
+	HEALING = 256,
+	WALKING = 512,
+	RUNNING = 1024
+}
+
+enum DEFUSE_TARGET {
+	NONE,
+	BOMB,
+	HOSTAGE
 }
 
 network_set_config(network_config_use_non_blocking_socket, true);
@@ -25,13 +35,14 @@ is_server = false;
 is_connected = false;
 server_socket = -1;
 client_socket = -1;
-my_player_id = -1;
+my_pid = -1;
 
 // Client tracking (server only)
 clients = ds_map_create();
 client_timeout = ds_map_create();
 timeout_threshold = 5000; // 5 seconds without heartbeat = disconnect
 server_timeout_threshold = 5000;
+server_response_warning_threshold = 1000;
 last_server_packet_time = current_time;
 server_disconnect_handled = false;
 
@@ -79,7 +90,18 @@ enum PACKET {
 	STATS_SYNC,
 	ROUND_END,
 	BOMB_SYNC,
-	ITEM_USE_SYNC
+	ITEM_USE_SYNC,
+	HOSTAGE_SYNC,
+	ITEM_ACTION_SYNC,
+	MACHINE_GUN_SYNC,
+	SUDO_SYNC
+}
+
+enum MACHINE_GUN_SYNC_ACTION {
+	REQUEST_MOUNT,
+	REQUEST_DISMOUNT,
+	STATE,
+	AMMO
 }
 
 enum BOMB_SYNC_ACTION {
@@ -87,10 +109,16 @@ enum BOMB_SYNC_ACTION {
 	PLANTED
 }
 
+enum HOSTAGE_SYNC_ACTION {
+	TAKEN,
+	DAMAGE
+}
+
 enum GRENADE_SYNC_ACTION {
 	REQUEST_SPAWN,
 	SPAWN,
-	EXPLODE
+	EXPLODE,
+	MOLOTOV_STATE
 }
 
 enum AIRPLANE_SYNC_ACTION {
@@ -118,6 +146,9 @@ ping_timer = 0;
 ping_ms = 0;
 stats_sync_timer = 0;
 stats_sync_interval = .25;
+game_win_diamond_granted = false;
+molotov_sync_timer = 0;
+molotov_sync_interval = .5;
 ping_send_time = 0;
 
 // Sequence numbers for packet ordering

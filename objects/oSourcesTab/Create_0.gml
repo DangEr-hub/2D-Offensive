@@ -6,8 +6,8 @@ zui_set_size(tab_width, tab_height);
 
 pos_x = zui_get_width() * .005;
 pos_y = zui_get_height() * .07;
-gap = max(120 * global.GUIMultiplier, 160);
-gap_x = max(160 * global.GUIMultiplier, 200);
+gap = max(120 * global.gui_scale, 160);
+gap_x = max(160 * global.gui_scale, 200);
 text_height = string_height("a")*2;
 max_i = 21;
 
@@ -26,7 +26,6 @@ source_names = [
 	"AWM: ",
 	"Spas-12: ",
 	"Empty magazine: ",
-	"SSG 08: ",
 	"Bullet nearby: ",
 	"Glock-17: ",
 	"USP unsilenced: ",
@@ -55,7 +54,7 @@ source_names = [
 	"Beep: ",
 	"Machine gun: ",
 	"SG550: ",
-	"MK18: ",
+	"Scar: ",
 	"P250: ",
 	"MAC11: ",
 	"Bot ref (1): ",
@@ -70,18 +69,17 @@ source_names = [
 	"Five-seven: ",
 	"Dragunov: ",
 	"TEC-9: ",
-	"SCAR: ",
 	"Galil: ",
-	"Leg anim.: ",
 	"Console: ",
 	"MP7: ",
+	"SCAR: ",
+	"M200: ",
 ];
 
 sources = [
 	"https://pixabay.com/sound-effects/sniper-rifle-5989/",
 	"https://pixabay.com/sound-effects/shotgun-firing-4-6746/",
 	"https://pixabay.com/sound-effects/empty-gun-shot-6209/",
-	"https://pixabay.com/sound-effects/gun-shot-1-176892/",
 	"https://pixabay.com/sound-effects/visceralbulletimpacts-6738/",
 	"https://freesound.org/people/JD_Brick_Productions/sounds/678527/",
 	"https://freesound.org/people/JD_Brick_Productions/sounds/678527/",
@@ -125,11 +123,11 @@ sources = [
 	"https://pixabay.com/sound-effects/film-special-effects-072803-semi-auto-pistol-26934/",
 	"https://pixabay.com/sound-effects/film-special-effects-perdition-1911-pistol-82365/",
 	"https://pixabay.com/sound-effects/film-special-effects-gunfire-single-shot-colt-peacemaker-94951/",
-	"https://pixabay.com/sound-effects/film-special-effects-ar15-168855/",
 	"https://pixabay.com/sound-effects/film-special-effects-beretta-92fs-168853/",
-	"https://opengameart.org/content/animated-top-down-survivor-player",
 	"https://marketplace.gamemaker.io/assets/1356/developer-console",
 	"https://pixabay.com/sound-effects/film-special-effects-m1911a1-168854/",
+	"https://pixabay.com/sound-effects/film-special-effects-single-gunshot-52-80191/",
+	"https://pixabay.com/sound-effects/film-special-effects-sniper-rifle-firing-2-39885/"
 	
 	
 	
@@ -150,8 +148,8 @@ for(i = 0; i < array_length(sources); i++){
     );
     with(src_but){
         zui_set_anchor(0.5, 0);
-        zui_set_width(64 * global.GUIMultiplier);
-        zui_set_height(16 * global.GUIMultiplier);
+        zui_set_width(64 * global.gui_scale);
+        zui_set_height(16 * global.gui_scale);
         caption = "Open";
 
         link_url = other.sources[other.i];

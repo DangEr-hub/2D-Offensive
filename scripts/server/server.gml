@@ -1,6 +1,7 @@
 /* Server-side networking functions */
 function start_server() {
     with (oNetworkManager) {
+		global.sudo = false;
         server_socket = network_create_socket_ext(network_type, server_port);
         
         if (server_socket < 0) {
@@ -61,12 +62,219 @@ function handle_server_receive(sender_ip, sender_port) {
 			case PACKET.BOMB_SYNC: handle_bomb_sync_server(key); break;
 
 			case PACKET.ITEM_USE_SYNC: handle_item_use_update_server(key); break;
+
+			case PACKET.ITEM_ACTION_SYNC: handle_item_action_server(key); break;
+
+			case PACKET.MACHINE_GUN_SYNC: handle_machine_gun_sync_server(key); break;
 			
 			
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
         }
     }
+}
+
+function server_set_client_sudo(player_id, enabled){
+	with(oNetworkManager){
+		if(!is_server) return false;
+
+		var socket_key = ds_map_find_first(clients);
+		while(!is_undefined(socket_key)){
+			if(ds_map_find_value(clients, socket_key) == player_id){
+				buffer_seek(send_buffer, buffer_seek_start, 0);
+				buffer_write(send_buffer, buffer_u8, PACKET.SUDO_SYNC);
+				buffer_write(send_buffer, buffer_u32, send_sequence++);
+				buffer_write(send_buffer, buffer_u8, player_id);
+				buffer_write(send_buffer, buffer_u8, enabled ? 1 : 0);
+				sent_server_udp(server_socket, socket_key, send_buffer);
+				return true;
+			}
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+	return false;
+}
+
+function handle_machine_gun_sync_server(socket_key) {
+	with (oNetworkManager) {
+		if (!ds_map_exists(clients, socket_key)) return;
+
+		var action = buffer_read(receive_buffer, buffer_u8);
+		var gun_x = buffer_read(receive_buffer, buffer_f16);
+		var gun_y = buffer_read(receive_buffer, buffer_f16);
+		var pid = ds_map_find_value(clients, socket_key);
+
+		if (action == MACHINE_GUN_SYNC_ACTION.REQUEST_MOUNT) {
+			server_mount_machine_gun(pid, gun_x, gun_y);
+		} else if (action == MACHINE_GUN_SYNC_ACTION.REQUEST_DISMOUNT) {
+			var gun = find_machine_gun_at(gun_x, gun_y);
+			if (instance_exists(gun) && gun.operator_pid == pid) server_release_machine_gun(pid);
+		}
+	}
+}
+
+function server_mount_machine_gun(pid, gun_x, gun_y) {
+	with (oNetworkManager) {
+		if (!is_server) return false;
+
+		var gun = find_machine_gun_at(gun_x, gun_y);
+		var player = find_instance_by_network_id(oPlayer, pid);
+		if (!instance_exists(gun) || !instance_exists(player)) return false;
+		if (instance_exists(gun.stats.Object) || gun.operator_pid >= 0) return false;
+		if (instance_exists(find_machine_gun_by_pid(pid))) return false;
+		if (player.stats.Health_points <= 0 || player.moving_state != STATES_PLAYER.none_state) return false;
+		if (point_distance(player.x, player.y, gun.x, gun.y) > 160) return false;
+
+		var player_data = server_get_player_state(pid);
+		var primary_id = ds_map_find_value(player_data, "primary_id");
+		if (pid == my_pid) primary_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+		if (is_undefined(primary_id)) primary_id = ds_map_find_value(player_data, "weapon_id");
+		if (!is_undefined(primary_id) && primary_id != Item.None) return false;
+
+		gun.operator_pid = pid;
+		gun.stats.Object = player;
+		var mount_pos = local_to_world(0, 96, gun.image_angle, gun);
+
+		if (pid == my_pid) {
+			mount_local_player_to_machine_gun(player, gun);
+		} else {
+			player.x = mount_pos[0];
+			player.y = mount_pos[1];
+			player.target_x = player.x;
+			player.target_y = player.y;
+			player.moving_state = STATES_PLAYER.machine_gun_state;
+			player.network_moving_state = STATES_PLAYER.machine_gun_state;
+			player.network_weapon_id = Item.basic_machine_gun;
+			player.network_scope = gun.stats.Slot_scope;
+			player.network_barrel = gun.stats.Slot_barrel;
+			player.network_grip = gun.stats.Slot_grip;
+			player.network_suppressor = gun.stats.Slot_suppressor;
+		}
+
+		ds_map_set(player_data, "x", mount_pos[0]);
+		ds_map_set(player_data, "y", mount_pos[1]);
+		ds_map_set(player_data, "moving_state", STATES_PLAYER.machine_gun_state);
+		ds_map_set(player_data, "active_weapon_slot", OtherSlot.Primary);
+		ds_map_set(player_data, "weapon_id", Item.basic_machine_gun);
+		ds_map_set(player_data, "weapon_scope", gun.stats.Slot_scope);
+		ds_map_set(player_data, "weapon_barrel", gun.stats.Slot_barrel);
+		ds_map_set(player_data, "weapon_grip", gun.stats.Slot_grip);
+		ds_map_set(player_data, "weapon_suppressor", gun.stats.Slot_suppressor);
+		ds_map_set(player_data, "weapon_ammo", gun.stats.Ammo);
+		ds_map_set(player_data, "weapon_clip_ammo", gun.stats.Clip_ammo);
+		ds_map_set(player_data, "primary_id", Item.basic_machine_gun);
+		ds_map_set(player_data, "primary_ammo", gun.stats.Ammo);
+		ds_map_set(player_data, "primary_clip_ammo", gun.stats.Clip_ammo);
+
+		server_machine_gun_state_broadcast(gun);
+		return true;
+	}
+	return false;
+}
+
+function server_release_machine_gun(pid) {
+	with (oNetworkManager) {
+		if (!is_server) return false;
+		var gun = find_machine_gun_by_pid(pid);
+		if (!instance_exists(gun)) return false;
+
+		var player = find_instance_by_network_id(oPlayer, pid);
+		var player_data = server_get_player_state(pid);
+		var ammo = ds_map_find_value(player_data, "weapon_ammo");
+		var clip_ammo = ds_map_find_value(player_data, "weapon_clip_ammo");
+		if (!is_undefined(ammo)) gun.stats.Ammo = max(0, ammo);
+		if (!is_undefined(clip_ammo)) gun.stats.Clip_ammo = max(0, clip_ammo);
+
+		if (pid == my_pid && instance_exists(player)) {
+			dismount_local_player_from_machine_gun(player, gun);
+		} else if (instance_exists(player)) {
+			player.moving_state = STATES_PLAYER.none_state;
+			player.network_moving_state = STATES_PLAYER.none_state;
+			player.network_weapon_id = Item.None;
+		}
+
+		gun.stats.Object = noone;
+		gun.operator_pid = -1;
+		ds_map_set(player_data, "moving_state", STATES_PLAYER.none_state);
+		ds_map_set(player_data, "weapon_id", Item.None);
+		ds_map_set(player_data, "weapon_ammo", 0);
+		ds_map_set(player_data, "weapon_clip_ammo", 0);
+		ds_map_set(player_data, "primary_id", Item.None);
+		ds_map_set(player_data, "primary_ammo", 0);
+		ds_map_set(player_data, "primary_clip_ammo", 0);
+
+		server_machine_gun_state_broadcast(gun);
+		return true;
+	}
+	return false;
+}
+
+function server_machine_gun_state_broadcast(gun, socket_key = "") {
+	with (oNetworkManager) {
+		if (!is_server || !instance_exists(gun)) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.MACHINE_GUN_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, MACHINE_GUN_SYNC_ACTION.STATE);
+		buffer_write(send_buffer, buffer_f16, gun.x);
+		buffer_write(send_buffer, buffer_f16, gun.y);
+		buffer_write(send_buffer, buffer_f16, gun.image_angle);
+		buffer_write(send_buffer, buffer_s16, gun.operator_pid);
+		buffer_write(send_buffer, buffer_u16, max(0, gun.stats.Ammo));
+		buffer_write(send_buffer, buffer_u16, max(0, gun.stats.Clip_ammo));
+		buffer_write(send_buffer, buffer_u8, gun.stats.Slot_scope);
+		buffer_write(send_buffer, buffer_u8, gun.stats.Slot_barrel);
+		buffer_write(send_buffer, buffer_u8, gun.stats.Slot_grip);
+		buffer_write(send_buffer, buffer_u8, gun.stats.Slot_suppressor);
+
+		if (socket_key != "") {
+			sent_server_udp(server_socket, socket_key, send_buffer);
+			return;
+		}
+
+		var key = ds_map_find_first(clients);
+		for (var i = 0; i < ds_map_size(clients); i++) {
+			sent_server_udp(server_socket, key, send_buffer);
+			key = ds_map_find_next(clients, key);
+		}
+	}
+}
+
+function server_machine_gun_ammo_changed(pid, ammo, clip_ammo) {
+	with (oNetworkManager) {
+		var gun = find_machine_gun_by_pid(pid);
+		if (!instance_exists(gun)) return;
+		gun.stats.Ammo = max(0, ammo);
+		gun.stats.Clip_ammo = max(0, clip_ammo);
+		var player_data = server_get_player_state(pid);
+		ds_map_set(player_data, "weapon_ammo", gun.stats.Ammo);
+		ds_map_set(player_data, "weapon_clip_ammo", gun.stats.Clip_ammo);
+		ds_map_set(player_data, "primary_ammo", gun.stats.Ammo);
+		ds_map_set(player_data, "primary_clip_ammo", gun.stats.Clip_ammo);
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.MACHINE_GUN_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, MACHINE_GUN_SYNC_ACTION.AMMO);
+		buffer_write(send_buffer, buffer_f16, gun.x);
+		buffer_write(send_buffer, buffer_f16, gun.y);
+		buffer_write(send_buffer, buffer_u16, gun.stats.Ammo);
+		buffer_write(send_buffer, buffer_u16, gun.stats.Clip_ammo);
+
+		var key = ds_map_find_first(clients);
+		for (var i = 0; i < ds_map_size(clients); i++) {
+			sent_server_udp(server_socket, key, send_buffer);
+			key = ds_map_find_next(clients, key);
+		}
+	}
+}
+
+function server_send_machine_gun_snapshots(socket_key) {
+	var gun_count = instance_number(oMachineGun);
+	for (var i = 0; i < gun_count; i++) {
+		server_machine_gun_state_broadcast(instance_find(oMachineGun, i), socket_key);
+	}
 }
 
 function handle_bomb_sync_server(socket_key) {
@@ -100,7 +308,11 @@ function handle_item_use_update_server(socket_key) {
 
 		var player = find_instance_by_network_id(oPlayer, pid);
 		if (instance_exists(player)) {
-			player.network_item_use_id = item_use_id;
+			if (player.network_item_action_timer > -1) {
+				player.network_item_use_restore_id = item_use_id;
+			} else {
+				player.network_item_use_id = item_use_id;
+			}
 		}
 
 		server_item_use_broadcast(pid, item_use_id);
@@ -116,6 +328,118 @@ function server_item_use_broadcast(pid, item_use_id) {
 		buffer_write(send_buffer, buffer_u32, send_sequence++);
 		buffer_write(send_buffer, buffer_u8, pid);
 		buffer_write(send_buffer, buffer_u16, item_use_id);
+
+		var socket_key = ds_map_find_first(clients);
+		for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
+			sent_server_udp(server_socket, socket_key, send_buffer);
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+}
+
+function handle_item_action_server(socket_key) {
+	with (oNetworkManager) {
+		if (!ds_map_exists(clients, socket_key)) return;
+
+		var pid = ds_map_find_value(clients, socket_key);
+		var item_id = buffer_read(receive_buffer, buffer_u16);
+		var value = buffer_read(receive_buffer, buffer_f16);
+		server_process_item_action(pid, item_id, value);
+	}
+}
+
+function server_process_item_action(pid, item_id, requested_value = 0) {
+	with (oNetworkManager) {
+		if (!is_server) return false;
+
+		var player_data = ds_map_find_value(player_states, pid);
+		var player = find_instance_by_network_id(oPlayer, pid);
+		if (is_undefined(player_data) || !instance_exists(player)) return false;
+		if (player.stats.Health_points <= 0) return false;
+
+		if (is_caliber_box_item(item_id)) {
+			var weapon_id = ds_map_find_value(player_data, "weapon_id");
+			var current_clip = ds_map_find_value(player_data, "weapon_clip_ammo");
+			if (is_undefined(weapon_id) || is_undefined(current_clip)) return false;
+			if (global.ItemIndex[# weapon_id, ItemStat.caliber_type] != global.ItemIndex[# item_id, ItemStat.caliber_type]) return false;
+
+			var amount = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
+			var requested_clip = max(0, round(requested_value));
+			if (requested_clip < current_clip || requested_clip > current_clip + amount) return false;
+
+			ds_map_set(player_data, "weapon_clip_ammo", requested_clip);
+			weapon_sync = true;
+			server_item_action_broadcast(pid, item_id, amount, requested_clip);
+			if (player.is_remote) {
+				if (player.network_item_action_timer <= -1) player.network_item_use_restore_id = player.network_item_use_id;
+				player.network_item_use_id = item_id;
+				player.network_item_action_timer = 0.25 * game_get_speed(gamespeed_fps);
+			}
+			damage_indicator("+" + string(round(amount)), player.x, player.y - 30, c_white, spr_Icons, ICON.ammo);
+			return true;
+		}
+
+		if (item_id == Item.dilatation_pill) {
+			global.time_step = .5;
+			if (instance_exists(global.local_player)) {
+				global.local_player.dilatation_timer = DILATATION_TIME;
+			}
+			if (player.is_remote) {
+				if (player.network_item_action_timer <= -1) player.network_item_use_restore_id = player.network_item_use_id;
+				player.network_item_use_id = item_id;
+				player.network_item_action_timer = 0.25 * game_get_speed(gamespeed_fps);
+			}
+			server_item_action_broadcast(pid, item_id, 0, DILATATION_TIME);
+			return true;
+		}
+
+		if (item_id != Item.HealingKit) return false;
+
+		var state = ds_map_find_value(player_data, "state");
+		var hp = ds_map_find_value(player_data, "hp");
+		if (is_undefined(hp) || hp <= 0) return false;
+		if (is_undefined(state) || (state & PLAYER_FLAGS.HEALING) == 0) {
+			server_item_action_broadcast(pid, item_id, 0, hp);
+			return false;
+		}
+
+		var max_hp = global.player_stats.Max_health;
+		var amount = max(0, min(global.ItemIndex[# Item.HealingKit, ItemStat.Damage], max_hp - hp));
+		hp += amount;
+		ds_map_set(player_data, "hp", hp);
+		ds_map_set(player_data, "hp_regen_at", current_time + 500);
+		ds_map_set(player_data, "state", state - PLAYER_FLAGS.HEALING);
+
+		with (player) {
+			stats.Health_points = hp;
+			stats.Damage_health_points = hp;
+			Healing = false;
+			HealingTime = -1;
+			HealingItemId = Item.None;
+			CanShoot = true;
+
+			if (amount > 0) {
+				damage_indicator("+" + string(round(amount)), x, y - 30, c_green, spr_Icons, ICON.health);
+			}
+		}
+
+		server_item_action_broadcast(pid, item_id, amount, hp);
+
+		return true;
+	}
+}
+
+function server_item_action_broadcast(pid, item_id, amount, value) {
+	with (oNetworkManager) {
+		if (!is_server) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.ITEM_ACTION_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, pid);
+		buffer_write(send_buffer, buffer_u16, item_id);
+		buffer_write(send_buffer, buffer_f16, amount);
+		buffer_write(send_buffer, buffer_f16, value);
 
 		var socket_key = ds_map_find_first(clients);
 		for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
@@ -144,6 +468,7 @@ function server_process_bomb_plant(planter_pid, plant_x, plant_y) {
 
 	global.bomb_planter_pid = planter_pid;
 	var bomb = instance_create_layer(plant_x, plant_y, "ItemsO", oBomb);
+	bomb.image_angle = irandom(359);
 	planter.planting = false;
 	planter.planting_value = 0;
 	server_bomb_plant_broadcast(planter_pid, bomb);
@@ -162,6 +487,7 @@ function server_bomb_plant_broadcast(planter_pid, bomb) {
 		buffer_write(send_buffer, buffer_f16, bomb.x);
 		buffer_write(send_buffer, buffer_f16, bomb.y);
 		buffer_write(send_buffer, buffer_u32, global.bomb_timer);
+		buffer_write(send_buffer, buffer_u16, round(bomb.image_angle));
 
 		var socket_key = ds_map_find_first(clients);
 		for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
@@ -673,13 +999,20 @@ function process_server_respawn(){
         if (instance_exists(p)) {
             spawn_x = p.respawn_x;
             spawn_y = p.respawn_y;
+			reset_hit_map(p);
             with (p) {
                 stats.Health_points = global.player_stats.Max_health;
                 death_from_server = false;
                 death_attacker_pid = -1;
-                KilledByName = "No one";
-                KilledByWeapon = "Nothing";
+				death_handled = false;
+				KilledByName = "No one";
+				KilledByWeapon = "Nothing";
 				player_can_shoot = true;
+				defusing = false;
+				defusing_time = 0;
+				defusing_max = DEFUSE_TIME;
+				defusing_target = DEFUSE_TARGET.NONE;
+				defusing_hostage = noone;
                 x = spawn_x;
                 y = spawn_y;
                 target_x = spawn_x;
@@ -687,9 +1020,12 @@ function process_server_respawn(){
                 depth = 100;
             }
         }
-        ds_map_set(player_data, "x", spawn_x);
-        ds_map_set(player_data, "y", spawn_y);
-        ds_map_set(player_data, "state", 0);
+			ds_map_set(player_data, "x", spawn_x);
+			ds_map_set(player_data, "y", spawn_y);
+			ds_map_set(player_data, "state", 0);
+			ds_map_set(player_data, "defusing_time", 0);
+			ds_map_set(player_data, "defusing_max", DEFUSE_TIME);
+			ds_map_set(player_data, "defusing_target", DEFUSE_TARGET.NONE);
 
         player_respawn_broadcast(0, global.player_stats.Max_health, spawn_x, spawn_y);
 		server_try_unlock_round();
@@ -737,13 +1073,20 @@ function handle_player_respawn_server(socket_key) {
         if (instance_exists(player_obj)) {
             spawn_x = player_obj.respawn_x;
             spawn_y = player_obj.respawn_y;
+			reset_hit_map(player_obj);
             with (player_obj) {
                 stats.Health_points = global.player_stats.Max_health;
                 death_from_server = false;
                 death_attacker_pid = -1;
+				death_handled = false;
                 KilledByName = "No one";
-                KilledByWeapon = "Nothing";
+				KilledByWeapon = "Nothing";
 				player_can_shoot = true;
+				defusing = false;
+				defusing_time = 0;
+				defusing_max = DEFUSE_TIME;
+				defusing_target = DEFUSE_TARGET.NONE;
+				defusing_hostage = noone;
 				x = spawn_x;
 				y = spawn_y;
                 target_x = spawn_x;
@@ -751,9 +1094,12 @@ function handle_player_respawn_server(socket_key) {
 				depth = 100;
             }
         }
-        ds_map_set(player_data, "x", spawn_x);
-        ds_map_set(player_data, "y", spawn_y);
-        ds_map_set(player_data, "state", 0);
+		ds_map_set(player_data, "x", spawn_x);
+		ds_map_set(player_data, "y", spawn_y);
+		ds_map_set(player_data, "state", 0);
+		ds_map_set(player_data, "defusing_time", 0);
+		ds_map_set(player_data, "defusing_max", DEFUSE_TIME);
+		ds_map_set(player_data, "defusing_target", DEFUSE_TARGET.NONE);
 
         player_respawn_broadcast(pid, global.player_stats.Max_health, spawn_x, spawn_y);
 		server_try_unlock_round();
@@ -803,7 +1149,7 @@ function server_shoot_interval_ms(pid, item_id) {
     return interval_frames * (1000 / game_get_speed(gamespeed_fps));
 }
 
-function server_complete_reload(player_data, item_id) {
+function server_complete_reload(player_data, item_id, pid = -1) {
     if (!server_valid_weapon_id(item_id)) return;
 
     var max_ammo = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
@@ -833,6 +1179,9 @@ function server_complete_reload(player_data, item_id) {
     ds_map_set(player_data, "weapon_clip_ammo", clip_ammo);
     ds_map_set(player_data, "weapon_reloading", false);
     ds_map_set(player_data, "weapon_reload_until", -1);
+	if (item_id == Item.basic_machine_gun && pid >= 0) {
+		server_machine_gun_ammo_changed(pid, ammo, clip_ammo);
+	}
 }
 
 function server_update_reload_state(pid, state_flags) {
@@ -848,7 +1197,7 @@ function server_update_reload_state(pid, state_flags) {
         if (is_undefined(reload_until)) reload_until = -1;
 
         if (is_reloading_server && reload_until >= 0 && current_time + 100 >= reload_until) {
-            server_complete_reload(player_data, item_id);
+            server_complete_reload(player_data, item_id, pid);
             is_reloading_server = false;
             reload_until = -1;
         }
@@ -864,10 +1213,19 @@ function server_update_reload_state(pid, state_flags) {
                 ds_map_set(player_data, "weapon_reloading", true);
                 ds_map_set(player_data, "weapon_reload_until", current_time + server_reload_duration_ms(item_id));
             }
-        } else if (is_reloading_server) {
+        } else if (is_reloading_server && item_id != Item.basic_machine_gun) {
             ds_map_set(player_data, "weapon_reloading", false);
             ds_map_set(player_data, "weapon_reload_until", -1);
         }
+
+		is_reloading_server = ds_map_find_value(player_data, "weapon_reloading");
+		if (is_undefined(is_reloading_server)) is_reloading_server = false;
+		if (is_reloading_server) {
+			state_flags |= PLAYER_FLAGS.RELOADING;
+		} else if ((state_flags & PLAYER_FLAGS.RELOADING) != 0) {
+			state_flags -= PLAYER_FLAGS.RELOADING;
+		}
+		ds_map_set(player_data, "state", state_flags);
     }
 }
 
@@ -893,6 +1251,10 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
         if (global.ItemIndex[# item_id, ItemStat.MaxAmmo] == -1) return false;
         if (ds_map_exists(projectiles_seen, projectile_id)) return false;
 
+		var mounted_gun = find_machine_gun_by_pid(pid);
+		if (item_id == Item.basic_machine_gun && !instance_exists(mounted_gun)) return false;
+		if (instance_exists(mounted_gun) && item_id != Item.basic_machine_gun) return false;
+
         var player_data = server_get_player_state(pid);
         var hp = ds_map_find_value(player_data, "hp");
         if (!is_undefined(hp) && hp <= 0) return false;
@@ -911,8 +1273,8 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
         var is_reloading = ds_map_find_value(player_data, "weapon_reloading");
         if (is_undefined(is_reloading)) is_reloading = false;
 
-        if (is_reloading) {
-            if (global.ItemIndex[# item_id, ItemStat.Defense] == 1) {
+		if (is_reloading) {
+			if (global.ItemIndex[# item_id, ItemStat.BaseDurability] == 1) {
                 ds_map_set(player_data, "weapon_reloading", false);
                 ds_map_set(player_data, "weapon_reload_until", -1);
             } else {
@@ -950,6 +1312,9 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
         ds_map_set(player_data, "next_shot_at", current_time + server_shoot_interval_ms(pid, item_id));
         ds_map_set(player_data, "shot_pellet_window_until", bullet_count > 1 ? current_time + 80 : current_time);
         ds_map_set(player_data, "shot_pellet_item", item_id);
+		if (item_id == Item.basic_machine_gun) {
+			server_machine_gun_ammo_changed(pid, ammo, max(clip_ammo, 0));
+		}
 
         return server_register_projectile(pid, projectile_id, item_id);
     }
@@ -1014,10 +1379,13 @@ function handle_tick_update_server(socket_id) {
         var x_pos = buffer_read(receive_buffer, buffer_f16);
         var y_pos = buffer_read(receive_buffer, buffer_f16);
         var direction_facing = buffer_read(receive_buffer, buffer_f16);
-        var state = buffer_read(receive_buffer, buffer_u8);
+        var state = buffer_read(receive_buffer, buffer_u16);
 		var moving_state_id = buffer_read(receive_buffer, buffer_u8);
 		var team_id = buffer_read(receive_buffer, buffer_u8);
 		var client_hp = buffer_read(receive_buffer, buffer_f16);
+		var client_has_defuse_kit = buffer_read(receive_buffer, buffer_bool);
+		var client_defusing_target = buffer_read(receive_buffer, buffer_u8);
+		client_defusing_target = clamp(client_defusing_target, DEFUSE_TARGET.NONE, DEFUSE_TARGET.HOSTAGE);
 		moving_state_id = clamp(moving_state_id, STATES_PLAYER.none_state, STATES_PLAYER.mortar_state);
 		team_id = clamp(team_id, TEAM.POLICE, TEAM.TERRORIST);
         
@@ -1034,14 +1402,32 @@ function handle_tick_update_server(socket_id) {
 			ds_map_set(player_data, "hp", server_hp);
 		}
         
-        ds_map_set(player_data, "x", x_pos);
+		var previous_defusing_target = ds_map_find_value(player_data, "defusing_target");
+		if (!is_undefined(previous_defusing_target) && previous_defusing_target != client_defusing_target) {
+			ds_map_set(player_data, "defusing_time", 0);
+		}
+
+		var mounted_gun = find_machine_gun_by_pid(pid);
+		if (instance_exists(mounted_gun)) {
+			var mount_pos = local_to_world(0, 96, mounted_gun.image_angle, mounted_gun);
+			x_pos = mount_pos[0];
+			y_pos = mount_pos[1];
+			moving_state_id = STATES_PLAYER.machine_gun_state;
+		} else if (moving_state_id == STATES_PLAYER.machine_gun_state) {
+			moving_state_id = STATES_PLAYER.none_state;
+		}
+
+		ds_map_set(player_data, "x", x_pos);
         ds_map_set(player_data, "y", y_pos);
         ds_map_set(player_data, "dir", direction_facing);
         ds_map_set(player_data, "state", state);
 		ds_map_set(player_data, "moving_state", moving_state_id);
 		ds_map_set(player_data, "Team", team_id);
+		ds_map_set(player_data, "defuse_has_kit", client_has_defuse_kit);
+		ds_map_set(player_data, "defusing_target", client_defusing_target);
 		ds_map_set(player_data, "timestamp", current_time);
         server_update_reload_state(pid, state);
+		state = ds_map_find_value(player_data, "state");
 
         var p = find_instance_by_network_id(oPlayer, pid);
         if (p == noone) {
@@ -1104,7 +1490,7 @@ function send_object_pos_sync_broadcast() {
 }
 
 function handle_weather_update_server(socket_id) {
-	/* DO BUDOUCNA - POKUD BUDE MÍT KLIENT SV_CHEATS=1, BUDE MOCT MĚNIT POČASÍ */
+	/* DO BUDOUCNA - POKUD BUDE MÍT KLIENT SUDO, BUDE MOCT MĚNIT POČASÍ */
 }
 
 function send_weather_broadcast() {
@@ -1121,6 +1507,156 @@ function send_weather_broadcast() {
             socket_key = ds_map_find_next(clients, socket_key);
         }
     }
+}
+
+function server_hostage_taken_broadcast(hostage, rescuer_pid) {
+	with (oNetworkManager) {
+		if (!is_server || !instance_exists(hostage)) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.HOSTAGE_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, HOSTAGE_SYNC_ACTION.TAKEN);
+		buffer_write(send_buffer, buffer_f16, hostage.x);
+		buffer_write(send_buffer, buffer_f16, hostage.y);
+		buffer_write(send_buffer, buffer_u8, rescuer_pid);
+
+		var socket_key = ds_map_find_first(clients);
+		for (var i = 0; i < ds_map_size(clients); i++) {
+			sent_server_udp(server_socket, socket_key, send_buffer);
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+}
+
+function server_hostage_damage_broadcast(hostage, damage, body_part, impact_x, impact_y) {
+	with (oNetworkManager) {
+		if (!is_server || !instance_exists(hostage)) return;
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.HOSTAGE_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, HOSTAGE_SYNC_ACTION.DAMAGE);
+		buffer_write(send_buffer, buffer_f16, hostage.x);
+		buffer_write(send_buffer, buffer_f16, hostage.y);
+		buffer_write(send_buffer, buffer_u8, clamp(hostage.stats.Health_points, 0, hostage.stats.Max_health_points));
+		buffer_write(send_buffer, buffer_u8, clamp(round(damage), 0, 255));
+		buffer_write(send_buffer, buffer_u8, body_part);
+		buffer_write(send_buffer, buffer_f16, impact_x);
+		buffer_write(send_buffer, buffer_f16, impact_y);
+
+		var socket_key = ds_map_find_first(clients);
+		for (var i = 0; i < ds_map_size(clients); i++) {
+			sent_server_udp(server_socket, socket_key, send_buffer);
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+}
+
+function server_update_defusing() {
+	with (oNetworkManager) {
+		if (!is_server || round_resolved) return;
+
+		var bomb = instance_find(oBomb, 0);
+		var player_count = ds_map_size(player_states);
+		var pid = ds_map_find_first(player_states);
+		var defuse_step = (delta_time / 1000000) * game_get_speed(gamespeed_fps);
+
+		for (var i = 0; i < player_count; i++) {
+			var player_data = ds_map_find_value(player_states, pid);
+			var player = find_instance_by_network_id(oPlayer, pid);
+			var state = ds_map_find_value(player_data, "state");
+			var target = ds_map_find_value(player_data, "defusing_target");
+			if (is_undefined(state)) state = 0;
+			if (is_undefined(target)) target = DEFUSE_TARGET.NONE;
+
+			var hostage = noone;
+			if (instance_exists(player)) {
+				hostage = find_nearest_available_hostage(player.x, player.y);
+			}
+
+			var wants_to_defuse = (state & PLAYER_FLAGS.DEFUSING) != 0;
+			var valid_player = wants_to_defuse
+				&& instance_exists(player)
+				&& player.stats.Team == TEAM.POLICE
+				&& player.stats.Health_points > 0;
+			var valid_bomb = valid_player
+				&& target == DEFUSE_TARGET.BOMB
+				&& global.bomb_planted
+				&& instance_exists(bomb)
+				&& point_distance(player.x, player.y, bomb.x, bomb.y) <= HOSTAGE_RANGE / 2;
+			var valid_hostage = valid_player
+				&& target == DEFUSE_TARGET.HOSTAGE
+				&& instance_exists(hostage)
+				&& !hostage.rescuing
+				&& point_distance(player.x, player.y, hostage.x, hostage.y) <= HOSTAGE_RANGE;
+
+			if (valid_bomb || valid_hostage) {
+				var has_defuse_kit = ds_map_find_value(player_data, "defuse_has_kit");
+				if (is_undefined(has_defuse_kit)) has_defuse_kit = false;
+				var defuse_max = valid_bomb ? DEFUSE_TIME * (has_defuse_kit ? 1 : 2) : DEFUSE_TIME;
+				var defuse_time = ds_map_find_value(player_data, "defusing_time");
+				if (is_undefined(defuse_time)) defuse_time = 0;
+				defuse_time = min(defuse_max, defuse_time + defuse_step);
+
+				if ((state & PLAYER_FLAGS.RELOADING) != 0) state -= PLAYER_FLAGS.RELOADING;
+				ds_map_set(player_data, "weapon_reloading", false);
+				ds_map_set(player_data, "weapon_reload_until", -1);
+				ds_map_set(player_data, "defusing_time", defuse_time);
+				ds_map_set(player_data, "defusing_max", defuse_max);
+				ds_map_set(player_data, "state", state);
+
+				player.network_bit_state = state;
+				player.defusing = true;
+				player.defusing_target = target;
+				player.defusing_time = defuse_time;
+				player.defusing_max = defuse_max;
+				player.Reloading = false;
+				player.ReloadTime = 0;
+
+				if (defuse_time >= defuse_max) {
+					if ((state & PLAYER_FLAGS.DEFUSING) != 0) state -= PLAYER_FLAGS.DEFUSING;
+					ds_map_set(player_data, "state", state);
+					ds_map_set(player_data, "defusing_time", 0);
+					ds_map_set(player_data, "defusing_target", DEFUSE_TARGET.NONE);
+					player.network_bit_state = state;
+					player.defusing = false;
+					player.defusing_time = 0;
+					player.defusing_target = DEFUSE_TARGET.NONE;
+
+					if (valid_hostage) {
+						hostage.rescuing = true;
+						hostage.rescuing_player = player;
+						server_hostage_taken_broadcast(hostage, pid);
+					} else {
+						if (instance_exists(oGameController)) oGameController.bomb_defused = true;
+						global.bomb_planted = false;
+						global.bomb_timer = 0;
+						global.bomb_planter_pid = -1;
+						with (oBomb) instance_destroy();
+						round_end("Win", TEAM.POLICE);
+						return;
+					}
+				}
+			} else {
+				if ((state & PLAYER_FLAGS.DEFUSING) != 0) state -= PLAYER_FLAGS.DEFUSING;
+				ds_map_set(player_data, "state", state);
+				ds_map_set(player_data, "defusing_time", 0);
+				ds_map_set(player_data, "defusing_max", DEFUSE_TIME);
+				ds_map_set(player_data, "defusing_target", DEFUSE_TARGET.NONE);
+
+				if (instance_exists(player)) {
+					player.network_bit_state = state;
+					player.defusing = false;
+					player.defusing_time = 0;
+					player.defusing_max = DEFUSE_TIME;
+					player.defusing_target = DEFUSE_TARGET.NONE;
+				}
+			}
+
+			pid = ds_map_find_next(player_states, pid);
+		}
+	}
 }
 
 function send_tick_broadcast() {
@@ -1145,6 +1681,8 @@ function send_tick_broadcast() {
 			var moving_state_id = ds_map_find_value(player_data, "moving_state");
 			var team_id = ds_map_find_value(player_data, "Team");
 			var hp = ds_map_find_value(player_data, "hp");
+			var defusing_time = ds_map_find_value(player_data, "defusing_time");
+			var defusing_max = ds_map_find_value(player_data, "defusing_max");
 
             if (is_undefined(x_pos)) x_pos = 200;
             if (is_undefined(y_pos)) y_pos = 200;
@@ -1153,15 +1691,19 @@ function send_tick_broadcast() {
             if (is_undefined(moving_state_id)) moving_state_id = STATES_PLAYER.none_state;
 			if (is_undefined(team_id)) team_id = TEAM.POLICE;
 			if (is_undefined(hp)) hp = global.player_stats.Max_health;
+			if (is_undefined(defusing_time)) defusing_time = 0;
+			if (is_undefined(defusing_max)) defusing_max = DEFUSE_TIME;
             
             buffer_write(send_buffer, buffer_u8, pid);
             buffer_write(send_buffer, buffer_f16, x_pos);
             buffer_write(send_buffer, buffer_f16, y_pos);
             buffer_write(send_buffer, buffer_f16, dir);
-            buffer_write(send_buffer, buffer_u8, state);
+			buffer_write(send_buffer, buffer_u16, state);
             buffer_write(send_buffer, buffer_u8, moving_state_id);
 			buffer_write(send_buffer, buffer_u8, team_id);
 			buffer_write(send_buffer, buffer_f16, hp);
+			buffer_write(send_buffer, buffer_f16, defusing_time);
+			buffer_write(send_buffer, buffer_f16, defusing_max);
 			key = ds_map_find_next(player_states, key);
         }
 		
@@ -1339,6 +1881,8 @@ function handle_client_disconnect(socket_id, read_inventory_snapshot = false) {
 				if (has_inventory_snapshot) server_read_weapon_inventory_snapshot(player_data);
 			}
 
+			server_release_machine_gun(pid);
+
 			var player = find_instance_by_network_id(oPlayer, pid);
 			var drop_x = ds_map_find_value(player_data, "x");
 			var drop_y = ds_map_find_value(player_data, "y");
@@ -1487,6 +2031,28 @@ function handle_weapon_update_server(socket_id) {
 		ds_map_set(player_data, "weapon_reloading", false);
 		ds_map_set(player_data, "weapon_reload_until", -1);
 		server_read_weapon_slots_snapshot(player_data);
+
+		var mounted_gun = find_machine_gun_by_pid(pid);
+		if (instance_exists(mounted_gun)) {
+			weapon_id = Item.basic_machine_gun;
+			weapon_scope = mounted_gun.stats.Slot_scope;
+			weapon_barrel = mounted_gun.stats.Slot_barrel;
+			weapon_grip = mounted_gun.stats.Slot_grip;
+			weapon_suppressor = mounted_gun.stats.Slot_suppressor;
+			weapon_ammo = mounted_gun.stats.Ammo;
+			weapon_clip_ammo = mounted_gun.stats.Clip_ammo;
+
+			ds_map_set(player_data, "weapon_id", weapon_id);
+			ds_map_set(player_data, "weapon_scope", weapon_scope);
+			ds_map_set(player_data, "weapon_barrel", weapon_barrel);
+			ds_map_set(player_data, "weapon_grip", weapon_grip);
+			ds_map_set(player_data, "weapon_suppressor", weapon_suppressor);
+			ds_map_set(player_data, "weapon_ammo", weapon_ammo);
+			ds_map_set(player_data, "weapon_clip_ammo", weapon_clip_ammo);
+			ds_map_set(player_data, "primary_id", weapon_id);
+			ds_map_set(player_data, "primary_ammo", weapon_ammo);
+			ds_map_set(player_data, "primary_clip_ammo", weapon_clip_ammo);
+		}
         
         // Update the player object
         var p = find_instance_by_network_id(oPlayer, pid);
@@ -1662,13 +2228,29 @@ function server_check_round_end() {
 
 	var police_alive = server_living_player_count(TEAM.POLICE);
 	var terrorists_alive = server_living_player_count(TEAM.TERRORIST);
+	var winning_team = -1;
+
 	if (police_alive <= 0 && terrorists_alive > 0) {
-		return round_end("Loss", TEAM.TERRORIST);
+		winning_team = TEAM.TERRORIST;
 	}
 	if (terrorists_alive <= 0 && police_alive > 0) {
-		if (global.bomb_planted) return false;
-		return round_end("Win", TEAM.POLICE);
+		winning_team = TEAM.POLICE;
 	}
+
+	if (winning_team != -1) {
+		global.bomb_planted = false;
+		global.bomb_timer = 0;
+		global.bomb_planter_pid = -1;
+		with (oBomb) instance_destroy();
+
+		if (instance_exists(oDraw)) {
+			oDraw.bomb_detonation_pending = false;
+			oDraw.round_end_timer = -1;
+		}
+
+		return round_end(winning_team == TEAM.POLICE ? "Win" : "Loss", winning_team);
+	}
+
 	return false;
 }
 
@@ -1740,7 +2322,7 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 
 	var attacker_x = server_player_state_value(attacker_pid, "x", shot_start[0]);
 	var attacker_y = server_player_state_value(attacker_pid, "y", shot_start[1]);
-	if (weapon_id == Item.Bomb) {
+	if (weapon_id == Item.Bomb || weapon_id == Item.MolotovGrenade) {
 		attacker_x = shot_start[0];
 		attacker_y = shot_start[1];
 	}
@@ -1749,8 +2331,7 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 	var damage = global.ItemIndex[# weapon_id, ItemStat.Damage] * suppressor_multiplier;
 	damage = damage * global.ItemIndex[# weapon_id, ItemStat.damage_drop](shot_distance) / (penetration_damage + 1);
 
-	result.hit_spd_mod = min(1, (1 - (penetration_power / (penetration_damage + 1))) / global.ItemIndex[# armour_id, ItemStat.Defense]);
-	result.aimpunch_modifier = penetration_power / (penetration_damage + 1);
+	var aim_punch_modifier = clamp(penetration_power / (penetration_damage + 1), 0, 1);
 
 	var damage_multiplier = 1;
 	if (hitbox_type >= HITBOX.LegProne) {
@@ -1761,13 +2342,18 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 		damage_multiplier = BODY_MULTIPLIER;
 		if (armour_dur > 0 && global.ItemIndex[# armour_id, ItemStat.Defense] <= .95) {
 			damage = damage * global.ItemIndex[# armour_id, ItemStat.Defense] * penetration_power;
+			aim_punch_modifier *= .1;
 		}
 	} else if (hitbox_type >= HITBOX.Head) {
 		damage_multiplier = HEADSHOT_MULTIPLIER;
 		if (helmet_dur > 0 && global.ItemIndex[# helmet_id, ItemStat.Defense] <= .95) {
 			damage = damage * global.ItemIndex[# helmet_id, ItemStat.Defense] * penetration_power;
+			aim_punch_modifier *= .1;
 		}
 	}
+
+	result.aimpunch_modifier = aim_punch_modifier;
+	result.hit_spd_mod = 1 - aim_punch_modifier;
 
 	var shield_modifier = 1;
 	var victim_weapon_id = server_player_state_value(victim_pid, "weapon_id", victim_obj.network_weapon_id);
@@ -1806,7 +2392,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (!instance_exists(victim_obj)) return;
 
-		if (weapon_id != Item.Bomb) {
+		if (weapon_id != Item.Bomb && weapon_id != Item.MolotovGrenade) {
 			var attacker_data = ds_map_find_value(player_states, attacker_pid);
 			if (!is_undefined(attacker_data)) {
 				var attacker_hp = ds_map_find_value(attacker_data, "hp");
@@ -1854,6 +2440,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         }
 
 		if (current_hp > 0 && new_hp <= 0) {
+			server_release_machine_gun(victim_pid);
 			award_damage_assists(victim_obj, attacker_pid);
 
 			var attacker_name = server_player_display_name(attacker_pid);
@@ -2161,5 +2748,6 @@ function handle_init_sync_server(socket_id) {
         }
 
         sent_server_udp(server_socket, socket_id, send_buffer);
+		server_send_machine_gun_snapshots(socket_id);
     }
 }

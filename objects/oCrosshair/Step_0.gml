@@ -1,5 +1,3 @@
-crosshair_x = (x + x_offset - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-crosshair_y = (y + y_offset - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
@@ -215,6 +213,32 @@ if(instance_exists(global.local_player)){
 	x = clamp(mouse_x + recoil_from_mouse_x, view_left, view_right);
 	y = clamp(mouse_y + recoil_from_mouse_y, view_top, view_bottom);
 	#endregion
+
+	#region Scope sway
+	var target_sway_strength = 0;
+	if(global.local_player.ScopeIn){
+		var stamina_ratio = clamp(
+			global.local_player.stats.Stamina_points / max(1, global.player_stats.Max_stamina),
+			0,
+			1
+		);
+		target_sway_strength = lerp(20, 10, stamina_ratio);
+
+		if(global.local_player.moving_state == STATES_PLAYER.prone_state){
+			target_sway_strength *= 0.5;
+		}else if(global.local_player.Moving){
+			target_sway_strength *= 2.0;
+		}
+
+		scope_sway_phase_x += 1.15 * global.time_step;
+		scope_sway_phase_y += 0.85 * global.time_step;
+	}
+
+	var sway_lerp = min(1, 0.75 * global.time_step);
+	scope_sway_strength = lerp(scope_sway_strength, target_sway_strength, sway_lerp);
+	scope_sway_x = (dsin(scope_sway_phase_x) + dsin(scope_sway_phase_y * 0.7) * 0.35) * scope_sway_strength;
+	scope_sway_y = (dsin(scope_sway_phase_y) + dsin(scope_sway_phase_x * 0.55) * 0.25) * scope_sway_strength * 1.25;
+	#endregion
 	
 }
 
@@ -227,3 +251,10 @@ if(global.DynamicCrosshair == true){
 
 x = round(x);
 y = round(y);
+var scoped_aim = instance_exists(global.local_player) && global.local_player.ScopeIn;
+aim_x = clamp(x + scope_sway_x + (scoped_aim ? x_offset : 0), oDraw.ViewX, oDraw.ViewX + oDraw.ViewW);
+aim_y = clamp(y + scope_sway_y + (scoped_aim ? y_offset : 0), oDraw.ViewY, oDraw.ViewY + oDraw.ViewH);
+visual_x = aim_x + (scoped_aim ? 0 : x_offset);
+visual_y = aim_y + (scoped_aim ? 0 : y_offset);
+crosshair_x = (visual_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+crosshair_y = (visual_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);

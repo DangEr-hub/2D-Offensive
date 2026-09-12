@@ -1,12 +1,18 @@
 #macro BUY_TIME 60 * game_get_speed(gamespeed_fps)
 #macro ROUND_STARTING_MONEY 100
+#macro DILATATION_TIME 2.5 * game_get_speed(gamespeed_fps)
+#macro MENU_COLOR make_color_rgb(0, 76, 76)
+#macro DEFUSE_TIME 5 * game_get_speed(gamespeed_fps)
 #macro ROUND_END_TIMER 5 * game_get_speed(gamespeed_fps)
 #macro ROUND_WIN_REWARD 200
+#macro PRONE_SPD .135
+#macro WALK_SPD .5
+#macro RUN_SPD 1.2
 #macro ROUND_LOSS_REWARD 50
-#macro HOSTAGE_RANGE 24
-#macro BOMB_TIMER 5 * game_get_speed(gamespeed_fps)
+#macro HOSTAGE_RANGE 128
 #macro HITMAP_KEY_BOMB -1000000
-#macro ROUND_LOSS_STREAK_BONUS 50
+#macro ROUND_LOSS_STREAK_BONUS 75
+#macro ROUND_WIN_STREAK_DEBUFF 25
 #macro IS_NET instance_exists(oNetworkManager)
 #macro AMMO_UPG 1.25
 #macro RELOAD_UPG 0.75
@@ -37,7 +43,7 @@
 #macro ACTIVATE_MARGIN 128
 #macro DEACTIVATE_MARGIN 256
 #macro DEBUG_COLOR c_aqua
-#macro STAMINA_HOLD_VALUE 0.5
+#macro STAMINA_RUN_VALUE 0.5
 #macro LEG_MULTIPLIER 0.7
 #macro ARM_MULTIPLIER 0.9
 #macro BODY_MULTIPLIER 1.1

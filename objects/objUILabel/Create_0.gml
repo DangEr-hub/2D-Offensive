@@ -9,6 +9,6 @@ font = set_font("GUI_small");
 color = c_white;
 caption = "";
 drawable = true;
-max_width = 150 * global.GUIMultiplier;
+max_width = 150 * global.gui_scale;
 icon_after = false;
 sprite_scale = 1;

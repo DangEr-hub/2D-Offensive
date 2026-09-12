@@ -21,7 +21,11 @@ function window_resize(){
     camera_set_view_size(CAM, global.CameraWidth, global.CameraHeight);
 }
 
-function draw_health_bar_fill(frame, xpos, ypos, progress, scale = global.GUIMultiplier, blend = c_white){
+function draw_health_bar_fill(xpos, ypos, progress, scale = global.gui_scale, blend = c_white, alpha = 1, draw_background = true){
+	if(draw_background){
+		draw_sprite_ext(spr_HealthBar, 0, xpos, ypos, scale, scale, 0, c_white, alpha);
+	}
+
 	var source_width = round(sprite_get_width(spr_HealthBar) * clamp(progress, 0, 1));
 	if(source_width <= 0){
 		return;
@@ -31,7 +35,7 @@ function draw_health_bar_fill(frame, xpos, ypos, progress, scale = global.GUIMul
 	var draw_y = round(ypos - sprite_get_yoffset(spr_HealthBar) * scale);
 	draw_sprite_part_ext(
 		spr_HealthBar,
-		frame,
+		1,
 		0,
 		0,
 		source_width,
@@ -41,11 +45,14 @@ function draw_health_bar_fill(frame, xpos, ypos, progress, scale = global.GUIMul
 		scale,
 		scale,
 		blend,
-		1
+		alpha
 	);
 }
 
 function pause(ObjectType){
+	if(instance_exists(oBotTab)){
+		with(oBotTab) zui_destroy();
+	}
 	if(instance_exists(oWeaponAttachments)){
 		global.local_player.player_can_shoot = true;
 		with(oWeaponAttachments){
@@ -153,9 +160,9 @@ function open_ingame_settings(){
 			alpha_value = 0;
 			window_id = id;
 
-			with(zui_create(zui_get_width() * .5, zui_get_height() - 32 * global.GUIMultiplier, objUIButton)){
+			with(zui_create(zui_get_width() * .5, zui_get_height() - 32 * global.gui_scale, objUIButton)){
 				zui_set_anchor(.5, 0);
-				zui_set_size(128 * global.GUIMultiplier, 24 * global.GUIMultiplier);
+				zui_set_size(128 * global.gui_scale, 24 * global.gui_scale);
 				caption = "Back";
 				callback = function(){
 					with(oSettingsTab){
@@ -255,7 +262,7 @@ function reset_gui(){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}
-					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"){
+					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine" || global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
 							alpha = global.GUIHUDAlpha * 3;
 						}

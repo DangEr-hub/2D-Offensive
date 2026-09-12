@@ -1,21 +1,22 @@
 event_inherited();
 ingame_overlay = false;
 overlay_black = noone;
-setting_tab_width = 512 * global.GUIMultiplier;
-setting_tab_height = 512 * global.GUIMultiplier;
+setting_tab_width = 512 * global.gui_scale;
+setting_tab_height = 512 * global.gui_scale;
 
 //draw_set_valign(1);
 draw_set_font(set_font("GUI_small"));
 zui_set_size(setting_tab_width, setting_tab_height);
 
-gap = 256 * global.GUIMultiplier;
-position_x = 32 + global.GUIMultiplier;
-position_y = 64 + global.GUIMultiplier;
+gap = 256 * global.gui_scale;
+position_x = 32 + global.gui_scale;
+position_y = 64 + global.gui_scale;
 toggle_particles_string = "Particles: ";
 crosshair_color_string = "Crosshair color (rgb): ";
 toggle_bloom_string = "Bloom shader: ";
 anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
+saturation_level_string = "Saturation level: ";
 text_height = string_height("a")*2;
 
 window_resolution_callback = function() {
@@ -56,10 +57,10 @@ window_resolution_callback = function() {
 gui_scale_callback = function() {
     var gui_scales = [1, 2];
     var closest_index = 0;
-    var smallest_diff = abs(global.GUIMultiplier - gui_scales[0]);
+    var smallest_diff = abs(global.gui_scale - gui_scales[0]);
     
     for (var i = 1; i < array_length(gui_scales); i++) {
-        var diff = abs(global.GUIMultiplier - gui_scales[i]);
+        var diff = abs(global.gui_scale - gui_scales[i]);
         if (diff < smallest_diff) {
             closest_index = i;
             smallest_diff = diff;
@@ -67,13 +68,13 @@ gui_scale_callback = function() {
     }
     
     if (closest_index + 1 < array_length(gui_scales)) {
-        global.GUIMultiplier = gui_scales[closest_index + 1];
+        global.gui_scale = gui_scales[closest_index + 1];
     } else {
-        global.GUIMultiplier = gui_scales[0];
+        global.gui_scale = gui_scales[0];
     }
     
     with(gui_scale_button){
-        caption = string(global.GUIMultiplier);
+        caption = string(global.gui_scale);
     }
     reset_gui();
     save_game();
@@ -97,6 +98,30 @@ toggle_particles_callback = function(){
 crosshair_color_text_input_callback = function(InputText){
 	set_crosshair_color(InputText);	
 	save_game();
+};
+
+saturation_level_text_input_callback = function(InputText){
+	var saturation_text = string_replace_all(string_trim(InputText), ",", ".");
+	var valid_number = string_length(saturation_text) > 0;
+	var decimal_points = 0;
+	var digits = 0;
+
+	for(var i = 1; i <= string_length(saturation_text); i++){
+		var character = string_char_at(saturation_text, i);
+		if(character == "."){
+			decimal_points++;
+		}else if(string_pos(character, "0123456789") == 0){
+			valid_number = false;
+			break;
+		}else{
+			digits++;
+		}
+	}
+
+	if(valid_number && digits > 0 && decimal_points <= 1){
+		global.saturation_level = clamp(real(saturation_text), 0, 2);
+		save_game();
+	}
 };
 
 anti_aliasing_callback = function() {
@@ -146,11 +171,11 @@ anti_aliasing_callback = function() {
 
 toggle_bloom_callback = function(){
 	with(toggle_bloom_button){
-		if(global.BloomShader == false){
-			global.BloomShader = true;
+		if(global.bloom_shader == false){
+			global.bloom_shader = true;
 			caption = "On";
 		}else{
-			global.BloomShader = false;
+			global.bloom_shader = false;
 			caption = "Off";
 		}
 	}
@@ -193,8 +218,8 @@ with(zui_create(position_x, position_y + text_height, objUILabel)){
 anti_aliasing_button = zui_create(position_x + gap, position_y + text_height/2, objUIButton);
 with(anti_aliasing_button){
 	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
+	zui_set_width(64 * global.gui_scale);
+	zui_set_height(16 * global.gui_scale);
 	
     switch(global.anti_aliasing) {
         case 0: caption = "Off"; break;
@@ -215,11 +240,11 @@ with(zui_create(position_x, position_y + text_height*2, objUILabel)){
 toggle_bloom_button = zui_create(position_x + gap, position_y + text_height/2 + text_height, objUIButton);
 with(toggle_bloom_button){
 	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
+	zui_set_width(64 * global.gui_scale);
+	zui_set_height(16 * global.gui_scale);
 	
 	caption = "On";
-	if(global.BloomShader == false){
+	if(global.bloom_shader == false){
 		caption = "Off";
 	}
 	callback = other.toggle_bloom_callback;
@@ -235,8 +260,8 @@ with(zui_create(position_x, position_y + text_height*3, objUILabel)){
 toggle_particles_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*3), objUIButton);
 with(toggle_particles_button){
 	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
+	zui_set_width(64 * global.gui_scale);
+	zui_set_height(16 * global.gui_scale);
 	
 	caption = "On";
 	if(global.DrawParticles == false){
@@ -271,7 +296,7 @@ with(zui_create(position_x + gap*.75, position_y + text_height*4 - text_height/3
 #endregion
 
 #region Dynamic crosshair
-checkbox_size = 16 * global.GUIMultiplier;
+checkbox_size = 16 * global.gui_scale;
 with(zui_create(position_x, position_y + text_height*5, objUILabel)){
 	color = c_white;
 	caption = "Dynamic crosshair: ";
@@ -334,8 +359,8 @@ window_resolution_button = zui_create(position_x + gap, position_y + text_height
 
 with (window_resolution_button) {
     zui_set_anchor(0.5, 0);
-    zui_set_width(96 * global.GUIMultiplier);
-    zui_set_height(24 * global.GUIMultiplier);
+    zui_set_width(96 * global.gui_scale);
+    zui_set_height(24 * global.gui_scale);
 
     caption = string(global.window_width) + " x " + string(global.window_height);
     callback = other.window_resolution_callback;
@@ -353,11 +378,25 @@ with(zui_create(position_x, position_y + text_height*9, objUILabel)){
 gui_scale_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*9), objUIButton);
 with(gui_scale_button){
 	zui_set_anchor(0.5, 0);
-	zui_set_width(64 * global.GUIMultiplier);
-	zui_set_height(16 * global.GUIMultiplier);
+	zui_set_width(64 * global.gui_scale);
+	zui_set_height(16 * global.gui_scale);
 	
-	caption = global.GUIMultiplier;
+	caption = global.gui_scale;
 	callback = other.gui_scale_callback;
+}
+#endregion
+
+#region Saturation level
+with(zui_create(position_x, position_y + text_height*10, objUILabel)){
+	color = c_white;
+	caption = other.saturation_level_string;
+}
+
+with(zui_create(position_x + gap*.75, position_y + text_height*10 - text_height/3, objUITextInput)){
+	zui_set_anchor(0, 0);
+	init_text = string(global.saturation_level);
+	max_string_length = 4;
+	callback = other.saturation_level_text_input_callback;
 }
 #endregion
 

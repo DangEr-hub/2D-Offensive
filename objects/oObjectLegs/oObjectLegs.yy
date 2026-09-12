@@ -29,10 +29,7 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": {
-    "name": "spr_PlayerLegs",
-    "path": "sprites/spr_PlayerLegs/spr_PlayerLegs.yy",
-  },
+  "spriteId": null,
   "spriteMaskId": null,
   "visible": true,
 }

@@ -70,7 +70,9 @@ function game_struct_create(){
 		"Recent_results": array_create(TRACKING_PERIOD, -1),
 		"Expected_results": array_create(TRACKING_PERIOD, -1),
 		"Enemy_ep": array_create(TRACKING_PERIOD, -1),
-		"Enemy_rd": array_create(TRACKING_PERIOD, 0)
+		"Enemy_rd": array_create(TRACKING_PERIOD, 0),
+		"Win_streak": array_create(2, 0),
+		"Loss_streak": array_create(2, 0)
 	}
 
 	for(var i = 0; i < TRACKING_PERIOD; i++){
@@ -89,6 +91,7 @@ function map_init(Map){
 	global.game_struct.Match_assists = 0;
 	global.game_struct.Match_deaths = 0;
 	global.MapID = Map;
+	initialize_bot_database(Map);
 	if(global.map_rounds[Map][2] == -1){
 		global.map_rounds[Map][2] = global.game_struct.Enemy_ep[global.game_struct.Current_game];
 	}
@@ -102,12 +105,62 @@ function clear_player_statistics(total_rounds){
 	global.game_struct.Rounds_win = 0;
 	global.game_struct.Rounds_lost = 0;
 	global.game_struct.Current_round = 0;
+	global.game_struct.Win_streak = array_create(2, 0);
+	global.game_struct.Loss_streak = array_create(2, 0);
 	global.player_stats.Player_team = TEAM.NONE;
+	global.BotMatchStats = [];
 	for(var i=0;i<total_rounds;i++){
 		global.game_struct.Headshots_per_round[i] = 0;
 		global.game_struct.Kills_per_round[i] = 0;
 		global.game_struct.Playing_time_per_round[i] = 0;
 	}
+}
+
+function reset_player_door_keys(){
+	global.player_stats.Gold = false;
+	global.player_stats.Magenta = false;
+	global.player_stats.Red = false;
+	global.player_stats.Aqua = false;
+	global.player_stats.Green = false;
+	global.player_stats.Gray = false;
+	global.player_stats.White = false;
+}
+
+function reset_singleplayer_game(){
+	global.game_struct.Rounds_win = 0;
+	global.game_struct.Rounds_lost = 0;
+	global.game_struct.Current_round = 0;
+	global.game_struct.Match_kills = 0;
+	global.game_struct.Match_assists = 0;
+	global.game_struct.Match_deaths = 0;
+	global.player_stats.Player_team = TEAM.NONE;
+	global.player_stats.Money = ROUND_STARTING_MONEY;
+	ds_grid_clear(global.Inventory, 0);
+	ds_grid_clear(global.MouseSlot, 0);
+	global.player_stats.Weight = 0;
+	reset_player_door_keys();
+
+	for(var i = 0; i < MAX_ROUNDS; i++){
+		global.game_struct.Headshots_per_round[i] = 0;
+		global.game_struct.Kills_per_round[i] = 0;
+		global.game_struct.Playing_time_per_round[i] = 0;
+	}
+
+	for(var map = 0; map < MAP.Total; map++){
+		for(var value = 0; value < array_length(global.map_rounds[map]); value++){
+			global.map_rounds[map][value] = -1;
+		}
+	}
+
+	global.game_struct.Loss_streak = array_create(2, 0);
+	global.game_struct.Win_streak = array_create(2, 0);
+	global.BotMatchStats = [];
+	global.bomb_planted = false;
+	global.bomb_timer = 0;
+	global.bomb_planter_pid = -1;
+	global.ranked_game = false;
+
+	save_game();
 }
 
 function clear_tracking_period(){
@@ -448,6 +501,7 @@ function round_end(round_result, winning_team = -1){
 		if (winning_team != TEAM.POLICE && winning_team != TEAM.TERRORIST) return false;
 		if (oNetworkManager.round_resolved) return false;
 
+		reset_player_door_keys();
 		oNetworkManager.round_resolved = true;
 		oNetworkManager.team_round_wins[winning_team]++;
 
@@ -457,20 +511,27 @@ function round_end(round_result, winning_team = -1){
 			global.game_struct.Rounds_lost = oNetworkManager.team_round_wins[local_enemy_team];
 		}
 
-		var network_round_number = oNetworkManager.team_round_wins[TEAM.POLICE]
-			+ oNetworkManager.team_round_wins[TEAM.TERRORIST];
-		if (instance_exists(oEconomics)) {
-			oEconomics.resolve_round(winning_team, network_round_number);
+		if (instance_exists(oGameController)) {
+			oGameController.resolve_round(winning_team);
 		}
 
-		if (instance_exists(oRatingController) && instance_exists(local_player)) {
-			oRatingController.player_win = winning_team == local_player.stats.Team;
+		if (instance_exists(oGameController) && instance_exists(local_player)) {
+			oGameController.player_win = winning_team == local_player.stats.Team;
 		}
 		if (instance_exists(oDraw)) {
 			oDraw.spectating = false;
 			oDraw.spectate_target = noone;
-			oDraw.GameEndMenu = oNetworkManager.team_round_wins[winning_team] >= (MAX_ROUNDS / 2 + 1);
+			var game_ended = oNetworkManager.team_round_wins[winning_team] >= (MAX_ROUNDS / 2 + 1);
+			oDraw.GameEndMenu = game_ended;
 			oDraw.RespawnMenu = true;
+
+			if (game_ended && !oNetworkManager.game_win_diamond_granted) {
+				if (instance_exists(local_player) && local_player.stats.Team == winning_team) {
+					global.player_stats.Diamonds += global.game_struct.Rounds_win*2;
+					save_game();
+				}
+				oNetworkManager.game_win_diamond_granted = true;
+			}
 		}
 
 		server_round_end_broadcast(winning_team);
@@ -478,24 +539,19 @@ function round_end(round_result, winning_team = -1){
 		return true;
 	}
 
-	if (winning_team == TEAM.POLICE || winning_team == TEAM.TERRORIST) {
-		var next_round_number = global.game_struct.Rounds_win + global.game_struct.Rounds_lost + 1;
-		if (instance_exists(oEconomics)) {
-			oEconomics.resolve_round(winning_team, next_round_number);
-		}
+	reset_player_door_keys();
+
+	if (instance_exists(oGameController)) {
+		oGameController.resolve_round(winning_team);
 	}
 
-	if(!instance_exists(oNetworkManager)){
-		save_game();
-		oRatingController.round_ended = true;
-		if(global.ranked_game == true){
-			if(round_result == "Win"){
-				oRatingController.player_win = true;
-			}else{
-				oRatingController.player_win = false;
-			}
+	save_game();
+	oGameController.round_ended = true;
+	if(global.ranked_game == true){
+		if(round_result == "Win"){
+			oGameController.player_win = true;
 		}else{
-			oDraw.RespawnMenu = true;
+			oGameController.player_win = false;
 		}
 	}else{
 		oDraw.RespawnMenu = true;
@@ -528,29 +584,29 @@ function rank_database(){
 	global.RankIndex = ds_grid_create(RankType.Total, RankStat.Total);
 	ds_grid_clear(global.RankIndex, 0);
 
-	RankStats(RankType.Unranked, 1.5, 0.8, "Unranked", SILVERI_EP);	
-	RankStats(RankType.SilverI, 1.5, 0.8, "Silver I", SILVERI_EP);	
-	RankStats(RankType.SilverII, 1.45, 0.87, "Silver II", SILVERII_EP);
-	RankStats(RankType.SilverIII, 1.25, 0.9, "Silver III", SILVERIII_EP);
-	RankStats(RankType.SilverIV, 1.2, 0.93, "Silver IV", SILVERIV_EP);
-	RankStats(RankType.SilverV, 1.1, 0.94, "Silver V", SILVERV_EP);
-	RankStats(RankType.SilverMaster, 1.07, 1, "Silver master", SILVER_MASTER_EP);
-	RankStats(RankType.GoldI, 1, 1.01, "Gold I", GOLDI_EP);
-	RankStats(RankType.GoldII, 0.95, 1.03, "Gold II", GOLDII_EP);
-	RankStats(RankType.GoldIII, 0.93, 1.05, "Gold III", GOLDIII_EP);
-	RankStats(RankType.GoldIV, 0.85, 1.07, "Gold IV", GOLDIV_EP);
-	RankStats(RankType.GoldMaster, 0.83, 1.11, "Gold master", GOLD_MASTER_EP);
-	RankStats(RankType.DiamondI, 0.8, 1.14, "Diamond I", DIAMONDI_EP);
-	RankStats(RankType.DiamondII, 0.77, 1.15, "Diamond II", DIAMONDII_EP);
-	RankStats(RankType.DiamondIII, 0.73, 1.18, "Diamond III", DIAMONDIII_EP);
-	RankStats(RankType.DiamondMaster, 0.7, 1.2, "Diamond master", DIAMOND_MASTER_EP);
-	RankStats(RankType.AssaultEliteI, 0.69, 1.21, "Assault elite I", ASSAULT_ELITEI_EP);
-	RankStats(RankType.AssaultEliteII, 0.67, 1.22, "Assault elite II", ASSAULT_ELITEII_EP);
-	RankStats(RankType.AssaultMaster, 0.63, 1.23, "Assault master", ASSAULT_MASTER_EP);
-	RankStats(RankType.VersatileMaster, 0.61, 1.25, "Versatile master", VERSATILE_MASTER_EP);
-	RankStats(RankType.ExperiencedVersatileMaster, 0.59, 1.3, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_EP);
-	RankStats(RankType.SupremeMaster, 0.53, 1.35, "Supreme master", SUPREME_MASTER_EP);
-	RankStats(RankType.GlobalMaster, 0.5, 1.75, "Global master", GLOBAL_MASTER_EP);
+	RankStats(RankType.Unranked, 1.5, 0.7, "Unranked", SILVERI_EP);	
+	RankStats(RankType.SilverI, 1.5, 0.7, "Silver I", SILVERI_EP);	
+	RankStats(RankType.SilverII, 1.45, 0.73, "Silver II", SILVERII_EP);
+	RankStats(RankType.SilverIII, 1.4, 0.75, "Silver III", SILVERIII_EP);
+	RankStats(RankType.SilverIV, 1.35, 0.78, "Silver IV", SILVERIV_EP);
+	RankStats(RankType.SilverV, 1.3, 0.8, "Silver V", SILVERV_EP);
+	RankStats(RankType.SilverMaster, 1.25, 0.83, "Silver master", SILVER_MASTER_EP);
+	RankStats(RankType.GoldI, 1.2, 0.85, "Gold I", GOLDI_EP);
+	RankStats(RankType.GoldII, 1.1, 0.89, "Gold II", GOLDII_EP);
+	RankStats(RankType.GoldIII, 1.05, 0.9, "Gold III", GOLDIII_EP);
+	RankStats(RankType.GoldIV, 1.0, 0.92, "Gold IV", GOLDIV_EP);
+	RankStats(RankType.GoldMaster, 0.95, 0.95, "Gold master", GOLD_MASTER_EP);
+	RankStats(RankType.DiamondI, 0.85, 0.98, "Diamond I", DIAMONDI_EP);
+	RankStats(RankType.DiamondII, 0.8, 1.02, "Diamond II", DIAMONDII_EP);
+	RankStats(RankType.DiamondIII, 0.75, 1.05, "Diamond III", DIAMONDIII_EP);
+	RankStats(RankType.DiamondMaster, 0.7, 1.08, "Diamond master", DIAMOND_MASTER_EP);
+	RankStats(RankType.AssaultEliteI, 0.65, 1.1, "Assault elite I", ASSAULT_ELITEI_EP);
+	RankStats(RankType.AssaultEliteII, 0.6, 1.12, "Assault elite II", ASSAULT_ELITEII_EP);
+	RankStats(RankType.AssaultMaster, 0.57, 1.15, "Assault master", ASSAULT_MASTER_EP);
+	RankStats(RankType.VersatileMaster, 0.53, 1.18, "Versatile master", VERSATILE_MASTER_EP);
+	RankStats(RankType.ExperiencedVersatileMaster, 0.5, 1.25, "Experienced versatile master", EXPERIENCED_VERSATILE_MASTER_EP);
+	RankStats(RankType.SupremeMaster, 0.45, 1.3, "Supreme master", SUPREME_MASTER_EP);
+	RankStats(RankType.GlobalMaster, 0.4, 1.5, "Global master", GLOBAL_MASTER_EP);
 }
 
 function get_rank(ep){
