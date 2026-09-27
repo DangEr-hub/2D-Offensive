@@ -9,8 +9,8 @@ tile.image_xscale = 0.5;
 tile.image_yscale = 0.5;
 
 stats = {
-	Item_id: Item.base_explosion,
-	Damage: global.ItemIndex[#Item.base_explosion, ItemStat.Damage],
+	Item_id: ITEM.base_explosion,
+	Damage: global.ItemIndex[#ITEM.base_explosion, ITEMSTATS.Damage],
 	Object_index: global.local_player.object_index,
 	Owner_name: global.local_player.Name,
 	Object: global.local_player,

@@ -240,7 +240,7 @@ with (zui_main()) {
 		zui_set_width(button_width);
 		zui_set_height(button_height);
 		caption = "Sources";
-		//spr[1] = Item.AKM;
+		//spr[1] = ITEM.AKM;
 		callback = oController.sources_callback;
 	}
 	

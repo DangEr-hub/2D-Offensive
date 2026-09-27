@@ -26,7 +26,7 @@ if(lottery_active){
         lottery_result = lottery_items[nearest_index];
         lottery_active = false;
 		
-		global.ItemIndex[# lottery_result, ItemStat.is_locked] = false;
+		global.ItemIndex[# lottery_result, ITEMSTATS.is_locked] = false;
 		alarm[1] = 1 * game_get_speed(gamespeed_fps);
     }
 }

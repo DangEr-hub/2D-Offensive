@@ -65,13 +65,14 @@ popup_main_menu_callback_positive = function(){
 		zui_destroy();
 	}
 	clear_player_statistics(global.game_struct.Rounds_win + global.game_struct.Rounds_lost);
+	save_game();
 	audio_stop_all();
 	with (oNetworkManager) instance_destroy();
 	room_goto(rm_main_menu);
 };
 
 main_menu_callback = function(){
-	ui_show_popup("Leave to main menu?", "Leave", "Yes", "No", 256 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
+	ui_show_popup("Leave to the main menu?", "Leave", "Yes", "No", 256 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
 };
 #endregion
 
@@ -149,7 +150,7 @@ with(zui_create(zui_get_width() * .5, button_start_y, objUIButton)){
 			var _black = zui_create(0, 0, objUIBlack, -1000);
 			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oDamageTable, -1000)) {
 				black = _black;
-				alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+				alpha = global.gui_alpha * 2.25; alpha_value = 0;
 				window_id = id;
 			}
 		}

@@ -7,22 +7,22 @@ var bot_name = target_bot.stats.Name;
 var bot_team = target_bot.stats.Team;
 var team_name = bot_team == TEAM.POLICE ? "Police" : "Terrorist";
 var team_color = bot_team == TEAM.POLICE ? c_blue : c_red;
-var primary_name = target_bot.WeaponID[0] == Item.None
-	? "None"
-	: global.ItemIndex[# target_bot.WeaponID[0], ItemStat.Name];
-var secondary_name = target_bot.WeaponID[1] == Item.None
-	? "None"
-	: global.ItemIndex[# target_bot.WeaponID[1], ItemStat.Name];
-var helmet_name = target_bot.HelmetID == Item.None
-	? "None"
-	: global.ItemIndex[# target_bot.HelmetID, ItemStat.Name];
-var armour_name = target_bot.ArmourID == Item.None
-	? "None"
-	: global.ItemIndex[# target_bot.ArmourID, ItemStat.Name];
+var primary_name = target_bot.WeaponID[0] == ITEM.None
+	? tr("None")
+	: tr_name(target_bot.WeaponID[0]);
+var secondary_name = target_bot.WeaponID[1] == ITEM.None
+	? tr("None")
+	: tr_name(target_bot.WeaponID[1]);
+var helmet_name = target_bot.HelmetID == ITEM.None
+	? tr("None")
+	: tr_name(target_bot.HelmetID);
+var armour_name = target_bot.ArmourID == ITEM.None
+	? tr("None")
+	: tr_name(target_bot.ArmourID);
 var health_text = "Health: " + string(round(target_bot.stats.Health_points)) + "/" + string(round(target_bot.stats.Max_health_points));
 var weight_text = "Weight: " + string_format(target_bot.stats.Weight, 0, 1) + " kg";
 var height_text = "Height: " + string_format(target_bot.stats.Height, 0, 1) + " cm";
-var age_text = "Age: " + string(round(target_bot.stats.Age)) + " years";
+var age_text = tr("Age") + ": " + string(round(target_bot.stats.Age)) + " " + tr("Years");
 var helmet_text = "Helmet: " + helmet_name;
 var armour_text = "Body: " + armour_name;
 var primary_text = "Primary weapon: " + primary_name;
@@ -37,12 +37,25 @@ draw_set_font(set_font("GUI_small"));
 var start_x = zui_get_width() * .08;
 var start_y = zui_get_height() * .125;
 var row_height = string_height("A") * 1.35;
-var team_value_x = start_x + string_width("Team: ");
+var team_value_x = start_x + string_width(tr("Team") + ": ");
 
 with(zui_create(0, 0, objUIWindowCaption, depth - 1)){
 	caption = bot_name;
 	draggable = 1;
 }
+
+var rank_label = zui_create(start_x, start_y, objUILabel);
+with(rank_label){
+	font = set_font("GUI_small");
+	color = c_white;
+	caption = "Rank:";
+	icon_sprite_index = spr_ranks;
+	icon_image_index = get_rank(global.game_struct.Enemy_ep[global.game_struct.Current_game]);
+	icon_after = true;
+}
+rank_label.sprite_scale = min(1, row_height * .85 / sprite_get_height(spr_ranks));
+rank_label.icon_offset[0] = string_width(tr("Rank") + ": ") * .5;
+start_y += row_height;
 
 with(zui_create(start_x, start_y, objUILabel)){
 	font = set_font("GUI_small");
@@ -54,7 +67,8 @@ with(zui_create(team_value_x, start_y, objUILabel)){
 	color = team_color;
 	caption = team_name;
 }
-with(zui_create(start_x, start_y + row_height, objUILabel)){
+health_txt = zui_create(start_x, start_y + row_height, objUILabel);
+with(health_txt){
 	font = set_font("GUI_small");
 	color = c_white;
 	caption = health_text;

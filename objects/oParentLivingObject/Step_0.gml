@@ -25,6 +25,14 @@ if (stats.Health_points > 0
 	FlashLight.blend = c_white;
 }
 
+#region In water logic
+if (place_meeting(x, y, oWater)) {
+	in_water = true; in_water_timer = game_get_speed(gamespeed_fps);
+} else {
+	if(in_water_timer > -1) {in_water_timer -= global.time_step; } in_water = (in_water_timer > -1);
+}
+#endregion
+
 if(col_timer > -1){ col_timer --; }
 if(object_index == oBot && col_timer == -1){
 	

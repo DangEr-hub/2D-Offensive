@@ -1,11 +1,11 @@
-if(stats.Item_id == Item.CELandMine){
+if(stats.Item_id == ITEM.CELandMine){
 	explosion_create(
-		global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID]/5,
+		global.ItemIndex[#stats.Item_id, ITEMSTATS.AmmoSpriteID]/5,
 		[x, y],
-		global.ItemIndex[#stats.Item_id, ItemStat.Damage]/2,
+		global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage]/2,
 		true,
 		stats.Object,
-		Item.base_explosion
+		ITEM.base_explosion
 	);
 }
 

@@ -1,4 +1,4 @@
-var dmg = round(other.stats.Damage * global.ItemIndex[# other.stats.Item_id, ItemStat.PenetrationPower]);
+var dmg = round(other.stats.Damage * global.ItemIndex[# other.stats.Item_id, ITEMSTATS.PenetrationPower]);
 var p_number = round(dmg/10);
 
 if (IS_NET && !oNetworkManager.is_server) {

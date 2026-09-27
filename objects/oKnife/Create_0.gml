@@ -3,7 +3,7 @@ stats = {
 	"Starting_x": x,
 	"Starting_y": y,
 	"Object": noone,
-	"Item_id": Item.None,
+	"Item_id": ITEM.None,
 	"Penetration_damage": 0,
 	"obj_index": -1,
 	"Owner_name": "",

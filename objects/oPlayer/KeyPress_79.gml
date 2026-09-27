@@ -3,3 +3,5 @@ if(!global.my_console[? "active"] && !IS_NET){
 	spawn_bots(global.MapID);
 	spawn_bots(global.MapID, true);
 }
+
+show_debug_message(tr("Main_menu"));

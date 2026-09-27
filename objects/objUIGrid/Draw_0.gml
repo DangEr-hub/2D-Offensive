@@ -257,42 +257,42 @@ if(show_stats){
 			draw_set_color(c_white);
 							
 			draw_set_font(set_font("GUI_grid"));
-			var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+			var Id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 			var text = "";
-			var statIndex = ItemStat.Damage + i * columns + j;
+			var statIndex = ITEMSTATS.Damage + i * columns + j;
 			if (statIndex <= array_length(statTitles)){
 								
 				switch(statIndex){
 										
-					case ItemStat.MaxAmmo:
-						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, Index.slot_ammo]) + "/" + string(global.Inventory[#oDraw.var_slot, Index.slot_clip_ammo]);
+					case ITEMSTATS.MaxAmmo:
+						text = statTitles[statIndex] + string(global.Inventory[#oDraw.var_slot, INDEX.slot_ammo]) + "/" + string(global.Inventory[#oDraw.var_slot, INDEX.slot_clip_ammo]);
 					break;
 									
-					case ItemStat.ReloadSpeed:
+					case ITEMSTATS.ReloadSpeed:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]/game_get_speed(gamespeed_fps)) + " s";
 					break;
 
-					case ItemStat.MovingSpdMul:
+					case ITEMSTATS.MovingSpdMul:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + " %";
 					break;
 
-					case ItemStat.PenetrationPower:
+					case ITEMSTATS.PenetrationPower:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]*100) + " %";
 					break;
 									
-					case ItemStat.ShootTimer:
+					case ITEMSTATS.ShootTimer:
 						text = statTitles[statIndex] + string(game_get_speed(gamespeed_fps)/global.ItemIndex[#Id, statIndex]*60);
 					break;
 
-					case ItemStat.Range:
+					case ITEMSTATS.Range:
 						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
 					break;
 										
-					case ItemStat.ShootingMode:
+					case ITEMSTATS.ShootingMode:
 						text = statTitles[statIndex] + get_shooting_modes_string(Id);
 					break;
 					
-					case ItemStat.WeaponTypeClass:
+					case ITEMSTATS.WeaponTypeClass:
 						text = get_wpn_type(Id);
 					break;
 									
@@ -329,30 +329,30 @@ if(show_stats){
 			draw_set_color(c_white);
 							
 			draw_set_font(set_font("GUI_grid"));
-			var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+			var Id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 			var text = "";
-			var statIndex = ItemStat.Weight + i * columns + j;
-			if (statIndex - ItemStat.Weight <= array_length(statTitles)){
+			var statIndex = ITEMSTATS.Weight + i * columns + j;
+			if (statIndex - ITEMSTATS.Weight <= array_length(statTitles)){
 								
 				#region Specific cases
 				switch(statIndex){
 										
-					case ItemStat.BaseDurability:
+					case ITEMSTATS.BaseDurability:
 						text = 
-							statTitles[statIndex - ItemStat.Weight] + 
-							string(global.Inventory[#oDraw.var_slot, Index.slot_durability]/global.ItemIndex[#Id, ItemStat.BaseDurability]*100) +
+							statTitles[statIndex - ITEMSTATS.Weight] + 
+							string(global.Inventory[#oDraw.var_slot, INDEX.slot_durability]/global.ItemIndex[#Id, ITEMSTATS.BaseDurability]*100) +
 							" %";
 					break;
-					case ItemStat.Defense:
+					case ITEMSTATS.Defense:
 						text = 
-							statTitles[statIndex - ItemStat.Weight] + 
-							string_format((1 - global.ItemIndex[# Id, ItemStat.Defense]) * 100, 0, 1) +
+							statTitles[statIndex - ITEMSTATS.Weight] + 
+							string_format((1 - global.ItemIndex[# Id, ITEMSTATS.Defense]) * 100, 0, 1) +
 							" %";
 					break;
-					case ItemStat.Weight:
+					case ITEMSTATS.Weight:
 						text = 
-							statTitles[statIndex - ItemStat.Weight] + 
-							string_format(global.ItemIndex[# Id, ItemStat.Weight], 0, 1) +
+							statTitles[statIndex - ITEMSTATS.Weight] + 
+							string_format(global.ItemIndex[# Id, ITEMSTATS.Weight], 0, 1) +
 							" kg";
 					break;
 				}
@@ -390,11 +390,11 @@ if(show_stats){
 			
 			switch(statTitles[j]){			
 				case "Damage: ":
-					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Damage]);
+					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, INDEX.slot_id], ITEMSTATS.Damage]);
 				break;
 				
 				case "Penetration power: ":
-					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.PenetrationPower]*100) + " %";
+					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, INDEX.slot_id], ITEMSTATS.PenetrationPower]*100) + " %";
 				break;
 			}
 			

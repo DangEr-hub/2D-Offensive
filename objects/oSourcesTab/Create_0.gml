@@ -16,9 +16,9 @@ with (zui_create(0, 0, objUIWindowCaption)) {
 	draggable = 1;
 }
 
-with (zui_create(zui_get_width() * .7, pos_y, objUILabel)) {
+with (zui_create(zui_get_width() * .65, zui_get_height() * .2, objUILabel)) {
 	color = c_white;
-	caption = "Inspired by Counter-Strike, CS2D \nand Unturned.";
+	caption = tr("Sources_description");
 }
 
 

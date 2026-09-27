@@ -7,7 +7,7 @@ zui_set_size(tab_width, tab_height);
 pos_x = zui_get_width() * .01;
 pos_y = zui_get_height() * .1;
 gap = 170 * global.gui_scale;
-text_height = string_height("a") * 1.4;
+text_height = string_height("a") * 1.55;
 popup = noone;
 
 waiting_keybind = false;
@@ -30,7 +30,7 @@ captions = [
 	"Open buy menu", "Drop weapon",
 	"Open console", "Knife light attack", "Knife heavy attack", "Use item",
 	"Scope", "Show scoreboard", "Take hostage", "Defuse bomb", "Open door",
-	"Bot info", "Run", "Walk",
+	"Bot info", "Run", "Walk", "Open terminal", "Take bot",
 ];
 
 var count = array_length(captions);
@@ -47,7 +47,7 @@ for(i = 0;i < rows;i ++){
 		zui_set_anchor(0.5, 0);
 		idx = other.i;
 		caption = keycode_to_string(global.KeyBinds[| other.i]);
-		zui_set_width(min(string_width(caption) * global.gui_scale, 128 * global.gui_scale));
+		zui_set_width(min(max(string_width(caption), string_width(tr(string_replace_all(caption, " ", "_")))) * global.gui_scale, 128 * global.gui_scale));
 		zui_set_height(16 * global.gui_scale);
 	
 	    callback = function(){
@@ -73,7 +73,7 @@ for(var k = 0; k < rows; k++){
         zui_set_anchor(0.5, 0);
 		idx = other.idx;
         caption = keycode_to_string(global.KeyBinds[| idx]);
-        zui_set_width(min(string_width(caption) * global.gui_scale, 128 * global.gui_scale));
+        zui_set_width(min(max(string_width(caption), string_width(tr(string_replace_all(caption, " ", "_")))) * global.gui_scale, 128 * global.gui_scale));
         zui_set_height(16 * global.gui_scale);
 	    callback = function(){
 	        oKeyboardTab.waiting_keybind = true;
@@ -97,7 +97,7 @@ popup_reset_callback_positive = function(){
 		if(idx != -1){
 		    caption = keycode_to_string(global.KeyBinds[| idx]);
 		    zui_set_width(
-		        min(string_width(caption) * global.gui_scale, 128 * global.gui_scale)
+		        min(max(string_width(caption), string_width(tr(string_replace_all(caption, " ", "_")))) * global.gui_scale, 128 * global.gui_scale)
 		    );
 		}
 	}	

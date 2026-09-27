@@ -118,7 +118,7 @@ function spawn_bots(map_index, spawn_friendly = false) {
     var spawned_team = spawn_friendly
         ? player_team
         : (player_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE);
-	var team_bot_position = 0;
+	var team_position_index = spawned_team - TEAM.POLICE;
 
 	if(!IS_NET){
 		initialize_bot_database(map_index);
@@ -153,8 +153,8 @@ function spawn_bots(map_index, spawn_friendly = false) {
 
 	            if (attempts < max_attempts) {
 	                var bot = instance_create_layer(spawn_x, spawn_y, "LivingO", oBot);
-				if(!IS_NET){
-					var database_stats = get_bot_database_stats(spawned_team, team_bot_position);
+				if(!IS_NET && instance_exists(oGameController)){
+					var database_stats = get_bot_database_stats(spawned_team, oGameController.bot_spawn_position[team_position_index]);
 					if(!is_undefined(database_stats)){
 						bot.stats = database_stats;
 						bot.stats.Health_points = bot.stats.Max_health_points;
@@ -163,13 +163,13 @@ function spawn_bots(map_index, spawn_friendly = false) {
 						bot.stats.Damage_stamina_points = bot.stats.Max_stamina_points;
 						bot.stats.Room = room;
 					}
+					oGameController.bot_spawn_position[team_position_index]++;
 				}
 				bot.stats.Team = spawned_team;
 				bot.has_defuse_kit = spawned_team == TEAM.POLICE && percent_chance(25);
 				bot.sprite_index = spawned_team == TEAM.TERRORIST
 					? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4)
 					: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
-				team_bot_position++;
 	            } else {
 					return false;
 	            }

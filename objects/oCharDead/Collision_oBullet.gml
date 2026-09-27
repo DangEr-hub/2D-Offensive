@@ -1,13 +1,13 @@
 /// @description Insert description here
 // You can write your code in this editor
-if(global.ItemIndex[# other.stats.Item_id, ItemStat.Type] != "Weapon"){
+if(global.ItemIndex[# other.stats.Item_id, ITEMSTATS.Type] != "Weapon"){
 	exit;
 }
 
 
 var bullet_hit = snd_BulletHit;
-var BloodSplashNumber = round(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 5);
-var BloodParticleNumber = round(global.ItemIndex[#other.stats.Item_id, ItemStat.Damage] / 2);
+var BloodSplashNumber = round(global.ItemIndex[#other.stats.Item_id, ITEMSTATS.Damage] / 5);
+var BloodParticleNumber = round(global.ItemIndex[#other.stats.Item_id, ITEMSTATS.Damage] / 2);
 
 if(other.stats.Tracer_image == 2){
 	BloodParticleNumber = 1;

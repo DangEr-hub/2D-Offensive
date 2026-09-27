@@ -22,7 +22,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() - button_height*1.25, obj
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Exit";
+	caption = "Close";
 	callback = function(){
 		with(oUsableItemDescription){
 			zui_destroy();
@@ -42,8 +42,8 @@ description_position_y = offset_position_y + grid_height;
 with(zui_create(description_position_x, description_position_y, objUILabel)){
 	zui_set_anchor(0, 0);
 	font = set_font("GUI_grid");
-	item_id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+	item_id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
+	caption = tr_desc(global.Inventory[#oDraw.var_slot, INDEX.slot_id]);
 }

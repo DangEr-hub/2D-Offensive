@@ -99,14 +99,14 @@ if(can_damage){
 			}
 		}
 		
-		var armour_id = Item.None;
-		var helmet_id = Item.None;
-		var shield_id = Item.None;
+		var armour_id = ITEM.None;
+		var helmet_id = ITEM.None;
+		var shield_id = ITEM.None;
 		
 		if(hit_object.object_index == oPlayer){
-			armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-			helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-			shield_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+			armour_id = global.Inventory[# OtherSlot.Armour, INDEX.slot_id];
+			helmet_id = global.Inventory[# OtherSlot.Helmet, INDEX.slot_id];
+			shield_id = global.Inventory[# OtherSlot.Shield, INDEX.slot_id];
 		}else if(hit_object.object_index == oBot){
 			armour_id = hit_object.ArmourID;
 			helmet_id = hit_object.HelmetID;

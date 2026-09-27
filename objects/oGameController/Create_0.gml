@@ -17,7 +17,9 @@ assists = 0;
 current_round = 0;
 playing_time = 0;
 round_ended = false;
+next_round_requested = false;
 round_start_money = global.player_stats.Money;
+bot_spawn_position = [0, 0];
 
 /// @description Round economy controller
 

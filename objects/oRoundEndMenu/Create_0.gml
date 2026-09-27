@@ -16,10 +16,13 @@ title_position_x = zui_get_width() * .5;
 title_position_y = zui_get_height() * .1 + 24/global.gui_scale;
 base_position_y = zui_get_height() * .2 + 24/global.gui_scale;
 gap = 128;
-test_respawn = IS_NET
+spectate_respawn = !IS_NET && instance_exists(oSpectateControl)
+	&& instance_exists(global.local_player)
+	&& global.local_player.stats.Health_points <= 0;
+test_respawn = spectate_respawn || (IS_NET
 	&& instance_exists(global.local_player)
 	&& global.local_player.stats.Health_points <= 0
-	&& (!oNetworkManager.is_server || !oNetworkManager.round_resolved);
+	&& (!oNetworkManager.is_server || !oNetworkManager.round_resolved));
 
 if(test_respawn){
 	title_color = c_gray;
@@ -62,6 +65,11 @@ rank_callbacks = [
 
 popup_respawn_callback_positive = function(){	
 	if(!instance_exists(oNetworkManager)){
+		if(instance_exists(oGameController) && (!oGameController.round_ended || instance_exists(oSpectateControl))){
+			oGameController.next_round_requested = true;
+			if(!oGameController.round_ended) round_end("Loss");
+			return;
+		}
 		with(objZUIMain){
 			zui_destroy();	
 		}
@@ -77,7 +85,11 @@ popup_respawn_callback_positive = function(){
 };
 
 respawn_callback = function(){
-	ui_show_popup("Continue?", "Continue", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_respawn_callback_positive, -1);		
+	if(spectate_respawn && instance_exists(oGameController) && !oGameController.round_ended){
+		ui_show_popup("Surrender round?", "This round will count as a loss.", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_respawn_callback_positive, -1);
+	}else{
+		ui_show_popup("Continue?", "Continue", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_respawn_callback_positive, -1);
+	}
 };
 
 popup_exit_callback_positive = function(){
@@ -102,7 +114,7 @@ popup_main_menu_callback_positive = function(){
 };
 
 main_menu_callback = function(){
-	ui_show_popup("Leave to main menu?", "Leave", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
+	ui_show_popup("Leave to the main menu?", "Leave", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
 };
 #endregion
 
@@ -163,7 +175,7 @@ button_width = 128 * global.gui_scale;
 button_height = 32 * global.gui_scale;
 button_spacing = round(button_height * 1.4);
 button_start_y = round(zui_get_height() * .7 - offset_y);
-with(zui_create(zui_get_width() * .5, button_start_y, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -173,14 +185,14 @@ with(zui_create(zui_get_width() * .5, button_start_y, objUIButton)){
 			var _black = zui_create(0, 0, objUIBlack, -1000);
 			with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oDamageTable, -1000)) {
 				black = _black;
-				alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+				alpha = global.gui_alpha * 2.25; alpha_value = 0;
 				window_id = id;
 			}
 		}
 	};
 }
 
-with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*2, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -190,15 +202,27 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButt
 	};
 }
 
-with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*2, objUIButton, -999)){
-	zui_set_anchor(0.5, 0);
-	zui_set_width(other.button_width);
-	zui_set_height(other.button_height);
-	caption = other.test_respawn ? "Respawn" : "Next round";
-	callback = other.respawn_callback;
+spectate_button = noone;
+if(spectate_respawn && array_length(oSpectateControl.candidate_bots) > 0){
+	spectate_button = zui_create(zui_get_width() * .5, button_start_y, objUIButton, -999);
+	with(spectate_button){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(other.button_width);
+		zui_set_height(other.button_height);
+		caption = "Spectate";
+		callback = function(){ with(oSpectateControl) begin_spectate(); };
+	}
 }
 
 with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIButton, -999)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = "Next round";
+	callback = other.respawn_callback;
+}
+
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -206,7 +230,7 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIBu
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

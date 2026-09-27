@@ -1,8 +1,17 @@
-if(round_ended == false && oDraw.PauseMenu == false && oDraw.RespawnMenu == false){
+if(round_ended == false && oDraw.PauseMenu == false && (oDraw.RespawnMenu == false || instance_exists(oSpectateControl))){
 	playing_time ++;
 }
 
-if(round_ended == true && oDraw.RespawnMenu == false){
+if(round_ended == true && (oDraw.RespawnMenu == false || instance_exists(oSpectateControl))){
+	if(instance_exists(oSpectateControl)){
+		with(oSpectateControl) instance_destroy();
+		with(objZUIMain) zui_destroy();
+		oDraw.spectating = false;
+		oDraw.spectate_target = noone;
+		oDraw.RespawnMenu = false;
+		oDraw.BackGround = -1;
+		oDraw.alarm[0] = -1;
+	}
 	oDraw.RespawnMenu = true;
 	if(player_win == true){
 		global.game_struct.Rounds_win ++;
@@ -23,4 +32,8 @@ if(round_ended == true && oDraw.RespawnMenu == false){
 		var game_result = calculate_game_result(global.game_struct.Rounds_win, global.game_struct.Rounds_lost);
 		update_eggy_rating_system(game_result, global.MapID);
 	}		
+	if(next_round_requested && !oDraw.GameEndMenu){
+		with(objZUIMain) zui_destroy();
+		room_restart();
+	}
 }

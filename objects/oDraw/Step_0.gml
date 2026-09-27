@@ -4,9 +4,45 @@ global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
 
+if(!network_devices_initialized){
+	for(var camera_index = 0; camera_index < instance_number(oCam); camera_index++){
+		register_network_device(instance_find(oCam, camera_index), "c");
+	}
+	for(var door_index = 0; door_index < instance_number(oDoor); door_index++){
+		register_network_device(instance_find(oDoor, door_index), "d");
+	}
+	for(var terminal_index = 0; terminal_index < instance_number(oTerminal); terminal_index++){
+		register_network_device(instance_find(oTerminal, terminal_index), "t");
+	}
+	network_devices_initialized = true;
+}
+
 var audio_listener_target = get_audio_listener_target();
 if (instance_exists(audio_listener_target)) {
 	audio_listener_position(audio_listener_target.x, audio_listener_target.y, 0);
+}
+
+var nearby_water = instance_exists(audio_listener_target)
+	? instance_nearest(audio_listener_target.x, audio_listener_target.y, oWater)
+	: noone;
+if (instance_exists(nearby_water) && audio_emitter_exists(river_emitter)) {
+	var river_x = (nearby_water.bbox_left + nearby_water.bbox_right) * .5;
+	var river_y = (nearby_water.bbox_top + nearby_water.bbox_bottom) * .5;
+	if (point_distance(audio_listener_target.x, audio_listener_target.y, river_x, river_y) <= 1024) {
+		audio_emitter_position(river_emitter, get_spatial_audio_x(river_x, audio_listener_target), river_y, 0);
+		var river_gain = instance_exists(global.local_player)
+			? clamp(global.local_player.muffled_sounds, 0, 1) : 1;
+		audio_emitter_gain(river_emitter, river_gain);
+		if (river_sound == -1 || !audio_is_playing(river_sound)) {
+			river_sound = audio_play_sound_on(river_emitter, snd_River, true, 0);
+		}
+	} else if (river_sound != -1) {
+		audio_stop_sound(river_sound);
+		river_sound = -1;
+	}
+} else if (river_sound != -1) {
+	audio_stop_sound(river_sound);
+	river_sound = -1;
 }
 
 
@@ -21,7 +57,7 @@ if (has_bomb_authority && global.bomb_planted) {
 			instance_destroy();
 		}
 	} else {
-		if(PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
+		if(PauseMenu == false && (RespawnMenu == false || instance_exists(oSpectateControl)) && GameEndMenu == false){
 		global.bomb_timer = max(0, global.bomb_timer - 1);
 		}
 	}
@@ -128,7 +164,7 @@ if(instance_exists(global.local_player)){
 	}
 	#endregion
 
-	if (spectating) {
+	if (spectating && IS_NET) {
 		if (!instance_exists(spectate_target) || spectate_target.stats.Health_points <= 0) {
 			spectate_target = find_living_player_teammate(global.local_player.stats.Team, global.local_player);
 		}
@@ -169,7 +205,7 @@ if(instance_exists(global.local_player)){
 	#endregion
 	
 	#region Airplane spawn
-	var chance = .05;
+	var chance = .01;
 	if((!IS_NET || oNetworkManager.is_server) && percent_chance(chance) && PauseMenu == false && RespawnMenu == false && GameEndMenu == false){
 		var offset = sprite_get_width(spr_AirPlane) * .5;
 		var ao = 45;
@@ -202,56 +238,57 @@ if(instance_exists(global.local_player)){
 	    play_sound(global.local_player.x, global.local_player.y, bird_sound, global.local_player.id);
 	    bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
 	}
-	
-	bloom_threshold = .29;
-	if(global.local_player.ToggleInfraVision == true){
-		bloom_threshold = .35;
-	}
-	
-	if(keyboard_check_pressed(global.KeyBinds[| KEY.Pause]) && !global.local_player.terminal_opened && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
-		if(PauseMenu == false){
 
-			pause(id);
-			PauseMenu = true;	
-		}else{
-			unpause(id);
-			PauseMenu = false;
+	if(keyboard_check_pressed(vk_escape) && instance_exists(oTerminal)){
+		with(oTerminal){
+			zui_destroy();
 		}
-	}
-	
-	if(keyboard_check_pressed(vk_escape)){
-		if(global.local_player.player_can_shoot == false){
-			global.local_player.player_can_shoot = true;
-		}
-		
-		if(instance_exists(oMortarMenu)){
-			with(oMortarMenu){
-				zui_destroy();
+		global.local_player.player_can_shoot = true;
+	}else{
+		if(keyboard_check_pressed(global.KeyBinds[| KEY.Pause]) && !instance_exists(oTerminal) && RespawnMenu == false && !instance_exists(oInventory) && !instance_exists(oWeaponAttachments) && !instance_exists(oBuyMenu) && !instance_exists(oMortarMenu)){
+			if(PauseMenu == false){
+				pause(id);
+				PauseMenu = true;
+			}else{
+				unpause(id);
+				PauseMenu = false;
 			}
-			global.local_player.moving_state = STATES_PLAYER.none_state;
 		}
-		
-		if(instance_exists(oBuyMenu)){
-			if(instance_exists(oBuyMenuDescription)){
-				with(oBuyMenuDescription){
+
+		if(keyboard_check_pressed(vk_escape) && !instance_exists(oSpectateControl)){
+			if(global.local_player.player_can_shoot == false){
+				global.local_player.player_can_shoot = true;
+			}
+
+			if(instance_exists(oMortarMenu)){
+				with(oMortarMenu){
+					zui_destroy();
+				}
+				global.local_player.moving_state = STATES_PLAYER.none_state;
+			}
+
+			if(instance_exists(oBuyMenu)){
+				if(instance_exists(oBuyMenuDescription)){
+					with(oBuyMenuDescription){
+						zui_destroy();
+					}
+				}
+				with(oBuyMenu){
 					zui_destroy();
 				}
 			}
-			with(oBuyMenu){
-				zui_destroy();
+			if(instance_exists(oInventory)){
+				instance_destroy(oInventory);
+				instance_destroy(oSlot);
 			}
-		}
-		if(instance_exists(oInventory)){
-			instance_destroy(oInventory);
-			instance_destroy(oSlot);
-		}
-		if(instance_exists(oWeaponAttachments)){
-			show_weapon_attachments = false;
-			with(oWeaponAttachments){
-				zui_destroy();
+			if(instance_exists(oWeaponAttachments)){
+				show_weapon_attachments = false;
+				with(oWeaponAttachments){
+					zui_destroy();
+				}
 			}
+			item_description_destroy();
 		}
-		item_description_destroy();
 	}
 
 	if(PauseMenu == true
@@ -272,8 +309,8 @@ if(instance_exists(global.local_player)){
 		window_set_cursor(cr_none);	
 	}
 
-	if(keyboard_check_pressed(global.KeyBinds[| KEY.WeaponAttachments])){
-		if(global.Inventory[# global.local_player.WeaponID, Index.slot_id] != Item.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false &&
+	if(!instance_exists(oSpectateControl) && keyboard_check_pressed(global.KeyBinds[| KEY.WeaponAttachments])){
+		if(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id] != ITEM.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false &&
 		!instance_exists(oBuyMenu)){
 			if(show_weapon_attachments == false){
 				with(zui_main()){
@@ -302,7 +339,7 @@ if(instance_exists(global.local_player)){
 	}
 	
 	#region Buy menu
-	if (!global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state &&
+	if (!instance_exists(oSpectateControl) && !global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state &&
 	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
 		if(buy_time <= 0){
 			buy_period_message_timer = game_get_speed(gamespeed_fps) * 2;
@@ -321,13 +358,13 @@ if(instance_exists(global.local_player)){
 	#endregion
 
 
-	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0){
+	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0 && !instance_exists(oRoundEndMenu) && !instance_exists(oGameEndMenu)){
 		with(zui_main()){
 			if(other.GameEndMenu == true && !instance_exists(oGameEndMenu)){
 				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 					alpha_value = 0;
-					alpha = global.GUIHUDAlpha * 2.25; 
+					alpha = global.gui_alpha * 2.25; 
 					window_id = id;
 				}
 			}
@@ -335,7 +372,7 @@ if(instance_exists(global.local_player)){
 				zui_create(0, 0, objUIBlack, -1000);
 				with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 					alpha_value = 0;
-					alpha = global.GUIHUDAlpha * 2.25; 
+					alpha = global.gui_alpha * 2.25; 
 					window_id = id;
 				}
 			}

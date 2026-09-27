@@ -3,9 +3,10 @@ if(!instance_exists(obj_hazeC)){
 }
 event_inherited();
 dilatation_timer = -1;
+adrenaline_timer = -1;
+steroids_timer = -1;
 current_building_id = -1;
 door_cooldown = -1;
-terminal_opened = false;
 command = array_create(4, -1);
 anim_base = TEXTURES.prone;
 equip_time_max = -1;
@@ -16,12 +17,11 @@ selected_bot = noone;
 bot_select_index = -1;
 bot_select_list = ds_list_create();
 alarm[0] = 1;
-wpn_id = Item.None;
+wpn_id = ITEM.None;
 Knife = -1;
 AmmoNeeded = 0;
 respawn_x = x;
 respawn_y = y;
-in_water_timer = -1;
 muffled_sounds = 1; ///Pro efekt muffled soundu
 rotation_direction = 1; ///Pro view bobbing
 rotation_angle = 0; ///Pro view bobbing
@@ -53,6 +53,7 @@ CanShoot = true;
 ShootTimer = -1;
 WeaponID = OtherSlot.Primary;
 Weapon = noone;
+machine_gun_take_loadout = undefined;
 XSpeed = 0;
 YSpeed = 0;
 ScopeIn = false;
@@ -65,7 +66,7 @@ FlashedBackGround = -1;
 ToggleNightVision = false;
 BaseHealingPower = round(global.player_stats.Max_health/25);
 HealingTime = -1;
-HealingItemId = Item.None;
+HealingItemId = ITEM.None;
 Healing = false;
 healing_pending = false;
 healing_request_timer = 0;
@@ -144,9 +145,11 @@ ViewShakeValuePower = 0;
 
 #region Movement vars
 SpeedMul = 1;
-RelativeSpeedValue = MOVE_SPD * 0.1;
+RelativeSpeedValue = MOVE_SPD * 0.075;
 RelativeSpeedX = 0;
 RelativeSpeedY = 0;
+last_move_xpos = 0;
+last_move_ypos = 0;
 MovingStabilizationTime = round(.025 * game_get_speed(gamespeed_fps));
 MovingStabilizationTimer = -1;
 running = false;
@@ -196,22 +199,25 @@ death_handled = false;
 // Network state
 network_bit_state = 0;
 network_moving_state = STATES_PLAYER.none_state;
-network_armour_id = Item.None;
-network_helmet_id = Item.None;
-network_shield_id = Item.None;
+network_armour_id = ITEM.None;
+network_helmet_id = ITEM.None;
+network_shield_id = ITEM.None;
 network_armour_dur = 0;
 network_helmet_dur = 0;
 network_shield_dur = 0;
-network_weapon_id = Item.None;
+network_weapon_id = ITEM.None;
 network_shoot_timer = -1;
-network_suppressor = Item.None;
-network_barrel = Item.None;
-network_scope = Item.None;
-network_grip = Item.None;
+network_suppressor = ITEM.None;
+network_barrel = ITEM.None;
+network_scope = ITEM.None;
+network_grip = ITEM.None;
+moving_state = STATES_PLAYER.none_state;
 network_throw_grenade = false;
-network_item_use_id = Item.None;
-network_item_use_restore_id = Item.None;
+network_item_use_id = ITEM.None;
+network_item_use_restore_id = ITEM.None;
 network_item_action_timer = -1;
+Moving = false;
+Flashed = false;
 
 #endregion
 
@@ -227,8 +233,8 @@ instance_create_depth(x, y, 200, oBombArea);
 
 global.local_player = get_local_player();
 
-if(global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.basic_machine_gun){
-	for(var i=0;i<Index.Total;i++){
+if(global.Inventory[# OtherSlot.Primary, INDEX.slot_id] == ITEM.basic_machine_gun){
+	for(var i=0;i<INDEX.Total;i++){
 		global.Inventory[# OtherSlot.Primary, i] = 0;
 	}
 }

@@ -10,10 +10,10 @@ content_left = zui_get_width() * .16;
 column_width = zui_get_width() * .36;
 content_title_y = max(75, 64 * global.gui_scale);
 
-xp_string = "Experience: " + string(global.player_stats.Xp) + "/" + string(global.player_stats.Max_xp);
-stamina_string = "Stamina: " + string(global.player_stats.Max_stamina);
-health_string = "Health: " + string(global.player_stats.Max_health);
-level_string = "Level: " + string(global.player_stats.Lvl);
+xp_string = tr("Experience") + ": " + string(global.player_stats.Xp) + "/" + string(global.player_stats.Max_xp);
+stamina_string = tr("Stamina") + ": " + string(global.player_stats.Max_stamina);
+health_string = tr("Health") + ": " + string(global.player_stats.Max_health);
+level_string = tr("Level") + ": " + string(global.player_stats.Lvl);
 bonus_xp_string = "(+" + string(global.player_stats.Max_xp) + ")";
 bonus_health_string = "(+" + string((global.player_stats.Max_health * power(STATS_LVL_UP, ln(global.player_stats.Lvl + 1))) - global.player_stats.Max_health) + ")";
 bonus_stamina_string = "(+" + string((global.player_stats.Max_stamina * power(STATS_LVL_UP, ln(global.player_stats.Lvl + 1))) - global.player_stats.Max_stamina) + ")";

@@ -10,7 +10,7 @@ if (room == rm_main_menu) {
     console_draw(global.my_console,
         global.ConsoleHeight * global.gui_scale,
         c_gray, c_silver, c_white, c_white,
-        global.GUIHUDAlpha * 2,
+        global.gui_alpha * 2,
         global.ConsoleWidth * global.gui_scale
     );
 }

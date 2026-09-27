@@ -5,6 +5,7 @@ check_vis_timer = irandom_range(1, check_vis_time);
 col_time = game_get_speed(gamespeed_fps) * .5;
 col_timer = irandom_range(1, col_time);
 stats = {};
+in_water_timer = -1;
 VisibilityTimer = -1;
 Visible = true;
 VisibilityTime = 2 * game_get_speed(gamespeed_fps);

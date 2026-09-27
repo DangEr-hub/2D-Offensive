@@ -13,7 +13,7 @@ plot_button_height = max(20 * global.gui_scale, 24);
 plot_button_y_offset = -(plot_button_height - font_get_size(draw_get_font())) * .25;
 plot_control_gap = max(24 * global.gui_scale, 32);
 rank_plot_gap = max(8 * global.gui_scale, 12);
-ratings_label_width = string_width("Ratings: ");
+ratings_label_width = max(string_width(tr("Ratings") + ": "), string_width(tr("RDs") + ": "));
 
 rank_position = 0;
 if(global.game_struct.Played_games >= TRACKING_PERIOD / 2){
@@ -26,7 +26,7 @@ rank_image_size_height = max(sprite_get_height(spr_ranks) / 2 * global.gui_scale
 rank_image_position_x = round(column_width * .5 - rank_image_size_width * .5);
 rank_image_gap = rank_image_size_height * 1.1;
 rank_title_y = rank_image_position_y - rank_image_gap;
-rank_title_string = "Rank: " + string(global.RankIndex[#rank_position, RankStat.Name]);
+rank_title_string = tr("Rank") + ": " + string(global.RankIndex[#rank_position, RankStat.Name]);
 rank_title_width = string_width(rank_title_string);
 rank_title_x = round(column_width * .5 - rank_title_width * .5);
 rank_plot_x = rank_title_x + rank_title_width + rank_plot_gap;
@@ -153,14 +153,12 @@ enemy_rating_graph_callback = function(){
 			values_y = [];
 			line_color = c_yellow;
 			point_color = c_orange;
-			x_axis_name = "Upcoming game";
+			x_axis_name = "Game";
 			y_axis_name = "Rating";
 
-			var first_enemy = global.game_struct.Current_game;
-			var remaining_games = TRACKING_PERIOD - first_enemy;
-			grid_x_steps = max(1, remaining_games - 1);
+			grid_x_steps = max(1, TRACKING_PERIOD - 1);
 
-			for(var game_offset = 0; game_offset < remaining_games; game_offset++){
+			for(var game_offset = 0; game_offset < TRACKING_PERIOD; game_offset++){
 				var enemy_index = first_enemy + game_offset;
 				var enemy_ep = global.game_struct.Enemy_ep[enemy_index];
 
@@ -200,14 +198,12 @@ enemy_rd_graph_callback = function(){
 			values_y = [];
 			line_color = c_aqua;
 			point_color = c_blue;
-			x_axis_name = "Upcoming game";
+			x_axis_name = "Game";
 			y_axis_name = "RD";
 
-			var first_enemy = global.game_struct.Current_game;
-			var remaining_games = TRACKING_PERIOD - first_enemy;
-			grid_x_steps = max(1, remaining_games - 1);
+			grid_x_steps = max(1, TRACKING_PERIOD - 1);
 
-			for(var game_offset = 0; game_offset < remaining_games; game_offset++){
+			for(var game_offset = 0; game_offset < TRACKING_PERIOD; game_offset++){
 				var enemy_index = first_enemy + game_offset;
 				var enemy_rd = global.game_struct.Enemy_rd[enemy_index];
 

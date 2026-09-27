@@ -32,7 +32,7 @@ if(instance_exists(global.local_player)){
 	    } else {
 	        WobbleX += 5*max(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0);
 	        WobbleY += 5*max(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
-	        WobbleScopeInMultiplier = clamp(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*5, 0, 10);
+	        WobbleScopeInMultiplier = clamp(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0, 10);
 	    }
 	}
 
@@ -50,27 +50,27 @@ if(instance_exists(global.local_player)){
 	#endregion
 
 	#region Recoil
-	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
-	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_grip], ItemStat.KickBackPower];	
-	var recoilY = global.ItemIndex[# global.local_player.wpn_id, ItemStat.RecoilY] * horizontal_recoil_multiplier;
-	var recoilX = global.ItemIndex[# global.local_player.wpn_id, ItemStat.RecoilX] * vertical_recoil_multiplier;
+	var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackInaccuracyMultiplier];
+	var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackPower];	
+	var recoilY = global.ItemIndex[# global.local_player.wpn_id, ITEMSTATS.RecoilY] * horizontal_recoil_multiplier;
+	var recoilX = global.ItemIndex[# global.local_player.wpn_id, ITEMSTATS.RecoilX] * vertical_recoil_multiplier;
 	
-	if(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.HardRecoil] == true){
+	if(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.HardRecoil] == true){
 		
 		#region Hard recoil
 		if(global.local_player.KickBack > 0){
 			
 			#region Variables
-			var KBPhase1 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase1];
-			var KBPhase2 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.KBPhase2];
+			var KBPhase1 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.KBPhase1];
+			var KBPhase2 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.KBPhase2];
 			#endregion
 
-			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootTimer] / 2 
-			/*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] == WEAPON_CLASS.PISTOL*/) 
-			|| (global.local_player.shooting /*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.WeaponTypeClass] != WEAPON_CLASS.PISTOL*/)) {
+			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootTimer] / 2 
+			/*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.PISTOL*/) 
+			|| (global.local_player.shooting /*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.PISTOL*/)) {
 				
 				#region Recoil mechanic
-			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.RecoilY]);
+			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.RecoilY]);
 			    var targetX = mouse_x;
 			    var targetY = mouse_y;
 				
@@ -145,7 +145,7 @@ if(instance_exists(global.local_player)){
 	}else{
 
 		#region Basic recoil
-		if(global.local_player.CanShoot == false && global.local_player.ShootTimer >= global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootTimer]/2){
+		if(global.local_player.CanShoot == false && global.local_player.ShootTimer >= global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootTimer]/2){
 			if(RecoilTimer[0] == -1){
 				RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
 			}
@@ -168,7 +168,7 @@ if(instance_exists(global.local_player)){
 		
 		#region Recoil X
 		if(RecoilTimer[1] > -1){
-			if(global.Inventory[# global.local_player.WeaponID, Index.slot_ammo] % 2 == 0){ 
+			if(global.Inventory[# global.local_player.WeaponID, INDEX.slot_ammo] % 2 == 0){ 
 				Recoil[1] += StabilizationSpeed * sign(recoilX);
 				Recoil[1] = min(Recoil[1], recoilX * global.local_player.KickBack);
 			}else{
@@ -238,6 +238,7 @@ if(instance_exists(global.local_player)){
 	scope_sway_strength = lerp(scope_sway_strength, target_sway_strength, sway_lerp);
 	scope_sway_x = (dsin(scope_sway_phase_x) + dsin(scope_sway_phase_y * 0.7) * 0.35) * scope_sway_strength;
 	scope_sway_y = (dsin(scope_sway_phase_y) + dsin(scope_sway_phase_x * 0.55) * 0.25) * scope_sway_strength * 1.25;
+
 	#endregion
 	
 }
@@ -248,6 +249,15 @@ if(global.DynamicCrosshair == true){
 	AlphaMul = .25;
 }
 #endregion
+
+if(global.Inventory[# global.local_player.WeaponID, INDEX.slot_grip] == ITEM.bipod){
+	if(global.local_player.moving_state == STATES_PLAYER.prone_state){
+		x_offset = 0;
+		y_offset = 0;
+		scope_sway_x = 0;
+		scope_sway_y = 0;
+	}
+}
 
 x = round(x);
 y = round(y);

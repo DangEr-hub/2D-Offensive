@@ -1,12 +1,15 @@
 
+if (river_sound != -1) audio_stop_sound(river_sound);
+if (audio_emitter_exists(river_emitter)) audio_emitter_free(river_emitter);
+
 if(player_has_machine_gun()){
-	for(var i = 0;i<WPN_ATTACHMENTS.Total;i++){
-		global.weapon_attachments[0][i] = Item.None;
+	for(var i = INDEX.slot_scope; i <= INDEX.slot_suppressor; i++){
+		global.Inventory[# OtherSlot.Primary, i] = ITEM.None;
 	}
-	global.Inventory[# OtherSlot.Primary, Index.slot_id] = Item.None;
-	global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = 0;
-	global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = 0;
-	global.ItemIndex[# global.Inventory[# OtherSlot.Primary, Index.slot_id], ItemStat.MaxAmmo] = 0;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_id] = ITEM.None;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_ammo] = 0;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_clip_ammo] = 0;
+	global.ItemIndex[# global.Inventory[# OtherSlot.Primary, INDEX.slot_id], ITEMSTATS.MaxAmmo] = 0;
 }
 with(zui_main()){
 	zui_destroy();

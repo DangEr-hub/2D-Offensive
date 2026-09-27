@@ -6,7 +6,7 @@ draw_set_font(set_font("GUI_small"));
 zui_set_size(pause_width_tab, pause_height_tab);
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-	caption = "Paused";
+	caption = "Pause";
 	draggable = 1;
 }
 
@@ -24,6 +24,9 @@ popup_exit_callback_positive = function(){
 	}
 	if(!IS_NET && instance_exists(oGameController)){
 		global.player_stats.Money = oGameController.round_start_money;
+		ds_grid_clear(global.Inventory, 0);
+		ds_grid_clear(global.MouseSlot, 0);
+		global.player_stats.Weight = 0;
 	}
 	save_game();
 	game_end();	
@@ -39,6 +42,9 @@ popup_main_menu_callback_positive = function(){
 	}
 	if(!IS_NET && instance_exists(oGameController)){
 		global.player_stats.Money = oGameController.round_start_money;
+		ds_grid_clear(global.Inventory, 0);
+		ds_grid_clear(global.MouseSlot, 0);
+		global.player_stats.Weight = 0;
 	}
 	save_game();
 	audio_stop_all();
@@ -47,7 +53,7 @@ popup_main_menu_callback_positive = function(){
 };
 
 main_menu_callback = function(){
-	ui_show_popup("Leave to main menu?", "Leave", "Yes", "No", 256 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
+	ui_show_popup("Leave to the main menu?", "Leave", "Yes", "No", 256 * global.gui_scale, 128 * global.gui_scale, popup_main_menu_callback_positive, -1);	
 };
 
 button_width = 128 * global.gui_scale;

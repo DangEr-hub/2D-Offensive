@@ -98,8 +98,8 @@ if(instance_exists(oPlayer)){
 
 		if (global.local_player.in_water == true) {
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000.0);
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)) * .5);
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 1);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)) * .25);
+			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 0.5);
 		} else {
 			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0.0);
 		}
@@ -173,8 +173,8 @@ if(instance_exists(oPlayer)){
 					draw_clear_alpha(c_black, 0);
 					shader_set(shd_NightVision);
 					shader_set_uniform_f(shader_get_uniform(shd_NightVision, "u_resolution"), surface_get_width(post_surface), surface_get_height(post_surface));
-					shader_set_uniform_f(shader_get_uniform(shd_NightVision, "intensity_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionIntensityPower]);
-					shader_set_uniform_f(shader_get_uniform(shd_NightVision, "noise_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionNoisePower]);
+					shader_set_uniform_f(shader_get_uniform(shd_NightVision, "intensity_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionIntensityPower]);
+					shader_set_uniform_f(shader_get_uniform(shd_NightVision, "noise_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionNoisePower]);
 					draw_surface_stretched(post_surface, 0, 0, global.GuiW, global.GuiH);
 					shader_reset();
 					surface_reset_target();
@@ -246,11 +246,11 @@ if(instance_exists(oPlayer)){
 			);
 			shader_set_uniform_f(
 				shader_get_uniform(shd_NightVision, "intensity_strength"), 
-				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionIntensityPower]
+				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionIntensityPower]
 			);
 			shader_set_uniform_f(
 				shader_get_uniform(shd_NightVision, "noise_strength"), 
-				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionNoisePower]
+				global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionNoisePower]
 			);
 		    draw_surface_stretched(nightvision_surface, 0, 0, global.GuiW, global.GuiH);
 		    shader_reset();
@@ -284,8 +284,8 @@ if(instance_exists(oPlayer)){
 			if(global.local_player.ToggleNightVision){
 				shader_set(shd_NightVision);
 				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "u_resolution"), global.GuiW, global.GuiH);
-				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "intensity_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionIntensityPower]);
-				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "noise_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, Index.slot_id], ItemStat.NightVisionNoisePower]);
+				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "intensity_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionIntensityPower]);
+				shader_set_uniform_f(shader_get_uniform(shd_NightVision, "noise_strength"), global.ItemIndex[#global.Inventory[# OtherSlot.Helmet, INDEX.slot_id], ITEMSTATS.NightVisionNoisePower]);
 				draw_surface_stretched(nightvision_surface, 0, 0, global.GuiW, global.GuiH);
 				shader_reset();
 			}else if(global.local_player.ToggleInfraVision){

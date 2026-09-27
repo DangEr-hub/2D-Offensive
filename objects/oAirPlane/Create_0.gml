@@ -28,14 +28,14 @@ stats = {
 	Health_points: hp,
 	Max_health_points: hp,
 	Damage_health_points: hp,
-	Item_id: Item.base_explosion,
+	Item_id: ITEM.base_explosion,
 	Damage: 0,
 	Object_index: -1,
 	Owner_name: "Aircraft",
 	Owner_id: -1,
 	Object: noone,
 };
-stats.Damage = global.ItemIndex[#stats.Item_id, ItemStat.Damage];
+stats.Damage = global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage];
 
 
 

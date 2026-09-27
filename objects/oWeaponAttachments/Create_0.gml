@@ -1,13 +1,13 @@
 event_inherited();
 texture_width = min(384 * global.gui_scale, 512);
 texture_height = min(192 * global.gui_scale, 320);
-Id = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
+Id = global.Inventory[# global.local_player.WeaponID, INDEX.slot_id];
 
 draw_set_font(set_font("GUI_small"));
 zui_set_size(texture_width, texture_height);
 
 with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
-    caption = global.ItemIndex[# other.Id, ItemStat.Name];
+    caption = tr_name(other.Id);
     draggable = 1;
 }
 
@@ -16,9 +16,9 @@ var w_width = 256 * scale;
 var w_height = 128 * scale;
 var weapon_x = zui_get_width() * 0.5;
 var weapon_y = zui_get_height() * 0.59;
-var sockets = global.ItemIndex[# Id, ItemStat.attach_sockets];
+var sockets = global.ItemIndex[# Id, ITEMSTATS.attach_sockets];
 var slot_keys = ["scope", "barrel", "grip", "suppressor"];
-var inv_slots = [Index.slot_scope, Index.slot_barrel, Index.slot_grip, Index.slot_suppressor];
+var inv_slots = [INDEX.slot_scope, INDEX.slot_barrel, INDEX.slot_grip, INDEX.slot_suppressor];
 
 var att = { 
     scope:      { items: [] },
@@ -28,13 +28,13 @@ var att = {
 };
 
 for(var j = 0; j < INVENTORY_SIZE; j++){
-    var item_in_inv = global.Inventory[# j, Index.slot_id];
-    if(item_in_inv == Item.None){ continue; }
+    var item_in_inv = global.Inventory[# j, INDEX.slot_id];
+    if(item_in_inv == ITEM.None){ continue; }
     
-    var item_slot_type = global.ItemIndex[# item_in_inv, ItemStat.slot];
+    var item_slot_type = global.ItemIndex[# item_in_inv, ITEMSTATS.slot];
     
     // Projdeme naše 4 sledované typy a porovnáme
-    for(var k = 0; k < ATTACHMENTS.slot_suppressor + 1; k++){
+    for(var k = 0; k < ATTACHMENTS.suppressor + 1; k++){
         if(item_slot_type == inv_slots[k]){
 			array_push(att[$ slot_keys[k]].items, { 
 			    item_id: item_in_inv, 
@@ -68,7 +68,7 @@ with (inst_weapon) {
 }
 
 // Attachmenty a tlačítka
-for (var i = 0; i < ATTACHMENTS.slot_suppressor + 1; i++) {
+for (var i = 0; i < ATTACHMENTS.suppressor + 1; i++) {
     var att_id = global.Inventory[# global.local_player.WeaponID, inv_slots[i]];
     var socket_name = slot_keys[i];
     var off = sockets[$ socket_name]; // Získáme socket
@@ -78,7 +78,7 @@ for (var i = 0; i < ATTACHMENTS.slot_suppressor + 1; i++) {
         var target_y = weapon_y + (off[1] * scale * 2);
         
         // CASE: Slot na zbrani je PRÁZDNÝ -> Vykreslíme dostupné věci z inventáře
-        if (att_id == Item.None) {
+        if (att_id == ITEM.None) {
             var list = att[$ socket_name].items;
             for (var m = 0; m < min(array_length(list), 4); m++) {
                 var item_data = list[m];
@@ -107,7 +107,7 @@ for (var i = 0; i < ATTACHMENTS.slot_suppressor + 1; i++) {
         }
 
         // CASE: Slot na zbrani je PLNÝ
-        if (att_id != Item.None) {
+        if (att_id != ITEM.None) {
             // Vykreslení ikony attachmentu
             with (zui_create(target_x, target_y, objUIImage)) {
                 zui_set_depth(500);
@@ -137,9 +137,9 @@ for (var i = 0; i < ATTACHMENTS.slot_suppressor + 1; i++) {
                     var _slot = self.target_slot;
                     var _player_weapon_row = global.local_player.WeaponID;
 
-                    if (global.Inventory[# _player_weapon_row, _slot] != Item.None) {
+                    if (global.Inventory[# _player_weapon_row, _slot] != ITEM.None) {
                         gain_item(_item, 1, 0, 0, 0, 0, 0, 0, 0, false);
-                        global.Inventory[# _player_weapon_row, _slot] = Item.None;    
+                        global.Inventory[# _player_weapon_row, _slot] = ITEM.None;    
                         if (instance_exists(oWeaponAttachments)) { with (oWeaponAttachments) { zui_destroy(); } }
                         with (zui_main()) {
                             zui_create(zui_get_width() * 0.5, zui_get_height() * 0.75, oWeaponAttachments);

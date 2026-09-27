@@ -26,11 +26,15 @@ if(instance_exists(Object)){
 		var half_animation = animation_frames * .5;
 		footstep_progress += abs(image_speed);
 
-		if(footstep_progress >= half_animation){
+		if(footstep_progress >= half_animation*.5){
 			footstep_progress -= half_animation;
 			var silent_movement = variable_instance_exists(Object, "walking") && Object.walking;
+			var footsteps = choose(snd_FootStep1, snd_FootStep2);
+			if(place_meeting(x, y, oWater)){
+				footsteps = choose(snd_WaterStep1, snd_WaterStep2);
+			}
 			if(!silent_movement){
-				play_sound(x, y, choose(snd_FootStep1, snd_FootStep2), Object);
+				play_sound(x, y, footsteps, Object);
 			}
 		}
 	}

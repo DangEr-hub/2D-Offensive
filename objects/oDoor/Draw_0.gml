@@ -1,6 +1,6 @@
 draw_self();
 event_inherited();
-draw_text(x, y, main_angle);
+//draw_text(x, y, usrname + "    " + passwd);
 
 var light_x = x + lengthdir_x(48 * image_xscale, image_angle);
 var light_y = y + lengthdir_y(48 * image_xscale, image_angle);

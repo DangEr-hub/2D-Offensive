@@ -13,7 +13,7 @@ g_width = 512 * global.gui_scale;
 g_height = 128 * global.gui_scale;
 
 alpha_value = 0;
-alpha = global.GUIHUDAlpha;
+alpha = global.gui_alpha;
 
 lottery_weapon_pool = [
 ];

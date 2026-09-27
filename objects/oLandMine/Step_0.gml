@@ -17,9 +17,9 @@ if(explode == true){
 	}else{
 	    image_index = ImageIndex + 3;
 		explosion_create(
-			global.ItemIndex[#stats.Item_id, ItemStat.AmmoSpriteID],
+			global.ItemIndex[#stats.Item_id, ITEMSTATS.AmmoSpriteID],
 			[x, y],
-			global.ItemIndex[#stats.Item_id, ItemStat.Damage],
+			global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage],
 			true,
 			stats.Object,
 			stats.Item_id

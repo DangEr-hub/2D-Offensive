@@ -14,9 +14,9 @@ if(other.is_remote == false || server_hostage_projectile){
 			exit;
 		}
 
-		var ObjectArmourID = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-		var ObjectHelmetID = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-		var ObjectShieldID = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+		var ObjectArmourID = global.Inventory[# OtherSlot.Armour, INDEX.slot_id];
+		var ObjectHelmetID = global.Inventory[# OtherSlot.Helmet, INDEX.slot_id];
+		var ObjectShieldID = global.Inventory[# OtherSlot.Shield, INDEX.slot_id];
 		if(MainObject.object_index != oPlayer){ ///Pokud to neni hitbox hrace
 			ObjectArmourID = MainObject.ArmourID;
 			ObjectHelmetID = MainObject.HelmetID;

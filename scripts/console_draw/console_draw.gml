@@ -8,7 +8,9 @@
 /// @param alpha
 /// @param width
 /// @param [x_position]
-function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined) {
+/// @param [terminal_mode]
+function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined,terminal_mode = false) {
+	c[? "terminal_mode"] = terminal_mode;
 	gpu_set_tex_filter(false);
 	/*var c,h,b1,b2,t1,t2,a;
 
@@ -24,22 +26,30 @@ function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined) {
 	if c[? "active"] {
 		draw_set_font(set_font("Console"));
 	    l = string_height("W");
+		yy = 48;
 	    p = 36; // Padding
-		ws = is_undefined(x_position) ? surface_get_width(application_surface) * .15 : x_position;
+		ws = is_undefined(x_position) ? surface_get_width(application_surface) * .075 : x_position;
 		o = 4;
 		gsw = string_width("> ");
-		sw = string_width(string_copy(c[? "string"],1,c[? "string_pos"]-1));
+		var display_string = c[? "string"];
+		if(terminal_mode){
+			var terminal_instance = instance_find(oTerminal, 0);
+			if(instance_exists(terminal_instance) && terminal_instance.sudo_login_stage == 2){
+				display_string = string_repeat("*", string_length(display_string));
+			}
+		}
+		sw = string_width(string_copy(display_string,1,c[? "string_pos"]-1));
     
 	    /* Console alpha */
 	    draw_set_alpha(a);
 		
 		/* Console outline */
 		draw_set_color(c_black);
-		draw_rectangle(ws - o,80 - o,w + o,(h+(p*2.5))+l + o,false);
+		draw_rectangle(ws - o,yy - o,w + o,(h+(p*2.5))+l + o,false);
     
 	    /* Command history window */
 	    draw_set_color(b1);
-		draw_rectangle(ws,80,w,(h+p*2),false);
+		draw_rectangle(ws,yy,w,(h+p*2),false);
     
 	    /* Command history */
 	    var ch,list = c[? "history"];
@@ -67,7 +77,14 @@ function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined) {
 			draw_set_alpha(1);
 	        for(s=0;s<ds_list_size(sugs);s++) {
 	            if !is_undefined(sugs[| s]) {
-					draw_text(ws,((h+p*2.5)+l)+(l*s),sugs[| s]);
+					var suggestion_y = ((h+p*2.5)+l)+(l*s);
+					if(c[? "dir"] == 1 && c[? "select"] == s){
+						draw_set_color(b2);
+						draw_rectangle(ws, suggestion_y, w, suggestion_y + l, false);
+						draw_set_color(t2);
+					}
+					draw_text(ws, suggestion_y, sugs[| s]);
+					draw_set_color(t1);
 	            }
 	        }
 	    }
@@ -84,7 +101,7 @@ function console_draw(c,h,b1,b2,t1,t2,a,w,x_position = undefined) {
     
 	    /* Draw input */
 	    draw_set_color(t2);
-	   draw_text(ws+gsw/2,h+(p*2.25),string_hash_to_newline(c[? "string"]));
+	   draw_text(ws+gsw/2,h+(p*2.25),string_hash_to_newline(display_string));
     
 	    /* Cursor alpha */
 	    c[? "cursor"] += 0.1;

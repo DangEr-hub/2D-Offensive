@@ -43,7 +43,7 @@ if(is_local){
 		    if (head_collision != noone) {
 				if(ds_list_find_index(HitList, Enemy.HeadHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
-		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower];
 		            }
 		            ds_list_add(HitList, Enemy.HeadHB.MainObject);
 		        }
@@ -51,7 +51,7 @@ if(is_local){
 		    if (body_collision != noone) {
 				if(ds_list_find_index(HitList, Enemy.BodyHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
-		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower];
 		            }
 		            ds_list_add(HitList, Enemy.BodyHB.MainObject);
 		        }
@@ -59,7 +59,7 @@ if(is_local){
 		    if (arm_collision != noone) {
 				if(ds_list_find_index(HitList, Enemy.ArmHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
-		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower];
 		            }
 		            ds_list_add(HitList, Enemy.ArmHB.MainObject);
 		        }
@@ -67,7 +67,7 @@ if(is_local){
 		    if (leg_collision != noone) {
 				if(ds_list_find_index(HitList, Enemy.LegHB.MainObject) == -1){
 		            if (ds_list_size(HitList) != 0) {
-		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower];
+		                stats.Penetration_damage += .5 / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower];
 		            }
 		            ds_list_add(HitList, Enemy.LegHB.MainObject);
 		        }
@@ -88,7 +88,7 @@ if(is_local){
 			part_type_direction(oParticleSystem.flame_particle,MotorAngle,MotorAngle,0,0);
 			part_particles_create(global.ParticleSystem, x, y, oParticleSystem.flame_particle, 50);
 		}
-		if(PointDistance <= global.ItemIndex[#stats.Item_id, ItemStat.Range]){
+		if(PointDistance <= global.ItemIndex[#stats.Item_id, ITEMSTATS.Range]){
 			if(instance_exists(stats.Nearest_enemy) && stats.Nearest_enemy != noone){
 			NearestTargetX = stats.Shot_x;
 			NearestTargetY = stats.Shot_y;
@@ -108,9 +108,9 @@ if(is_local){
 				stats.Shot_y + inaccuracy_formula(stats.Item_id, stats.Object)
 			);
 			NearestTargetX = stats.Starting_x +
-			lengthdir_x(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
+			lengthdir_x(global.ItemIndex[#stats.Item_id, ITEMSTATS.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
 			NearestTargetY = stats.Starting_y + 
-			lengthdir_y(global.ItemIndex[#stats.Item_id, ItemStat.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
+			lengthdir_y(global.ItemIndex[#stats.Item_id, ITEMSTATS.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));
 		}
 		var Angle = point_direction(stats.Starting_x, stats.Starting_y, NearestTargetX, NearestTargetY);
 		direction += get_angle(Angle, 16);
@@ -119,7 +119,7 @@ if(is_local){
 			explosion_create(
 				20, 
 				[NearestTargetX, NearestTargetY],
-				global.ItemIndex[# stats.Item_id, ItemStat.Damage] * global.ItemIndex[# other.stats.Item_id, ItemStat.damage_drop](PointDistance), 
+				global.ItemIndex[# stats.Item_id, ITEMSTATS.Damage] * global.ItemIndex[# other.stats.Item_id, ITEMSTATS.damage_drop](PointDistance), 
 				false, 
 				stats.Object, 
 				stats.Item_id,

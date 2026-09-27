@@ -27,6 +27,10 @@ function draw_graph(x_values, y_values, xx, yy, width, height, options)
     var show_labels = struct_get_default(options, "show_labels", true);
 	var x_axis_name = string(struct_get_default(options, "x_axis_name", ""));
 	var y_axis_name = string(struct_get_default(options, "y_axis_name", ""));
+	var translated_x_axis = tr(string_replace_all(x_axis_name, " ", "_"));
+	var translated_y_axis = tr(string_replace_all(y_axis_name, " ", "_"));
+	if(translated_x_axis != "") x_axis_name = translated_x_axis;
+	if(translated_y_axis != "") y_axis_name = translated_y_axis;
 	var background_margin = max(
 		0,
 		struct_get_default(options, "background_margin", 0.1)

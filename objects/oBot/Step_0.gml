@@ -3,8 +3,13 @@ event_inherited();
 
 #region Death
 if(stats.Health_points <= 0){
+	var drop_weapon_slot = WeaponPositionID;
 	if(State == STATES.MACHINE_GUN || instance_exists(machine_gun_object)){
+		drop_weapon_slot = machine_gun_slot;
 		bot_release_machine_gun();
+	}
+	if(WeaponID[drop_weapon_slot] == ITEM.None){
+		drop_weapon_slot = 1 - drop_weapon_slot;
 	}
 	if(death_timestamp < 0 || current_time - death_timestamp <= 500){
 		var death_sound_effect = choose(snd_Death1, snd_Death2);
@@ -26,22 +31,22 @@ if(stats.Health_points <= 0){
 	instance_destroy(LegHB);
 	instance_destroy(Legs);
 	drop_experience(1, xp_value, x, y, sprite_width/4);
-	if(percent_chance(10)){
+	if(WeaponID[drop_weapon_slot] != ITEM.None && percent_chance(10)){
 		ItemDrop(
-			WeaponID[WeaponPositionID], 
+			WeaponID[drop_weapon_slot], 
 			x + lengthdir_x(WeaponDistance, RotationAngle), 
 			y + lengthdir_y(WeaponDistance, RotationAngle), 
-			Ammo[WeaponPositionID],
-			ClipAmmo[WeaponPositionID],
+			Ammo[drop_weapon_slot],
+			ClipAmmo[drop_weapon_slot],
 			0,
 			1,
-			attachments[WeaponPositionID][ATTACHMENTS.slot_scope],
-			attachments[WeaponPositionID][ATTACHMENTS.slot_barrel],
-			attachments[WeaponPositionID][ATTACHMENTS.slot_grip],
-			attachments[WeaponPositionID][ATTACHMENTS.slot_suppressor]
+			attachments[drop_weapon_slot][ATTACHMENTS.scope],
+			attachments[drop_weapon_slot][ATTACHMENTS.barrel],
+			attachments[drop_weapon_slot][ATTACHMENTS.grip],
+			attachments[drop_weapon_slot][ATTACHMENTS.suppressor]
 		);
 	}
-	if(ArmourID != Item.None){
+	if(ArmourID != ITEM.None){
 		if(percent_chance(10)){
 			ItemDrop(
 				ArmourID, 
@@ -53,7 +58,7 @@ if(stats.Health_points <= 0){
 			);
 		}
 	}
-	if(HelmetID != Item.None){
+	if(HelmetID != ITEM.None){
 		if(percent_chance(10)){
 			ItemDrop(
 				HelmetID, 
@@ -67,7 +72,7 @@ if(stats.Health_points <= 0){
 	}
 	if(has_defuse_kit){
 		ItemDrop(
-			Item.DefuseKit,
+			ITEM.DefuseKit,
 			random_range(x - sprite_width/4, x + sprite_width/4),
 			random_range(y - sprite_height/4, y + sprite_height/4)
 		);
@@ -75,11 +80,13 @@ if(stats.Health_points <= 0){
 
 	if(percent_chance(25)){
 		var drop_items = [
-			{item:	Item.dilatation_pill, weight: 35},
-			{item:	Item.low_cal_box, weight: 50},
-			{item:	Item.gauge_box, weight: 35},
-			{item:	Item.med_cal_box, weight: 25},
-			{item:	Item.high_cal_box, weight: 15}
+			{item:	ITEM.dilatation_pill, weight: 35},
+			{item:	ITEM.adrenaline, weight: 15},
+			{item:	ITEM.steroids, weight: 15},
+			{item:	ITEM.low_cal_box, weight: 50},
+			{item:	ITEM.gauge_box, weight: 35},
+			{item:	ITEM.med_cal_box, weight: 25},
+			{item:	ITEM.high_cal_box, weight: 15}
 		];
 
 		var weight_sum = 0;
@@ -103,7 +110,7 @@ if(stats.Health_points <= 0){
 	}
 	
 	
-	var gnd_id = [Item.HEGrenade, Item.FlashBangGrenade, Item.SmokeGrenade, Item.MolotovGrenade];
+	var gnd_id = [ITEM.HEGrenade, ITEM.FlashBangGrenade, ITEM.SmokeGrenade, ITEM.MolotovGrenade];
 	for(var i = 0; i < array_length(Grenades); i ++){
 		if(Grenades[i] > 0){
 			if(percent_chance(10)){
@@ -112,7 +119,7 @@ if(stats.Health_points <= 0){
 		}
 	}
 
-	var EnemyDead = instance_create_depth(x, y, depth, oEnemyDead);
+	var EnemyDead = instance_create_depth(x, y, depth, oCharDead);
 	EnemyDead.mask_index = spr_BotDead;
 	EnemyDead.sprite_index = sprite_index;
 	EnemyDead.image_index = 3;
@@ -183,15 +190,15 @@ if(instance_exists(Legs)){
 }
 
 if(bot_is_prone){
-	var prone_weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.AmmoSpriteID] + 1;
-	Weapon.image_index = WeaponID[WeaponPositionID] != Item.None ? prone_weapon_index : 0;
+	var prone_weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.AmmoSpriteID] + 1;
+	Weapon.image_index = WeaponID[WeaponPositionID] != ITEM.None ? prone_weapon_index : 0;
 	HeadHB.image_index = HITBOX.HeadProne;
 	BodyHB.image_index = HITBOX.BodyProne;
 
 	if(FlashedTimer > FlashedTime * .25){
 		image_index = TEXTURES.flashed_prone;
 		ArmHB.image_index = HITBOX.ArmProneFlashed;
-	}else if(Reloading && ReloadTime >= global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.ReloadSpeed] * .9){
+	}else if(Reloading && ReloadTime >= global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpeed] * .9){
 		image_index = TEXTURES.reload_prone;
 		ArmHB.image_index = HITBOX.ArmProneReloading;
 	}else{
@@ -204,27 +211,22 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1 && trigger_texture_
 	
 	#region Weapon texture
 	
-	var weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.AmmoSpriteID] + 1;		
-	Weapon.image_index = WeaponID[WeaponPositionID] != Item.None ? weapon_index : 0;		
+	var weapon_index = global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.AmmoSpriteID] + 1;		
+	Weapon.image_index = WeaponID[WeaponPositionID] != ITEM.None ? weapon_index : 0;		
 	#endregion
 	
 	#region Enemy texture
-	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass]){
+	switch(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass]){
 		case WEAPON_CLASS.ASSAULT_RIFLE:
 		case WEAPON_CLASS.SUBMACHINE_GUN:
 		case WEAPON_CLASS.SNIPER_RIFLE:
 		case WEAPON_CLASS.SHOTGUN:
 		case WEAPON_CLASS.MISSILE:
 			apply_weapon_texture(TEXTURES.assault_rifle, HITBOX.BodyAR, HITBOX.ArmAR);
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.85;
-			if(global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] != WEAPON_CLASS.SUBMACHINE_GUN){
-				WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * 0.75;
-			}
 		break;
 	
 		case WEAPON_CLASS.PISTOL:
 			apply_weapon_texture(TEXTURES.pistol, HITBOX.BodyPistol, HITBOX.ArmPistol);
-			WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
 		break;
 
 		case WEAPON_CLASS.MACHINE_GUN:
@@ -249,7 +251,6 @@ if(EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1 && trigger_texture_
 				image_index = TEXTURES.flashed_no_weapon;
 				ArmHB.image_index = HITBOX.ArmFlashedNoWeapon;
 			}
-			WeaponDistance = sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon) * .75;
 		break;
 	}
 	#endregion
@@ -260,7 +261,6 @@ if!(EquippedGrenadeTimer == -1){
 	image_index = TEXTURES.reload;
 	BodyHB.image_index = HITBOX.BodyThrowReload;
 	ArmHB.image_index = HITBOX.ArmThrowReload;
-	WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
 	#endregion
 	
 }else if!(EquippedLandMineTimer == -1){
@@ -268,22 +268,25 @@ if!(EquippedGrenadeTimer == -1){
 	image_index = TEXTURES.no_weapon;
 	BodyHB.image_index = HITBOX.BodyNoWeapon;
 	ArmHB.image_index = HITBOX.ArmNoWeapon;
-		WeaponDistance = (sprite_get_bbox_right(spr_Weapon) - sprite_get_bbox_left(spr_Weapon)) * .75;
 		#endregion
 	}
 }
 #endregion
 	
+if(global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.MACHINE_GUN){
+	WeaponDistance = get_weapon_muzzle_distance(Weapon.sprite_index, Weapon.image_index) * Weapon.image_xscale;
+}
+
 #region Healing kit
 if(healing == true){
 	CanShoot = false;
 	healing_time += global.time_step;
 }
-if(healing_time >= global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]){
-	damage_indicator("+" + string(global.ItemIndex[#Item.HealingKit, ItemStat.Damage]), x, y - 30, c_green, spr_Icons, ICON.health);
+if(healing_time >= global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.ReloadSpeed]){
+	damage_indicator("+" + string(global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.Damage]), x, y - 30, c_green, spr_Icons, ICON.health);
 	healing = false;
 	CanShoot = true;
-	stats.Health_points += global.ItemIndex[#Item.HealingKit, ItemStat.Damage];
+	stats.Health_points += global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.Damage];
 	stats.Damage_health_points = stats.Health_points;
 	healing_time = -1;
 }
@@ -391,6 +394,7 @@ if(State == STATES.Prone){
 			&& (State != STATES.Idle || State != STATES.Death || State != STATES.FleeDanger || State != STATES.MoveFlashed  || State != STATES.MoveAway  || State != STATES.MoveAwayFromGrenade  || State != STATES.MoveInSmoke)
 			&& bot_target_is_enemy(ChasingObject)
 			&& !healing
+			&& !Reloading
 			&& EquippedGrenadeTimer == -1
 			&& EquippedLandMineTimer == -1;
 
@@ -420,7 +424,7 @@ if(State == STATES.FleeDanger && global.EnemyCanMove == true){
 	if(MoveTime <= 0){
 		bot_flee_from_danger(NearestDangerX, NearestDangerY);
 	}
-}else if(global.EnemyCanMove == true && mv_timer <= 1){
+}else if(global.EnemyCanMove == true && mv_timer <= global.time_step){
 	
 	if(instance_exists(ChasingObject) && State != STATES.MoveCommand){
 		target_x = ChasingObject.x;
@@ -486,7 +490,7 @@ if(State == STATES.FleeDanger && global.EnemyCanMove == true){
 		case STATES.MoveFlashed:
 			if(ReactionTimer <= 0){
 				if(percent_chance(50 * rank_boost)){
-					MoveRunAway(ChasingObject.headshot_x, ChasingObject.headshot_y);
+					MoveRunAway(target_x, target_y);
 				}
 			}
 		break;
@@ -573,7 +577,7 @@ if(State == STATES.MoveCommand){
 }
 #endregion
 	
-#region Shooting state
+#region Shooting state and crosshair
 if (ChasingObject != noone && !bot_target_is_enemy(ChasingObject)) {
 	ChasingObject = noone;
 	ChasingObjectSpotted = false;
@@ -581,6 +585,36 @@ if (ChasingObject != noone && !bot_target_is_enemy(ChasingObject)) {
 	shoot_accumulator = 0;
 	search_timer = 1;
 }
+
+if(bot_target_is_enemy(ChasingObject) && ChasingObjectSpotted){
+	var cs_max_spread = 48 * rank_less;
+	if(cs_focus_target != ChasingObject || (cs_last_step_time >= 0 && current_time - cs_last_step_time > 250)){
+		cs_focus_target = ChasingObject;
+		cs_spread = cs_max_spread;
+		cs_start_angle = point_direction(x, y, ChasingObject.x, ChasingObject.y);
+		crosshair_x = x + lengthdir_x(384, cs_start_angle);
+		crosshair_y = y + lengthdir_y(384, cs_start_angle);
+	}
+	cs_spread = max(0, cs_spread - (0.75 * rank_boost * global.time_step));
+	var cs_target_x = ChasingObject.headshot_x + sin(degtorad(current_time * .015 + cs_phase)) * cs_spread;
+	var cs_target_y = ChasingObject.headshot_y + cos(degtorad(current_time * .03 + cs_phase)) * cs_spread;
+	var cs_step = 8 * rank_boost * global.time_step;
+	var cs_distance = point_distance(crosshair_x, crosshair_y, cs_target_x, cs_target_y);
+	if(cs_distance <= cs_step){
+		crosshair_x = cs_target_x;
+		crosshair_y = cs_target_y;
+	}else{
+		var cs_angle = point_direction(crosshair_x, crosshair_y, cs_target_x, cs_target_y);
+		crosshair_x += lengthdir_x(cs_step, cs_angle);
+		crosshair_y += lengthdir_y(cs_step, cs_angle);
+	}
+}else{
+	cs_focus_target = noone;
+	cs_spread = 48 * rank_less;
+	crosshair_x = x + lengthdir_x(384, RotationAngle);
+	crosshair_y = y + lengthdir_y(384, RotationAngle);
+}
+cs_last_step_time = current_time;
 
 if(global.EnemyCanMove == true && bot_target_is_enemy(ChasingObject)){
     if(ReactionTimer <= 0){
@@ -624,7 +658,7 @@ stats.Damage_health_points = clamp(stats.Damage_health_points, 0, stats.Max_heal
 stats.Stamina_points = clamp(stats.Stamina_points, 0, stats.Max_stamina_points);
 stats.Damage_stamina_points = clamp(stats.Damage_stamina_points, 0, stats.Max_stamina_points);
 WeaponPositionID = min(WeaponNumber, 1);
-has_suppressor = has_attachment(Item.advanced_suppressor, ATTACHMENTS.slot_suppressor, id, WeaponPositionID);
+has_suppressor = has_attachment(ITEM.suppressor, ATTACHMENTS.suppressor, id, WeaponPositionID);
 Weapon.x = x;
 Weapon.y = y;
 
@@ -645,8 +679,12 @@ if(reload_timer > 0){
 	reload_timer = max(0, reload_timer - global.time_step);
 }
 if(Reloading == true){
-	var active_reload_time = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
+	var active_reload_time = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpeed]);
+	var previous_reload_time = ReloadTime;
 	ReloadTime = min(ReloadTime + global.time_step, active_reload_time);
+	if (previous_reload_time < active_reload_time * .5 && ReloadTime >= active_reload_time * .5) {
+		play_sound(x, y, snd_Reload);
+	}
 }else{
 	ReloadTime = 0;
 	reload_timer = -1;
@@ -694,7 +732,7 @@ if (abs(enemy_aimpunch) < 0.01) {
 	enemy_aimpunch = 0;
 }
 	
-if(WeaponID[WeaponPositionID] == Item.None){
+if(WeaponID[WeaponPositionID] == ITEM.None){
 	WeaponPositionID = 1 - WeaponPositionID;
 }
 
@@ -704,11 +742,11 @@ if(FlashedTimer == 0){
 }
 
 if(ArmourDurability[0] <= 0){
-	ArmourID = Item.None;	
+	ArmourID = ITEM.None;	
 }
 
 if(ArmourDurability[1] <= 0){
-	HelmetID = Item.None;	
+	HelmetID = ITEM.None;	
 }
 
 #endregion
@@ -816,7 +854,13 @@ if(mv_timer <= 0 && State != STATES.MoveCommand && State != STATES.FleeDanger &&
 	&& percent_chance(clamp(20 * rank_boost, 10, 35))){
 		set_state(STATES.Walk);
 	}
-	mv_timer = random_range(50, 100) * rank_less;
+	// Let the current movement finish before choosing another direction.
+	var movement_class = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass];
+	var movement_pause = random_range(8, 18) * rank_less;
+	if(movement_class == WEAPON_CLASS.ASSAULT_RIFLE || movement_class == WEAPON_CLASS.PISTOL){
+		movement_pause = random_range(4, 10) * rank_less;
+	}
+	mv_timer = max(1, MoveTime) + movement_pause;
 }
 #endregion
 
@@ -934,7 +978,7 @@ if(State == STATES.MACHINE_GUN){
 #endregion
 	
 #region Reloading
-if (WeaponID[WeaponPositionID] != Item.None) {
+if (WeaponID[WeaponPositionID] != ITEM.None) {
 	if (Ammo[WeaponPositionID] > MaxAmmo[WeaponPositionID]) {
 		Ammo[WeaponPositionID] = MaxAmmo[WeaponPositionID];
 	}
@@ -944,7 +988,7 @@ if (WeaponID[WeaponPositionID] != Item.None) {
 		var should_reload = true;
 
 		if (State != STATES.MACHINE_GUN && Ammo[1 - WeaponPositionID] > 0) {
-		    if (percent_chance(50) || WeaponID[1 - WeaponPositionID] == Item.None) {
+		    if (percent_chance(50) || WeaponID[1 - WeaponPositionID] == ITEM.None) {
 		        should_reload = true;
 		    } else {
 		        WeaponPositionID = 1 - WeaponPositionID;
@@ -958,18 +1002,18 @@ if (WeaponID[WeaponPositionID] != Item.None) {
 			trigger_texture_timer = trigger_texture_time;
 			ReloadTime = 0;
 			Reloading = true;
-			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
+			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpeed]);
 		}
 	}
 }
 
 if(Reloading && reload_timer <= 0){
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BaseDurability] != 1){
+	if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.BaseDurability] != 1){
 		
 		#region Normal reloading
-		if(WeaponID[WeaponPositionID] != Item.Spas && WeaponID[WeaponPositionID] != Item.Javelin){
+		if(WeaponID[WeaponPositionID] != ITEM.Spas && WeaponID[WeaponPositionID] != ITEM.Javelin){
 			particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
-			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.AmmoSpriteID], x, y);		
+			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.AmmoSpriteID], x, y);		
 		}
 		if (Ammo[WeaponPositionID] < MaxAmmo[WeaponPositionID] && ClipAmmo[WeaponPositionID] > 0) {
 			if (ClipAmmo[WeaponPositionID] > AmmoNeeded) {
@@ -999,7 +1043,7 @@ if(Reloading && reload_timer <= 0){
 		}
 		if(Ammo[WeaponPositionID] < MaxAmmo[WeaponPositionID] && ClipAmmo[WeaponPositionID] > 0){
 			Reloading = true;
-			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
+			reload_timer = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpeed]);
 		}else{
 			reload_timer = -1;
 		}
@@ -1063,8 +1107,8 @@ if(instance_exists(ChasingObject) && ChasingObject.stats.Team != stats.Team && d
 #region Throw grenade or lay land mine
 if(global.EnemyCanMove == true){
 	if (State == STATES.ThrowGrenade && !bot_target_is_enemy(ChasingObject)) {
-		EquippedGrenade = Item.None;
-		EquippedGrenadeID = Item.None;
+		EquippedGrenade = ITEM.None;
+		EquippedGrenadeID = ITEM.None;
 		EquippedGrenadeTimer = -1;
 		set_state(STATES.Idle);
 	}
@@ -1072,20 +1116,20 @@ if(global.EnemyCanMove == true){
 	if(State == STATES.ThrowGrenade && EquippedGrenadeTimer == -1 && bot_target_is_enemy(ChasingObject)){
 		var Target_x, Target_y, GrenadeSpd;
 		switch(EquippedGrenadeID){
-			case Item.HEGrenade:
+			case ITEM.HEGrenade:
 				Target_x = ChasingObject.x;
 				Target_y = ChasingObject.y;
 				GrenadeSpd = 7;
 			break;
 		
-			case Item.FlashBangGrenade:
+			case ITEM.FlashBangGrenade:
 				var behindAngle = RotationAngle + 180;
 				Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
 				Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
 				GrenadeSpd = 5;
 			break;
 			
-			case Item.SmokeGrenade:
+			case ITEM.SmokeGrenade:
 				Target_x = random_range(x - sprite_width, x + sprite_width);
 				Target_y = random_range(y - sprite_height, y + sprite_height);
 				GrenadeSpd = 1;
@@ -1120,7 +1164,8 @@ if(global.EnemyCanMove == true){
 
 #region Movement
 walking = State == STATES.Walk;
-if (--MoveTime > 0) {
+MoveTime = max(0, MoveTime - global.time_step);
+if (MoveTime > 0) {
 	XSpeed += lengthdir_x(Acceleration * 2, MoveDirection);
 	YSpeed += lengthdir_y(Acceleration * 2, MoveDirection);
 
@@ -1141,14 +1186,14 @@ if (--MoveTime > 0) {
 	}
 }
 	
+// Friction
+XSpeed = approach(XSpeed, 0, Friction);
+YSpeed = approach(YSpeed, 0, Friction);
+
 ///Movement speed limitation
 var movement_speed_limit = walking ? MaxSpeed * WALK_SPD : MaxSpeed;
 XSpeed = clamp(XSpeed, -movement_speed_limit, movement_speed_limit);
 YSpeed = clamp(YSpeed, -movement_speed_limit, movement_speed_limit);
-	
-// Friction
-XSpeed = approach(XSpeed, 0, Friction);
-YSpeed = approach(YSpeed, 0, Friction);
 	
 #endregion
 

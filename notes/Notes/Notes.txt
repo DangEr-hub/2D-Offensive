@@ -2,9 +2,18 @@ https://pixabay.com/sound-effects/film-special-effects-m249-sound-effects-244559
 
 Pridat fotky
 
-Boost itemy - rychlost, obrana
+Centrifugy na uran
 
-Bipod funkcnost pri pronu
+m249, kriss vector
+
+boti mohou používat mortar
+
+Boost itemy - obrana
+
+laser gun
+
+rank se bude vykreslovat pouze při shift a najetí na bota
+
 
 Dalsi AR: https://pixabay.com/sound-effects/film-special-effects-ar15-168855/
 

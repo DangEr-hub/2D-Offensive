@@ -14,3 +14,8 @@ var crosshair_too_far = !instance_exists(oCrosshair)
 if(invalid_target || hidden_target || blocked_enemy || game_menu_open || crosshair_too_far){
 	zui_destroy();
 }
+
+var health_text = "Health: " + string(round(target_bot.stats.Health_points)) + "/" + string(round(target_bot.stats.Max_health_points));
+with(health_txt){
+	caption = health_text;
+}

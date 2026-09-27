@@ -39,7 +39,7 @@ function compute_airplane_network_id() {
     return irandom(65535);
 }
 
-function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid, attacker_item_id = Item.None){
+function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid, attacker_item_id = ITEM.None){
 	
 	var blood_color = c_red;
 	if(BodyPart <= HITBOX.HeadProne){
@@ -48,9 +48,9 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 
 	object.attack_damage = damage;
 
-	var armour_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-	var helmet_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-	var shield_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
+	var armour_id = global.Inventory[# OtherSlot.Armour, INDEX.slot_id];
+	var helmet_id = global.Inventory[# OtherSlot.Helmet, INDEX.slot_id];
+	var shield_id = global.Inventory[# OtherSlot.Shield, INDEX.slot_id];
 	var update_local_inventory = true;
 	
 	if(IS_NET && object.object_index == oPlayer){
@@ -83,9 +83,9 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 		if(instance_exists(attacker)){
 			attacker_name = attacker.stats.Name;
 		}
-		if (attacker_item_id == Item.Bomb) {
+		if (attacker_item_id == ITEM.Bomb) {
 			hitmap_attacker_key = HITMAP_KEY_BOMB;
-			attacker_name = global.ItemIndex[# Item.Bomb, ItemStat.Name];
+			attacker_name = tr_name(ITEM.Bomb);
 			hitmap_attacker = noone;
 		}
 
@@ -98,11 +98,11 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	}
 
 	if(!IS_NET || update_local_inventory){
-		global.Inventory[# OtherSlot.Armour, Index.slot_durability] = equip_dur[0];
-		global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = equip_dur[1];
-		global.Inventory[# OtherSlot.Shield, Index.slot_durability] = equip_dur[2];
+		global.Inventory[# OtherSlot.Armour, INDEX.slot_durability] = equip_dur[0];
+		global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability] = equip_dur[1];
+		global.Inventory[# OtherSlot.Shield, INDEX.slot_durability] = equip_dur[2];
 	}
-	if(damage > 2){
+	if(damage >= 5){
 		with(object){
 			AimPunchDir = irandom(sprite_get_number(spr_AimPunch) - 1);
 			AimPunchTimer = AimPunchTime;
@@ -133,12 +133,12 @@ function equip_network_propagate(){
 				ds_map_add(oNetworkManager.player_states, network_id, data);
 			}
 
-			ds_map_set(data, "helmet_id",  global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
-			ds_map_set(data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
-			ds_map_set(data, "armour_id",  global.Inventory[# OtherSlot.Armour, Index.slot_id]);
-			ds_map_set(data, "armour_dur", global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
-			ds_map_set(data, "shield_id",  global.Inventory[# OtherSlot.Shield, Index.slot_id]);
-			ds_map_set(data, "shield_dur", global.Inventory[# OtherSlot.Shield, Index.slot_durability]);
+			ds_map_set(data, "helmet_id",  global.Inventory[# OtherSlot.Helmet, INDEX.slot_id]);
+			ds_map_set(data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability]);
+			ds_map_set(data, "armour_id",  global.Inventory[# OtherSlot.Armour, INDEX.slot_id]);
+			ds_map_set(data, "armour_dur", global.Inventory[# OtherSlot.Armour, INDEX.slot_durability]);
+			ds_map_set(data, "shield_id",  global.Inventory[# OtherSlot.Shield, INDEX.slot_id]);
+			ds_map_set(data, "shield_dur", global.Inventory[# OtherSlot.Shield, INDEX.slot_durability]);
 		}
 	}
 }
@@ -156,13 +156,13 @@ function weapon_network_propagate(){
 				ds_map_add(oNetworkManager.player_states, network_id, data);
 			}
 
-			ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);
-			ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, Index.slot_scope]);
-			ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, Index.slot_barrel]);
-			ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, Index.slot_grip]);
-			ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, Index.slot_suppressor]);
-			ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, Index.slot_ammo]);
-			ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+			ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, INDEX.slot_id]);
+			ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, INDEX.slot_scope]);
+			ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, INDEX.slot_barrel]);
+			ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, INDEX.slot_grip]);
+			ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, INDEX.slot_suppressor]);
+			ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, INDEX.slot_ammo]);
+			ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, INDEX.slot_clip_ammo]);
 		}
 	}
 }
@@ -203,19 +203,19 @@ function create_local_player(pid) {
         ds_map_add(player_data, "hp", player.stats.Health_points);
         
         // Initialize equipment with current values
-        ds_map_add(player_data, "helmet_id", global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
-        ds_map_add(player_data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
-        ds_map_add(player_data, "armour_id", global.Inventory[# OtherSlot.Armour, Index.slot_id]);
-        ds_map_add(player_data, "armour_dur", global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
-        ds_map_add(player_data, "shield_id", global.Inventory[# OtherSlot.Shield, Index.slot_id]);
-        ds_map_add(player_data, "shield_dur", global.Inventory[# OtherSlot.Shield, Index.slot_durability]);
-        ds_map_add(player_data, "weapon_id", global.Inventory[# player.WeaponID, Index.slot_id]);
-        ds_map_add(player_data, "weapon_scope", global.Inventory[# player.WeaponID, Index.slot_scope]);
-        ds_map_add(player_data, "weapon_barrel", global.Inventory[# player.WeaponID, Index.slot_barrel]);
-        ds_map_add(player_data, "weapon_grip", global.Inventory[# player.WeaponID, Index.slot_grip]);
-        ds_map_add(player_data, "weapon_suppressor", global.Inventory[# player.WeaponID, Index.slot_suppressor]);
-        ds_map_add(player_data, "weapon_ammo", global.Inventory[# player.WeaponID, Index.slot_ammo]);
-        ds_map_add(player_data, "weapon_clip_ammo", global.Inventory[# player.WeaponID, Index.slot_clip_ammo]);
+        ds_map_add(player_data, "helmet_id", global.Inventory[# OtherSlot.Helmet, INDEX.slot_id]);
+        ds_map_add(player_data, "helmet_dur", global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability]);
+        ds_map_add(player_data, "armour_id", global.Inventory[# OtherSlot.Armour, INDEX.slot_id]);
+        ds_map_add(player_data, "armour_dur", global.Inventory[# OtherSlot.Armour, INDEX.slot_durability]);
+        ds_map_add(player_data, "shield_id", global.Inventory[# OtherSlot.Shield, INDEX.slot_id]);
+        ds_map_add(player_data, "shield_dur", global.Inventory[# OtherSlot.Shield, INDEX.slot_durability]);
+        ds_map_add(player_data, "weapon_id", global.Inventory[# player.WeaponID, INDEX.slot_id]);
+        ds_map_add(player_data, "weapon_scope", global.Inventory[# player.WeaponID, INDEX.slot_scope]);
+        ds_map_add(player_data, "weapon_barrel", global.Inventory[# player.WeaponID, INDEX.slot_barrel]);
+        ds_map_add(player_data, "weapon_grip", global.Inventory[# player.WeaponID, INDEX.slot_grip]);
+        ds_map_add(player_data, "weapon_suppressor", global.Inventory[# player.WeaponID, INDEX.slot_suppressor]);
+        ds_map_add(player_data, "weapon_ammo", global.Inventory[# player.WeaponID, INDEX.slot_ammo]);
+        ds_map_add(player_data, "weapon_clip_ammo", global.Inventory[# player.WeaponID, INDEX.slot_clip_ammo]);
         
         ds_map_add(player_states, pid, player_data);
     }
@@ -301,17 +301,13 @@ function find_machine_gun_by_pid(_pid) {
 function mount_local_player_to_machine_gun(_player, _gun) {
 	if (!instance_exists(_player) || !instance_exists(_gun)) return false;
 
-	global.Inventory[# OtherSlot.Primary, Index.slot_id] = _gun.stats.Id;
-	global.Inventory[# OtherSlot.Primary, Index.slot_scope] = _gun.stats.Slot_scope;
-	global.Inventory[# OtherSlot.Primary, Index.slot_barrel] = _gun.stats.Slot_barrel;
-	global.Inventory[# OtherSlot.Primary, Index.slot_grip] = _gun.stats.Slot_grip;
-	global.Inventory[# OtherSlot.Primary, Index.slot_suppressor] = _gun.stats.Slot_suppressor;
-	global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = _gun.stats.Ammo;
-	global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = _gun.stats.Clip_ammo;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope] = _gun.stats.Slot_scope;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel] = _gun.stats.Slot_barrel;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip] = _gun.stats.Slot_grip;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor] = _gun.stats.Slot_suppressor;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_id] = _gun.stats.Id;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_scope] = _gun.stats.Slot_scope;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_barrel] = _gun.stats.Slot_barrel;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_grip] = _gun.stats.Slot_grip;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_suppressor] = _gun.stats.Slot_suppressor;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_ammo] = _gun.stats.Ammo;
+	global.Inventory[# OtherSlot.Primary, INDEX.slot_clip_ammo] = _gun.stats.Clip_ammo;
 
 	_player.WeaponID = OtherSlot.Primary;
 	_player.WeaponNumber = 0;
@@ -331,20 +327,24 @@ function mount_local_player_to_machine_gun(_player, _gun) {
 function dismount_local_player_from_machine_gun(_player, _gun) {
 	if (!instance_exists(_player) || !instance_exists(_gun)) return false;
 
-	_gun.stats.Slot_scope = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope];
-	_gun.stats.Slot_barrel = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel];
-	_gun.stats.Slot_grip = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip];
-	_gun.stats.Slot_suppressor = global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor];
-	_gun.stats.Ammo = global.Inventory[# OtherSlot.Primary, Index.slot_ammo];
-	_gun.stats.Clip_ammo = global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo];
+	_gun.stats.Slot_scope = global.Inventory[# OtherSlot.Primary, INDEX.slot_scope];
+	_gun.stats.Slot_barrel = global.Inventory[# OtherSlot.Primary, INDEX.slot_barrel];
+	_gun.stats.Slot_grip = global.Inventory[# OtherSlot.Primary, INDEX.slot_grip];
+	_gun.stats.Slot_suppressor = global.Inventory[# OtherSlot.Primary, INDEX.slot_suppressor];
+	_gun.stats.Ammo = global.Inventory[# OtherSlot.Primary, INDEX.slot_ammo];
+	_gun.stats.Clip_ammo = global.Inventory[# OtherSlot.Primary, INDEX.slot_clip_ammo];
 
-	for (var i = 0; i < Index.Total; i++) {
+	for (var i = 0; i < INDEX.Total; i++) {
 		global.Inventory[# OtherSlot.Primary, i] = 0;
 	}
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_scope] = Item.None;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_barrel] = Item.None;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_grip] = Item.None;
-	global.weapon_attachments[0][WPN_ATTACHMENTS.weapon_suppressor] = Item.None;
+	if (is_struct(_player.machine_gun_take_loadout)) {
+		for (var i = 0; i < INDEX.Total; i++) {
+			global.Inventory[# OtherSlot.Primary, i] = _player.machine_gun_take_loadout.primary[i];
+		}
+		_player.WeaponID = _player.machine_gun_take_loadout.weapon_slot;
+		_player.WeaponNumber = _player.WeaponID - OtherSlot.Primary;
+		_player.machine_gun_take_loadout = undefined;
+	}
 
 	_player.Reloading = false;
 	_player.ReloadTime = 0;

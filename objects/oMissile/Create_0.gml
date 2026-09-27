@@ -34,8 +34,8 @@ depth = -1100;
 
 
 stats = {
-	Item_id: Item.base_explosion,
-	Damage: global.ItemIndex[#Item.base_explosion, ItemStat.Damage],
+	Item_id: ITEM.base_explosion,
+	Damage: global.ItemIndex[#ITEM.base_explosion, ITEMSTATS.Damage],
 	Object_index: -1,
 	Owner_name: "Aircraft",
 	Owner_id: -1,

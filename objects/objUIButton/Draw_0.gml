@@ -18,12 +18,14 @@ draw_sprite_stretched_ext(sprButton, 0, -6, -6, __width + 12, __height + 12, dra
 draw_set_font(font);
 draw_set_alpha(alpha * alpha_value);
 
-if(spr[1] == Item.None) {
-	var tw = string_width(caption)/2;
-	if(string_width(caption) >= __width * .9){
+if(spr[1] == ITEM.None) {
+	var str = tr(string_replace_all(caption, " ", "_"));
+	if(str == "") str = caption;
+	var tw = string_width(str)/2;
+	if(string_width(str) >= __width * .9){
 		tw = __width/2.1;	
 	}
-    draw_text_outlined_ext(__width * 0.5 - tw, __height * 0.5 + caption_offset_y, caption, caption_color, c_black, 1, string_height("a"), __width);
+    draw_text_outlined_ext(__width * 0.5 - tw, __height * 0.5 + caption_offset_y, str, caption_color, c_black, 1, string_height("a"), __width);
 } else {
     var draw_w = spr[2] * final_scale;
     var draw_h = spr[3] * final_scale;

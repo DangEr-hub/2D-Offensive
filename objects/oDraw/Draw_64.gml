@@ -2,6 +2,19 @@ draw_set_font(set_font("Console"));
 var TextHeightSmall = string_height("a");
 draw_set_valign(fa_middle);
 
+#region Draw spectating crosshair
+if(spectating == true){
+	with(spectate_target){
+		if(!instance_exists(oCrosshair)){ break; }
+		var cx = (crosshair_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+		var cy = (crosshair_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+		var x_scale = oCrosshair.image_xscale * .5 * global.crosshair_scale;
+		var y_scale = oCrosshair.image_yscale * .5 * global.crosshair_scale;
+		draw_sprite_ext(spr_StaticCrosshair, 0, cx, cy, x_scale, y_scale, oCrosshair.image_angle, global.crosshair_color, global.CrosshairAlpha * oCrosshair.AlphaMul);	
+	}
+}
+#endregion
+
 
 if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !spectating && !instance_exists(oBuyMenu)){
 	
@@ -23,7 +36,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 	#region Draw scope
 	if (global.local_player.ScopeIn == true) {
 		if(global.local_player.player_has_scope == 0){
-			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)*5), 0.1);
+			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player)*5), 0.1);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 			var ScopeRadius = sprite_get_width(spr_SniperScope) * 1.75;
 			SurfaceWidth = global.GuiW;
@@ -90,7 +103,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			#endregion
 			
 		}else if(global.local_player.player_has_scope == 1){
-			var ScopeBlurValue = min((.0025 + (global.local_player.ViewShake / 250)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player)), 0.15);
+			var ScopeBlurValue = min((.0025 + (global.local_player.ViewShake / 250)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player)), 0.15);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
@@ -315,44 +328,67 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				var bar_spacing = round(sprite_get_height(spr_ranks)*.5 * global.gui_scale);
 				draw_set_font(set_font("Console"));
 				draw_set_color(c_black);
+				
+				if(has_attachment(ITEM.laser, WeaponPositionID, id, ATTACHMENTS.barrel)){
+					var cx = (crosshair_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+					var cy = (crosshair_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+					var laser_pos = local_to_world(56, 16, Weapon.image_angle, Weapon);
+					var laser_gui_x = (laser_pos[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
+					var laser_gui_y = (laser_pos[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
+					var laser_dx = cx - laser_gui_x;
+					var laser_dy = cy - laser_gui_y;
+					var laser_length = max(1, point_distance(laser_gui_x, laser_gui_y, cx, cy));
+					var offset_x = -laser_dy / laser_length;
+					var offset_y = laser_dx / laser_length;
+					draw_set_color(c_red);
+					for(var glow_offset = 3; glow_offset >= 1; glow_offset--){
+						draw_set_alpha(0.08 * (4 - glow_offset));
+						draw_line(laser_gui_x + offset_x * glow_offset, laser_gui_y + offset_y * glow_offset,
+							cx + offset_x * glow_offset, cy + offset_y * glow_offset);
+						draw_line(laser_gui_x - offset_x * glow_offset, laser_gui_y - offset_y * glow_offset,
+							cx - offset_x * glow_offset, cy - offset_y * glow_offset);
+					}
+					draw_set_alpha(1);
+					draw_line(laser_gui_x, laser_gui_y, cx, cy);
+				}
 
 				if(global.draw_damage == true){
 					var health_bar_x = round(HealthX - sprite_width/2);
 					var health_bar_y = round(HealthY - sprite_height/2);
-					draw_health_bar_fill(health_bar_x, health_bar_y, stats.Damage_health_points/stats.Max_health_points, global.gui_scale, c_yellow, global.GUIHUDAlpha);
-					draw_health_bar_fill(health_bar_x, health_bar_y, stats.Health_points/stats.Max_health_points, global.gui_scale, c_red, global.GUIHUDAlpha, false);
+					draw_health_bar_fill(health_bar_x, health_bar_y, stats.Damage_health_points/stats.Max_health_points, global.gui_scale, c_yellow, global.gui_alpha);
+					draw_health_bar_fill(health_bar_x, health_bar_y, stats.Health_points/stats.Max_health_points, global.gui_scale, c_red, global.gui_alpha, false);
 				}
 				
 				if(id == global.local_player.selected_bot){
-					draw_sprite_ext(spr_BotSelect, 0, select_x, select_y, 0.5 * global.gui_scale, 0.5 * global.gui_scale, false, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_BotSelect, 0, select_x, select_y, 0.5 * global.gui_scale, 0.5 * global.gui_scale, false, c_white, global.gui_alpha);
 				}
 
 				if (planting) {
-					draw_health_bar_fill(default_xx, default_yy, planting_value / max(1, planting_max), global.gui_scale, c_orange, global.GUIHUDAlpha);
+					draw_health_bar_fill(default_xx, default_yy, planting_value / max(1, planting_max), global.gui_scale, c_orange, global.gui_alpha);
 					default_yy -= bar_spacing;
 				}
 
 				if(healing == true){
-					var healing_duration = max(1, global.ItemIndex[#Item.HealingKit, ItemStat.ReloadSpeed]);
-					draw_health_bar_fill(default_xx, default_yy, healing_time/healing_duration, global.gui_scale, c_purple, global.GUIHUDAlpha);
+					var healing_duration = max(1, global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.ReloadSpeed]);
+					draw_health_bar_fill(default_xx, default_yy, healing_time/healing_duration, global.gui_scale, c_purple, global.gui_alpha);
 					default_yy -= bar_spacing;
 				}
 
 				if(Reloading == true){
-					var reload_duration = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpeed]);
-					draw_health_bar_fill(default_xx, default_yy, ReloadTime/reload_duration, global.gui_scale, c_dkgray, global.GUIHUDAlpha);
+					var reload_duration = max(1, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpeed]);
+					draw_health_bar_fill(default_xx, default_yy, ReloadTime/reload_duration, global.gui_scale, c_dkgray, global.gui_alpha);
 					default_yy -= bar_spacing;
 				}
 			
 				if(equip_timer > -1){
-					var equip_duration = max(1, global.ItemIndex[#WeaponID[1 - WeaponPositionID], ItemStat.EquipTime]);
-					draw_health_bar_fill(default_xx, default_yy, equip_time/equip_duration, global.gui_scale, c_olive, global.GUIHUDAlpha);
+					var equip_duration = max(1, global.ItemIndex[#WeaponID[1 - WeaponPositionID], ITEMSTATS.EquipTime]);
+					draw_health_bar_fill(default_xx, default_yy, equip_time/equip_duration, global.gui_scale, c_olive, global.gui_alpha);
 					default_yy -= bar_spacing;
 				}
 					
-				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, get_rank(global.game_struct.Enemy_ep[global.game_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
-				}
+				//if!(instance_exists(oInventory)){
+				//	draw_sprite_ext(spr_ranks, get_rank(global.game_struct.Enemy_ep[global.game_struct.Current_game]), default_xx, default_yy, 1, 1, 0, c_white, global.gui_alpha);
+				//}
 			}
 		}
 		#endregion
@@ -364,8 +400,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				var HealthY = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				var health_bar_x = round(HealthX - sprite_width / 2);
 				var health_bar_y = round(HealthY - sprite_height / 2);
-				draw_health_bar_fill(health_bar_x, health_bar_y, stats.Damage_health_points / stats.Max_health_points, global.gui_scale, c_yellow, global.GUIHUDAlpha);
-				draw_health_bar_fill(health_bar_x, health_bar_y, stats.Health_points / stats.Max_health_points, global.gui_scale, c_red, global.GUIHUDAlpha, false);
+				draw_health_bar_fill(health_bar_x, health_bar_y, stats.Damage_health_points / stats.Max_health_points, global.gui_scale, c_yellow, global.gui_alpha);
+				draw_health_bar_fill(health_bar_x, health_bar_y, stats.Health_points / stats.Max_health_points, global.gui_scale, c_red, global.gui_alpha, false);
 			}
 		}
 		#endregion
@@ -390,7 +426,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 					var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 					var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 				    if(distance_to_object(global.local_player) <= global.local_player.PickUpDistance){   
-						draw_text_outlined(round(xx) - string_width(global.ItemIndex[# image_index, ItemStat.Name])/4, round(yy) - string_height("a"), global.ItemIndex[# image_index, ItemStat.Name], c_white, c_black, 1);
+						draw_text_outlined(round(xx) - string_width(tr_name(image_index))/4, round(yy) - string_height("a"), tr_name(image_index), c_white, c_black, 1);
 						draw_text_outlined(round(xx), round(yy), oDraw.Pick, c_white, c_black, 1);
 				    }
 				}
@@ -452,6 +488,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 					draw_text_outlined(round(door_x - string_width(door_prompt) * .5), round(door_y), door_prompt, c_white, c_black, 1);
 				}
 			}
+
+			if (!instance_exists(oTerminal) && instance_exists(oTerminalTile)) {
+				var terminal_tile = instance_nearest(global.local_player.x, global.local_player.y, oTerminalTile);
+				if (instance_exists(terminal_tile) && point_distance(global.local_player.x, global.local_player.y, terminal_tile.x, terminal_tile.y) <= 96) {
+					var terminal_x = ((terminal_tile.bbox_left + terminal_tile.bbox_right) * .5 - ViewX) * (global.GuiW / ViewW);
+					var terminal_y = ((terminal_tile.bbox_top + terminal_tile.bbox_bottom) * .5 - ViewY) * (global.GuiH / ViewH);
+					var terminal_prompt = "Open - [" + keycode_to_string(global.KeyBinds[| KEY.OpenTerm]) + "]";
+					draw_text_outlined(round(terminal_x - string_width(terminal_prompt) * .5), round(terminal_y), terminal_prompt, c_white, c_black, 1);
+				}
+			}
 		}
 		#endregion
 
@@ -468,9 +514,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 		if(!instance_exists(oInventory) && global.draw_hud){
 			
 			#region Draw shooting mode
-			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
-			if(global.ItemIndex[# weapon, ItemStat.Type] == "Weapon" && global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
-				var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.ShootingMode], global.local_player.weapon_shooting_mode) + 
+			var weapon = global.Inventory[# global.local_player.WeaponID, INDEX.slot_id];
+			if(global.ItemIndex[# weapon, ITEMSTATS.Type] == "Weapon" && global.ItemIndex[# weapon, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
+				var shooting_mode_string = ds_list_find_value(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootingMode], global.local_player.weapon_shooting_mode) + 
 											"[" + keycode_to_string(global.KeyBinds[| KEY.ChangeMode]) + "]";
 				var shooting_mode_x = display_get_gui_width()/2 - string_width(shooting_mode_string);
 				var shooting_mode_y = display_get_gui_height() - HUDShift*2;
@@ -479,13 +525,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			#endregion
 			
 			#region Draw item switching outside of inventory
-			if(global.Inventory[#global.local_player.item_use_position, Index.slot_id] != Item.None){
+			if(global.Inventory[#global.local_player.item_use_position, INDEX.slot_id] != ITEM.None){
 				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleLeft])) + "] - Left ";
 				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleRight])) + "] - Right";
 				var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.gui_scale;
-			    var Id = global.Inventory[#global.local_player.item_use_position, Index.slot_id];        
+			    var Id = global.Inventory[#global.local_player.item_use_position, INDEX.slot_id];        
 			    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1);  
-				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*2, global.ItemIndex[#Id, ItemStat.Name], c_white, c_black, 1);            
+				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*2, tr_name(Id), c_white, c_black, 1);            
 				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*3, CycleLeftString, c_white, c_black, 1);
 				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale + string_width(CycleLeftString), ItemY + TextHeightSmall*3, CycleRightString, c_white, c_black, 1);
 			}
@@ -502,16 +548,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			var MagX = HealthX + sprite_get_width(spr_HealthBar) * 2 * global.gui_scale + HUDShift;
 			var MagY = StaminaY;
 			var AmmoSpriteWidth = (sprite_get_bbox_right(spr_AmmoType) - sprite_get_bbox_left(spr_AmmoType))*global.gui_scale;
-			var AmmoDrawValue = min(round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]), 10);
-			var AmmoRemain = round(global.Inventory[# global.local_player.WeaponID, Index.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.MaxAmmo]) - AmmoDrawValue;
+			var AmmoDrawValue = min(round(global.Inventory[# global.local_player.WeaponID, INDEX.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.MaxAmmo]), 10);
+			var AmmoRemain = round(global.Inventory[# global.local_player.WeaponID, INDEX.slot_clip_ammo]/global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.MaxAmmo]) - AmmoDrawValue;
 			var Value = 0;
-			var money_string = "Money: " + string(global.player_stats.Money);
+			var money_string = tr("Money") + ": " + string(global.player_stats.Money);
 			var money_x = HUDShift;
 			var money_y = StaminaY - bar_gap*4.5;
-			var weapon = global.Inventory[# global.local_player.WeaponID, Index.slot_id];
-			if(global.ItemIndex[# weapon, ItemStat.Type] == "Weapon" && global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
+			weapon = global.Inventory[# global.local_player.WeaponID, INDEX.slot_id];
+			if(global.ItemIndex[# weapon, ITEMSTATS.Type] == "Weapon" && global.ItemIndex[# weapon, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
 				for(var i=0;i<AmmoDrawValue;i++){
-					draw_sprite_ext(spr_AmmoType, global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, Index.slot_id], ItemStat.AmmoSpriteID], MagX + (i*AmmoSpriteWidth), MagY, 2 * global.gui_scale, 2 * global.gui_scale, 0, c_white, global.GUIHUDAlpha * 2);
+					draw_sprite_ext(spr_AmmoType, global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.AmmoSpriteID], MagX + (i*AmmoSpriteWidth), MagY, 2 * global.gui_scale, 2 * global.gui_scale, 0, c_white, global.gui_alpha * 2);
 					Value ++;
 				}
 		
@@ -521,15 +567,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				}
 			}
 			
-			draw_text_outlined(money_x, money_y, "Money: ", c_white, c_black, 1);
-			draw_text_outlined(money_x + string_width("Money: "), money_y, string(global.player_stats.Money), MAIN_COLOR, c_black, 1);
+			var money = tr("Money") + ": ";
+			draw_text_outlined(money_x, money_y, money, c_white, c_black, 1);
+			draw_text_outlined(money_x + string_width(money), money_y, string(global.player_stats.Money), MAIN_COLOR, c_black, 1);
 			draw_sprite_ext(spr_Coin, 0, money_x + string_width(money_string) * .9, money_y, 2 * global.gui_scale, 2 * global.gui_scale, 0, c_white, 1);
 
 			draw_set_color(c_black);
 		
 			#region Health bar
-			draw_health_bar_fill(HealthX, HealthY, global.local_player.stats.Damage_health_points/global.player_stats.Max_health, global.gui_scale * 2, c_yellow, 1);
-			draw_health_bar_fill(HealthX, HealthY, global.local_player.stats.Health_points/global.player_stats.Max_health, global.gui_scale * 2, c_red, 1, false);
+			draw_health_bar_fill(HealthX, HealthY, global.local_player.stats.Damage_health_points/global.local_player.stats.Max_health_points, global.gui_scale * 2, c_yellow, 1);
+			draw_health_bar_fill(HealthX, HealthY, global.local_player.stats.Health_points/global.local_player.stats.Max_health_points, global.gui_scale * 2, c_red, 1, false);
 			#endregion
 			
 			#region Stamina bar
@@ -558,8 +605,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				var b = 54;
 				Value = 0;
 				for(var i=0;i<oDraw.HotBarItems;i++){
-					var Id = global.Inventory[# (OtherSlot.Knife - i), Index.slot_id];
-					if(Id != Item.None){
+					var Id = global.Inventory[# (OtherSlot.Knife - i), INDEX.slot_id];
+					if(Id != ITEM.None){
 					
 						#region Draw weapon
 						shader_set(shd_LightGray);
@@ -576,8 +623,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 						#endregion
 					
 						#region Draw no ammo weapon
-						if(global.ItemIndex[# Id, ItemStat.MaxAmmo] != -1){ ///Pokud item není nůž
-							if(global.Inventory[# (OtherSlot.Knife - i), Index.slot_clip_ammo] <= 0 && global.Inventory[# (OtherSlot.Knife - i), Index.slot_ammo] <= 0){
+						if(global.ItemIndex[# Id, ITEMSTATS.MaxAmmo] != -1){ ///Pokud item není nůž
+							if(global.Inventory[# (OtherSlot.Knife - i), INDEX.slot_clip_ammo] <= 0 && global.Inventory[# (OtherSlot.Knife - i), INDEX.slot_ammo] <= 0){
 								draw_sprite_ext(
 									spr_broken, 0, HotBarX, HotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
 									1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1
@@ -597,13 +644,13 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				var ArmourHotBarX = HotBarX - sprite_get_width(spr_Items)/1.25*global.gui_scale;
 				var ArmourHotBarY = HotBarY;
 				for(var i=0;i<armour_slots;i++){
-					if(global.Inventory[# (OtherSlot.Shield - i), Index.slot_id] != Item.None){
+					if(global.Inventory[# (OtherSlot.Shield - i), INDEX.slot_id] != ITEM.None){
 					
 						#region Draw armour and helmet
 						shader_set(shd_LightGray);
 						shader_set_uniform_f(oDraw.BlendColor, 0.1, 0.1, 0.1, 1.0);
 						draw_sprite_ext(
-							spr_Items, global.Inventory[# (OtherSlot.Shield - i), Index.slot_id], ArmourHotBarX, ArmourHotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
+							spr_Items, global.Inventory[# (OtherSlot.Shield - i), INDEX.slot_id], ArmourHotBarX, ArmourHotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
 							1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1
 						);		
 						shader_reset();
@@ -611,7 +658,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 					
 					
 						#region Draw broken armour and helmet
-						if(global.Inventory[# (OtherSlot.Shield - i), Index.slot_durability] <= 0 && global.Inventory[# (OtherSlot.Shield - i), Index.slot_id] != Item.None){
+						if(global.Inventory[# (OtherSlot.Shield - i), INDEX.slot_durability] <= 0 && global.Inventory[# (OtherSlot.Shield - i), INDEX.slot_id] != ITEM.None){
 							draw_sprite_ext(
 								spr_broken, 0, ArmourHotBarX, ArmourHotBarY - HotBarOffsetY - Value*HotBarOffsetY, 
 								1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1
@@ -654,7 +701,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			
 			if(Reloading == true && (!is_local || global.draw_hud)){
 				var reload_item_id = is_remote ? network_weapon_id : wpn_id;
-				var player_reload_duration = max(1, global.ItemIndex[# reload_item_id, ItemStat.ReloadSpeed]);
+				var player_reload_duration = max(1, global.ItemIndex[# reload_item_id, ITEMSTATS.ReloadSpeed]);
 				var reload_progress = clamp(ReloadTime / player_reload_duration, 0, 1);
 				draw_health_bar_fill(xx - sprite_width/2, default_yy, reload_progress, global.gui_scale, c_dkgray);
 				default_yy -= bar_spacing;
@@ -667,7 +714,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			}
 
 			if (Healing && (!is_local || global.draw_hud)) {
-				var healing_duration = max(1, global.ItemIndex[# Item.HealingKit, ItemStat.ReloadSpeed]);
+				var healing_duration = max(1, global.ItemIndex[# ITEM.HealingKit, ITEMSTATS.ReloadSpeed]);
 				draw_health_bar_fill(xx - sprite_width/2, default_yy, HealingTime / healing_duration, global.gui_scale, c_purple);
 				default_yy -= bar_spacing;
 			}
@@ -683,7 +730,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 					rank_position = get_rank(global.game_struct.Player_ep);
 				}
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.GUIHUDAlpha);
+					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.gui_alpha);
 				}
 			}
 		}
@@ -705,7 +752,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		draw_set_font(set_font("Console"));
 		var hour_str = (oLightRenderer.CurrentHour < 10 ? "0" + string(oLightRenderer.CurrentHour) : string(oLightRenderer.CurrentHour));
 		var minute_str = (oLightRenderer.CurrentMinute < 10 ? "0" + string(oLightRenderer.CurrentMinute) : string(oLightRenderer.CurrentMinute));
-		draw_text_outlined(50, 50 + TextHeightSmall*2, "Time: " + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);
+		draw_text_outlined(50, 50 + TextHeightSmall*2, tr("Time: ") + string(hour_str) + ":" + string(minute_str), c_white, c_black, 1);
 	}
 	#endregion
 
@@ -713,7 +760,7 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 	if (global.bomb_planted) {
 		draw_set_font(set_font("Console"));
 		var bomb_seconds = max(0, ceil(global.bomb_timer / game_get_speed(gamespeed_fps)));
-		var bomb_timer_text = "Bomb planted: " + string(bomb_seconds) + " s";
+		var bomb_timer_text = tr("Bomb_planted") + ": " + string(bomb_seconds) + " s";
 		var bomb_timer_x = round(global.GuiW * 0.5 - string_width(bomb_timer_text) * 0.5);
 		var bomb_timer_y = round(global.GuiH * 0.2);
 		draw_text_outlined(bomb_timer_x, bomb_timer_y, bomb_timer_text, c_orange, c_black, 1);
@@ -760,21 +807,21 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 		
 			draw_set_font(set_font("GUI_grid"));
 			//Player velocity
-			var PlayerVelocity = sqrt(power(global.local_player.XSpeed, 2) + power(global.local_player.YSpeed, 2)) * game_get_speed(gamespeed_fps);
-			var SpdString = "Velocity: " + string_format(min(PlayerVelocity, MOVE_SPD * game_get_speed(gamespeed_fps)), 0, 1) + " Units/Second";
+			var PlayerVelocity = sqrt(power(global.local_player.XSpeed, 2) + power(global.local_player.YSpeed, 2)) * 1000000 / max(delta_time, 1);
+			var SpdString = tr("Velocity") + ": " + string_format(PlayerVelocity, 0, 1) + " " + tr("Units_per_second");
 			draw_text_outlined(AdminHUDX - string_width(SpdString), AdminHUDY, SpdString, c_white, c_black, 1);	
 		
 			//Crosshair range
-			var RangeString = "Range: " + string_format(global.local_player.Range, 0, 1) + " Units";
+			var RangeString = tr("Range") + ": " + string_format(global.local_player.Range, 0, 1) + " " + tr("Units");
 			draw_text_outlined(AdminHUDX - string_width(RangeString), AdminHUDY + TextHeightSmall, RangeString, c_white, c_black, 1);	
 		
 			//KickBack
-			var KBString = "Kickback: " + string_format(global.local_player.KickBack, 0, 1);
+			var KBString = tr("Kickback") + ": " + string_format(global.local_player.KickBack, 0, 1);
 			draw_text_outlined(AdminHUDX - string_width(KBString), AdminHUDY + TextHeightSmall*2, KBString, c_white, c_black, 1);	
 				
 			//Inaccuracy
-			var player_inaccuracy = inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, Index.slot_id], global.local_player);
-			var inaccuracy_string = "Inaccuracy: " + string_format(player_inaccuracy, 0, 1) + " Units";
+			var player_inaccuracy = inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player);
+			var inaccuracy_string = tr("Inaccuracy") + ": " + string_format(player_inaccuracy, 0, 1) + " " + tr("Units");
 			draw_text_outlined(AdminHUDX - string_width(inaccuracy_string), AdminHUDY + TextHeightSmall*3, inaccuracy_string, c_white, c_black, 1);	
 		
 			if(global.ranked_game == true){
@@ -793,18 +840,18 @@ if(!instance_exists(oBuyMenu) && !instance_exists(oInventory) && !instance_exist
 				//Volatility
 				var gv = global.game_struct.Game_volatility;
 				var pv = global.game_struct.Predictive_volatility;
-				var pv_string = "Predictive volatility: " + string_format(pv, 0, 2);
-				var gv_string = "Game volatility: " + string(global.game_struct.Game_volatility);
+				var pv_string = tr("Predictive_volatility") + ": " + string_format(pv, 0, 2);
+				var gv_string = tr("Game_volatility") + ": " + string(global.game_struct.Game_volatility);
 
 				draw_text_outlined(AdminHUDX - string_width(gv_string), AdminHUDY + TextHeightSmall * 8, gv_string, c_white, c_black, 1);
 				draw_text_outlined(AdminHUDX - string_width(pv_string), AdminHUDY + TextHeightSmall * 9, pv_string, c_white, c_black, 1);
 
 			
 				//Enemy elos
-				var enemy_elos_string = "Enemy R: [ ";
-				var enemy_elos_string_eggy_scale = "Enemy R (ES): " + string(global.game_struct.Enemy_ep);
-				var enemy_rd_string = "Enemy RD: [ ";
-				var enemy_rd_string_es = "Enemy RD (ES) " + string(global.game_struct.Enemy_rd);
+				var enemy_elos_string = tr("Enemy") + " R: [ ";
+				var enemy_elos_string_eggy_scale = tr("Enemy") + " R (ES): " + string(global.game_struct.Enemy_ep);
+				var enemy_rd_string = tr("Enemy") + " RD: [ ";
+				var enemy_rd_string_es = tr("Enemy") + " RD (ES) " + string(global.game_struct.Enemy_rd);
 			
 				for (var i = 0; i < array_length(global.game_struct.Enemy_ep); i++) {
 				    var converted_elo = convert_back(global.game_struct.Enemy_ep[i]);
@@ -832,23 +879,23 @@ with(oSlot){
 	var scale = min(1 * global.gui_scale, 2 * global.gui_scale);
 	var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 	var yy = (y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-	var Id = global.Inventory[# VarSlot, Index.slot_id];
-	var Amount = global.Inventory[# VarSlot, Index.SlotAmount];
+	var Id = global.Inventory[# VarSlot, INDEX.slot_id];
+	var Amount = global.Inventory[# VarSlot, INDEX.SlotAmount];
 	var xx2 = (mouse_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 	var yy2 = (mouse_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-	var Ammo = global.Inventory[# VarSlot, Index.slot_ammo];
-	var ClipAmmo = global.Inventory[# VarSlot, Index.slot_clip_ammo];
-	var Durability = global.Inventory[# VarSlot, Index.slot_durability];
-	var MouseID = global.MouseSlot[# 0, Index.slot_id];
-	var MouseAmount = global.MouseSlot[# 0, Index.SlotAmount];
-	var slot_alpha = global.GUIHUDAlpha*2.75;
+	var Ammo = global.Inventory[# VarSlot, INDEX.slot_ammo];
+	var ClipAmmo = global.Inventory[# VarSlot, INDEX.slot_clip_ammo];
+	var Durability = global.Inventory[# VarSlot, INDEX.slot_durability];
+	var MouseID = global.MouseSlot[# 0, INDEX.slot_id];
+	var MouseAmount = global.MouseSlot[# 0, INDEX.SlotAmount];
+	var slot_alpha = global.gui_alpha*2.75;
 
 	draw_sprite_ext(sprite_index, image_index, xx, yy, scale, scale, 0, image_blend, slot_alpha);
-	if (Id != Item.None){ 
+	if (Id != ITEM.None){ 
 		var c_x = xx + sprite_get_width(spr_Slot) * 0.5 * scale;
 		var c_y = yy + sprite_get_height(spr_Slot) * 0.5 * scale;
 		draw_sprite_ext(spr_Items, Id, c_x, c_y, scale, scale, 0, c_white, slot_alpha);
-		var sockets = global.ItemIndex[# Id, ItemStat.attach_sockets];
+		var sockets = global.ItemIndex[# Id, ITEMSTATS.attach_sockets];
 		var slot_keys = [
 			"scope",
 			"barrel",
@@ -856,22 +903,22 @@ with(oSlot){
 			"suppressor"
 		];
 		var inv_slots = [
-			Index.slot_scope,
-			Index.slot_barrel,
-			Index.slot_grip,
-			Index.slot_suppressor
+			INDEX.slot_scope,
+			INDEX.slot_barrel,
+			INDEX.slot_grip,
+			INDEX.slot_suppressor
 		];
 
-		for(var i = 0; i < (ATTACHMENTS.slot_suppressor + 1); i++){
+		for(var i = 0; i < (ATTACHMENTS.suppressor + 1); i++){
 			var att = global.Inventory[# VarSlot, inv_slots[i]];
-			if(att != Item.None && sockets[$ slot_keys[i]] != undefined){
+			if(att != ITEM.None && sockets[$ slot_keys[i]] != undefined){
 			    var off = sockets[$ slot_keys[i]];
 			    draw_sprite_ext(spr_Items, att, c_x + off[0] * scale, c_y + off[1] * scale, scale * 0.5, scale * 0.5, 0, c_white, slot_alpha);
 			}
 		}
 
 		draw_set_alpha(slot_alpha);
-		if(VarSlot < OtherSlot.Primary && (global.ItemIndex[# Id, ItemStat.Type] == "Item" || global.ItemIndex[# Id, ItemStat.Type] == "Grenade")){
+		if(VarSlot < OtherSlot.Primary && (global.ItemIndex[# Id, ITEMSTATS.Type] == "Item" || global.ItemIndex[# Id, ITEMSTATS.Type] == "Grenade")){
 			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
 		}
 		draw_set_alpha(1);
@@ -884,8 +931,8 @@ with(oSlot){
 		}
 	}
 	
-	if (global.MouseSlot[# 0, Index.slot_id] != Item.None){
-	    draw_sprite_ext(spr_Items, global.MouseSlot[# 0, Index.slot_id], xx2, yy2, scale, scale, 0, c_white, slot_alpha);
+	if (global.MouseSlot[# 0, INDEX.slot_id] != ITEM.None){
+	    draw_sprite_ext(spr_Items, global.MouseSlot[# 0, INDEX.slot_id], xx2, yy2, scale, scale, 0, c_white, slot_alpha);
 	} 
 	
 	
@@ -893,82 +940,82 @@ with(oSlot){
 		image_blend = MAIN_COLOR;
 		
 		if(mouse_check_button_pressed(mb_right) && keyboard_check(vk_control)){
-			if(VarSlot < OtherSlot.Primary && global.ItemIndex[# Id, ItemStat.Type] != "Item" && global.ItemIndex[# Id, ItemStat.Type] != "Grenade"
-			&& global.ItemIndex[# Id, ItemStat.Type] != "Bomb"){
+			if(VarSlot < OtherSlot.Primary && Id != ITEM.None && global.ItemIndex[# Id, ITEMSTATS.Type] != "Item" && global.ItemIndex[# Id, ITEMSTATS.Type] != "Grenade"
+			&& global.ItemIndex[# Id, ITEMSTATS.Type] != "Bomb"){
 	
 				#region Primary equip
-				var primary_slot_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
-				if (primary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
+				var primary_slot_id = global.Inventory[# OtherSlot.Primary, INDEX.slot_id];
+				if (primary_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 					item_swap("varslot", OtherSlot.Primary);
-					primary_slot_id = Item.None;
+					primary_slot_id = ITEM.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
+				} else if (global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY) {
 					item_swap("varslot", OtherSlot.Primary);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
 				
 				#region Secondary equip
-				var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, Index.slot_id];
-				if (secondary_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
+				var secondary_slot_id = global.Inventory[# OtherSlot.Secondary, INDEX.slot_id];
+				if (secondary_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 					item_swap("varslot", OtherSlot.Secondary);
-					secondary_slot_id = Item.None;
+					secondary_slot_id = ITEM.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
+				} else if (global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY) {
 					item_swap("varslot", OtherSlot.Secondary);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
 				
 				#region Knife equip
-				var knife_slot_id = global.Inventory[# OtherSlot.Knife, Index.slot_id];
-				if (knife_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
+				var knife_slot_id = global.Inventory[# OtherSlot.Knife, INDEX.slot_id];
+				if (knife_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 					item_swap("varslot", OtherSlot.Knife);
-					knife_slot_id = Item.None;
+					knife_slot_id = ITEM.None;
 					with(global.local_player){ weapon_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
+				} else if (global.ItemIndex[# Id, ITEMSTATS.WeaponType] == WEAPON_TYPE.TERTIARY) {
 					item_swap("varslot", OtherSlot.Knife);
 					with(global.local_player){ weapon_network_propagate(); }
 				}
 				#endregion
 				
 				#region Armour equip and dequip
-				var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-				if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], armour_slot_id);
+				var armour_slot_id = global.Inventory[# OtherSlot.Armour, INDEX.slot_id];
+				if (armour_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.Type] == "Armour")) {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], armour_slot_id);
 					item_swap("varslot", OtherSlot.Armour);
-					armour_slot_id = Item.None;
+					armour_slot_id = ITEM.None;
 					with(global.local_player){ equip_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], armour_slot_id);
+				} else if (global.ItemIndex[# Id, ITEMSTATS.Type] == "Armour") {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], armour_slot_id);
 					item_swap("varslot", OtherSlot.Armour);
 					with(global.local_player){ equip_network_propagate(); }
 				}
 				#endregion
 				
 				#region Helmet equip and dequip
-				var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-				if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], helmet_slot_id);
+				var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, INDEX.slot_id];
+				if (helmet_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.Type] == "Helmet")) {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], helmet_slot_id);
 					item_swap("varslot", OtherSlot.Helmet);
-					helmet_slot_id = Item.None;
+					helmet_slot_id = ITEM.None;
 					with(global.local_player){ equip_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], helmet_slot_id);
+				} else if (global.ItemIndex[# Id, ITEMSTATS.Type] == "Helmet") {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], helmet_slot_id);
 					item_swap("varslot", OtherSlot.Helmet);
 					with(global.local_player){ equip_network_propagate(); }
 				}
 				#endregion
 				
 				#region Shield equip
-				var shield_slot_id = global.Inventory[# OtherSlot.Shield, Index.slot_id];
-				if (shield_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Shield")) {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], shield_slot_id);
+				var shield_slot_id = global.Inventory[# OtherSlot.Shield, INDEX.slot_id];
+				if (shield_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.Type] == "Shield")) {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], shield_slot_id);
 					item_swap("varslot", OtherSlot.Shield);
-					shield_slot_id = Item.None;
+					shield_slot_id = ITEM.None;
 					with(global.local_player){ equip_network_propagate(); }
-				} else if (global.ItemIndex[# Id, ItemStat.Type] == "Shield") {
-					ItemAddWeight(global.Inventory[# VarSlot, Index.slot_id], shield_slot_id);
+				} else if (global.ItemIndex[# Id, ITEMSTATS.Type] == "Shield") {
+					ItemAddWeight(global.Inventory[# VarSlot, INDEX.slot_id], shield_slot_id);
 					item_swap("varslot", OtherSlot.Shield);
 					with(global.local_player){ equip_network_propagate(); }
 				}
@@ -978,7 +1025,7 @@ with(oSlot){
 		}
 	
 		
-		if(mouse_check_button_pressed(mb_left) && MouseID == Item.None && !keyboard_check(vk_control)){
+		if(mouse_check_button_pressed(mb_left) && MouseID == ITEM.None && !keyboard_check(vk_control)){
 			item_description_destroy();
 			if(oDraw.DrawInfo == true){
 				oDraw.DrawInfo = false;
@@ -1004,22 +1051,22 @@ with(oSlot){
 			if(VarSlot <= INVENTORY_SIZE){
 				
 				#region Usable slots item switching
-				if (Id == 0 || MouseID == 0 || Id != MouseID || (Id == MouseID && global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield" || global.ItemIndex[#Id, ItemStat.Type] == "Weapon")){
+				if (Id == 0 || MouseID == 0 || Id != MouseID || (Id == MouseID && global.ItemIndex[#Id, ITEMSTATS.Type] == "Armour" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Helmet" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Shield" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Weapon")){
 					item_swap("mouse", VarSlot);
 				}else if (Id == MouseID){
-					global.Inventory[# VarSlot, 1] += global.MouseSlot[# 0, Index.SlotAmount];
-					global.MouseSlot[# 0, Index.slot_id] = Item.None;
-					global.MouseSlot[# 0, Index.SlotAmount] = 0;
+					global.Inventory[# VarSlot, 1] += global.MouseSlot[# 0, INDEX.SlotAmount];
+					global.MouseSlot[# 0, INDEX.slot_id] = ITEM.None;
+					global.MouseSlot[# 0, INDEX.SlotAmount] = 0;
 				}
 				#endregion
 			
 			}else if(VarSlot == OtherSlot.Primary){
 			
 				#region Primary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY)) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY)) {
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.PRIMARY) {
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -1027,10 +1074,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Secondary){
 				
 				#region Secondary equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY)) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY)) {
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY) {
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -1038,10 +1085,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Knife){
 				
 				#region Knife equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY)) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.TERTIARY)) {
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.WeaponType] == WEAPON_TYPE.TERTIARY) {
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.TERTIARY) {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -1049,12 +1096,12 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Helmet){
 				
 				#region Helmet equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet")) {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Helmet")) {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, INDEX.slot_id]);
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Helmet") {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Helmet") {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, INDEX.slot_id]);
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -1062,12 +1109,12 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Armour){
 				
 				#region Armour equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Armour")) {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Armour")) {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, INDEX.slot_id]);
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Armour") {
-					ItemAddWeight(MouseID, global.Inventory[# VarSlot, Index.slot_id]);
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Armour") {
+					ItemAddWeight(MouseID, global.Inventory[# VarSlot, INDEX.slot_id]);
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion
@@ -1075,10 +1122,10 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Shield){
 				
 				#region Shield equip and dequip
-				if (Id != Item.None && (MouseID == Item.None || global.ItemIndex[#MouseID, ItemStat.Type] == "Shield")) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Shield")) {
 				    item_swap("mouse", VarSlot);
-				    Id = Item.None;
-				} else if (global.ItemIndex[#MouseID, ItemStat.Type] == "Shield") {
+				    Id = ITEM.None;
+				} else if (global.ItemIndex[#MouseID, ITEMSTATS.Type] == "Shield") {
 				    item_swap("mouse", VarSlot);
 				}
 				#endregion

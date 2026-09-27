@@ -102,6 +102,7 @@ function map_init(Map){
 }
 
 function clear_player_statistics(total_rounds){
+	global.player_stats.Money = ROUND_STARTING_MONEY;
 	global.game_struct.Rounds_win = 0;
 	global.game_struct.Rounds_lost = 0;
 	global.game_struct.Current_round = 0;

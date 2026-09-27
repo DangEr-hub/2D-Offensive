@@ -3,7 +3,7 @@ function lottery_pick_weapon(pool){
 
     for(var i = 0; i < array_length(pool); i++){
         var weapon = pool[i];
-        var rarity = global.ItemIndex[# weapon, ItemStat.Rarity];
+        var rarity = global.ItemIndex[# weapon, ITEMSTATS.Rarity];
         total_weight += lottery_rarity_weight(rarity);
     }
 
@@ -11,7 +11,7 @@ function lottery_pick_weapon(pool){
 
     for(var i = 0; i < array_length(pool); i++){
         var weapon = pool[i];
-        var rarity = global.ItemIndex[# weapon, ItemStat.Rarity];
+        var rarity = global.ItemIndex[# weapon, ITEMSTATS.Rarity];
 
         roll -= lottery_rarity_weight(rarity);
 
@@ -68,7 +68,7 @@ function lottery_start(){
 }
 
 function draw_lottery(pos_x, pos_y, w, h){
-    draw_set_alpha(global.GUIHUDAlpha);
+    draw_set_alpha(global.gui_alpha);
     draw_set_color(MENU_COLOR);
     draw_rectangle(pos_x, pos_y, pos_x + w, pos_y + h, false);
 		
@@ -92,7 +92,7 @@ function draw_lottery(pos_x, pos_y, w, h){
         var scale = lerp(0.7, 1.15, proximity);
 
         var weapon = lottery_items[i];
-        var rarity = global.ItemIndex[# weapon, ItemStat.Rarity];
+        var rarity = global.ItemIndex[# weapon, ITEMSTATS.Rarity];
         var rarity_color = lottery_rarity_color(rarity);
 
         var current_slot_width = slot_width * 0.9 * scale;
@@ -112,7 +112,7 @@ function draw_lottery(pos_x, pos_y, w, h){
 
 		// Draw item card border
         draw_set_color(c_black);
-        draw_set_alpha(global.GUIHUDAlpha * 0.5);
+        draw_set_alpha(global.gui_alpha * 0.5);
         draw_rectangle(
             slot_x - current_slot_width * 0.5 + 3,
             center_y - current_slot_height * 0.5 + 3,
@@ -121,7 +121,7 @@ function draw_lottery(pos_x, pos_y, w, h){
             false
         );
 
-        draw_set_alpha(global.GUIHUDAlpha);
+        draw_set_alpha(global.gui_alpha);
 
 		// Draw item
         draw_sprite_ext(
@@ -133,7 +133,7 @@ function draw_lottery(pos_x, pos_y, w, h){
             scale,
             0,
             c_white,
-            global.GUIHUDAlpha
+            global.gui_alpha
         );
 
 		/// Draw vertical line

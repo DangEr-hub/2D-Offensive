@@ -1,7 +1,7 @@
-item_id = Item.None;
+item_id = ITEM.None;
 alpha_value = 0;
 description = "";
-alpha = global.GUIHUDAlpha * 3; alpha_value = 0;
+alpha = global.gui_alpha * 3; alpha_value = 0;
 icon_sprite_index = -1;
 icon_image_index = -1;
 outline_color = c_black;
@@ -11,4 +11,5 @@ caption = "";
 drawable = true;
 max_width = 150 * global.gui_scale;
 icon_after = false;
+icon_offset = [0, 0];
 sprite_scale = 1;

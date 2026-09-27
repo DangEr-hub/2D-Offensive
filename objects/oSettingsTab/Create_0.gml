@@ -1,14 +1,14 @@
 event_inherited();
 ingame_overlay = false;
 overlay_black = noone;
-setting_tab_width = 512 * global.gui_scale;
-setting_tab_height = 512 * global.gui_scale;
+setting_tab_width = max(512 * global.gui_scale, 768);
+setting_tab_height = max(512 * global.gui_scale, 768);
 
 //draw_set_valign(1);
 draw_set_font(set_font("GUI_small"));
 zui_set_size(setting_tab_width, setting_tab_height);
 
-gap = 256 * global.gui_scale;
+gap = 288 * global.gui_scale;
 position_x = 32 + global.gui_scale;
 position_y = 64 + global.gui_scale;
 toggle_particles_string = "Particles: ";
@@ -18,6 +18,13 @@ anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
 saturation_level_string = "Saturation level: ";
 text_height = string_height("a")*2;
+
+language_callback = function(language_code){
+	global.language = language_code;
+	language_cz_checkbox.value = language_code == "cz";
+	language_en_checkbox.value = language_code == "en";
+	save_game();
+};
 
 window_resolution_callback = function() {
     var resolutions = [
@@ -397,6 +404,39 @@ with(zui_create(position_x + gap*.75, position_y + text_height*10 - text_height/
 	init_text = string(global.saturation_level);
 	max_string_length = 4;
 	callback = other.saturation_level_text_input_callback;
+}
+#endregion
+
+#region Language
+with(zui_create(position_x, position_y + text_height*11, objUILabel)){
+	color = c_white;
+	caption = "Language: ";
+}
+
+language_cz_checkbox = zui_create(position_x + gap, position_y + text_height*11 - checkbox_size/2, objUICheckbox);
+with(language_cz_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = global.language == "cz";
+	callback = function(){ oSettingsTab.language_callback("cz"); };
+}
+
+with(zui_create(position_x + gap + checkbox_size + 12 * global.gui_scale, position_y + text_height*11, objUILabel)){
+	color = c_white;
+	caption = "CZ";
+}
+
+language_en_checkbox = zui_create(position_x + gap + 100 * global.gui_scale, position_y + text_height*11 - checkbox_size/2, objUICheckbox);
+with(language_en_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = global.language == "en";
+	callback = function(){ oSettingsTab.language_callback("en"); };
+}
+
+with(zui_create(position_x + gap + 100 * global.gui_scale + checkbox_size + 12 * global.gui_scale, position_y + text_height*11, objUILabel)){
+	color = c_white;
+	caption = "EN";
 }
 #endregion
 

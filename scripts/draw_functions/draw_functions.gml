@@ -152,6 +152,26 @@ function draw_text_outlined_ext(position_x, position_y, text, text_color, outlin
 	draw_set_colour(c_white);
 }
 	
+function draw_weapon_attachments(weapon_inst, muzzle_distance, suppressor_id, barrel_id, scope_id){
+	if(suppressor_id != ITEM.None){
+		var suppressor_uvs = sprite_get_uvs(spr_Items, suppressor_id);
+		var suppressor_distance = muzzle_distance - (suppressor_uvs[4] - sprite_get_xoffset(spr_Items)) * .5;
+		draw_sprite_ext(spr_Items, suppressor_id,
+			weapon_inst.x + lengthdir_x(suppressor_distance, weapon_inst.image_angle),
+			weapon_inst.y + lengthdir_y(suppressor_distance, weapon_inst.image_angle),
+			.5, .5, weapon_inst.image_angle, c_white, 1);
+	}
+
+	if(barrel_id != ITEM.None){
+		draw_sprite_ext(spr_Attachments, global.ItemIndex[# barrel_id, ITEMSTATS.AmmoSpriteID],
+			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, 1);
+	}
+	if(scope_id != ITEM.None){
+		draw_sprite_ext(spr_Attachments, global.ItemIndex[# scope_id, ITEMSTATS.AmmoSpriteID],
+			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, 1);
+	}
+}
+
 function draw_blur_2d(sprite, subimg, position_x, position_y, xscale, yscale, rot, col, alpha, blur_radius) {
     var surf_horizontal = surface_create(sprite_get_width(sprite) * xscale, sprite_get_height(sprite) * yscale);
     var surf_vertical = surface_create(sprite_get_width(sprite) * xscale, sprite_get_height(sprite) * yscale);
@@ -209,7 +229,7 @@ function draw_impact_trace(x1, y1, x2, y2){
 }
 
 function draw_compass(xx, yy, w, h){
-    draw_set_alpha(global.GUIHUDAlpha * 0.75);
+    draw_set_alpha(global.gui_alpha * 0.75);
 
     draw_set_color(c_black);
     draw_rectangle(xx, yy, xx + w, yy + h, true);
@@ -264,7 +284,7 @@ function draw_compass(xx, yy, w, h){
 
             if(abs(angle_diff) <= v_angle){
                 draw_set_color(col);
-                draw_circle(marker_x, center_y, 8, false);
+                draw_circle(marker_x, center_y, 4 * global.gui_scale, false);
             }
         }
     }
@@ -277,7 +297,7 @@ function draw_compass(xx, yy, w, h){
 
 			if(abs(angle_diff) <= v_angle){
 				draw_set_color(c_green);
-				draw_circle(marker_x, center_y, 8, false);
+				draw_circle(marker_x, center_y, 4 * global.gui_scale, false);
 			}
 		}
 	}
@@ -290,7 +310,8 @@ function draw_compass(xx, yy, w, h){
 
 			if(abs(angle_diff) <= v_angle){
 				draw_set_color(c_red);
-				draw_rectangle(marker_x - 4, center_y - 4, marker_x + 4, center_y + 4, false);
+				var size = 4 * global.gui_scale;
+				draw_rectangle(marker_x - size, center_y - size, marker_x + size, center_y + size, false);
 			}
 		}
 	}
@@ -305,7 +326,7 @@ function draw_compass(xx, yy, w, h){
 
 	            if(abs(remote_angle_diff) <= v_angle){
 	                draw_set_color(remote_col);
-	                draw_circle(remote_marker_x, center_y, 6, false);
+	                draw_circle(remote_marker_x, center_y, 4 * global.gui_scale, false);
 	            }
 	        }
 	    }

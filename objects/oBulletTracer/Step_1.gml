@@ -18,7 +18,7 @@ if(wall_collision == noone && instance_exists(stats.Object)){
 	var col = collision_line(stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y, oParentTile, true, false)
 	var hits_machine_gun_operator = col != noone
 		&& shot_hits_machine_gun_operator(col, stats.Object_x, stats.Object_y, stats.Shot_x, stats.Shot_y);
-	if(col != noone && !hits_machine_gun_operator && stats.Item_id != Item.basic_machine_gun){
+	if(col != noone && !hits_machine_gun_operator && stats.Item_id != ITEM.basic_machine_gun){
 		if(col.hideable){
 			var hideable_collision = find_collision_point(
 				stats.Object_x,
@@ -45,19 +45,19 @@ if(wall_collision == noone && instance_exists(stats.Object)){
 		if(col.transparent){
 			glass_modifier = 50;
 		}		
-		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower] / glass_modifier;
+		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower] / glass_modifier;
 	}
 }
 
 var bullet_damage = 0;
 if(wall_collision != noone){
-	bullet_damage = stats.Damage * global.ItemIndex[#stats.Item_id, ItemStat.damage_drop](point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
+	bullet_damage = stats.Damage * global.ItemIndex[#stats.Item_id, ITEMSTATS.damage_drop](point_distance(stats.Starting_x, stats.Starting_y, wall_collision.xx, wall_collision.yy));
 	if(impact_flag == true){
 		var glass_modifier = 1;
 		if(wall_collision.inst_id.transparent){
 			glass_modifier = 50;
 		}		
-		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ItemStat.PenetrationPower] / glass_modifier;
+		stats.Penetration_damage += PENETRATION_VALUE / global.ItemIndex[#stats.Item_id, ITEMSTATS.PenetrationPower] / glass_modifier;
 	}
 	
 		
@@ -69,7 +69,7 @@ if(wall_collision != noone){
 		
 		#region Variables
 		var wall_sound = snd_BulletConcrete;
-		var WallParticles = irandom_range(global.ItemIndex[#stats.Item_id, ItemStat.Damage], global.ItemIndex[#stats.Item_id, ItemStat.Damage]*2);
+		var WallParticles = irandom_range(global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage]*2);
 		if(image_index == 2){
 			WallParticles = 1;	
 		}
@@ -106,7 +106,7 @@ if(wall_collision != noone){
 			
 			#region Particles
 			if(instance_exists(oParticleSystem)){
-				var spark_number = round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5);
+				var spark_number = round(global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage]/5);
 				if(image_index == 2){
 					spark_number = 1;	
 				}
@@ -186,7 +186,7 @@ if(wall_collision != noone){
 			explosion_create(
 				10, 
 				[x, y],
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], 
 				false, 
 				stats.Object, 
 				stats.Item_id,
@@ -195,7 +195,7 @@ if(wall_collision != noone){
 			);	
 		
 			if(instance_exists(oParticleSystem)){
-				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, round(global.ItemIndex[#stats.Item_id, ItemStat.Damage]/5));
+				part_particles_create(global.ParticleSystem, x, y, oParticleSystem.Spark, round(global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage]/5));
 			}
 		
 		play_impact_sound(x, y, wall_sound, stats.Object, wall_collision.inst_id);

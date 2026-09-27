@@ -2,7 +2,7 @@
 		var knife_object = instance_nearest(x, y, oKnife);
 		if (instance_exists(knife_object)) {
 		    if (instance_exists(knife_object.stats.Object) && knife_object.stats.Object_index == oPlayer) {
-		        if (knife_object.stats.Object.knife_attack_timer >= global.ItemIndex[# knife_object.stats.Item_id, ItemStat.ReloadSpeed]) {
+		        if (knife_object.stats.Object.knife_attack_timer >= global.ItemIndex[# knife_object.stats.Item_id, ITEMSTATS.ReloadSpeed]) {
 		            var hitbox_corners = get_hitbox_corners(knife_object, 25, 50, 20, knife_object.stats.Object.RotationAngle);
 
 		            // Get the min and max x and y coordinates from the hitbox corners to define the bounding box

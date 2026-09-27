@@ -1,7 +1,7 @@
 event_inherited();
 
 with(buy_time_cap){
-	caption = "Buy time remaining: " + string(ceil(oDraw.buy_time / 60)) + " s";
+	caption = tr("Buy_time_remaining") + " " + string(ceil(oDraw.buy_time / 60)) + " s";
 }
 if(oDraw.buy_time <= 0){
 	global.local_player.player_can_move = true;

@@ -12,7 +12,7 @@ if (instance_exists(oDraw)) {
 }
 
 stats = {
-	"Item_id": Item.Bomb
+	"Item_id": ITEM.Bomb
 };
 
 if (!IS_NET || oNetworkManager.is_server) {
@@ -25,7 +25,7 @@ stats = {
 	Object_index: oBomb,
 	Owner_name: "Bomb",
 	Owner_id: global.bomb_planter_pid,
-	Item_id: Item.Bomb
+	Item_id: ITEM.Bomb
 };
 
 image_xscale = .5;

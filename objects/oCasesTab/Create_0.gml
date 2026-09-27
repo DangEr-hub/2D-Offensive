@@ -34,18 +34,18 @@ ar_case_callback = function(){
 		with(zui_create(zui_get_width() * .2, zui_get_height() * .5, objUILottery)){
 			zui_set_anchor(0, 0); 			
 			lottery_weapon_pool = [
-				Item.AKM,
-				Item.MK18,
-				Item.m4a1,
-				Item.famas,
-				Item.galil
+				ITEM.AKM,
+				ITEM.MK18,
+				ITEM.m4a1,
+				ITEM.famas,
+				ITEM.galil
 			];
 		}
 		global.player_stats.AR_cases --;
 	}
 };
 
-ar_count_str = "Assault rifles - " + string(global.player_stats.AR_cases) + "x";
+ar_count_str = tr("Assault_rifles") + " - " + string(global.player_stats.AR_cases) + "x";
 ar_count = zui_create(ar_cases_x + bw/2 - string_width(ar_count_str)/2, cases_y - text_h*2, objUILabel);
 with(ar_count){caption = oCasesTab.ar_count_str; }
 
@@ -101,16 +101,16 @@ sniper_case_callback = function(){
 		with(zui_create(zui_get_width() * .2, zui_get_height() * .5, objUILottery)){
 			zui_set_anchor(0, 0); 			
 			lottery_weapon_pool = [
-				Item.awm,
-				Item.SSG08,
-				Item.Dragunov
+				ITEM.awm,
+				ITEM.SSG08,
+				ITEM.Dragunov
 			];
 		}
 		global.player_stats.Sniper_cases --;
 	}
 };
 
-sniper_count_str = "Sniper rifles - " + string(global.player_stats.Sniper_cases) + "x";
+sniper_count_str = tr("Sniper_rifles") + " - " + string(global.player_stats.Sniper_cases) + "x";
 sniper_count = zui_create(sniper_cases_x + bw/2 - string_width(sniper_count_str)/2, cases_y - text_h*2, objUILabel);
 with(sniper_count){caption = oCasesTab.sniper_count_str; }
 
@@ -167,19 +167,19 @@ pistol_case_callback = function(){
 		with(zui_create(zui_get_width() * .2, zui_get_height() * .5, objUILottery)){
 			zui_set_anchor(0, 0); 			
 			lottery_weapon_pool = [
-				Item.Glock,
-				Item.usp,
-				Item.DesertEagle,
-				Item.p250,
-				Item.tec9,
-				Item.p250
+				ITEM.Glock,
+				ITEM.usp,
+				ITEM.DesertEagle,
+				ITEM.p250,
+				ITEM.tec9,
+				ITEM.p250
 			];
 		}
 		global.player_stats.Pistol_cases --;
 	}
 };
 
-pistol_count_str = "Pistols - " + string(global.player_stats.Pistol_cases) + "x";
+pistol_count_str = tr("Pistols") + " - " + string(global.player_stats.Pistol_cases) + "x";
 pistol_count = zui_create(pistol_cases_x + bw/2 - string_width(pistol_count_str)/2, cases_y - text_h*2, objUILabel);
 with(pistol_count){caption = oCasesTab.pistol_count_str; }
 
@@ -235,17 +235,17 @@ smg_case_callback = function(){
 		with(zui_create(zui_get_width() * .2, zui_get_height() * .5, objUILottery)){
 			zui_set_anchor(0, 0); 			
 			lottery_weapon_pool = [
-				Item.MAC11,
-				Item.MP9,
-				Item.MP7,
-				Item.P90
+				ITEM.MAC11,
+				ITEM.MP9,
+				ITEM.MP7,
+				ITEM.P90
 			];
 		}
 		global.player_stats.Smg_cases --;
 	}
 };
 
-smg_count_str = "Submachine guns - " + string(global.player_stats.Smg_cases) + "x";
+smg_count_str = tr("Submachine_guns") + " - " + string(global.player_stats.Smg_cases) + "x";
 smg_count = zui_create(smg_cases_x + bw/2 - string_width(smg_count_str)/2, cases_y - text_h*2, objUILabel);
 with(smg_count){caption = oCasesTab.smg_count_str; }
 
@@ -301,14 +301,14 @@ heavy_case_callback = function(){
 		with(zui_create(zui_get_width() * .2, zui_get_height() * .5, objUILottery)){
 			zui_set_anchor(0, 0); 			
 			lottery_weapon_pool = [
-				Item.Javelin,
+				ITEM.Javelin,
 			];
 		}
 		global.player_stats.Heavy_cases --;
 	}
 };
 
-heavy_count_str = "Heavy guns - " + string(global.player_stats.Heavy_cases) + "x";
+heavy_count_str = tr("Heavy_guns") + " - " + string(global.player_stats.Heavy_cases) + "x";
 heavy_count = zui_create(heavy_cases_x + bw/2 - string_width(heavy_count_str)/2, cases_y - text_h*2, objUILabel);
 with(heavy_count){caption = oCasesTab.heavy_count_str; }
 

@@ -11,19 +11,19 @@ var yy22 = (global.InventoryEquipRightBottomCorner[1] - oDraw.ViewY) * (global.G
 
 if!(mouse_to_gui(xx1, yy1, xx2, yy2) || mouse_to_gui(xx12, yy12, xx22, yy22)){
 	
-	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[# 0, Index.slot_id] != Item.None){
+	if(mouse_check_button_pressed(mb_right) && global.MouseSlot[# 0, INDEX.slot_id] != ITEM.None){
 		request_item_drop(
-			global.MouseSlot[# 0, Index.slot_id],
+			global.MouseSlot[# 0, INDEX.slot_id],
 			global.local_player.x,
 			global.local_player.y,
-			global.MouseSlot[# 0, Index.slot_ammo],
-			global.MouseSlot[# 0, Index.slot_clip_ammo],
-			global.MouseSlot[# 0, Index.slot_durability],
-			global.MouseSlot[# 0, Index.SlotAmount],
-			global.MouseSlot[# 0, Index.slot_scope],
-			global.MouseSlot[# 0, Index.slot_barrel],
-			global.MouseSlot[# 0, Index.slot_grip],
-			global.MouseSlot[# 0, Index.slot_suppressor],
+			global.MouseSlot[# 0, INDEX.slot_ammo],
+			global.MouseSlot[# 0, INDEX.slot_clip_ammo],
+			global.MouseSlot[# 0, INDEX.slot_durability],
+			global.MouseSlot[# 0, INDEX.SlotAmount],
+			global.MouseSlot[# 0, INDEX.slot_scope],
+			global.MouseSlot[# 0, INDEX.slot_barrel],
+			global.MouseSlot[# 0, INDEX.slot_grip],
+			global.MouseSlot[# 0, INDEX.slot_suppressor],
 		);	
 		
 		for(var i=0;i<ds_grid_height(global.MouseSlot);i++){
@@ -58,48 +58,48 @@ switch(VarSlot){
 	break;
 }
 
-if(global.Inventory[#VarSlot, Index.slot_id] == Item.None){
+if(global.Inventory[#VarSlot, INDEX.slot_id] == ITEM.None){
 	DrawItemInfo = false;
 }
 
 if(DrawItemInfo == true){
 	if(oDraw.DrawInfo == false){
-		var Id = global.Inventory[#VarSlot, Index.slot_id];
-		if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
+		var Id = global.Inventory[#VarSlot, INDEX.slot_id];
+		if(global.ItemIndex[#Id, ITEMSTATS.Type] == "Armour" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Helmet" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Shield"){
 			oDraw.var_slot = VarSlot;
-			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			oDraw.item_description = tr_name(Id);
 			item_description_destroy();
 			with(zui_main()){
 				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
-					alpha = global.GUIHUDAlpha * 3;
+					alpha = global.gui_alpha * 3;
 				}
 			}
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
+		}else if(global.ItemIndex[#Id, ITEMSTATS.Type] == "Item"){
 			oDraw.var_slot = VarSlot;
-			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			oDraw.item_description = tr_name(Id);
 			item_description_destroy();
 			with(zui_main()){
 				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
-					alpha = global.GUIHUDAlpha * 3;
+					alpha = global.gui_alpha * 3;
 				}
 			}
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
+		}else if(global.ItemIndex[#Id, ITEMSTATS.Type] == "Weapon"){
 			oDraw.var_slot = VarSlot;
-			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			oDraw.item_description = tr_name(Id);
 			item_description_destroy();
 			with(zui_main()){
 				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
-					alpha = global.GUIHUDAlpha * 3;
+					alpha = global.gui_alpha * 3;
 				}
 			}
-		}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine"
-		 || global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
+		}else if(global.ItemIndex[#Id, ITEMSTATS.Type] == "Grenade" || global.ItemIndex[#Id, ITEMSTATS.Type] == "Landmine"
+		 || global.ItemIndex[#Id, ITEMSTATS.Type] == "Bomb"){
 			oDraw.var_slot = VarSlot;
-			oDraw.item_description = global.ItemIndex[#Id, ItemStat.Name];
+			oDraw.item_description = tr_name(Id);
 			item_description_destroy();
 			with(zui_main()){
 				with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
-					alpha = global.GUIHUDAlpha * 3;
+					alpha = global.gui_alpha * 3;
 				}
 			}
 		}

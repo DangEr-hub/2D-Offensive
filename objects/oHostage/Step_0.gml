@@ -66,7 +66,7 @@ if (stats.Health_points <= 0) {
 	if (instance_exists(BodyHB)) instance_destroy(BodyHB);
 	if (instance_exists(ArmHB)) instance_destroy(ArmHB);
 
-	var EnemyDead = instance_create_depth(x, y, depth, oEnemyDead);
+	var EnemyDead = instance_create_depth(x, y, depth, oCharDead);
 	EnemyDead.mask_index = spr_BotDead;
 	EnemyDead.sprite_index = sprite_index;
 	EnemyDead.image_index = 1;

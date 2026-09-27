@@ -22,7 +22,7 @@ with(zui_create(zui_get_width() * .75, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Exit";
+	caption = "Close";
 	callback = function(){
 		with(oItemDescription){
 			zui_destroy();
@@ -36,7 +36,7 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 	zui_set_height(other.button_height);
 	caption = "Use";
 	callback = function(){
-		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
+		if(global.Inventory[#oDraw.var_slot, INDEX.SlotAmount] <= 1){
 			with(oItemDescription){
 				zui_destroy();
 			}
@@ -61,8 +61,8 @@ if(global.gui_scale < 2){
 with(zui_create(offset_position_x, offset_position_y + offset_y, objUILabel)){
 	zui_set_anchor(0, 0);
 	font = set_font("GUI_grid");
-	item_id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+	item_id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
+	caption = tr_desc(global.Inventory[#oDraw.var_slot, INDEX.slot_id]);
 }

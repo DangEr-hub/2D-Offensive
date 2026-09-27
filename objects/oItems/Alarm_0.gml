@@ -6,7 +6,7 @@ if(LightObject == undefined || LightObject == -1){
 	LightObject.castShadows = false;
 	LightObject.xscale = .5;
 	LightObject.yscale = .5;
-	LightObject.blend = global.ItemIndex[#image_index, ItemStat.ItemColor];
+	LightObject.blend = global.ItemIndex[#image_index, ITEMSTATS.ItemColor];
 }
 
 if (IS_NET) {

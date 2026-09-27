@@ -322,9 +322,9 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var is_bot = (hit_object.object_index == oBot);
 	var is_hostage = (hit_object.object_index == oHostage);
 	var has_godmode = false;
-	var armour_id = Item.None;
-	var helmet_id = Item.None;
-	var shield_id = Item.None;
+	var armour_id = ITEM.None;
+	var helmet_id = ITEM.None;
+	var shield_id = ITEM.None;
 	var helmet_durability = 0;
 	var armour_durability = 0;
 	var shield_durability = 0;
@@ -332,7 +332,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	var data = -1;
 	var hp = hit_object.stats.Health_points;
 	var attacker = attacking_item.stats.Object;
-	var is_bomb_damage = attacking_item.stats.Item_id == Item.Bomb;
+	var is_bomb_damage = attacking_item.stats.Item_id == ITEM.Bomb;
 
 	if (IS_NET && is_hostage && (!instance_exists(oNetworkManager) || !oNetworkManager.is_server)) {
 		return;
@@ -363,9 +363,9 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			armour_id = ArmourID;
 			helmet_id = HelmetID;
 			shield_id = ShieldID;
-			helmet_durability = global.Inventory[# OtherSlot.Helmet, Index.slot_durability];
-			armour_durability = global.Inventory[# OtherSlot.Armour, Index.slot_durability];
-			shield_durability = global.Inventory[# OtherSlot.Shield, Index.slot_durability];
+			helmet_durability = global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability];
+			armour_durability = global.Inventory[# OtherSlot.Armour, INDEX.slot_durability];
+			shield_durability = global.Inventory[# OtherSlot.Shield, INDEX.slot_durability];
 		}
 	}
 	/*************/
@@ -404,13 +404,12 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 
 	if(hp > 0 && has_godmode == false){
 		var Damage = attacking_item.stats.Damage;
-		var penetration_power = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.PenetrationPower];
+		var penetration_power = global.ItemIndex[# attacking_item.stats.Item_id, ITEMSTATS.PenetrationPower];
 		var aim_punch_modifier = clamp(penetration_power / (attacking_item.stats.Penetration_damage + 1), 0, 1);
 		hit_object.attack_damage = Damage;
-		hit_object.AimPunchTimer = hit_object.AimPunchTime;
 		
 		/* Stealth damage with knife */
-		if(global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.KNIFE){
+		if(global.ItemIndex[# attacking_item.stats.Item_id, ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.KNIFE){
 			if(apply_stealth_damage(hit_object)){
 				Damage *= STEALTH_DMG_MOD;
 			}
@@ -433,15 +432,15 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			DamageMultiplier = ARM_MULTIPLIER;
 		}else if(BodyPart >= HITBOX.BodyNoWeapon){
 			DamageMultiplier = BODY_MULTIPLIER;
-			if(armour_durability > 0 && global.ItemIndex[# armour_id, ItemStat.Defense] <= .95){
-				hit_object.attack_damage *= global.ItemIndex[# armour_id, ItemStat.Defense] * penetration_power;
+			if(armour_durability > 0 && global.ItemIndex[# armour_id, ITEMSTATS.Defense] <= .95){
+				hit_object.attack_damage *= global.ItemIndex[# armour_id, ITEMSTATS.Defense] * penetration_power;
 				aim_punch_modifier *= .1;
 			}
 		}else if(BodyPart >= HITBOX.Head){
 			DamageMultiplier = HEADSHOT_MULTIPLIER;
 			blood_color = c_maroon;
-			if(helmet_durability > 0 && global.ItemIndex[# helmet_id, ItemStat.Defense] <= .95){
-				hit_object.attack_damage *= global.ItemIndex[# helmet_id, ItemStat.Defense] * penetration_power;
+			if(helmet_durability > 0 && global.ItemIndex[# helmet_id, ITEMSTATS.Defense] <= .95){
+				hit_object.attack_damage *= global.ItemIndex[# helmet_id, ITEMSTATS.Defense] * penetration_power;
 				aim_punch_modifier *= .1;
 			}
 		}
@@ -451,16 +450,18 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		
 		var shield_modifier = 1;
 		if(hit_object.shield_equip == true && shield_durability > 0){
-			shield_modifier = global.ItemIndex[# shield_id, ItemStat.Defense];
+			shield_modifier = global.ItemIndex[# shield_id, ITEMSTATS.Defense];
 			play_sound(hit_object.x, hit_object.y, snd_BulletMetal, hit_object);
 		}
 		
 		hit_object.attack_damage = ceil(hit_object.attack_damage * DamageMultiplier * (global.hard_mode == true ? 2 : 1) * shield_modifier);
 		
-		if(hit_object.attack_damage <= 5){
+		if(hit_object.attack_damage < 5){
 			aim_punch_modifier = 0;
 			hit_object.AimPunchMultiplier = 0;
 			hit_object.aimpunch_speed_multiplier = 1;
+		}else{
+			hit_object.AimPunchTimer = hit_object.AimPunchTime;
 		}
 		
 		if(hit_object.object_index == oBot){
@@ -486,7 +487,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		#region Hitmap
 		if (is_bomb_damage) {
 			attacker_key = HITMAP_KEY_BOMB;
-			attacker_name = global.ItemIndex[# Item.Bomb, ItemStat.Name];
+			attacker_name = tr_name(ITEM.Bomb);
 		} else if (instance_exists(attacker)) {
 		    if (attacker.object_index == oPlayer) {
 		        attacker_key  = attacker.network_id;  // PID hráče
@@ -534,7 +535,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    attacker_pid = attacking_item.stats.Owner_id;
 		}
 		
-		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.reward];
+		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ITEMSTATS.reward];
 
 		if (hp <= hit_object.attack_damage) {
 			if (!is_hostage) {
@@ -595,7 +596,7 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		    }
 
 		    hit_object.KilledByName = attacking_item.stats.Owner_name;
-		    hit_object.KilledByWeapon = global.ItemIndex[# attacking_item.stats.Item_id, ItemStat.Name];
+		    hit_object.KilledByWeapon = tr_name(attacking_item.stats.Item_id);
 			if(is_bot){
 				hit_object.death_timestamp = current_time;
 			}
@@ -661,9 +662,9 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 
 			if(is_player && hit_object.is_local){
 				synced_equip_dur = [
-					global.Inventory[# OtherSlot.Armour, Index.slot_durability],
-					global.Inventory[# OtherSlot.Helmet, Index.slot_durability],
-					global.Inventory[# OtherSlot.Shield, Index.slot_durability]
+					global.Inventory[# OtherSlot.Armour, INDEX.slot_durability],
+					global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability],
+					global.Inventory[# OtherSlot.Shield, INDEX.slot_durability]
 				];
 			}
 
@@ -691,10 +692,10 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
 		randomDirection = random_range(attacking_object.RotationAngle - 180 - 90, attacking_object.RotationAngle - 180 + 90);
 	}
 	
-	var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# shield_id, ItemStat.Defense];
+	var dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# shield_id, ITEMSTATS.Defense];
     if (is_player) {
         if (hit_object.is_local && hit_object.shield_equip == true) {
-            global.Inventory[# OtherSlot.Shield, Index.slot_durability] = max(global.Inventory[# OtherSlot.Shield, Index.slot_durability] - dmg_loss, 0);
+            global.Inventory[# OtherSlot.Shield, INDEX.slot_durability] = max(global.Inventory[# OtherSlot.Shield, INDEX.slot_durability] - dmg_loss, 0);
         } else {
             hit_object.network_shield_dur = max(hit_object.network_shield_dur - dmg_loss, 0);
         }
@@ -705,16 +706,16 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
     // DAMAGE TO BODY
     if (BodyPart > HITBOX.HeadProne) {
 
-        if (global.ItemIndex[# armour_id, ItemStat.Defense] > .95 || armour_durability <= 0 
+        if (global.ItemIndex[# armour_id, ITEMSTATS.Defense] > .95 || armour_durability <= 0 
         || BodyPart >= HITBOX.ArmNoWeapon) {
 
 			play_sound(impact_x, impact_y, snd_BulletHit, attacking_object);
 
         } else {
-            dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense];
+            dmg_loss = hit_object.attack_damage / 50 / global.ItemIndex[# armour_id, ITEMSTATS.Defense];
             if (is_player) {
                 if (hit_object.is_local) {
-                    global.Inventory[# OtherSlot.Armour, Index.slot_durability] = max(global.Inventory[# OtherSlot.Armour, Index.slot_durability] - dmg_loss, 0);
+                    global.Inventory[# OtherSlot.Armour, INDEX.slot_durability] = max(global.Inventory[# OtherSlot.Armour, INDEX.slot_durability] - dmg_loss, 0);
                 } else {
                     hit_object.network_armour_dur = max(hit_object.network_armour_dur - dmg_loss, 0);
                 }
@@ -737,17 +738,17 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
 
     } else {
 		
-        if (global.ItemIndex[# helmet_id, ItemStat.Defense] > .95 || helmet_durability <= 0) {
+        if (global.ItemIndex[# helmet_id, ITEMSTATS.Defense] > .95 || helmet_durability <= 0) {
 
             var sound_effect2 = choose(snd_HeadShot1, snd_HeadShot2);
 			play_sound(impact_x, impact_y, sound_effect2, attacking_object);
 
         } else {
-            var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense];
+            var dmg_loss2 = hit_object.attack_damage / 50 / global.ItemIndex[# helmet_id, ITEMSTATS.Defense];
 
             if (is_player) {
                 if (hit_object.is_local) {
-                    global.Inventory[# OtherSlot.Helmet, Index.slot_durability] = max(global.Inventory[# OtherSlot.Helmet, Index.slot_durability] - dmg_loss2, 0);
+                    global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability] = max(global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability] - dmg_loss2, 0);
                 } else {
                     hit_object.network_helmet_dur = max(hit_object.network_helmet_dur - dmg_loss2, 0);
                 }

@@ -1,5 +1,6 @@
-if(!IS_NET){
+if(!IS_NET && !instance_exists(oSpectateControl)){
 	BackGround = sprite_create_from_surface(application_surface, 0, 0, global.GuiW, global.GuiH, false, true, 0, 0);
+	with(oBot) cs_last_step_time = -1;
 	instance_deactivate_all(true);
 	instance_activate_object(oParticleSystem);
 	instance_activate_object(oCamera);

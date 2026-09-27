@@ -1,11 +1,159 @@
+/// @func   collision_triangle(x1, y1, x2, y2, x3, y3, object)
+///
+/// @desc   Returns an object instance id that collides with a given triangle.
+///         If there is no collision, keyword noone is returned.
+///
+///         IMPORTANT: Initialize with collision_triangle_init() before first use.
+///
+/// @param  {real}      x1          x-coordinate of 1st point of triangle
+/// @param  {real}      y1          y-coordinate of 1st point of triangle
+/// @param  {real}      x2          x-coordinate of 2nd point of triangle
+/// @param  {real}      y2          y-coordinate of 2nd point of triangle
+/// @param  {real}      x3          x-coordinate of 3rd point of triangle
+/// @param  {real}      y3          y-coordinate of 3rd point of triangle
+/// @param  {object}    object      object or instance to check, or all
+///
+/// @return {instance}  object instance id
+///
+/// GMLscripts.com/license
+function collision_triangle(x1, y1, x2, y2, x3, y3, object)
+{
+    // Bounding box check (early out)
+    var xmin = min(x1, x2, x3);
+    var xmax = max(x1, x2, x3);
+    var ymin = min(y1, y2, y3);
+    var ymax = max(y1, y2, y3);
+    var inst = collision_rectangle(xmin, ymin, xmax, ymax, object, false, false);
+    if (inst == noone) return noone;
+
+    // Triangle perimeter check (early out)
+    inst = collision_line(x1, y1, x2, y2, object, true, false);
+    if (inst != noone) return inst;
+    inst = collision_line(x1, y1, x3, y3, object, true, false);
+    if (inst != noone) return inst;
+    inst = collision_line(x2, y2, x3, y3, object, true, false);
+    if (inst != noone) return inst;
+
+    // Find long side, make it (x1,y2) to (x2,y2)
+    var d12 = point_distance(x1, y1, x2, y2);
+    var d13 = point_distance(x1, y1, x3, y3);
+    var d23 = point_distance(x2, y2, x3, y3);
+    var t;
+    switch (max(d12, d13, d23)) {
+        case d13:
+            t = x2; x2 = x3; x3 = t;
+            t = y2; y2 = y3; y3 = t;
+            d12 = d13;
+            break;
+        case d23:
+            t = x1; x1 = x3; x3 = t;
+            t = y1; y1 = y3; y3 = t;
+            d12 = d23;
+            break;
+    }
+
+    // From (x3,y3), find nearest point on long side (x4,y4).
+    var x4, y4;
+    if (d12 == 0) {
+        x4 = x1;
+        y4 = y1;
+    }else{
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        var px = x3 - x1;
+        var py = y3 - y1;
+        t = (px * dx + py * dy) / (d12 * d12);
+        x4 = x1 + t * dx;
+        y4 = y1 + t * dy;
+    }
+
+    // A line constructed from (x3,y3) to (x4,y4) divides
+    // the original triangle into two right triangles.
+    // Fit the collision mask into these triangles.
+    var d14 = point_distance(x1, y1, x4, y4);
+    var d24 = d12 - d14;
+    var side = sign((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
+    with (oCollisionTriangle) {
+        image_angle  = point_direction(x1, y1, x2, y2);
+        image_xscale = d14 / size;
+        image_yscale = side * point_distance(x3, y3, x4, y4) / size;
+        inst = instance_place(x4, y4, object);
+        if (inst != noone) return inst;
+        image_xscale = -d24 / size;
+        inst = instance_place(x4, y4, object);
+        if (inst != noone) return inst;
+    }
+    return noone;
+}
+
+/// @func   collision_triangle_init(size)
+///
+/// @desc   Required to initialize collision_triangle() before first use.
+///         Creates an instance of stub object __objCollisionTriangle and
+///         prepares it for use including the creation of triangle collision
+///         mask of the given size. A larger size can improves accuracy at
+///         the expense of memory usage. The default size of 256 pixels is
+///         probably sufficient for most purposes.
+///
+///         This function only needs to be called once and the collision
+///         triangle instance persists between rooms. If it is called again,
+///         any previous triangle collision instance will be destroyed along
+///         with its collision mask sprite, and a new instance and collision
+///         mask sprite will be created using the new size.
+///
+///         IMPORTANT: An object called __objCollisionTriangle must exist
+///         in your project before use. It should be a blank stub and does
+///         not require any additional settings or inclusion in any room.
+///
+/// @param  {real}      size        size of mask in pixels (default 256)
+///
+/// @return {bool}      true on success, false otherwise.
+///
+/// GMLscripts.com/license
+
+function collision_triangle_init(size=256)
+{
+    with (oCollisionTriangle) {
+        if (sprite_exists(mask_index)) sprite_delete(mask_index);
+        instance_destroy();
+    }
+    var color = draw_get_color();
+    var surface = surface_create(size, size);
+    if (!surface_exists(surface)) return false;
+    surface_set_target(surface);
+    draw_clear_alpha(c_black, 0);
+    draw_set_color(c_white);
+    draw_triangle(size, size, size, -1, -1, -1, false);
+    surface_reset_target();
+    var sprite = sprite_create_from_surface(surface, 0, 0, size, size, true, false, size, 0);
+    surface_free(surface);
+    draw_set_color(color);
+    if (!sprite_exists(sprite)) return false;
+    sprite_collision_mask(sprite, false, 2, 0, 0, size, size, bboxkind_precise, 0);
+    with (instance_create_depth(0, 0, 0, oCollisionTriangle)) {
+        self.persistent = true;
+        self.visible = false;
+        self.mask_index = sprite;
+        self.size = size;
+    }
+    return true;
+}
+
+function get_weapon_muzzle_distance(weapon_sprite, weapon_frame) {
+	if(weapon_frame == 0) return 0;
+	var uvs = sprite_get_uvs(weapon_sprite, weapon_frame);
+	// The cropped frame ends at the muzzle; measure it from the sprite origin.
+	return max(0, uvs[4] + round(uvs[6] * sprite_get_width(weapon_sprite)) - sprite_get_xoffset(weapon_sprite));
+}
+
 function get_weapon_price_weight(item_id, equipment_level) {
-    var price = global.ItemIndex[# item_id, ItemStat.Cost];
+    var price = global.ItemIndex[# item_id, ITEMSTATS.Cost];
     if (price <= 0) { return 0; }
 
 	/// target_price+-price_range = price for weapon
     var target_price = 0; var price_range = 0;
 
-	if(global.ItemIndex[# item_id, ItemStat.WeaponType] == WEAPON_TYPE.SECONDARY){
+	if(global.ItemIndex[# item_id, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY){
 		switch(equipment_level){
 			case EQUIPMENT_LEVEL.FIRST: target_price = 35; price_range = 40; break;
 			case EQUIPMENT_LEVEL.LOW:   target_price = 55; price_range = 40; break;
@@ -31,8 +179,8 @@ function choose_weighted_weapon(equipment_level, weapon_type) {
     var weights = [];
     var total_weight = 0;
 
-    for (var item_id = 1; item_id < Item.Total; item_id++) {
-        if (global.ItemIndex[# item_id, ItemStat.Type] != "Weapon" || global.ItemIndex[# item_id, ItemStat.WeaponType] != weapon_type) {
+    for (var item_id = 1; item_id < ITEM.Total; item_id++) {
+        if (global.ItemIndex[# item_id, ITEMSTATS.Type] != "Weapon" || global.ItemIndex[# item_id, ITEMSTATS.WeaponType] != weapon_type) {
             continue;
         }
         var weight = get_weapon_price_weight(item_id, equipment_level);
@@ -44,7 +192,7 @@ function choose_weighted_weapon(equipment_level, weapon_type) {
         }
     }
 
-    if (total_weight <= 0) {  return Item.None;   }
+    if (total_weight <= 0) {  return ITEM.None;   }
 
     var roll = random(total_weight);
     for (var i = 0; i < array_length(weapons); i++) {
@@ -53,7 +201,7 @@ function choose_weighted_weapon(equipment_level, weapon_type) {
             return weapons[i];
         }
     }
-    return Item.None;
+    return ITEM.None;
 }
 
 
@@ -63,7 +211,7 @@ function apply_prone_texture(){
 	BodyHB.image_index = HITBOX.BodyProne;
 
 	if(!Flashed){
-		if!(ReloadTime >= global.ItemIndex[#wpn_id, ItemStat.ReloadSpeed] * .75){
+		if!(ReloadTime >= global.ItemIndex[#wpn_id, ITEMSTATS.ReloadSpeed] * .75){
 			anim_base = TEXTURES.prone;
 			ArmHB.image_index = HITBOX.ArmProne;
 		}else{
@@ -103,14 +251,14 @@ function apply_weapon_texture(tex_normal, body_hb, arm_hb){
 	/* player and enemy function */
 	HeadHB.image_index = HITBOX.Head;
 	var flashed_check = false;
-	var wpn = Item.None;
+	var wpn = ITEM.None;
 	if(object_index == oPlayer){
 		wpn = wpn_id;
 		flashed_check = !Flashed;
 	}else { flashed_check = (FlashedTimer <= FlashedTime * .25); wpn = WeaponID[WeaponPositionID]; }
 	
 	if(flashed_check){
-		if!(ReloadTime >= global.ItemIndex[# wpn, ItemStat.ReloadSpeed] * .9){
+		if!(ReloadTime >= global.ItemIndex[# wpn, ITEMSTATS.ReloadSpeed] * .9){
 			image_index = tex_normal;
 			BodyHB.image_index = body_hb;
 			ArmHB.image_index = arm_hb;
@@ -145,7 +293,7 @@ function local_to_world(_lx, _ly, _ang = image_angle, obj = id){
 
 function get_wpn_type(item_id){
 	var wpn_type = "Pistol";
-	switch(global.ItemIndex[# item_id, ItemStat.WeaponTypeClass]){
+	switch(global.ItemIndex[# item_id, ITEMSTATS.WeaponTypeClass]){
 		case WEAPON_CLASS.ASSAULT_RIFLE: wpn_type = "Assault rifle"; break;
 		case WEAPON_CLASS.SHOTGUN: wpn_type = "Shotgun"; break;
 		case WEAPON_CLASS.SNIPER_RIFLE: wpn_type = "Sniper rifle"; break;
@@ -217,7 +365,7 @@ function array_max(arr) {
 }
 
 function player_has_machine_gun(){
-	return global.Inventory[# OtherSlot.Primary, Index.slot_id] == Item.basic_machine_gun;
+	return global.Inventory[# OtherSlot.Primary, INDEX.slot_id] == ITEM.basic_machine_gun;
 }
 	
 function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_type = "Circle", update_haze_pos = true, haze_width = 64, haze_height = 64){
@@ -231,18 +379,18 @@ function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_t
 }
 
 function buy_item(ItemID){
-	if(global.player_stats.Money >= global.ItemIndex[#ItemID, ItemStat.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ItemStat.is_locked] == false){
-		global.player_stats.Money -= global.ItemIndex[#ItemID, ItemStat.Cost];
+	if(global.player_stats.Money >= global.ItemIndex[#ItemID, ITEMSTATS.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ITEMSTATS.is_locked] == false){
+		global.player_stats.Money -= global.ItemIndex[#ItemID, ITEMSTATS.Cost];
 		gain_item(
 			ItemID,
 			1,
-			global.ItemIndex[#ItemID, ItemStat.MaxAmmo], 
-			global.ItemIndex[#ItemID, ItemStat.ClipAmmo], 
-			global.ItemIndex[#ItemID, ItemStat.BaseDurability],
-			global.ItemIndex[#ItemID, ItemStat.preattached][$ "scope"] ?? Item.None,
-            global.ItemIndex[#ItemID, ItemStat.preattached][$ "barrel"] ?? Item.None,
-            global.ItemIndex[#ItemID, ItemStat.preattached][$ "grip"] ?? Item.None,
-            global.ItemIndex[#ItemID, ItemStat.preattached][$ "suppressor"] ?? Item.None,
+			global.ItemIndex[#ItemID, ITEMSTATS.MaxAmmo], 
+			global.ItemIndex[#ItemID, ITEMSTATS.ClipAmmo], 
+			global.ItemIndex[#ItemID, ITEMSTATS.BaseDurability],
+			global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "scope"] ?? ITEM.None,
+            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "barrel"] ?? ITEM.None,
+            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "grip"] ?? ITEM.None,
+            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "suppressor"] ?? ITEM.None,
 			false
 		);
 	}
@@ -252,7 +400,7 @@ function has_attachment(item_id, slot, object = global.local_player, which_slot 
 	if!(instance_exists(object)){
 		return;
 	}	
-	var item = Item.None;
+	var item = ITEM.None;
 	if(object == global.local_player){
 		item = global.Inventory[# global.local_player.WeaponID, slot];
 	}else{
@@ -265,6 +413,9 @@ function has_attachment(item_id, slot, object = global.local_player, which_slot 
 }
 
 function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, BulletObject, BulletDamage, ObjectIndex, name_vis, BNE, BOPosition, remote = true, local_remote = [true, false], proj_own = [-1, -1], explosion = false){
+	if (!remote && instance_exists(BulletObject) && BulletObject.object_index == oPlayer && BulletObject.steroids_timer > 0) {
+		BulletDamage *= STEROIDS_MOD;
+	}
 	var bullet_tracer = instance_create_layer(pos[0], pos[1], "ItemsO", oBulletTracer);
 	var bullet_x = shot_pos[0];
 	var bullet_y = shot_pos[1];
@@ -338,8 +489,8 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 	var instance_emitter = bullet_tracer.stats.Object;
 	var has_suppressor = false;
 	
-	if(global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.Type] == "Weapon" && explosion == false){
-		sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ItemStat.SoundID];
+	if(global.ItemIndex[# bullet_tracer.stats.Item_id, ITEMSTATS.Type] == "Weapon" && explosion == false){
+		sound_id = global.ItemIndex[# bullet_tracer.stats.Item_id, ITEMSTATS.SoundID];
 	}
 
 	if(!explosion && instance_exists(instance_emitter)){
@@ -351,15 +502,15 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 			    }
 			    if(instance_emitter.is_local){
 			        has_suppressor =
-			            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.advanced_suppressor;
+			            global.Inventory[# instance_emitter.WeaponID, INDEX.slot_suppressor] == ITEM.suppressor;
 			    }else{
 			        has_suppressor =
-			            instance_emitter.network_suppressor == Item.advanced_suppressor;
+			            instance_emitter.network_suppressor == ITEM.suppressor;
 			    }
 			}else{
 			    if(bullet_tracer.stats.Object_index == oPlayer){
 			        has_suppressor =
-			            global.Inventory[# instance_emitter.WeaponID, Index.slot_suppressor] == Item.advanced_suppressor;
+			            global.Inventory[# instance_emitter.WeaponID, INDEX.slot_suppressor] == ITEM.suppressor;
 			    }
 			}
 		
@@ -386,7 +537,7 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id, projectile_id = -1){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
-	var damage = BulletDamage * global.ItemIndex[# BulletItemID, ItemStat.damage_drop](point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
+	var damage = BulletDamage * global.ItemIndex[# BulletItemID, ITEMSTATS.damage_drop](point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
 	
 	var particles_number = 1;
 	if(TracerImage != 2){
@@ -681,7 +832,7 @@ function create_shooting_effects(object){
 		
 		#region Create smoke effect
 		create_fog(FlashLightX, FlashLightY, 20, other.RotationAngle - 180, 5, 5, 10, .1, .75, 
-			clamp(global.ItemIndex[#other.wpn_id, ItemStat.ShootTimer], 10, 30),
+			clamp(global.ItemIndex[#other.wpn_id, ITEMSTATS.ShootTimer], 10, 30),
 			[lengthdir_x(5, RotationAngle - 180), lengthdir_y(5, RotationAngle - 180), true]
 		);
 		#endregion
@@ -689,16 +840,16 @@ function create_shooting_effects(object){
 		//create_haze_effect(FlashLightX, FlashLightY, 0.5 * game_get_speed(gamespeed_fps), self, "Circle", true, 32);
 						
 		#region Create bullet casing
-		if(global.ItemIndex[#wpn_id, ItemStat.BulletCasingID] != -1){
-			particle_create(global.ItemIndex[#wpn_id, ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-			0, RotationAngle - 180, 0, true, true, global.ItemIndex[#wpn_id, ItemStat.BulletCasingID], x, y, 1, 60);
+		if(global.ItemIndex[#wpn_id, ITEMSTATS.BulletCasingID] != -1){
+			particle_create(global.ItemIndex[#wpn_id, ITEMSTATS.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+			0, RotationAngle - 180, 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.BulletCasingID], x, y, 1, 60);
 		}
 		#endregion
 				
 		#region Create flash effect
 		if(stats.Health_points > 0){
 			if(flash_effect_timer == -1){
-				flash_effect_timer = round(global.ItemIndex[#wpn_id, ItemStat.ShootTimer] * 2);
+				flash_effect_timer = round(global.ItemIndex[#wpn_id, ITEMSTATS.ShootTimer] * 2);
 				MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 				MuzzleFlashLight.angle = RotationAngle;
 				MuzzleFlashLight.alpha = FLASHLIGHT_ALPHA * 2;
@@ -709,7 +860,7 @@ function create_shooting_effects(object){
 		
 		if(instance_exists(oParticleSystem)){
 			part_type_size(oParticleSystem.Spark, .05, .1,0,.1);
-			part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.Spark, global.ItemIndex[# wpn_id, ItemStat.Damage]/5);
+			part_particles_create(global.ParticleSystem, FlashLightX, FlashLightY, oParticleSystem.Spark, global.ItemIndex[# wpn_id, ITEMSTATS.Damage]/5);
 			part_type_size(oParticleSystem.Spark, .1,.25,0,.1)
 		}
 		
@@ -719,15 +870,15 @@ function create_shooting_effects(object){
 function player_shooting(){
 	
 	if(global.ranked_game == true
-	&& global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
-		var projectiles_fired = max(1, global.ItemIndex[#wpn_id, ItemStat.Bullets]);
+	&& global.ItemIndex[#wpn_id, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
+		var projectiles_fired = max(1, global.ItemIndex[#wpn_id, ITEMSTATS.Bullets]);
 		global.player_stats.All_shots += projectiles_fired;
 		oGameController.all_shots += projectiles_fired;
 	}
 	
 	create_shooting_effects(id);
 								
-	for(i=0;i<global.ItemIndex[#wpn_id, ItemStat.Bullets];i++){
+	for(i=0;i<global.ItemIndex[#wpn_id, ITEMSTATS.Bullets];i++){
 						
 		#region Determine shot position
 							
@@ -736,20 +887,28 @@ function player_shooting(){
 			prone_kickback = .5;
 		}
 		var suppressor_multiplier = 1;
-		if(global.Inventory[# WeaponID, Index.slot_suppressor] != Item.None){
-			suppressor_multiplier = global.ItemIndex[#global.Inventory[# WeaponID, Index.slot_suppressor], ItemStat.Defense];	
+		if(global.Inventory[# WeaponID, INDEX.slot_suppressor] != ITEM.None){
+			suppressor_multiplier = global.ItemIndex[#global.Inventory[# WeaponID, INDEX.slot_suppressor], ITEMSTATS.Defense];	
 		}
 		var current_weapon_id = wpn_id;
-		var kb_phase_1 = round(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase1] * prone_kickback);
-		var kb_phase_2 = round(global.ItemIndex[# current_weapon_id, ItemStat.KBPhase2] * prone_kickback);
-		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetX];
-		var recoil_offset_y = global.ItemIndex[# current_weapon_id, ItemStat.RecoilOffsetY];
-		var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackInaccuracyMultiplier];
-		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, Index.slot_grip], ItemStat.KickBackPower];
+		var kb_phase_1 = round(global.ItemIndex[# current_weapon_id, ITEMSTATS.KBPhase1] * prone_kickback);
+		var kb_phase_2 = round(global.ItemIndex[# current_weapon_id, ITEMSTATS.KBPhase2] * prone_kickback);
+		var recoil_offset_x = global.ItemIndex[# current_weapon_id, ITEMSTATS.RecoilOffsetX];
+		var recoil_offset_y = global.ItemIndex[# current_weapon_id, ITEMSTATS.RecoilOffsetY];
+		var horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackInaccuracyMultiplier];
+		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackPower];
 		var crosshair_aim_x = oCrosshair.aim_x;
 		var crosshair_aim_y = oCrosshair.aim_y;
 
-		if (global.ItemIndex[#wpn_id, ItemStat.random_bullet_spread] == true) {
+		
+		if(moving_state == STATES_PLAYER.prone_state){
+			if(global.Inventory[# WeaponID, INDEX.slot_grip] == ITEM.bipod){
+				horizontal_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackInaccuracyMultiplier];
+				vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackInaccuracyMultiplier];
+			}	
+		}
+
+		if (global.ItemIndex[#wpn_id, ITEMSTATS.random_bullet_spread] == true) {
 			ShotX = random_range(
 				crosshair_aim_x - inaccuracy_formula(current_weapon_id, id),
 				crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)
@@ -779,7 +938,7 @@ function player_shooting(){
 		}
 		#endregion
 			
-		if(global.ItemIndex[#wpn_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.MISSILE){
+		if(global.ItemIndex[#wpn_id, ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.MISSILE){
 			create_bullet_tracer(
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
@@ -788,10 +947,10 @@ function player_shooting(){
 					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 					25,
-					global.ItemIndex[#wpn_id, ItemStat.Range]
+					global.ItemIndex[#wpn_id, ITEMSTATS.Range]
 				],
 				id,
-				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#wpn_id, ITEMSTATS.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
 				instance_nearest(crosshair_aim_x, crosshair_aim_y, oBot),
@@ -807,10 +966,10 @@ function player_shooting(){
 					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
 					BULLET_SPEED * global.time_step,
-					global.ItemIndex[#wpn_id, ItemStat.Range]
+					global.ItemIndex[#wpn_id, ITEMSTATS.Range]
 				],
 				id,
-				global.ItemIndex[#wpn_id, ItemStat.Damage] * suppressor_multiplier,
+				global.ItemIndex[#wpn_id, ITEMSTATS.Damage] * suppressor_multiplier,
 				object_index,
 				[stats.Name, Visible],
 				noone,
@@ -828,14 +987,26 @@ function inaccuracy_formula(WID, ObjectType){
 		if(ObjectType.object_index == oPlayer){
 			if(instance_exists(oPlayer)){
 				var MovingIn = 1;
-				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ItemStat.KickBackInaccuracyMultiplier]);
+				var KickBackIn = 1 + (ObjectType.KickBack * global.ItemIndex[#WID, ITEMSTATS.KickBackInaccuracyMultiplier]);
 				var run_modifier = ObjectType.running ? 2 : 1;
 				var walk_modifier = ObjectType.walking ? .75 : 1;
 				
+				var laser_mod = 1;
+				var barrel_item = ObjectType.is_remote
+					? ObjectType.network_barrel
+					: global.Inventory[# ObjectType.WeaponID, INDEX.slot_barrel];
+				var suppressor_item = ObjectType.is_remote
+					? ObjectType.network_suppressor
+					: global.Inventory[# ObjectType.WeaponID, INDEX.slot_suppressor];
+				
+				if(barrel_item == ITEM.laser){
+					laser_mod = global.ItemIndex[# barrel_item, ITEMSTATS.KickBackPower];
+				}
+				
 				var range_inaccuracy = 1;
-				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
+				var accuracy_func = global.ItemIndex[#WID, ITEMSTATS.accuracy_drop];
 				if(is_callable(accuracy_func) && !is_real(accuracy_func) && is_method(accuracy_func)){
-					range_inaccuracy = max(1 + (1 - global.ItemIndex[#WID, ItemStat.accuracy_drop](ObjectType.Range)), 1);
+					range_inaccuracy = max(1 + (1 - accuracy_func(ObjectType.Range)), 1);
 				}
 				var moving_state_inaccuracy = 1;
 	
@@ -844,15 +1015,15 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 	
 				if(ObjectType.Moving == true){
-					MovingIn = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
+					MovingIn = global.ItemIndex[#WID, ITEMSTATS.MovingInaccuracyMultiplier];
 				}
 			
 				var ScopeTimerInaccuracy = 1;
 				var ScopeInaccuracy = 1;
 
-				if(global.ItemIndex[# WID, ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
+				if(global.ItemIndex[# WID, ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
 					if(ObjectType.ScopeIn == false){
-						if(global.ItemIndex[# WID, ItemStat.Defense] == 0){ ///Klasické sniperky
+						if(global.ItemIndex[# WID, ITEMSTATS.Defense] == 0){ ///Klasické sniperky
 							ScopeTimerInaccuracy = 50;
 						}else{ ///Semi-automatické sniperky
 							ScopeTimerInaccuracy = 10;	
@@ -866,8 +1037,8 @@ function inaccuracy_formula(WID, ObjectType){
 					}
 				}
 				return
-				min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
-				(KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy * run_modifier * walk_modifier * global.ItemIndex[# global.weapon_attachments[min(ObjectType.WeaponID, 1)][WPN_ATTACHMENTS.weapon_suppressor], ItemStat.KickBackPower] * max(ScopeTimerInaccuracy, 1)), 175);
+				min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
+				(laser_mod * KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy * run_modifier * walk_modifier * global.ItemIndex[# suppressor_item, ITEMSTATS.KickBackPower] * max(ScopeTimerInaccuracy, 1)), 175);
 			}
 		}else if(ObjectType.object_index == oBot){
 			if(instance_exists(oBot)){
@@ -877,13 +1048,13 @@ function inaccuracy_formula(WID, ObjectType){
 				var EnemyMovingInaccuracy = 1;
 				var EnemyRangeInaccuracy = 1;
 				var bot_walk_modifier = ObjectType.walking ? .75 : 1;
-				var accuracy_func = global.ItemIndex[#WID, ItemStat.accuracy_drop];
+				var accuracy_func = global.ItemIndex[#WID, ITEMSTATS.accuracy_drop];
 				if(is_callable(accuracy_func) && !is_real(accuracy_func) && is_method(accuracy_func)){
-				 EnemyRangeInaccuracy = 1 + (1 -  accuracy_func(point_distance(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x)));
+				 EnemyRangeInaccuracy = 1 + (1 -  accuracy_func(point_distance(ObjectType.x, ObjectType.y, ObjectType.crosshair_x, ObjectType.crosshair_y)));
 				}
 			
 				var smoke_list = ds_list_create();
-				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.ChasingObject.headshot_x, ObjectType.ChasingObject.headshot_x, oSmokeTile, true, false, smoke_list, false);
+				var smoke_number = collision_line_list(ObjectType.x, ObjectType.y, ObjectType.crosshair_x, ObjectType.crosshair_y, oSmokeTile, true, false, smoke_list, false);
 				behind_smoke_inaccuracy = 5 * smoke_number + 1;
 				ds_list_destroy(smoke_list);
 
@@ -896,11 +1067,11 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 			
 				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
-					EnemyMovingInaccuracy = global.ItemIndex[#WID, ItemStat.MovingInaccuracyMultiplier];
+					EnemyMovingInaccuracy = global.ItemIndex[#WID, ITEMSTATS.MovingInaccuracyMultiplier];
 				}
 				
-				var inaccuracy_value = min(global.ItemIndex[#WID, ItemStat.Inaccuracy] *
-				EnemyMovingInaccuracy * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ItemStat.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
+				var inaccuracy_value = min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
+				EnemyMovingInaccuracy * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ITEMSTATS.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
 				return inaccuracy_value;
 
 			}
@@ -1077,6 +1248,7 @@ function create_player(PlayerHP, PlayerStamina, PlayerName, PlayerTeam){
     var player_struct = {
 		Name: PlayerName,
         Health_points: PlayerHP,
+		Max_health_points: PlayerHP,
 		Damage_health_points: PlayerHP,
 		Stamina_points: PlayerStamina,
 		Damage_stamina_points: PlayerStamina,

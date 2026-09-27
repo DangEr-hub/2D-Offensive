@@ -8,19 +8,19 @@ var MovingSpeedMultiplier = 1;
 var cmd_mod = 1;
 
 if(Reloading == true){
-	ReloadingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ReloadSpdMul];
+	ReloadingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ReloadSpdMul];
 }
 
 if(CanShoot == false){
-	ShootingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootSpdMul];	
+	ShootingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootSpdMul];	
 }
 
 if(XSpeed != 0 || YSpeed != 0){
-	MovingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.MovingSpdMul];
+	MovingSpeedMultiplier = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.MovingSpdMul];
 }
 
 if(State == STATES.MoveCommand){
-	cmd_mod = 1.5;	
+	cmd_mod = 1.25;	
 }
 
-MaxSpeed = min(2.5 * rank_boost, 5.75) * ReloadingSpeedMultiplier * ShootingSpeedMultiplier * MovingSpeedMultiplier * cmd_mod;
+MaxSpeed = min(2 * rank_boost, 4.5) * ReloadingSpeedMultiplier * ShootingSpeedMultiplier * MovingSpeedMultiplier * cmd_mod;

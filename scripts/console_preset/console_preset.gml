@@ -1,9 +1,18 @@
 /// @description console_preset(console)
 function console_preset(argument0) {
+	var c = argument0;
+	if(ds_map_exists(c, "terminal_mode") && c[? "terminal_mode"]){
+		var terminal_instance = instance_find(oTerminal, 0);
+		if(instance_exists(terminal_instance)){
+			terminal_instance.terminal_add_suggestions(c);
+		}
+		c[? "preset"] = true;
+		return;
+	}
+
 	var r = (global.crosshair_color >> 16) & 0xFF;
 	var g = (global.crosshair_color >> 8) & 0xFF;
 	var b = global.crosshair_color & 0xFF;
-	var c = argument0;
 	var fullscreen = window_get_fullscreen();
 	var sudo_text = " (sudo)";
 

@@ -182,7 +182,7 @@ function try_shoot(base){
 		return;
 	}
 
-    var shoot_timer = min(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer], 30);
+    var shoot_timer = min(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer], 30);
     var gain = (base / shoot_timer) * rank_boost / 10;
 
     shoot_accumulator += gain * global.time_step;
@@ -190,14 +190,14 @@ function try_shoot(base){
     var chance = min(shoot_accumulator * 100, 100);
 	
 	var shotgun_shoot = false;
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BaseDurability] != 1){
+	if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.BaseDurability] != 1){
 		shotgun_shoot = true;
 	}else if(Ammo[WeaponPositionID] >= MaxAmmo[WeaponPositionID] || !Reloading) {	
 		shotgun_shoot = true;
 	}
 
     if(percent_chance(chance) && shotgun_shoot){
-        EnemyShooting(ChasingObject.headshot_x, ChasingObject.headshot_y);
+        EnemyShooting(crosshair_x, crosshair_y);
         shoot_accumulator = 0;
     }
 }
@@ -220,8 +220,8 @@ function bot_bullet_create(DangerShotX, DangerShotY){
 	var suppressor_dmg_mul = 1;
 	var suppressor_accuracy_mul = 1;
 	if(has_suppressor){
-		suppressor_dmg_mul = global.ItemIndex[# attachments[WeaponPositionID, ATTACHMENTS.slot_suppressor], ItemStat.Defense];	
-		suppressor_accuracy_mul = global.ItemIndex[# attachments[WeaponPositionID, ATTACHMENTS.slot_suppressor], ItemStat.KickBackPower];	
+		suppressor_dmg_mul = global.ItemIndex[# attachments[WeaponPositionID, ATTACHMENTS.suppressor], ITEMSTATS.Defense];	
+		suppressor_accuracy_mul = global.ItemIndex[# attachments[WeaponPositionID, ATTACHMENTS.suppressor], ITEMSTATS.KickBackPower];	
 	}
 	
 	var inaccuracy = inaccuracy_formula(weapon, id);
@@ -238,7 +238,7 @@ function bot_bullet_create(DangerShotX, DangerShotY){
 	var projectile_image = 0;
 	var projectile_speed = BULLET_SPEED * global.time_step;
 	var homing_target = noone;
-	if(global.ItemIndex[# weapon, ItemStat.WeaponTypeClass] == WEAPON_CLASS.MISSILE){
+	if(global.ItemIndex[# weapon, ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.MISSILE){
 		projectile_image = 1;
 		projectile_speed = 25;
 		homing_target = ChasingObject;
@@ -253,10 +253,10 @@ function bot_bullet_create(DangerShotX, DangerShotY){
 				weapon,
 				point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), EnemyShotX, EnemyShotY),
 				projectile_speed,
-				global.ItemIndex[# weapon, ItemStat.Range]
+				global.ItemIndex[# weapon, ITEMSTATS.Range]
 			],
 			id,
-			global.ItemIndex[#weapon, ItemStat.Damage] * suppressor_dmg_mul,
+			global.ItemIndex[#weapon, ITEMSTATS.Damage] * suppressor_dmg_mul,
 			object_index,
 			[stats.Name, Visible],
 			homing_target,
@@ -353,33 +353,33 @@ function EnemyShooting(DangerX, DangerY){
 		shoot_accumulator = 0;
 		return;
 	}
-	has_suppressor = attachments[WeaponPositionID][ATTACHMENTS.slot_suppressor] == Item.advanced_suppressor;
+	has_suppressor = attachments[WeaponPositionID][ATTACHMENTS.suppressor] == ITEM.suppressor;
 
 	if(CanShoot == true && ChasingObjectSpotted == true && distance_to_object(ChasingObject) <= ChasingDistance && Ammo[WeaponPositionID] > 0){
 
 		if(Visible == true && Ammo[WeaponPositionID] % 2 == 0){
 		
 			#region Create smoke effect
-			create_fog(FlashLightX, FlashLightY, 20, other.RotationAngle - 180, 5, 5, 10, .1, .75, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer],
+			create_fog(FlashLightX, FlashLightY, 20, other.RotationAngle - 180, 5, 5, 10, .1, .75, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer],
 				[lengthdir_x(5, RotationAngle - 180), lengthdir_y(5, RotationAngle - 180), true]
 			);
 			#endregion
 		
 		}
 		
-		if(global.ItemIndex[# WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
-			particle_create(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-			0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.BulletCasingID], x, y, 1, 60);
+		if(global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
+			particle_create(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
+			0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.BulletCasingID], x, y, 1, 60);
 		}
-		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.KickBackPower];
+		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.KickBackPower];
 		KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);	
-		for(i=0;i<global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.Bullets];i++){	
+		for(i=0;i<global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.Bullets];i++){	
 			bot_bullet_create(DangerX, DangerY);
 		}
 		
 		#region Create flash effect
 		if(flash_effect_timer == -1){
-			flash_effect_timer = round(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * .75);
+			flash_effect_timer = round(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer] * .75);
 			if(Ammo[WeaponPositionID] % 2 == 0){
 				var MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 				MuzzleFlashLight.angle = RotationAngle;
@@ -390,12 +390,12 @@ function EnemyShooting(DangerX, DangerY){
 		#endregion
 		
 		var adaptive = 
-		has_attachment(Item.adaptive_chambering, ATTACHMENTS.slot_barrel, id, WeaponPositionID) 
-		? global.ItemIndex[# attachments[WeaponPositionID][ATTACHMENTS.slot_barrel], ItemStat.ShootTimer] 
+		has_attachment(ITEM.adaptive_chambering, ATTACHMENTS.barrel, id, WeaponPositionID) 
+		? global.ItemIndex[# attachments[WeaponPositionID][ATTACHMENTS.barrel], ITEMSTATS.ShootTimer] 
 		: 1;
 		
 		Ammo[WeaponPositionID] --;
-		ShootTimer = global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.ShootTimer] * adaptive;
+		ShootTimer = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer] * adaptive;
 		alarm[3] = ShootTimer;
 		CanShoot = false;
 	}
@@ -429,19 +429,19 @@ function bot_mount_machine_gun(_machine_gun){
 	machine_gun_previous_ammo = Ammo[machine_gun_slot];
 	machine_gun_previous_clip_ammo = ClipAmmo[machine_gun_slot];
 	machine_gun_previous_max_ammo = MaxAmmo[machine_gun_slot];
-	machine_gun_previous_scope = attachments[machine_gun_slot][ATTACHMENTS.slot_scope];
-	machine_gun_previous_barrel = attachments[machine_gun_slot][ATTACHMENTS.slot_barrel];
-	machine_gun_previous_grip = attachments[machine_gun_slot][ATTACHMENTS.slot_grip];
-	machine_gun_previous_suppressor = attachments[machine_gun_slot][ATTACHMENTS.slot_suppressor];
+	machine_gun_previous_scope = attachments[machine_gun_slot][ATTACHMENTS.scope];
+	machine_gun_previous_barrel = attachments[machine_gun_slot][ATTACHMENTS.barrel];
+	machine_gun_previous_grip = attachments[machine_gun_slot][ATTACHMENTS.grip];
+	machine_gun_previous_suppressor = attachments[machine_gun_slot][ATTACHMENTS.suppressor];
 
 	WeaponID[machine_gun_slot] = _machine_gun.stats.Id;
 	Ammo[machine_gun_slot] = _machine_gun.stats.Ammo;
 	ClipAmmo[machine_gun_slot] = _machine_gun.stats.Clip_ammo;
-	MaxAmmo[machine_gun_slot] = global.ItemIndex[# _machine_gun.stats.Id, ItemStat.MaxAmmo];
-	attachments[machine_gun_slot][ATTACHMENTS.slot_scope] = _machine_gun.stats.Slot_scope;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_barrel] = _machine_gun.stats.Slot_barrel;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_grip] = _machine_gun.stats.Slot_grip;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_suppressor] = _machine_gun.stats.Slot_suppressor;
+	MaxAmmo[machine_gun_slot] = global.ItemIndex[# _machine_gun.stats.Id, ITEMSTATS.MaxAmmo];
+	attachments[machine_gun_slot][ATTACHMENTS.scope] = _machine_gun.stats.Slot_scope;
+	attachments[machine_gun_slot][ATTACHMENTS.barrel] = _machine_gun.stats.Slot_barrel;
+	attachments[machine_gun_slot][ATTACHMENTS.grip] = _machine_gun.stats.Slot_grip;
+	attachments[machine_gun_slot][ATTACHMENTS.suppressor] = _machine_gun.stats.Slot_suppressor;
 	_machine_gun.stats.Object = id;
 	WeaponNumber = machine_gun_slot;
 	WeaponPositionID = machine_gun_slot;
@@ -471,10 +471,10 @@ function bot_release_machine_gun(){
 	if(instance_exists(machine_gun_object)){
 		machine_gun_object.stats.Ammo = Ammo[machine_gun_slot];
 		machine_gun_object.stats.Clip_ammo = ClipAmmo[machine_gun_slot];
-		machine_gun_object.stats.Slot_scope = attachments[machine_gun_slot][ATTACHMENTS.slot_scope];
-		machine_gun_object.stats.Slot_barrel = attachments[machine_gun_slot][ATTACHMENTS.slot_barrel];
-		machine_gun_object.stats.Slot_grip = attachments[machine_gun_slot][ATTACHMENTS.slot_grip];
-		machine_gun_object.stats.Slot_suppressor = attachments[machine_gun_slot][ATTACHMENTS.slot_suppressor];
+		machine_gun_object.stats.Slot_scope = attachments[machine_gun_slot][ATTACHMENTS.scope];
+		machine_gun_object.stats.Slot_barrel = attachments[machine_gun_slot][ATTACHMENTS.barrel];
+		machine_gun_object.stats.Slot_grip = attachments[machine_gun_slot][ATTACHMENTS.grip];
+		machine_gun_object.stats.Slot_suppressor = attachments[machine_gun_slot][ATTACHMENTS.suppressor];
 		if(machine_gun_object.stats.Object == id){
 			machine_gun_object.stats.Object = noone;
 		}
@@ -484,10 +484,10 @@ function bot_release_machine_gun(){
 	Ammo[machine_gun_slot] = machine_gun_previous_ammo;
 	ClipAmmo[machine_gun_slot] = machine_gun_previous_clip_ammo;
 	MaxAmmo[machine_gun_slot] = machine_gun_previous_max_ammo;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_scope] = machine_gun_previous_scope;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_barrel] = machine_gun_previous_barrel;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_grip] = machine_gun_previous_grip;
-	attachments[machine_gun_slot][ATTACHMENTS.slot_suppressor] = machine_gun_previous_suppressor;
+	attachments[machine_gun_slot][ATTACHMENTS.scope] = machine_gun_previous_scope;
+	attachments[machine_gun_slot][ATTACHMENTS.barrel] = machine_gun_previous_barrel;
+	attachments[machine_gun_slot][ATTACHMENTS.grip] = machine_gun_previous_grip;
+	attachments[machine_gun_slot][ATTACHMENTS.suppressor] = machine_gun_previous_suppressor;
 	WeaponNumber = machine_gun_previous_weapon_number;
 	WeaponPositionID = min(WeaponNumber, 1);
 	machine_gun_object = noone;
@@ -633,92 +633,81 @@ function bot_flee_from_danger(danger_x, danger_y){
 }
 
 function bot_move_shooting(DangerX, DangerY){
-	
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.ASSAULT_RIFLE){
-		SideStepMin = 45;
-		SideStepMax = 180 * rank_less;
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(70, 110) * rank_less;
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.PISTOL){
-		SideStepMin = 0;
-		SideStepMax = 180 * rank_less;
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(120, 200) * rank_less;	
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
-		SideStepMin = 90;
-		SideStepMax = 90 * rank_less;
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		MoveTime = random_range(150, 230) * random_range(2, 3) * rank_less;	
-		if(mv_timer == 0){ mv_timer = MoveTime * rank_less; }
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SUBMACHINE_GUN){
-		SideStepMin = 0;
-		SideStepMax = 30 * rank_less;
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		XSpeed += lengthdir_x(Acceleration*2, MoveDirection);
-		YSpeed += lengthdir_y(Acceleration*2, MoveDirection);
-		MoveTime = random_range(110, 150) * random_range(2, 3) * rank_less;	
-		if(mv_timer == 0){ mv_timer = MoveTime * rank_less; }
+	var weapon_class = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass];
+	var dir = point_direction(x, y, DangerX, DangerY);
+	switch(weapon_class){
+		case WEAPON_CLASS.ASSAULT_RIFLE:
+		case WEAPON_CLASS.PISTOL:
+			if(percent_chance(40 * rank_boost)){
+				predictive_side = -predictive_side;
+			}
+			MoveDirection = dir + random_range(65, 110) * predictive_side;
+			MoveTime = random_range(10, 25) * rank_less;
+			break;
+		case WEAPON_CLASS.SNIPER_RIFLE:
+			MoveDirection = dir + choose(-90, 90);
+			MoveTime = random_range(150, 230) * random_range(2, 3) * rank_less;
+			break;
+		case WEAPON_CLASS.SUBMACHINE_GUN:
+		case WEAPON_CLASS.SHOTGUN:
+			MoveDirection = dir + random_range(-25, 25);
+			MoveTime = random_range(150, 220);
+			break;
+		default:
+			MoveDirection = dir + random_range(-45, 45);
+			MoveTime = random_range(70, 110);
+			break;
 	}
+	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
 }
-	
+
 function MoveRandom(){
-	
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.ASSAULT_RIFLE){
-		MoveDirection = random(360);
-		MoveTime = random_range(70, 110) * rank_less;
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(1, 2) * rank_less; }
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.PISTOL){
-		MoveDirection = random(360);
-		MoveTime = random_range(120, 200) * rank_less;
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(1, 2) * rank_less; }
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
-		MoveDirection = random(360);
-		MoveTime = random_range(150, 230) * rank_less;
-		if(mv_timer == 0){ mv_timer = MoveTime * rank_less; }
-		XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SUBMACHINE_GUN){
-		MoveDirection = random(360);
-		MoveTime = random_range(110, 150) * rank_less;
-		if(mv_timer == 0){ mv_timer = MoveTime * rank_less; }
-		XSpeed += lengthdir_x(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Acceleration*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	var weapon_class = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass];
+	MoveDirection = random(360);
+	switch(weapon_class){
+		case WEAPON_CLASS.ASSAULT_RIFLE:
+		case WEAPON_CLASS.PISTOL:
+			MoveTime = random_range(25, 50) * rank_less;
+			break;
+		case WEAPON_CLASS.SNIPER_RIFLE:
+			MoveTime = random_range(150, 230);
+			break;
+		case WEAPON_CLASS.SUBMACHINE_GUN:
+		case WEAPON_CLASS.SHOTGUN:
+			MoveTime = random_range(150, 220);
+			break;
+		default:
+			MoveTime = random_range(70, 110);
+			break;
 	}
+	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
 }
 
 function move_predictive(PositionX, PositionY){
-	
 	var dir = point_direction(x, y, PositionX, PositionY);
-	
-	// občas změň stranu (predikce chování hráče)
-	if(irandom(30) == 0){
-		if(random(1) < 0.5){
-			predictive_side = -1;
+	var weapon_class = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass];
+	if(weapon_class == WEAPON_CLASS.ASSAULT_RIFLE || weapon_class == WEAPON_CLASS.PISTOL){
+		if(percent_chance(40 * rank_boost)){
+			predictive_side = -predictive_side;
+		}
+		MoveDirection = dir + random_range(75, 105) * predictive_side;
+		MoveTime = random_range(10, 20) * rank_less;
+	}else{
+		if(percent_chance(10)){
+			predictive_side = -predictive_side;
+		}
+		if(weapon_class == WEAPON_CLASS.SUBMACHINE_GUN || weapon_class == WEAPON_CLASS.SHOTGUN){
+			MoveDirection = dir + random_range(10, 30) * predictive_side;
+			MoveTime = random_range(150, 220);
 		}else{
-			predictive_side = 1;
+			MoveDirection = dir + 90 * predictive_side;
+			MoveTime = random_range(150, 230);
 		}
 	}
-	
-	// boční úhyb
-	MoveDirection = dir + 90 * predictive_side;
-	
-	MoveTime = random_range(70, 110) * rank_less;
-	if(mv_timer == 0){ mv_timer = MoveTime * rank_less; }
-	
-	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
+	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps) / 60);
 }
 
 function MoveIdle(){
@@ -741,38 +730,34 @@ function MoveIdle(){
 
 function MoveTowards(DangerX, DangerY, Accel, SideStepMin = 1, SideStepMax = 90){	
 	
-	if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.ASSAULT_RIFLE){
+	if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.ASSAULT_RIFLE){
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
-		MoveTime = random_range(40, 55);
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.PISTOL){
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax*.33), -random_range(SideStepMin, SideStepMax*.33));
-		MoveTime = random_range(70, 110);
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
-		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin*45, SideStepMax), -random_range(SideStepMin*45, SideStepMax));
-		MoveTime = random_range(150, 230);
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
+		MoveTime = random_range(25, 50);
 		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ItemStat.WeaponTypeClass] == WEAPON_CLASS.SUBMACHINE_GUN){
+	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.PISTOL){
+		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax*.33), -random_range(SideStepMin, SideStepMax*.33));
+		MoveTime = random_range(20, 40);
+		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.SNIPER_RIFLE){
+		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin*45, SideStepMax), -random_range(SideStepMin*45, SideStepMax));
+		MoveTime = random_range(150, 230);
+		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+	}else if(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.SUBMACHINE_GUN
+	|| global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.SHOTGUN){
 		SideStepMin = 0;
-		SideStepMax = 15;
+		SideStepMax = min(SideStepMax, 15);
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax*.1), -random_range(SideStepMin, SideStepMax*.1));
 		MoveTime = random_range(150, 220);
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}else{
 		MoveDirection = point_direction(x, y, DangerX, DangerY) + choose(random_range(SideStepMin, SideStepMax*.33), -random_range(SideStepMin, SideStepMax*.33));
 		MoveTime = random_range(55, 90);
-		if(mv_timer == 0){ mv_timer = MoveTime * random_range(2, 3) * rank_less; }
-		XSpeed += lengthdir_x(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
-		YSpeed += lengthdir_y(Accel*2, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		XSpeed += lengthdir_x(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
+		YSpeed += lengthdir_y(Accel, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	}
 }
 
@@ -781,7 +766,6 @@ function EnemyThrowGrenade(DangerX, DangerY){
 	SideStepMax = 30;
 	MoveDirection = point_direction(x, y, DangerX, DangerY) - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(70, 110);
-	if(mv_timer == 0){ mv_timer = MoveTime * random_range(1, 2) * rank_less; }
 	XSpeed += lengthdir_x(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration*3, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
@@ -792,7 +776,6 @@ function EnemyLayDownLandMine(){
 	SideStepMax = 30;
 	MoveDirection = MoveDirection - 180 + choose(random_range(SideStepMin, SideStepMax), -random_range(SideStepMin, SideStepMax));
 	MoveTime = random_range(70, 110);
-	if(mv_timer == 0){ mv_timer = MoveTime * random_range(1, 2) * rank_less; }
 	XSpeed += lengthdir_x(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 	YSpeed += lengthdir_y(Acceleration, MoveDirection) * (game_get_speed(gamespeed_fps)/60);
 }
@@ -803,24 +786,24 @@ function ChooseGrenade(){
 		Grenade = (first_grenade + i) mod 3;
 		if(Grenades[Grenade] > 0){
 			switch(Grenade){
-				case 0: EquippedGrenadeID = Item.HEGrenade; break;	
-				case 1: EquippedGrenadeID = Item.FlashBangGrenade; break;	
-				case 2: EquippedGrenadeID = Item.SmokeGrenade; break;
+				case 0: EquippedGrenadeID = ITEM.HEGrenade; break;	
+				case 1: EquippedGrenadeID = ITEM.FlashBangGrenade; break;	
+				case 2: EquippedGrenadeID = ITEM.SmokeGrenade; break;
 			}
 			return Grenade;
 		}
 	}
 
-	EquippedGrenadeID = Item.None;
+	EquippedGrenadeID = ITEM.None;
 	return -1;
 }
 
 function ChooseLandMine(){
 	LandMine = choose(0, 4, 8);
 	switch(LandMine){
-		case 0: EquippedLandMineID = Item.HELandMine; break;	
-		case 4: EquippedLandMineID = Item.CELandMine; break;	
-		case 8: EquippedLandMineID = Item.LELandMine; break;
+		case 0: EquippedLandMineID = ITEM.HELandMine; break;	
+		case 4: EquippedLandMineID = ITEM.CELandMine; break;	
+		case 8: EquippedLandMineID = ITEM.LELandMine; break;
 	}
 	return LandMine;	
 }

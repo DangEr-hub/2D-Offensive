@@ -53,6 +53,11 @@ function pause(ObjectType){
 	if(instance_exists(oBotTab)){
 		with(oBotTab) zui_destroy();
 	}
+	if(instance_exists(oTerminal)){
+		with(oTerminal){
+			zui_destroy();
+		}
+	}
 	if(instance_exists(oWeaponAttachments)){
 		global.local_player.player_can_shoot = true;
 		with(oWeaponAttachments){
@@ -71,7 +76,7 @@ function pause(ObjectType){
 	with(zui_main()){
 		zui_create(0, 0, objUIBlack, -1000);
 		with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oPause, -1000)) {
-			alpha = global.GUIHUDAlpha * 2.25; alpha_value = 0;
+			alpha = global.gui_alpha * 2.25; alpha_value = 0;
 			window_id = id;
 		}
 	}
@@ -156,7 +161,7 @@ function open_ingame_settings(){
 		with(zui_create(zui_get_width() * .5, zui_get_height() * .5, oSettingsTab, -2000)){
 			ingame_overlay = true;
 			overlay_black = settings_black;
-			alpha = global.GUIHUDAlpha * 1.25;
+			alpha = global.gui_alpha * 1.25;
 			alpha_value = 0;
 			window_id = id;
 
@@ -185,7 +190,13 @@ function open_ingame_settings(){
 function reset_gui(){
 	var restore_statistics_table = instance_exists(oStatisticsTable)
 		&& keyboard_check(global.KeyBinds[| KEY.Scoreboard]);
+	var restore_terminal = instance_exists(oTerminal);
 	statistics_table_close();
+	if(restore_terminal){
+		with(oTerminal){
+			zui_destroy();
+		}
+	}
 
 	if(instance_exists(oWeaponAttachments)){
 		with(oWeaponAttachments){
@@ -231,14 +242,14 @@ function reset_gui(){
 						zui_create(0, 0, objUIBlack, -1000);
 						with (zui_create(zui_get_width() * 0.5, zui_get_height() * .5, oGameEndMenu, -1000)) {
 							alpha_value = 0;
-							alpha = global.GUIHUDAlpha * 2.25; 
+							alpha = global.gui_alpha * 2.25; 
 							window_id = id;
 						}
 					}else{
 						zui_create(0, 0, objUIBlack, -1000);
 						with (zui_create(zui_get_width() * 0.5, zui_get_height() * 0.5, oRoundEndMenu, -1000)) {
 							alpha_value = 0;
-							alpha = global.GUIHUDAlpha * 2.25; 
+							alpha = global.gui_alpha * 2.25; 
 							window_id = id;
 						}
 					}
@@ -249,22 +260,22 @@ function reset_gui(){
 			if(oDraw.DrawInfo == true){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
-					var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+					var Id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 					if(global.ItemIndex[#Id, ItemStat.Type] == "Armour" || global.ItemIndex[#Id, ItemStat.Type] == "Helmet" || global.ItemIndex[#Id, ItemStat.Type] == "Shield"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oArmourDescription)){
-							alpha = global.GUIHUDAlpha * 3;
+							alpha = global.gui_alpha * 3;
 						}
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Item"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oItemDescription)){
-							alpha = global.GUIHUDAlpha * 3;
+							alpha = global.gui_alpha * 3;
 						}
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Weapon"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oWeaponDescription)){
-							alpha = global.GUIHUDAlpha * 3;
+							alpha = global.gui_alpha * 3;
 						}
 					}else if(global.ItemIndex[#Id, ItemStat.Type] == "Grenade" || global.ItemIndex[#Id, ItemStat.Type] == "Landmine" || global.ItemIndex[#Id, ItemStat.Type] == "Bomb"){
 						with(zui_create(zui_get_width() * .5, zui_get_width() * .1, oUsableItemDescription)){
-							alpha = global.GUIHUDAlpha * 3;
+							alpha = global.gui_alpha * 3;
 						}
 					}
 				}
@@ -274,6 +285,11 @@ function reset_gui(){
 
 	if(restore_statistics_table){
 		statistics_table_open();
+	}
+	if(restore_terminal){
+		with(zui_main()){
+			zui_create(zui_get_width() * .5, zui_get_height() * .5, oTerminal, -2000);
+		}
 	}
 }
 	

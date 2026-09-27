@@ -51,11 +51,11 @@ if(instance_exists(oLightRenderer)){
 }
 
 stats = {
-	Damage: global.ItemIndex[# Item.MolotovGrenade, ItemStat.Damage],
+	Damage: global.ItemIndex[# ITEM.MolotovGrenade, ITEMSTATS.Damage],
 	Starting_x: x,
 	Starting_y: y,
 	Object: noone,
-	Item_id: Item.MolotovGrenade,
+	Item_id: ITEM.MolotovGrenade,
 	Penetration_damage: 0,
 	Tracer_image: 4,
 	Object_index: -1,

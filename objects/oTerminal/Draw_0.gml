@@ -10,5 +10,6 @@ console_draw(
 	make_color_rgb(215, 10, 83),
 	1,
 	terminal_width - terminal_padding,
-	terminal_padding
+	terminal_padding,
+	true
 );

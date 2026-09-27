@@ -1,14 +1,40 @@
 /// @description Insert description here
 // You can write your code in this editor
 event_inherited();
-draw_set_font(fnt_ConsoleSmall);
-//draw_text(x, y - 50, "can_prone " + string(can_prone));
+//draw_set_font(fnt_ConsoleSmall);
+//draw_text(x, y - 50, "attachments " + string(attachments));
 //draw_text(x, y - 75, "eq level " + string(equipment_level));
 //draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
 if(stats.Health_points <= 0){
 	exit;
 }
 if(Visible == true){
+	with(Weapon){
+		var owner_can_draw = instance_exists(Owner) && Owner.stats.Health_points > 0;
+
+		if(Visible == true && owner_can_draw){
+			draw_self();
+		}
+
+		if(owner_can_draw && Owner.object_index == oBot && Owner.Visible == true){
+			if(Owner.CanShoot == false
+			&& Owner.ShootTimer >= global.ItemIndex[# Owner.WeaponID[Owner.WeaponPositionID], ITEMSTATS.ShootTimer] / 1.5
+			&& Owner.healing == false){
+				draw_sprite_ext(
+					spr_MuzzleFlash,
+					0,
+					Owner.Weapon.x + lengthdir_x(Owner.WeaponDistance, Owner.RotationAngle),
+					Owner.Weapon.y + lengthdir_y(Owner.WeaponDistance, Owner.RotationAngle),
+					1,
+					1,
+					Owner.RotationAngle,
+					c_white,
+					1
+				);
+			}
+		}
+	}
+	
 	var armour_sprite_index = 0;
 	if(image_index == TEXTURES.no_weapon){
 		armour_sprite_index = 0;	
@@ -38,39 +64,34 @@ if(Visible == true){
 		armour_sprite_index = 8;
 	}
 
-	if(ArmourID == Item.KevlarVest){
+	if(ArmourID == ITEM.KevlarVest){
 		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == Item.MilitaryVest){
+	}else if(ArmourID == ITEM.MilitaryVest){
 		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == Item.SpecOpsVest){
+	}else if(ArmourID == ITEM.SpecOpsVest){
 		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
 	}
 
 	var helmet_sprite_index = -1;
 	var helmet_index = -1;
 	switch(HelmetID){
-		case Item.KevlarHelm: helmet_sprite_index = 0; break;
-		case Item.MilitaryHelm: helmet_sprite_index = 1; break;
-		case Item.SpecOpsHelm: helmet_sprite_index = 2; break;
-		case Item.NightVision: helmet_sprite_index = 3; break;
-		case Item.InfraredVision: helmet_sprite_index = 4; break;
+		case ITEM.KevlarHelm: helmet_sprite_index = 0; break;
+		case ITEM.MilitaryHelm: helmet_sprite_index = 1; break;
+		case ITEM.SpecOpsHelm: helmet_sprite_index = 2; break;
+		case ITEM.NightVision: helmet_sprite_index = 3; break;
+		case ITEM.InfraredVision: helmet_sprite_index = 4; break;
 	}
 	helmet_index = helmet_sprite_index;
 	if(State == STATES.Prone){ helmet_index = helmet_sprite_index + 5; }
-	if(helmet_index != -1){draw_sprite_ext(spr_Helmet, helmet_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha)};
+	if(helmet_sprite_index != -1){draw_sprite_ext(spr_Helmet, helmet_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha)};
 	
-	var suppressor_id = attachments[WeaponPositionID][ATTACHMENTS.slot_suppressor];
-	if(suppressor_id == Item.advanced_suppressor && EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
-		draw_sprite_ext(
-			spr_Items,
-			suppressor_id,
-			Weapon.x + lengthdir_x(WeaponDistance*.85, RotationAngle),
-			Weapon.y + lengthdir_y(WeaponDistance*.85, RotationAngle),
-			.5,
-			.5,
-			RotationAngle,
-			c_white, 
-			1
+	if(WeaponID[WeaponPositionID] != ITEM.None && Weapon.Visible
+	&& EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
+		draw_weapon_attachments(
+			Weapon, WeaponDistance,
+			attachments[WeaponPositionID][ATTACHMENTS.suppressor],
+			attachments[WeaponPositionID][ATTACHMENTS.barrel],
+			attachments[WeaponPositionID][ATTACHMENTS.scope]
 		);
 	}
 		

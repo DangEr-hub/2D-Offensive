@@ -1,8 +1,8 @@
 /* oNetworkManager - Step */
 if (instance_exists(global.local_player)) {
 	item_use_resync_timer += delta_time / 1000000;
-	var current_item_use_id = global.Inventory[# global.local_player.item_use_position, Index.slot_id];
-	if (global.local_player.Healing && global.local_player.HealingItemId != Item.None) {
+	var current_item_use_id = global.Inventory[# global.local_player.item_use_position, INDEX.slot_id];
+	if (global.local_player.Healing && global.local_player.HealingItemId != ITEM.None) {
 		current_item_use_id = global.local_player.HealingItemId;
 	}
 	var item_use_changed = current_item_use_id != last_item_use_id;
@@ -69,7 +69,7 @@ if (is_server) {
 				if(walking){ bit_states |= PLAYER_FLAGS.WALKING; }
 				if(running){ bit_states |= PLAYER_FLAGS.RUNNING; }
 				ds_map_set(data, "state",  bit_states);
-				ds_map_set(data, "defuse_has_kit", find_item(Item.DefuseKit) != -1);
+				ds_map_set(data, "defuse_has_kit", find_item(ITEM.DefuseKit) != -1);
 				var previous_defusing_target = ds_map_find_value(data, "defusing_target");
 				if (!is_undefined(previous_defusing_target) && previous_defusing_target != defusing_target) {
 					ds_map_set(data, "defusing_time", 0);
@@ -77,13 +77,13 @@ if (is_server) {
 				ds_map_set(data, "defusing_target", defusing_target);
 				ds_map_set(data, "moving_state", moving_state);
 				ds_map_set(data, "Team", stats.Team);
-				ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, Index.slot_id]);
-				ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, Index.slot_scope]);
-				ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, Index.slot_barrel]);
-				ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, Index.slot_grip]);
-				ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, Index.slot_suppressor]);
-				ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, Index.slot_ammo]);
-				ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+				ds_map_set(data, "weapon_id", global.Inventory[# WeaponID, INDEX.slot_id]);
+				ds_map_set(data, "weapon_scope", global.Inventory[# WeaponID, INDEX.slot_scope]);
+				ds_map_set(data, "weapon_barrel", global.Inventory[# WeaponID, INDEX.slot_barrel]);
+				ds_map_set(data, "weapon_grip", global.Inventory[# WeaponID, INDEX.slot_grip]);
+				ds_map_set(data, "weapon_suppressor", global.Inventory[# WeaponID, INDEX.slot_suppressor]);
+				ds_map_set(data, "weapon_ammo", global.Inventory[# WeaponID, INDEX.slot_ammo]);
+				ds_map_set(data, "weapon_clip_ammo", global.Inventory[# WeaponID, INDEX.slot_clip_ammo]);
 				server_update_reload_state(0, bit_states);
             }
             ds_map_set(data, "timestamp", current_time);

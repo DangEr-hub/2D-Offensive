@@ -80,17 +80,19 @@ function handle_projectile_spawn_server(key) {
 			return;
 		}
 
-		max_dist = global.ItemIndex[# item_id, ItemStat.Range];
-		var suppressor_id = server_player_state_value(owner_pid, "weapon_suppressor", Item.None);
+		max_dist = global.ItemIndex[# item_id, ITEMSTATS.Range];
+		var suppressor_id = server_player_state_value(owner_pid, "weapon_suppressor", ITEM.None);
 		var damage_multiplier = 1;
-		if (suppressor_id != Item.None) {
-			damage_multiplier = global.ItemIndex[# suppressor_id, ItemStat.Defense];
+		if (suppressor_id != ITEM.None) {
+			damage_multiplier = global.ItemIndex[# suppressor_id, ITEMSTATS.Defense];
 		}
-		dmg = global.ItemIndex[# item_id, ItemStat.Damage] * damage_multiplier;
+		dmg = global.ItemIndex[# item_id, ITEMSTATS.Damage] * damage_multiplier;
 
 		if (!server_validate_projectile_spawn(owner_pid, proj_id, item_id)) {
 			return;
 		}
+		var projectile_data = ds_map_find_value(projectiles_seen, proj_id);
+		dmg *= projectile_data.steroids_multiplier;
 
 		var p = find_instance_by_network_id(oPlayer, owner_pid);
 		
@@ -104,7 +106,7 @@ function handle_projectile_spawn_server(key) {
 					item_id,
 					angle,
 					spd,
-					global.ItemIndex[# item_id, ItemStat.Range]
+					global.ItemIndex[# item_id, ITEMSTATS.Range]
 				],
 				p,
 				dmg,
@@ -233,8 +235,8 @@ function handle_grenade_sync_server(socket_key) {
                 var target_y = buffer_read(receive_buffer, buffer_f16);
                 var item_id = buffer_read(receive_buffer, buffer_u16);
 
-                if (item_id <= Item.None || item_id >= Item.Total) return;
-                if (global.ItemIndex[# item_id, ItemStat.Type] != "Grenade") return;
+                if (item_id <= ITEM.None || item_id >= ITEM.Total) return;
+                if (global.ItemIndex[# item_id, ITEMSTATS.Type] != "Grenade") return;
 
                 var owner_pid = ds_map_find_value(clients, socket_key);
                 var owner = find_instance_by_network_id(oPlayer, owner_pid);
@@ -325,8 +327,8 @@ function handle_grenade_sync_client() {
 					create_grenade_explosion_visual(
 						impact_x,
 						impact_y,
-						Item.MolotovGrenade,
-						global.ItemIndex[# Item.MolotovGrenade, ItemStat.Damage],
+						ITEM.MolotovGrenade,
+						global.ItemIndex[# ITEM.MolotovGrenade, ITEMSTATS.Damage],
 						impact_net_id,
 						impact_age
 					);
@@ -377,7 +379,7 @@ function server_grenade_explosion_broadcast(grenade_inst) {
         buffer_write(send_buffer, buffer_f16, grenade_inst.x);
         buffer_write(send_buffer, buffer_f16, grenade_inst.y);
         buffer_write(send_buffer, buffer_u16, grenade_inst.stats.Item_id);
-        buffer_write(send_buffer, buffer_f16, global.ItemIndex[# grenade_inst.stats.Item_id, ItemStat.Damage]);
+        buffer_write(send_buffer, buffer_f16, global.ItemIndex[# grenade_inst.stats.Item_id, ITEMSTATS.Damage]);
 
         var socket_key = ds_map_find_first(clients);
         for (var i = 0; i < ds_map_size(clients); i++) {
@@ -427,12 +429,12 @@ function server_molotov_state_broadcast() {
 }
 
 function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage, network_id = -1, initial_age = 0) {
-    if (item_id == Item.SmokeGrenade) {
+    if (item_id == ITEM.SmokeGrenade) {
         create_fog(x_pos, y_pos, random_range(100, 150), random(360), 0.1, random_range(.1, .5), 11, .9, .75, SMOKE_TIME);
         return;
     }
 
-	if (item_id == Item.MolotovGrenade) {
+	if (item_id == ITEM.MolotovGrenade) {
 		var impact = noone;
 		if(network_id >= 0){
 			impact = find_instance_by_network_id(oMolotovImpact, network_id);
@@ -473,7 +475,7 @@ function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage
         2 * game_get_speed(gamespeed_fps)
     );
 
-    if (item_id == Item.FlashBangGrenade && instance_exists(global.local_player)) {
+    if (item_id == ITEM.FlashBangGrenade && instance_exists(global.local_player)) {
         if (!collision_line(x_pos, y_pos, global.local_player.x, global.local_player.y, oParentTile, true, false)) {
             if (point_distance(x_pos, y_pos, global.local_player.x, global.local_player.y) < global.FlashBangMaxDistance) {
                 if (global.GodMode == false) {

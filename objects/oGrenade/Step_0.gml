@@ -11,7 +11,7 @@ if(stuck == false){
 
 }
 
-if(stats.Item_id == Item.StickyGrenade){
+if(stats.Item_id == ITEM.StickyGrenade){
 	if (!stuck) {
 		if(instance_exists(oParentTile)){
 		    var collision_instance = instance_place(x, y, oParentTile);
@@ -46,7 +46,7 @@ if(stats.Item_id == Item.StickyGrenade){
 	}
 }
 
-if(stats.Item_id == Item.MolotovGrenade && image_index == 4 && instance_exists(oParticleSystem)){
+if(stats.Item_id == ITEM.MolotovGrenade && image_index == 4 && instance_exists(oParticleSystem)){
 	var flame_offset = 13 * max(image_xscale, image_yscale);
 	var flame_x = x + lengthdir_x(flame_offset, image_angle - 90);
 	var flame_y = y - z + lengthdir_y(flame_offset, image_angle - 90);
@@ -79,24 +79,24 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 		if(IS_NET && network_authority){
 			server_grenade_explosion_broadcast(id);
 		}
-		if(stats.Item_id == Item.HEGrenade){
+		if(stats.Item_id == ITEM.HEGrenade){
 			
 			#region Create explosion effect
 			explosion_create(
 				30, 
 				[x, y],
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], 
 				true, 
 				stats.Object, 
 				stats.Item_id
 			);
 			#endregion
 			
-		}else if(stats.Item_id == Item.FlashBangGrenade){
+		}else if(stats.Item_id == ITEM.FlashBangGrenade){
 			explosion_create(
 				5, 
 				[x, y],
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], 
 				true, 
 				stats.Object, 
 				stats.Item_id
@@ -142,7 +142,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 					
 				}
 			}
-		}else if(stats.Item_id == Item.SmokeGrenade){
+		}else if(stats.Item_id == ITEM.SmokeGrenade){
 				
 			#region Create smoke effect
 			instance_destroy(id);
@@ -153,7 +153,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			);
 			#endregion
 				
-		}else if(stats.Item_id == Item.MolotovGrenade){
+		}else if(stats.Item_id == ITEM.MolotovGrenade){
 			var owner_id = -1;
 			if(is_struct(stats) && variable_struct_exists(stats, "Owner_id")){
 				owner_id = stats.Owner_id;
@@ -161,7 +161,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			var molotov_impact = create_molotov_impact(
 				x,
 				y,
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage],
+				global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage],
 				stats.Object,
 				stats.Item_id,
 				stats.Owner_name,
@@ -174,13 +174,13 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			}
 			instance_destroy(id);
 
-		}else if(stats.Item_id == Item.StickyGrenade){
+		}else if(stats.Item_id == ITEM.StickyGrenade){
 			
 			#region Create explosion effect
 			explosion_create(
 				30,
 				[x, y],
-				global.ItemIndex[#stats.Item_id, ItemStat.Damage], 
+				global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], 
 				true, 
 				stats.Object, 
 				stats.Item_id

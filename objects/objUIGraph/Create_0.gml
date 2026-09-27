@@ -1,11 +1,11 @@
 alpha_value = 0;
-alpha = global.GUIHUDAlpha;
+alpha = global.gui_alpha;
 
 values_x = [];
 values_y = [];
 
-g_width = 256 * global.gui_scale;
-g_height = 128 * global.gui_scale;
+g_width = max(256 * global.gui_scale, 400);
+g_height = max(128 * global.gui_scale, 400);
 
 zui_set_size(g_width, g_height);
 

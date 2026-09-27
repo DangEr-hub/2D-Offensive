@@ -55,9 +55,9 @@ if (oNetworkManager.is_server) {
 			buffer_write(send_buffer, buffer_u8, true);
 
 			var host_data = ds_map_find_value(player_states, 0);
-			var host_weapon_id = Item.None;
+			var host_weapon_id = ITEM.None;
 			if (!is_undefined(host_data)) host_weapon_id = ds_map_find_value(host_data, "weapon_id");
-			var has_host_weapon = !is_undefined(host_weapon_id) && host_weapon_id > Item.None && host_weapon_id < Item.Total;
+			var has_host_weapon = !is_undefined(host_weapon_id) && host_weapon_id > ITEM.None && host_weapon_id < ITEM.Total;
 			buffer_write(send_buffer, buffer_u8, has_host_weapon);
 			if (has_host_weapon) {
 				var host_player = find_instance_by_network_id(oPlayer, 0);
@@ -76,10 +76,10 @@ if (oNetworkManager.is_server) {
 				var host_suppressor = ds_map_find_value(host_data, "weapon_suppressor");
 				var host_ammo = ds_map_find_value(host_data, "weapon_ammo");
 				var host_clip_ammo = ds_map_find_value(host_data, "weapon_clip_ammo");
-				if (is_undefined(host_scope)) host_scope = Item.None;
-				if (is_undefined(host_barrel)) host_barrel = Item.None;
-				if (is_undefined(host_grip)) host_grip = Item.None;
-				if (is_undefined(host_suppressor)) host_suppressor = Item.None;
+				if (is_undefined(host_scope)) host_scope = ITEM.None;
+				if (is_undefined(host_barrel)) host_barrel = ITEM.None;
+				if (is_undefined(host_grip)) host_grip = ITEM.None;
+				if (is_undefined(host_suppressor)) host_suppressor = ITEM.None;
 				if (is_undefined(host_ammo)) host_ammo = -1;
 				if (is_undefined(host_clip_ammo)) host_clip_ammo = -1;
 

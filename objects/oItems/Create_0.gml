@@ -1,9 +1,9 @@
 /* oItems Create event */
 PushForce = 0;
-scope_attachment = Item.None;
-barrel_attachment = Item.None;
-grip_attachment = Item.None;
-suppressor_attachment = Item.None;
+scope_attachment = ITEM.None;
+barrel_attachment = ITEM.None;
+grip_attachment = ITEM.None;
+suppressor_attachment = ITEM.None;
 ClipAmmo = -1;
 Ammo = -1;
 Durability = -1;

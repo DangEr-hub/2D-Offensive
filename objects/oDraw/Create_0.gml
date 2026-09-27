@@ -5,6 +5,11 @@ decor_spawned = false;
 aberration_level = 0;
 saturation_level = 0;
 bird_snd_timer = irandom_range(game_get_speed(gamespeed_fps)*2, game_get_speed(gamespeed_fps) * 7);
+river_emitter = audio_emitter_create();
+river_sound = -1;
+if (audio_emitter_exists(river_emitter)) {
+	audio_emitter_falloff(river_emitter, 64, 512, 1);
+}
 KilledByWeapon = "Nothing";
 KilledByName = "No one";
 var_slot = 0;
@@ -16,6 +21,81 @@ buy_period_message_timer = 0;
 round_end_timer = -1;
 bomb_detonation_pending = false;
 alarm[1] = audio_sound_length(snd_Wind);
+
+network_pools = [
+	"10.0.0",
+	"10.10.0",
+	"10.20.4",
+	"10.42.0",
+	"172.16.0",
+	"172.20.0",
+	"172.31.0",
+	"192.168.0",
+	"192.168.1",
+	"192.168.10"
+];
+network_prefix = network_pools[irandom(array_length(network_pools) - 1)];
+network_gateway = network_prefix + ".1";
+
+network_usernames = [
+	"admin", "operator", "root", "sysadmin", "service",
+	"joe", "bob", "daniel", "alex", "sam",
+	"guest", "support", "security", "control", "manager"
+];
+network_passwords = [
+	"admin", "1975", "1111", "123456", "password",
+	"qwerty", "letmein", "welcome", "access", "control",
+	"service", "security", "operator", "system", "network"
+];
+network_username = network_usernames[irandom(array_length(network_usernames) - 1)];
+network_password = network_passwords[irandom(array_length(network_passwords) - 1)];
+
+network_next_host = 2;
+network_camera_number = 1;
+network_door_number = 1;
+network_terminal_number = 1;
+network_terminal_ip = "";
+network_terminal_name = "";
+network_devices_initialized = false;
+
+register_network_device = function(device, device_prefix){
+	if(!instance_exists(device)) return;
+	if(variable_instance_exists(device, "network_ip") && device.network_ip != "") return;
+	if(device_prefix == "t" && network_terminal_ip != ""){
+		device.network_ip = network_terminal_ip;
+		device.network_name = network_terminal_name;
+		device.network_online = true;
+		device.network_world_x = device.x;
+		device.network_world_y = device.y;
+		return;
+	}
+
+	device.network_ip = network_prefix + "." + string(network_next_host);
+	device.network_online = true;
+	network_next_host++;
+
+	switch(device_prefix){
+		case "c":
+			device.network_name = "c" + string(network_camera_number);
+			network_camera_number++;
+		break;
+
+		case "d":
+			device.network_name = "d" + string(network_door_number);
+			network_door_number++;
+		break;
+
+		case "t":
+			device.network_name = "t" + string(network_terminal_number);
+			network_terminal_ip = device.network_ip;
+			network_terminal_name = device.network_name;
+			network_terminal_number++;
+		break;
+	}
+
+	device.network_world_x = device.x;
+	device.network_world_y = device.y;
+};
 
 NightVisionSurface = -1;
 BlackoutSurface = -1;

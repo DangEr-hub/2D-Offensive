@@ -83,7 +83,7 @@ function console_command_word_count(words, start_index, last_index){
 
 function console_autocomplete_value(suggestion){
 	var cut_position = string_length(suggestion) + 1;
-	var markers = [" <", " {", " (", " ["];
+	var markers = [" <", "<", " {", " (", " ["];
 	for(var marker_index = 0; marker_index < array_length(markers); marker_index++){
 		var marker_position = string_pos(markers[marker_index], suggestion);
 		if(marker_position > 0){
@@ -99,6 +99,7 @@ function console_submit(Console) {
 	if global.console[? "active"] {
 
 	    var list = global.console[? "history"];
+	    var input_list = global.console[? "input_history"];
 	    var sug = global.console[? "suggestions"];
 	    var i,sep,no,c;
 	    sep = global.console[? "sep"];
@@ -106,6 +107,9 @@ function console_submit(Console) {
     
 	    //Pasting text
 	    if(keyboard_check(vk_control)){
+			global.console[? "backspace_hold"] = 0;
+			global.console[? "left_hold"] = 0;
+			global.console[? "right_hold"] = 0;
 	        if(keyboard_check_pressed(ord("V"))) {
     
 	        var clip = clipboard_get_text();
@@ -129,77 +133,117 @@ function console_submit(Console) {
 	    }
 	    else
 	    /* String input */
-	    if keyboard_check_pressed(vk_anykey) 
+	{
+		var repeat_backspace = false;
+		var repeat_left = false;
+		var repeat_right = false;
+		if(keyboard_check(vk_backspace)){
+			global.console[? "backspace_hold"]++;
+			repeat_backspace = keyboard_check_pressed(vk_backspace)
+				|| (global.console[? "backspace_hold"] > 20 && global.console[? "backspace_hold"] mod 3 == 0);
+		}else{
+			global.console[? "backspace_hold"] = 0;
+		}
+		if(keyboard_check(vk_left)){
+			global.console[? "left_hold"]++;
+			repeat_left = keyboard_check_pressed(vk_left)
+				|| (global.console[? "left_hold"] > 15 && global.console[? "left_hold"] mod 3 == 0);
+		}else{
+			global.console[? "left_hold"] = 0;
+		}
+		if(keyboard_check(vk_right)){
+			global.console[? "right_hold"]++;
+			repeat_right = keyboard_check_pressed(vk_right)
+				|| (global.console[? "right_hold"] > 15 && global.console[? "right_hold"] mod 3 == 0);
+		}else{
+			global.console[? "right_hold"] = 0;
+		}
+
+	    if keyboard_check_pressed(vk_anykey) || repeat_backspace || repeat_left || repeat_right
 	    {
 	        /* Delete */
-	        if keyboard_check_pressed(vk_backspace) 
+	        if repeat_backspace
 	        {
+				global.console[? "dir"] = -1;
+				global.console[? "select"] = 0;
 	            if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;
 	            global.console[? "string"] = string_delete(global.console[? "string"],global.console[? "string_pos"],1);
 	        } 
 	        else 
 	        /* Back one position */
-			if keyboard_check_pressed(vk_left) 
+			if repeat_left
 	        {
 				if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;  
 	        } 
 	        else 
 	        /* Forward one position */ 
-	        if keyboard_check_pressed(vk_right) 
+	        if repeat_right
 	        {
-				global.console[? "string_pos"] += 1;
+				global.console[? "string_pos"] = min(global.console[? "string_pos"] + 1, string_length(global.console[? "string"]) + 1);
 	        } 
 			else 
 	        /* Selected last entered command */
 	        if keyboard_check_pressed(vk_up) {
-        
-	            if global.console[? "dir"] = 1 {
-	                global.console[? "dir"] = -1;
-	                global.console[? "select"] = 0;
-	            }
-	            var last = ds_list_find_value(global.console[? "history"],global.console[? "select"]);
-	            if !is_undefined(last) {
-	                global.console[? "string"] = last;
-	                global.console[? "string_pos"] = string_length(last)+1;
-	            }
-	            if global.console[? "select"] < ds_list_size(global.console[? "history"]) then
-	            global.console[? "select"] += 1 else global.console[? "select"] = 0;
+			if(global.console[? "dir"] == 1 && ds_list_size(global.console[? "suggestions"]) > 0){
+				global.console[? "select"] = max(0, global.console[? "select"] - 1);
+				sug = ds_list_find_value(global.console[? "suggestions"], global.console[? "select"]);
+				sug = console_autocomplete_value(sug);
+				global.console[? "string"] = sug;
+				global.console[? "string_pos"] = string_length(sug) + 1;
+			}else{
+				global.console[? "dir"] = -1;
+				var last = ds_list_find_value(input_list, global.console[? "input_select"]);
+				if(!is_undefined(last)){
+					global.console[? "string"] = last;
+					global.console[? "string_pos"] = string_length(last) + 1;
+				}
+				if(global.console[? "input_select"] < ds_list_size(input_list) - 1){
+					global.console[? "input_select"]++;
+				}
+			}
             
 	        } else 
         
 	        /* Selected suggested command */
 	        if keyboard_check_pressed(vk_down) 
 	        {
-	            if global.console[? "dir"] = -1 
-	            {
-	                global.console[? "dir"] = 1;
-	                global.console[? "select"] = 0;
-	            }
-	            sug = ds_list_find_value(global.console[? "suggestions"],global.console[? "select"]);
-            
-	            if !(is_undefined(sug))
-	            {
-	                sug = console_autocomplete_value(sug);
-	                global.console[? "string"] = sug;
-	                global.console[? "string_pos"] = string_length(sug)+1;
-	            }
-	            if global.console[? "select"] < ds_list_size(global.console[? "suggestions"]) then global.console[? "select"] += 1 else global.console[? "select"] = 0;   
+			var suggestion_count = ds_list_size(global.console[? "suggestions"]);
+			if(suggestion_count > 0){
+				if(global.console[? "dir"] == -1){
+					global.console[? "dir"] = 1;
+					global.console[? "select"] = 0;
+				}else{
+					global.console[? "select"] = min(global.console[? "select"] + 1, suggestion_count - 1);
+				}
+
+				sug = ds_list_find_value(global.console[? "suggestions"], global.console[? "select"]);
+				sug = console_autocomplete_value(sug);
+				global.console[? "string"] = sug;
+				global.console[? "string_pos"] = string_length(sug) + 1;
+			}
 	        }
 	        else
 	        {
 
 	        /* Insert character */
-	        if !(keyboard_check_pressed(vk_enter))
+			var terminal_console_key = global.console[? "terminal_mode"]
+				&& keyboard_check_pressed(global.KeyBinds[| KEY.Console]);
+	        if !(keyboard_check_pressed(vk_enter)) && !terminal_console_key
 	        {
 	            global.console[? "string"] = string_insert(keyboard_lastchar,global.console[? "string"],global.console[? "string_pos"]);
-	            if keyboard_lastchar != "" then global.console[? "string_pos"] += 1;  
+	            if keyboard_lastchar != "" {
+					global.console[? "string_pos"] += 1;
+					global.console[? "dir"] = -1;
+					global.console[? "select"] = 0;
+				}
 	        }
 	        /* Reset last character */
 	        keyboard_lastchar = "";
 	    }
 	}
+	}
     
-	if(keyboard_check_released(vk_anykey))
+	if(keyboard_check_released(vk_anykey) && global.console[? "dir"] != 1)
 	{
 	    if(ds_exists(global.console[? "text"],ds_type_list))
 	    {
@@ -228,8 +272,36 @@ function console_submit(Console) {
 			while(string_pos("  ", str) > 0){
 				str = string_replace_all(str, "  ", " ");
 			}
-	        // Add to history
-	        ds_list_insert(list,0,str);
+			var submit_terminal_mode = ds_map_exists(global.console, "terminal_mode") && global.console[? "terminal_mode"];
+			var terminal_instance = submit_terminal_mode ? instance_find(oTerminal, 0) : noone;
+			var credential_input = instance_exists(terminal_instance) && terminal_instance.sudo_login_stage > 0;
+			var password_input = instance_exists(terminal_instance) && terminal_instance.sudo_login_stage == 2;
+
+			// Passwords are displayed as hidden and are not stored in command history.
+			ds_list_insert(list, 0, password_input ? "********" : str);
+			if(!credential_input){
+				ds_list_insert(input_list, 0, str);
+			}
+			global.console[? "input_select"] = 0;
+
+			if(submit_terminal_mode){
+				global.console[? "command"] = str;
+				global.console[? "arguments"] = [str];
+				global.console[? "count"] = 0;
+				keyboard_string = "";
+
+				if(instance_exists(terminal_instance)){
+					terminal_instance.terminal_command_submit(str);
+				}
+
+				global.console[? "string"] = "";
+				global.console[? "string_pos"] = 1;
+				global.console[? "select"] = 0;
+				global.console[? "dir"] = -1;
+				console_preset(global.my_console);
+				return true;
+			}
+
 	        // Split console string
 			c = string_split(str, sep);
 			no = array_length(c) - 1;
@@ -337,7 +409,7 @@ function console_submit(Console) {
 					case "give item":
 						if(no == 1 && string_digits(c[1]) != ""){
 							GiveItem = instance_create_layer(global.local_player.x, global.local_player.y, "ItemsO", oItems);
-							GiveItem.image_index = clamp(round(real(c[1])), 0, Item.Total - 1);
+							GiveITEM.image_index = clamp(round(real(c[1])), 0, ITEM.Total - 1);
 						}
 					break;
 					case "draw admin hud":
@@ -614,15 +686,15 @@ function console_submit(Console) {
 							if(return_logical_value(real(c[1])) == true){
 								reset_gui();
 								
-								for(var w = 0; w < Item.Total; w ++){
-									if(global.ItemIndex[# w, ItemStat.Type] != "Weapon" && global.ItemIndex[# w, ItemStat.Type] != "Grenade" &&
-									global.ItemIndex[# w, ItemStat.Type] != "Armour" && global.ItemIndex[# w, ItemStat.Type] != "Helmet" &&
-									global.ItemIndex[# w, ItemStat.Type] != "Shield"){
+								for(var w = 0; w < ITEM.Total; w ++){
+									if(global.ItemIndex[# w, ITEMSTATS.Type] != "Weapon" && global.ItemIndex[# w, ITEMSTATS.Type] != "Grenade" &&
+									global.ItemIndex[# w, ITEMSTATS.Type] != "Armour" && global.ItemIndex[# w, ITEMSTATS.Type] != "Helmet" &&
+									global.ItemIndex[# w, ITEMSTATS.Type] != "Shield"){
 										continue;
 									}
 									
-									if(global.ItemIndex[# w, ItemStat.is_locked] == true){
-										global.ItemIndex[# w, ItemStat.is_locked] = false;
+									if(global.ItemIndex[# w, ITEMSTATS.is_locked] == true){
+										global.ItemIndex[# w, ITEMSTATS.is_locked] = false;
 										if(ds_list_find_index(global.unlocked_items, w) == -1){
 											ds_list_add(global.unlocked_items, w);
 										}
@@ -643,6 +715,8 @@ function console_submit(Console) {
 	        }
 	        global.console[? "string"] = "";
 	        global.console[? "string_pos"] = 1;
+	        global.console[? "select"] = 0;
+	        global.console[? "dir"] = -1;
 	        console_preset(global.my_console);
 	        return true;
         

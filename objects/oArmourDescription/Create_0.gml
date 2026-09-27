@@ -22,7 +22,7 @@ with(zui_create(zui_get_width() * .75, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Exit";
+	caption = "Close";
 	callback = function(){
 		with(oArmourDescription){
 			zui_destroy();
@@ -39,26 +39,26 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 		caption = "Equip";
 	}	
 	callback = function(){
-		if(global.Inventory[#oDraw.var_slot, Index.SlotAmount] <= 1){
+		if(global.Inventory[#oDraw.var_slot, INDEX.SlotAmount] <= 1){
 			with(oArmourDescription){
 				zui_destroy();
 			}
 		}
-		var Id = global.Inventory[#oDraw.var_slot, Index.slot_id];
-		switch(global.ItemIndex[#Id, ItemStat.Type]){
+		var Id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
+		switch(global.ItemIndex[#Id, ITEMSTATS.Type]){
 				
 			case "Helmet":
 				
 				if(oDraw.var_slot < OtherSlot.Helmet){
 					
 					#region Helmet equip
-					var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, Index.slot_id];
-					if (helmet_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Helmet")) {
-						ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], helmet_slot_id);
+					var helmet_slot_id = global.Inventory[# OtherSlot.Helmet, INDEX.slot_id];
+					if (helmet_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.Type] == "Helmet")) {
+						ItemAddWeight(global.Inventory[# oDraw.var_slot, INDEX.slot_id], helmet_slot_id);
 						item_swap("item_use_position", OtherSlot.Helmet);
-						helmet_slot_id = Item.None;
-					} else if (global.ItemIndex[# Id, ItemStat.Type] == "Helmet") {
-						ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], helmet_slot_id);
+						helmet_slot_id = ITEM.None;
+					} else if (global.ItemIndex[# Id, ITEMSTATS.Type] == "Helmet") {
+						ItemAddWeight(global.Inventory[# oDraw.var_slot, INDEX.slot_id], helmet_slot_id);
 						item_swap("item_use_position", OtherSlot.Helmet);
 					}
 					#endregion
@@ -68,17 +68,17 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 					#region Helmet dequip
 					gain_item(
 						Id,
-						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
-						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
-						global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo],
-						global.Inventory[# oDraw.var_slot, Index.slot_durability],
-						global.Inventory[# oDraw.var_slot, Index.slot_scope],
-						global.Inventory[# oDraw.var_slot, Index.slot_barrel],
-						global.Inventory[# oDraw.var_slot, Index.slot_grip],
-						global.Inventory[# oDraw.var_slot, Index.slot_suppressor],
+						global.Inventory[# oDraw.var_slot, INDEX.SlotAmount],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_ammo],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_clip_ammo],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_durability],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_scope],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_barrel],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_grip],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_suppressor],
 						false
 					);
-					ItemAddWeight(Item.None, Id);
+					ItemAddWeight(ITEM.None, Id);
 					item_swap("description_button", OtherSlot.Helmet);
 					#endregion
 				
@@ -91,13 +91,13 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 				if(oDraw.var_slot < OtherSlot.Helmet){
 					
 					#region Armour equip
-					var armour_slot_id = global.Inventory[# OtherSlot.Armour, Index.slot_id];
-					if (armour_slot_id != Item.None && (Id == Item.None || global.ItemIndex[# Id, ItemStat.Type] == "Armour")) {
-						ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], armour_slot_id);
+					var armour_slot_id = global.Inventory[# OtherSlot.Armour, INDEX.slot_id];
+					if (armour_slot_id != ITEM.None && (Id == ITEM.None || global.ItemIndex[# Id, ITEMSTATS.Type] == "Armour")) {
+						ItemAddWeight(global.Inventory[# oDraw.var_slot, INDEX.slot_id], armour_slot_id);
 						item_swap("item_use_position", OtherSlot.Armour);
-						armour_slot_id = Item.None;
-					} else if (global.ItemIndex[# Id, ItemStat.Type] == "Armour") {
-						ItemAddWeight(global.Inventory[# oDraw.var_slot, Index.slot_id], armour_slot_id);
+						armour_slot_id = ITEM.None;
+					} else if (global.ItemIndex[# Id, ITEMSTATS.Type] == "Armour") {
+						ItemAddWeight(global.Inventory[# oDraw.var_slot, INDEX.slot_id], armour_slot_id);
 						item_swap("item_use_position", OtherSlot.Armour);
 					}
 					#endregion
@@ -107,17 +107,17 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 					#region Armour dequip
 					gain_item(
 						Id,
-						global.Inventory[# oDraw.var_slot, Index.SlotAmount],
-						global.Inventory[# oDraw.var_slot, Index.slot_ammo],
-						global.Inventory[# oDraw.var_slot, Index.slot_clip_ammo],
-						global.Inventory[# oDraw.var_slot, Index.slot_durability],
-						global.Inventory[# oDraw.var_slot, Index.slot_scope],
-						global.Inventory[# oDraw.var_slot, Index.slot_barrel],
-						global.Inventory[# oDraw.var_slot, Index.slot_grip],
-						global.Inventory[# oDraw.var_slot, Index.slot_suppressor],
+						global.Inventory[# oDraw.var_slot, INDEX.SlotAmount],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_ammo],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_clip_ammo],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_durability],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_scope],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_barrel],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_grip],
+						global.Inventory[# oDraw.var_slot, INDEX.slot_suppressor],
 						false
 					);
-					ItemAddWeight(Item.None, Id);
+					ItemAddWeight(ITEM.None, Id);
 					item_swap("description_button", OtherSlot.Armour);
 					#endregion
 				
@@ -148,8 +148,8 @@ if(global.gui_scale < 2){
 with(zui_create(description_position_x, description_position_y, objUILabel)){
 	zui_set_anchor(0, 0);
 	font = set_font("GUI_grid");
-	item_id = global.Inventory[#oDraw.var_slot, Index.slot_id];
+	item_id = global.Inventory[#oDraw.var_slot, INDEX.slot_id];
 	description = "Inventory";
 	color = c_white;
-	caption = global.ItemIndex[#global.Inventory[#oDraw.var_slot, Index.slot_id], ItemStat.Description];
+	caption = tr_desc(global.Inventory[#oDraw.var_slot, INDEX.slot_id]);
 }

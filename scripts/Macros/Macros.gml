@@ -1,9 +1,14 @@
 #macro BUY_TIME 60 * game_get_speed(gamespeed_fps)
 #macro ROUND_STARTING_MONEY 100
 #macro DILATATION_TIME 2.5 * game_get_speed(gamespeed_fps)
+#macro ADRENALINE_TIME 3 * game_get_speed(gamespeed_fps)
+#macro STEROID_TIME 5 * game_get_speed(gamespeed_fps)
+#macro ADRENALINE_MOD 1.25
+#macro STEROIDS_MOD 1.25
 #macro MENU_COLOR make_color_rgb(0, 76, 76)
 #macro DEFUSE_TIME 5 * game_get_speed(gamespeed_fps)
 #macro ROUND_END_TIMER 5 * game_get_speed(gamespeed_fps)
+#macro CAM_ACTIVE_TIME 15 * game_get_speed(gamespeed_fps)
 #macro ROUND_WIN_REWARD 200
 #macro PRONE_SPD .135
 #macro WALK_SPD .5
@@ -45,9 +50,9 @@
 #macro DEBUG_COLOR c_aqua
 #macro STAMINA_RUN_VALUE 0.5
 #macro LEG_MULTIPLIER 0.7
-#macro ARM_MULTIPLIER 0.9
-#macro BODY_MULTIPLIER 1.1
-#macro HEADSHOT_MULTIPLIER 4.1
+#macro ARM_MULTIPLIER 0.85
+#macro BODY_MULTIPLIER 1.0
+#macro HEADSHOT_MULTIPLIER 4.5
 #macro CAM view_camera[0]
 #macro AMBIENT_OFFSET 1.25
 #macro MAIN_COLOR make_color_rgb(255, 215, 0)

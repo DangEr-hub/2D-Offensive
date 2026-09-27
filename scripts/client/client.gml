@@ -123,8 +123,8 @@ function handle_machine_gun_sync_client() {
 			gun.stats.Ammo = buffer_read(receive_buffer, buffer_u16);
 			gun.stats.Clip_ammo = buffer_read(receive_buffer, buffer_u16);
 			if (gun.operator_pid == my_pid && instance_exists(global.local_player)) {
-				global.Inventory[# OtherSlot.Primary, Index.slot_ammo] = gun.stats.Ammo;
-				global.Inventory[# OtherSlot.Primary, Index.slot_clip_ammo] = gun.stats.Clip_ammo;
+				global.Inventory[# OtherSlot.Primary, INDEX.slot_ammo] = gun.stats.Ammo;
+				global.Inventory[# OtherSlot.Primary, INDEX.slot_clip_ammo] = gun.stats.Clip_ammo;
 			}
 			return;
 		}
@@ -150,7 +150,7 @@ function handle_machine_gun_sync_client() {
 			} else {
 				previous_operator.moving_state = STATES_PLAYER.none_state;
 				previous_operator.network_moving_state = STATES_PLAYER.none_state;
-				previous_operator.network_weapon_id = Item.None;
+				previous_operator.network_weapon_id = ITEM.None;
 			}
 		}
 
@@ -179,7 +179,7 @@ function handle_machine_gun_sync_client() {
 			player.target_y = player.y;
 			player.moving_state = STATES_PLAYER.machine_gun_state;
 			player.network_moving_state = STATES_PLAYER.machine_gun_state;
-			player.network_weapon_id = Item.basic_machine_gun;
+			player.network_weapon_id = ITEM.basic_machine_gun;
 			player.network_scope = scope;
 			player.network_barrel = barrel;
 			player.network_grip = grip;
@@ -298,7 +298,7 @@ function handle_item_action_client() {
 		var value = buffer_read(receive_buffer, buffer_f16);
 		var player = find_instance_by_network_id(oPlayer, pid);
 
-		if (item_id == Item.dilatation_pill) {
+		if (item_id == ITEM.dilatation_pill) {
 			global.time_step = .5;
 			if (instance_exists(global.local_player)) {
 				global.local_player.dilatation_timer = DILATATION_TIME;
@@ -308,18 +308,20 @@ function handle_item_action_client() {
 		if (!instance_exists(player)) return;
 
 		with (player) {
-			if (is_remote && item_id != Item.HealingKit) {
+			if (is_local && item_id == ITEM.adrenaline) adrenaline_timer = value;
+			if (is_local && item_id == ITEM.steroids) steroids_timer = value;
+			if (is_remote && item_id != ITEM.HealingKit) {
 				if (network_item_action_timer <= -1) network_item_use_restore_id = network_item_use_id;
 				network_item_use_id = item_id;
 				network_item_action_timer = 0.25 * game_get_speed(gamespeed_fps);
 			}
 
-			if (item_id == Item.HealingKit) {
+			if (item_id == ITEM.HealingKit) {
 				stats.Health_points = value;
 				stats.Damage_health_points = value;
 				Healing = false;
 				HealingTime = -1;
-				HealingItemId = Item.None;
+				HealingItemId = ITEM.None;
 				healing_pending = false;
 				healing_request_timer = 0;
 				CanShoot = true;
@@ -329,7 +331,7 @@ function handle_item_action_client() {
 				}
 			} else if (is_caliber_box_item(item_id)) {
 				if (is_local) {
-					global.Inventory[# WeaponID, Index.slot_clip_ammo] = round(value);
+					global.Inventory[# WeaponID, INDEX.slot_clip_ammo] = round(value);
 				}
 				if (amount > 0) {
 					damage_indicator("+" + string(round(amount)), x, y - 30, c_white, spr_Icons, ICON.ammo);
@@ -366,7 +368,7 @@ function handle_bomb_sync_client() {
 			with (local_player) {
 				if (planter_pid == network_id
 				&& planting_slot >= 0
-				&& global.Inventory[# planting_slot, Index.slot_id] == Item.Bomb) {
+				&& global.Inventory[# planting_slot, INDEX.slot_id] == ITEM.Bomb) {
 					ItemAmountSubstract(planting_slot, 1);
 				}
 				planting = false;
@@ -708,7 +710,8 @@ function handle_player_death_client() {
                 death_from_server = true;
                 death_attacker_pid = attacker_pid;
                 KilledByName = attacker_name;
-                KilledByWeapon = weapon_name;
+                KilledByWeapon = weapon_id > ITEM.None && weapon_id < ITEM.Total
+                    ? tr_name(weapon_id) : weapon_name;
             }
         }
     }
@@ -789,6 +792,8 @@ function handle_player_respawn_client() {
 			reset_hit_map(player);
             with (player) {
                 stats.Health_points = new_hp;
+				adrenaline_timer = -1;
+				steroids_timer = -1;
                 death_from_server = false;
                 death_attacker_pid = -1;
 				death_handled = false;
@@ -1239,7 +1244,7 @@ function handle_tick_update_client() {
 			with (tick_local_player) {
 				if (global.bomb_planter_pid == network_id
 				&& planting_slot >= 0
-				&& global.Inventory[# planting_slot, Index.slot_id] == Item.Bomb) {
+				&& global.Inventory[# planting_slot, INDEX.slot_id] == ITEM.Bomb) {
 					ItemAmountSubstract(planting_slot, 1);
 				}
 				planting = false;
@@ -1357,12 +1362,12 @@ function send_equipment_update_client() {
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         
         with (player) {
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Helmet, Index.slot_id]);
-            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Helmet, Index.slot_durability]);
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Armour, Index.slot_id]);
-            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Armour, Index.slot_durability]);
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Shield, Index.slot_id]);
-            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Shield, Index.slot_durability]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Helmet, INDEX.slot_id]);
+            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Helmet, INDEX.slot_durability]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Armour, INDEX.slot_id]);
+            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Armour, INDEX.slot_durability]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# OtherSlot.Shield, INDEX.slot_id]);
+            buffer_write(other.send_buffer, buffer_f16, global.Inventory[# OtherSlot.Shield, INDEX.slot_durability]);
         }
         
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
@@ -1381,13 +1386,13 @@ function send_weapon_update_client() {
         buffer_write(send_buffer, buffer_u32, send_sequence++);
         
         with (player) {
-            buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, Index.slot_id]);
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, Index.slot_scope]);
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, Index.slot_barrel]);
-            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, Index.slot_grip]);
-			buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, Index.slot_suppressor]);
-			buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, Index.slot_ammo]);
-			buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, Index.slot_clip_ammo]);
+            buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, INDEX.slot_id]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, INDEX.slot_scope]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, INDEX.slot_barrel]);
+            buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, INDEX.slot_grip]);
+			buffer_write(other.send_buffer, buffer_u8, global.Inventory[# WeaponID, INDEX.slot_suppressor]);
+			buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, INDEX.slot_ammo]);
+			buffer_write(other.send_buffer, buffer_u16, global.Inventory[# WeaponID, INDEX.slot_clip_ammo]);
 			write_weapon_slots_snapshot(other.send_buffer, WeaponID);
 		}
         
@@ -1401,15 +1406,15 @@ function write_weapon_slots_snapshot(target_buffer, active_slot) {
 	var weapon_slots = [OtherSlot.Primary, OtherSlot.Secondary];
 	for (var slot_index = 0; slot_index < array_length(weapon_slots); slot_index++) {
 		var slot = weapon_slots[slot_index];
-		buffer_write(target_buffer, buffer_u16, global.Inventory[# slot, Index.slot_id]);
-		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, Index.slot_scope]);
-		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, Index.slot_barrel]);
-		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, Index.slot_grip]);
-		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, Index.slot_suppressor]);
-		buffer_write(target_buffer, buffer_s16, global.Inventory[# slot, Index.slot_ammo]);
-		buffer_write(target_buffer, buffer_s16, global.Inventory[# slot, Index.slot_clip_ammo]);
-		buffer_write(target_buffer, buffer_f16, global.Inventory[# slot, Index.slot_durability]);
-		buffer_write(target_buffer, buffer_u16, global.Inventory[# slot, Index.SlotAmount]);
+		buffer_write(target_buffer, buffer_u16, global.Inventory[# slot, INDEX.slot_id]);
+		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, INDEX.slot_scope]);
+		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, INDEX.slot_barrel]);
+		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, INDEX.slot_grip]);
+		buffer_write(target_buffer, buffer_u8, global.Inventory[# slot, INDEX.slot_suppressor]);
+		buffer_write(target_buffer, buffer_s16, global.Inventory[# slot, INDEX.slot_ammo]);
+		buffer_write(target_buffer, buffer_s16, global.Inventory[# slot, INDEX.slot_clip_ammo]);
+		buffer_write(target_buffer, buffer_f16, global.Inventory[# slot, INDEX.slot_durability]);
+		buffer_write(target_buffer, buffer_u16, global.Inventory[# slot, INDEX.SlotAmount]);
 	}
 }
 
@@ -1419,9 +1424,9 @@ function write_weapon_inventory_snapshot(target_buffer, active_slot) {
 	var equipment_slots = [OtherSlot.Helmet, OtherSlot.Armour, OtherSlot.Shield];
 	for (var equipment_index = 0; equipment_index < array_length(equipment_slots); equipment_index++) {
 		var equipment_slot = equipment_slots[equipment_index];
-		buffer_write(target_buffer, buffer_u16, global.Inventory[# equipment_slot, Index.slot_id]);
-		buffer_write(target_buffer, buffer_f16, global.Inventory[# equipment_slot, Index.slot_durability]);
-		buffer_write(target_buffer, buffer_u16, global.Inventory[# equipment_slot, Index.SlotAmount]);
+		buffer_write(target_buffer, buffer_u16, global.Inventory[# equipment_slot, INDEX.slot_id]);
+		buffer_write(target_buffer, buffer_f16, global.Inventory[# equipment_slot, INDEX.slot_durability]);
+		buffer_write(target_buffer, buffer_u16, global.Inventory[# equipment_slot, INDEX.SlotAmount]);
 	}
 }
 
@@ -1458,7 +1463,7 @@ function send_tick_update_client() {
 			buffer_write(other.send_buffer, buffer_u8, moving_state);
 			buffer_write(other.send_buffer, buffer_u8, stats.Team);
 			buffer_write(other.send_buffer, buffer_f16, stats.Health_points);
-			buffer_write(other.send_buffer, buffer_bool, find_item(Item.DefuseKit) != -1);
+			buffer_write(other.send_buffer, buffer_bool, find_item(ITEM.DefuseKit) != -1);
 			buffer_write(other.send_buffer, buffer_u8, defusing_target);
         }
         
@@ -1485,7 +1490,7 @@ function send_heartbeat() {
 }
 
 function client_spawn_disconnected_weapon(drop_x, drop_y, item_id, ammo, clip_ammo, scope, barrel, grip, suppressor) {
-	if (item_id <= Item.None || item_id >= Item.Total) return noone;
+	if (item_id <= ITEM.None || item_id >= ITEM.Total) return noone;
 
 	var dropped_weapon = instance_create_layer(drop_x, drop_y, "ItemsO", oItems);
 	dropped_weapon.image_index = item_id;
@@ -1527,7 +1532,7 @@ function client_drop_cached_remote_weapon(pid) {
 		if (!ds_exists(player_data, ds_type_map)) return false;
 
 		var item_id = ds_map_find_value(player_data, "weapon_id");
-		if (is_undefined(item_id) || item_id <= Item.None || item_id >= Item.Total) return false;
+		if (is_undefined(item_id) || item_id <= ITEM.None || item_id >= ITEM.Total) return false;
 
 		var drop_x = ds_map_find_value(player_data, "x");
 		var drop_y = ds_map_find_value(player_data, "y");
@@ -1547,10 +1552,10 @@ function client_drop_cached_remote_weapon(pid) {
 		var suppressor = ds_map_find_value(player_data, "weapon_suppressor");
 		if (is_undefined(ammo)) ammo = -1;
 		if (is_undefined(clip_ammo)) clip_ammo = -1;
-		if (is_undefined(scope)) scope = Item.None;
-		if (is_undefined(barrel)) barrel = Item.None;
-		if (is_undefined(grip)) grip = Item.None;
-		if (is_undefined(suppressor)) suppressor = Item.None;
+		if (is_undefined(scope)) scope = ITEM.None;
+		if (is_undefined(barrel)) barrel = ITEM.None;
+		if (is_undefined(grip)) grip = ITEM.None;
+		if (is_undefined(suppressor)) suppressor = ITEM.None;
 
 		client_spawn_disconnected_weapon(drop_x, drop_y, item_id, ammo, clip_ammo, scope, barrel, grip, suppressor);
 		return true;

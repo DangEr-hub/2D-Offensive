@@ -1,12 +1,12 @@
 /// @description Insert description here
 // You can write your code in this editor
-item_variable = Item.None;
+item_variable = ITEM.None;
 buy_menu_description = noone;
 buy_menu = false;
 clickable = true;
 sprite_image_angle = 0;
 alpha_value = 0;
-alpha = global.GUIHUDAlpha * 3;
+alpha = global.gui_alpha * 3;
 healthbar = false;
 circular_bar = false;
 bar_value = 0;

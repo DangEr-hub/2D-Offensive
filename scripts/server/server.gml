@@ -127,9 +127,9 @@ function server_mount_machine_gun(pid, gun_x, gun_y) {
 
 		var player_data = server_get_player_state(pid);
 		var primary_id = ds_map_find_value(player_data, "primary_id");
-		if (pid == my_pid) primary_id = global.Inventory[# OtherSlot.Primary, Index.slot_id];
+		if (pid == my_pid) primary_id = global.Inventory[# OtherSlot.Primary, INDEX.slot_id];
 		if (is_undefined(primary_id)) primary_id = ds_map_find_value(player_data, "weapon_id");
-		if (!is_undefined(primary_id) && primary_id != Item.None) return false;
+		if (!is_undefined(primary_id) && primary_id != ITEM.None) return false;
 
 		gun.operator_pid = pid;
 		gun.stats.Object = player;
@@ -144,7 +144,7 @@ function server_mount_machine_gun(pid, gun_x, gun_y) {
 			player.target_y = player.y;
 			player.moving_state = STATES_PLAYER.machine_gun_state;
 			player.network_moving_state = STATES_PLAYER.machine_gun_state;
-			player.network_weapon_id = Item.basic_machine_gun;
+			player.network_weapon_id = ITEM.basic_machine_gun;
 			player.network_scope = gun.stats.Slot_scope;
 			player.network_barrel = gun.stats.Slot_barrel;
 			player.network_grip = gun.stats.Slot_grip;
@@ -155,14 +155,14 @@ function server_mount_machine_gun(pid, gun_x, gun_y) {
 		ds_map_set(player_data, "y", mount_pos[1]);
 		ds_map_set(player_data, "moving_state", STATES_PLAYER.machine_gun_state);
 		ds_map_set(player_data, "active_weapon_slot", OtherSlot.Primary);
-		ds_map_set(player_data, "weapon_id", Item.basic_machine_gun);
+		ds_map_set(player_data, "weapon_id", ITEM.basic_machine_gun);
 		ds_map_set(player_data, "weapon_scope", gun.stats.Slot_scope);
 		ds_map_set(player_data, "weapon_barrel", gun.stats.Slot_barrel);
 		ds_map_set(player_data, "weapon_grip", gun.stats.Slot_grip);
 		ds_map_set(player_data, "weapon_suppressor", gun.stats.Slot_suppressor);
 		ds_map_set(player_data, "weapon_ammo", gun.stats.Ammo);
 		ds_map_set(player_data, "weapon_clip_ammo", gun.stats.Clip_ammo);
-		ds_map_set(player_data, "primary_id", Item.basic_machine_gun);
+		ds_map_set(player_data, "primary_id", ITEM.basic_machine_gun);
 		ds_map_set(player_data, "primary_ammo", gun.stats.Ammo);
 		ds_map_set(player_data, "primary_clip_ammo", gun.stats.Clip_ammo);
 
@@ -190,16 +190,16 @@ function server_release_machine_gun(pid) {
 		} else if (instance_exists(player)) {
 			player.moving_state = STATES_PLAYER.none_state;
 			player.network_moving_state = STATES_PLAYER.none_state;
-			player.network_weapon_id = Item.None;
+			player.network_weapon_id = ITEM.None;
 		}
 
 		gun.stats.Object = noone;
 		gun.operator_pid = -1;
 		ds_map_set(player_data, "moving_state", STATES_PLAYER.none_state);
-		ds_map_set(player_data, "weapon_id", Item.None);
+		ds_map_set(player_data, "weapon_id", ITEM.None);
 		ds_map_set(player_data, "weapon_ammo", 0);
 		ds_map_set(player_data, "weapon_clip_ammo", 0);
-		ds_map_set(player_data, "primary_id", Item.None);
+		ds_map_set(player_data, "primary_id", ITEM.None);
 		ds_map_set(player_data, "primary_ammo", 0);
 		ds_map_set(player_data, "primary_clip_ammo", 0);
 
@@ -295,8 +295,8 @@ function handle_item_use_update_server(socket_key) {
 
 		var pid = ds_map_find_value(clients, socket_key);
 		var item_use_id = buffer_read(receive_buffer, buffer_u16);
-		if (item_use_id < Item.None || item_use_id >= Item.Total) {
-			item_use_id = Item.None;
+		if (item_use_id < ITEM.None || item_use_id >= ITEM.Total) {
+			item_use_id = ITEM.None;
 		}
 
 		var player_data = ds_map_find_value(player_states, pid);
@@ -361,9 +361,9 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 			var weapon_id = ds_map_find_value(player_data, "weapon_id");
 			var current_clip = ds_map_find_value(player_data, "weapon_clip_ammo");
 			if (is_undefined(weapon_id) || is_undefined(current_clip)) return false;
-			if (global.ItemIndex[# weapon_id, ItemStat.caliber_type] != global.ItemIndex[# item_id, ItemStat.caliber_type]) return false;
+			if (global.ItemIndex[# weapon_id, ITEMSTATS.caliber_type] != global.ItemIndex[# item_id, ITEMSTATS.caliber_type]) return false;
 
-			var amount = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
+			var amount = global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
 			var requested_clip = max(0, round(requested_value));
 			if (requested_clip < current_clip || requested_clip > current_clip + amount) return false;
 
@@ -379,7 +379,7 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 			return true;
 		}
 
-		if (item_id == Item.dilatation_pill) {
+		if (item_id == ITEM.dilatation_pill) {
 			global.time_step = .5;
 			if (instance_exists(global.local_player)) {
 				global.local_player.dilatation_timer = DILATATION_TIME;
@@ -393,7 +393,27 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 			return true;
 		}
 
-		if (item_id != Item.HealingKit) return false;
+		if (item_id == ITEM.adrenaline || item_id == ITEM.steroids) {
+			var effect_time;
+			if (item_id == ITEM.adrenaline) {
+				effect_time = ADRENALINE_TIME;
+				player.adrenaline_timer = effect_time;
+				ds_map_set(player_data, "adrenaline_until", current_time + effect_time * 1000 / game_get_speed(gamespeed_fps));
+			} else {
+				effect_time = STEROID_TIME;
+				player.steroids_timer = effect_time;
+				ds_map_set(player_data, "steroids_until", current_time + effect_time * 1000 / game_get_speed(gamespeed_fps));
+			}
+			if (player.is_remote) {
+				if (player.network_item_action_timer <= -1) player.network_item_use_restore_id = player.network_item_use_id;
+				player.network_item_use_id = item_id;
+				player.network_item_action_timer = 0.25 * game_get_speed(gamespeed_fps);
+			}
+			server_item_action_broadcast(pid, item_id, 0, effect_time);
+			return true;
+		}
+
+		if (item_id != ITEM.HealingKit) return false;
 
 		var state = ds_map_find_value(player_data, "state");
 		var hp = ds_map_find_value(player_data, "hp");
@@ -404,7 +424,7 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 		}
 
 		var max_hp = global.player_stats.Max_health;
-		var amount = max(0, min(global.ItemIndex[# Item.HealingKit, ItemStat.Damage], max_hp - hp));
+		var amount = max(0, min(global.ItemIndex[# ITEM.HealingKit, ITEMSTATS.Damage], max_hp - hp));
 		hp += amount;
 		ds_map_set(player_data, "hp", hp);
 		ds_map_set(player_data, "hp_regen_at", current_time + 500);
@@ -415,7 +435,7 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 			stats.Damage_health_points = hp;
 			Healing = false;
 			HealingTime = -1;
-			HealingItemId = Item.None;
+			HealingItemId = ITEM.None;
 			CanShoot = true;
 
 			if (amount > 0) {
@@ -458,13 +478,13 @@ function server_process_bomb_plant(planter_pid, plant_x, plant_y) {
 	if (point_distance(planter.x, planter.y, plant_x, plant_y) > 64) return false;
 	if (!position_in_bomb_area(planter.x, planter.y) || !position_in_bomb_area(plant_x, plant_y)) return false;
 
-	var equipped_item = Item.None;
+	var equipped_item = ITEM.None;
 	if (planter.is_local) {
-		equipped_item = global.Inventory[# planter.item_use_position, Index.slot_id];
+		equipped_item = global.Inventory[# planter.item_use_position, INDEX.slot_id];
 	} else {
-		equipped_item = server_player_state_value(planter_pid, "item_use_id", Item.None);
+		equipped_item = server_player_state_value(planter_pid, "item_use_id", ITEM.None);
 	}
-	if (equipped_item != Item.Bomb) return false;
+	if (equipped_item != ITEM.Bomb) return false;
 
 	global.bomb_planter_pid = planter_pid;
 	var bomb = instance_create_layer(plant_x, plant_y, "ItemsO", oBomb);
@@ -952,8 +972,8 @@ function send_stats_broadcast(){
 }
 
 function server_item_display_name(item_id) {
-	if (!is_undefined(item_id) && item_id > Item.None && item_id < Item.Total) {
-		return global.ItemIndex[# item_id, ItemStat.Name];
+	if (!is_undefined(item_id) && item_id > ITEM.None && item_id < ITEM.Total) {
+		return tr_name(item_id);
 	}
 
 	return "Unknown";
@@ -986,7 +1006,9 @@ function process_server_respawn(){
             ds_map_add(player_states, 0, player_data);
         }
 
-        ds_map_set(player_data, "hp", global.player_stats.Max_health);
+		ds_map_set(player_data, "hp", global.player_stats.Max_health);
+		ds_map_set(player_data, "adrenaline_until", 0);
+		ds_map_set(player_data, "steroids_until", 0);
 
         var p = find_instance_by_network_id(oPlayer, 0);		
 		var spawn_x = 0;
@@ -1002,6 +1024,8 @@ function process_server_respawn(){
 			reset_hit_map(p);
             with (p) {
                 stats.Health_points = global.player_stats.Max_health;
+				adrenaline_timer = -1;
+				steroids_timer = -1;
                 death_from_server = false;
                 death_attacker_pid = -1;
 				death_handled = false;
@@ -1066,6 +1090,8 @@ function handle_player_respawn_server(socket_key) {
         }
 
         ds_map_set(player_data, "hp", global.player_stats.Max_health);
+		ds_map_set(player_data, "adrenaline_until", 0);
+		ds_map_set(player_data, "steroids_until", 0);
 
         var player_obj = find_instance_by_network_id(oPlayer, pid);
         var spawn_x = server_player_state_value(pid, "x", 0);
@@ -1076,6 +1102,8 @@ function handle_player_respawn_server(socket_key) {
 			reset_hit_map(player_obj);
             with (player_obj) {
                 stats.Health_points = global.player_stats.Max_health;
+				adrenaline_timer = -1;
+				steroids_timer = -1;
                 death_from_server = false;
                 death_attacker_pid = -1;
 				death_handled = false;
@@ -1119,29 +1147,29 @@ function server_get_player_state(pid) {
 
 function server_valid_weapon_id(item_id) {
     if (is_undefined(item_id)) return false;
-    return (item_id > Item.None && item_id < Item.Total && global.ItemIndex[# item_id, ItemStat.Type] == "Weapon");
+    return (item_id > ITEM.None && item_id < ITEM.Total && global.ItemIndex[# item_id, ITEMSTATS.Type] == "Weapon");
 }
 
 function server_valid_server_damage_item(item_id) {
-    if (is_undefined(item_id) || item_id <= Item.None || item_id >= Item.Total) return false;
+    if (is_undefined(item_id) || item_id <= ITEM.None || item_id >= ITEM.Total) return false;
 
-    var item_type = global.ItemIndex[# item_id, ItemStat.Type];
-	return (item_type == "Weapon" || item_type == "Grenade" || item_type == "Landmine" || item_id == Item.Bomb);
+    var item_type = global.ItemIndex[# item_id, ITEMSTATS.Type];
+	return (item_type == "Weapon" || item_type == "Grenade" || item_type == "Landmine" || item_id == ITEM.Bomb);
 }
 
 function server_reload_duration_ms(item_id) {
-    return max(1, global.ItemIndex[# item_id, ItemStat.ReloadSpeed]) * (1000 / game_get_speed(gamespeed_fps));
+    return max(1, global.ItemIndex[# item_id, ITEMSTATS.ReloadSpeed]) * (1000 / game_get_speed(gamespeed_fps));
 }
 
 function server_shoot_interval_ms(pid, item_id) {
     var adaptive = 1;
-    var barrel = server_player_state_value(pid, "weapon_barrel", Item.None);
-    if (barrel != Item.None) {
-        adaptive = global.ItemIndex[# barrel, ItemStat.ShootTimer];
+    var barrel = server_player_state_value(pid, "weapon_barrel", ITEM.None);
+    if (barrel != ITEM.None) {
+        adaptive = global.ItemIndex[# barrel, ITEMSTATS.ShootTimer];
     }
 
-    var interval_frames = max(1, global.ItemIndex[# item_id, ItemStat.ShootTimer] * adaptive);
-    var shooting_modes = global.ItemIndex[# item_id, ItemStat.ShootingMode];
+    var interval_frames = max(1, global.ItemIndex[# item_id, ITEMSTATS.ShootTimer] * adaptive);
+    var shooting_modes = global.ItemIndex[# item_id, ITEMSTATS.ShootingMode];
     if (!is_undefined(shooting_modes) && ds_exists(shooting_modes, ds_type_list) && ds_list_find_index(shooting_modes, "Burst") != -1) {
         interval_frames = min(interval_frames, max(interval_frames / 2, 5));
     }
@@ -1152,7 +1180,7 @@ function server_shoot_interval_ms(pid, item_id) {
 function server_complete_reload(player_data, item_id, pid = -1) {
     if (!server_valid_weapon_id(item_id)) return;
 
-    var max_ammo = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
+    var max_ammo = global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
     if (max_ammo <= 0) return;
 
     var ammo = ds_map_find_value(player_data, "weapon_ammo");
@@ -1164,7 +1192,7 @@ function server_complete_reload(player_data, item_id, pid = -1) {
     clip_ammo = max(clip_ammo, 0);
 
     if (ammo < max_ammo && clip_ammo > 0) {
-        if (global.ItemIndex[# item_id, ItemStat.BaseDurability] != 1) {
+        if (global.ItemIndex[# item_id, ITEMSTATS.BaseDurability] != 1) {
             var ammo_needed = max_ammo - ammo;
             var ammo_loaded = min(ammo_needed, clip_ammo);
             ammo += ammo_loaded;
@@ -1179,7 +1207,7 @@ function server_complete_reload(player_data, item_id, pid = -1) {
     ds_map_set(player_data, "weapon_clip_ammo", clip_ammo);
     ds_map_set(player_data, "weapon_reloading", false);
     ds_map_set(player_data, "weapon_reload_until", -1);
-	if (item_id == Item.basic_machine_gun && pid >= 0) {
+	if (item_id == ITEM.basic_machine_gun && pid >= 0) {
 		server_machine_gun_ammo_changed(pid, ammo, clip_ammo);
 	}
 }
@@ -1203,7 +1231,7 @@ function server_update_reload_state(pid, state_flags) {
         }
 
         if (is_reloading_client) {
-            var max_ammo = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
+            var max_ammo = global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
             var ammo = ds_map_find_value(player_data, "weapon_ammo");
             var clip_ammo = ds_map_find_value(player_data, "weapon_clip_ammo");
             if (is_undefined(ammo)) ammo = max_ammo;
@@ -1213,7 +1241,7 @@ function server_update_reload_state(pid, state_flags) {
                 ds_map_set(player_data, "weapon_reloading", true);
                 ds_map_set(player_data, "weapon_reload_until", current_time + server_reload_duration_ms(item_id));
             }
-        } else if (is_reloading_server && item_id != Item.basic_machine_gun) {
+        } else if (is_reloading_server && item_id != ITEM.basic_machine_gun) {
             ds_map_set(player_data, "weapon_reloading", false);
             ds_map_set(player_data, "weapon_reload_until", -1);
         }
@@ -1238,7 +1266,8 @@ function server_register_projectile(pid, projectile_id, item_id) {
             owner_pid: pid,
             item_id: item_id,
             created_at: current_time,
-            hits: 0
+            hits: 0,
+            steroids_multiplier: server_player_state_value(pid, "steroids_until", 0) > current_time ? STEROIDS_MOD : 1
         });
 
         return true;
@@ -1248,19 +1277,19 @@ function server_register_projectile(pid, projectile_id, item_id) {
 function server_validate_projectile_spawn(pid, projectile_id, item_id) {
     with (oNetworkManager) {
         if (!server_valid_weapon_id(item_id)) return false;
-        if (global.ItemIndex[# item_id, ItemStat.MaxAmmo] == -1) return false;
+        if (global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo] == -1) return false;
         if (ds_map_exists(projectiles_seen, projectile_id)) return false;
 
 		var mounted_gun = find_machine_gun_by_pid(pid);
-		if (item_id == Item.basic_machine_gun && !instance_exists(mounted_gun)) return false;
-		if (instance_exists(mounted_gun) && item_id != Item.basic_machine_gun) return false;
+		if (item_id == ITEM.basic_machine_gun && !instance_exists(mounted_gun)) return false;
+		if (instance_exists(mounted_gun) && item_id != ITEM.basic_machine_gun) return false;
 
         var player_data = server_get_player_state(pid);
         var hp = ds_map_find_value(player_data, "hp");
         if (!is_undefined(hp) && hp <= 0) return false;
 
         var state_weapon = ds_map_find_value(player_data, "weapon_id");
-        if (is_undefined(state_weapon) || state_weapon == Item.None) {
+        if (is_undefined(state_weapon) || state_weapon == ITEM.None) {
             ds_map_set(player_data, "weapon_id", item_id);
         } else if (state_weapon != item_id) {
             return false;
@@ -1274,7 +1303,7 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
         if (is_undefined(is_reloading)) is_reloading = false;
 
 		if (is_reloading) {
-			if (global.ItemIndex[# item_id, ItemStat.BaseDurability] == 1) {
+			if (global.ItemIndex[# item_id, ITEMSTATS.BaseDurability] == 1) {
                 ds_map_set(player_data, "weapon_reloading", false);
                 ds_map_set(player_data, "weapon_reload_until", -1);
             } else {
@@ -1282,7 +1311,7 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
             }
         }
 
-        var bullet_count = global.ItemIndex[# item_id, ItemStat.Bullets];
+        var bullet_count = global.ItemIndex[# item_id, ITEMSTATS.Bullets];
         var pellet_until = ds_map_find_value(player_data, "shot_pellet_window_until");
         var pellet_item = ds_map_find_value(player_data, "shot_pellet_item");
         if (bullet_count > 1 && !is_undefined(pellet_until) && !is_undefined(pellet_item) && current_time <= pellet_until && pellet_item == item_id) {
@@ -1294,7 +1323,7 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
             return false;
         }
 
-        var max_ammo = global.ItemIndex[# item_id, ItemStat.MaxAmmo];
+        var max_ammo = global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
         var ammo = ds_map_find_value(player_data, "weapon_ammo");
         var clip_ammo = ds_map_find_value(player_data, "weapon_clip_ammo");
         if (is_undefined(ammo)) ammo = max_ammo;
@@ -1312,7 +1341,7 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
         ds_map_set(player_data, "next_shot_at", current_time + server_shoot_interval_ms(pid, item_id));
         ds_map_set(player_data, "shot_pellet_window_until", bullet_count > 1 ? current_time + 80 : current_time);
         ds_map_set(player_data, "shot_pellet_item", item_id);
-		if (item_id == Item.basic_machine_gun) {
+		if (item_id == ITEM.basic_machine_gun) {
 			server_machine_gun_ammo_changed(pid, ammo, max(clip_ammo, 0));
 		}
 
@@ -1322,7 +1351,7 @@ function server_validate_projectile_spawn(pid, projectile_id, item_id) {
 
 function server_validate_hit_projectile(attacker_pid, projectile_id, weapon_id) {
     with (oNetworkManager) {
-        if (server_valid_weapon_id(weapon_id) && global.ItemIndex[# weapon_id, ItemStat.WeaponTypeClass] == WEAPON_CLASS.KNIFE) {
+        if (server_valid_weapon_id(weapon_id) && global.ItemIndex[# weapon_id, ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.KNIFE) {
             return true;
         }
 
@@ -1827,7 +1856,7 @@ function server_drop_disconnected_inventory(player_data, drop_x, drop_y) {
 	for (var slot_index = 0; slot_index < array_length(slot_prefixes); slot_index++) {
 		var prefix = slot_prefixes[slot_index];
 		var item_id = ds_map_find_value(player_data, prefix + "_id");
-		if (!is_undefined(item_id) && item_id > Item.None && item_id < Item.Total) {
+		if (!is_undefined(item_id) && item_id > ITEM.None && item_id < ITEM.Total) {
 			var ammo = ds_map_find_value(player_data, prefix + "_ammo");
 			var clip_ammo = ds_map_find_value(player_data, prefix + "_clip_ammo");
 			var durability = ds_map_find_value(player_data, prefix + "_durability");
@@ -1854,7 +1883,7 @@ function server_drop_disconnected_inventory(player_data, drop_x, drop_y) {
 	for (var equipment_index = 0; equipment_index < array_length(equipment_keys); equipment_index++) {
 		var equipment_key = equipment_keys[equipment_index];
 		var equipment_id = ds_map_find_value(player_data, equipment_key + "_id");
-		if (!is_undefined(equipment_id) && equipment_id > Item.None && equipment_id < Item.Total) {
+		if (!is_undefined(equipment_id) && equipment_id > ITEM.None && equipment_id < ITEM.Total) {
 			var equipment_durability = ds_map_find_value(player_data, equipment_key + "_dur");
 			var equipment_amount = ds_map_find_value(player_data, equipment_key + "_amount");
 			if (is_undefined(equipment_durability)) equipment_durability = -1;
@@ -2034,7 +2063,7 @@ function handle_weapon_update_server(socket_id) {
 
 		var mounted_gun = find_machine_gun_by_pid(pid);
 		if (instance_exists(mounted_gun)) {
-			weapon_id = Item.basic_machine_gun;
+			weapon_id = ITEM.basic_machine_gun;
 			weapon_scope = mounted_gun.stats.Slot_scope;
 			weapon_barrel = mounted_gun.stats.Slot_barrel;
 			weapon_grip = mounted_gun.stats.Slot_grip;
@@ -2096,11 +2125,11 @@ function send_weapon_broadcast() {
 			var weapon_ammo = ds_map_find_value(player_data, "weapon_ammo");
 			var weapon_clip_ammo = ds_map_find_value(player_data, "weapon_clip_ammo");
 
-            if (is_undefined(weapon_id)) weapon_id = Item.None;
-            if (is_undefined(weapon_scope)) weapon_scope = Item.None;
-            if (is_undefined(weapon_barrel)) weapon_barrel = Item.None;
-            if (is_undefined(weapon_grip)) weapon_grip = Item.None;
-			if (is_undefined(weapon_suppressor)) weapon_suppressor = Item.None;
+            if (is_undefined(weapon_id)) weapon_id = ITEM.None;
+            if (is_undefined(weapon_scope)) weapon_scope = ITEM.None;
+            if (is_undefined(weapon_barrel)) weapon_barrel = ITEM.None;
+            if (is_undefined(weapon_grip)) weapon_grip = ITEM.None;
+			if (is_undefined(weapon_suppressor)) weapon_suppressor = ITEM.None;
 			if (is_undefined(weapon_ammo)) weapon_ammo = 0;
 			if (is_undefined(weapon_clip_ammo)) weapon_clip_ammo = 0;
 
@@ -2286,7 +2315,7 @@ function server_round_end_broadcast(winning_team) {
 	}
 }
 
-function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_type, impact_pos, weapon_id, penetration_damage, shot_start, allow_server_damage_item = false) {
+function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_type, impact_pos, weapon_id, penetration_damage, shot_start, allow_server_damage_item = false, projectile_id = -1) {
 	var result = {
 		damage: 0,
 		hit_spd_mod: 1,
@@ -2294,15 +2323,15 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 		equip_dur: [0, 0, 0]
 	};
 
-	if (weapon_id < 0 || weapon_id >= Item.Total) {
+	if (weapon_id < 0 || weapon_id >= ITEM.Total) {
 		return result;
 	}
 
 	weapon_id = floor(weapon_id);
 	penetration_damage = clamp(penetration_damage, 0, 100);
 
-	var item_type = global.ItemIndex[# weapon_id, ItemStat.Type];
-	if (weapon_id == Item.None || (item_type != "Weapon" && !(allow_server_damage_item && server_valid_server_damage_item(weapon_id)))) {
+	var item_type = global.ItemIndex[# weapon_id, ITEMSTATS.Type];
+	if (weapon_id == ITEM.None || (item_type != "Weapon" && !(allow_server_damage_item && server_valid_server_damage_item(weapon_id)))) {
 		return result;
 	}
 
@@ -2314,22 +2343,26 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 	var helmet_dur = server_player_state_value(victim_pid, "helmet_dur", victim_obj.network_helmet_dur);
 	var shield_dur = server_player_state_value(victim_pid, "shield_dur", victim_obj.network_shield_dur);
 
-	var suppressor_id = server_player_state_value(attacker_pid, "weapon_suppressor", Item.None);
+	var suppressor_id = server_player_state_value(attacker_pid, "weapon_suppressor", ITEM.None);
 	var suppressor_multiplier = 1;
-	if (item_type == "Weapon" && suppressor_id != Item.None) {
-		suppressor_multiplier = global.ItemIndex[# suppressor_id, ItemStat.Defense];
+	if (item_type == "Weapon" && suppressor_id != ITEM.None) {
+		suppressor_multiplier = global.ItemIndex[# suppressor_id, ITEMSTATS.Defense];
 	}
 
 	var attacker_x = server_player_state_value(attacker_pid, "x", shot_start[0]);
 	var attacker_y = server_player_state_value(attacker_pid, "y", shot_start[1]);
-	if (weapon_id == Item.Bomb || weapon_id == Item.MolotovGrenade) {
+	if (weapon_id == ITEM.Bomb || weapon_id == ITEM.MolotovGrenade) {
 		attacker_x = shot_start[0];
 		attacker_y = shot_start[1];
 	}
 	var shot_distance = point_distance(attacker_x, attacker_y, impact_pos[0], impact_pos[1]);
-	var penetration_power = global.ItemIndex[# weapon_id, ItemStat.PenetrationPower];
-	var damage = global.ItemIndex[# weapon_id, ItemStat.Damage] * suppressor_multiplier;
-	damage = damage * global.ItemIndex[# weapon_id, ItemStat.damage_drop](shot_distance) / (penetration_damage + 1);
+	var penetration_power = global.ItemIndex[# weapon_id, ITEMSTATS.PenetrationPower];
+	var damage = global.ItemIndex[# weapon_id, ITEMSTATS.Damage] * suppressor_multiplier;
+	if (item_type == "Weapon" && projectile_id >= 0 && ds_map_exists(oNetworkManager.projectiles_seen, projectile_id)) {
+		var projectile_data = ds_map_find_value(oNetworkManager.projectiles_seen, projectile_id);
+		damage *= projectile_data.steroids_multiplier;
+	}
+	damage = damage * global.ItemIndex[# weapon_id, ITEMSTATS.damage_drop](shot_distance) / (penetration_damage + 1);
 
 	var aim_punch_modifier = clamp(penetration_power / (penetration_damage + 1), 0, 1);
 
@@ -2340,14 +2373,14 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 		damage_multiplier = ARM_MULTIPLIER;
 	} else if (hitbox_type >= HITBOX.BodyNoWeapon) {
 		damage_multiplier = BODY_MULTIPLIER;
-		if (armour_dur > 0 && global.ItemIndex[# armour_id, ItemStat.Defense] <= .95) {
-			damage = damage * global.ItemIndex[# armour_id, ItemStat.Defense] * penetration_power;
+		if (armour_dur > 0 && global.ItemIndex[# armour_id, ITEMSTATS.Defense] <= .95) {
+			damage = damage * global.ItemIndex[# armour_id, ITEMSTATS.Defense] * penetration_power;
 			aim_punch_modifier *= .1;
 		}
 	} else if (hitbox_type >= HITBOX.Head) {
 		damage_multiplier = HEADSHOT_MULTIPLIER;
-		if (helmet_dur > 0 && global.ItemIndex[# helmet_id, ItemStat.Defense] <= .95) {
-			damage = damage * global.ItemIndex[# helmet_id, ItemStat.Defense] * penetration_power;
+		if (helmet_dur > 0 && global.ItemIndex[# helmet_id, ITEMSTATS.Defense] <= .95) {
+			damage = damage * global.ItemIndex[# helmet_id, ITEMSTATS.Defense] * penetration_power;
 			aim_punch_modifier *= .1;
 		}
 	}
@@ -2358,26 +2391,30 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 	var shield_modifier = 1;
 	var victim_weapon_id = server_player_state_value(victim_pid, "weapon_id", victim_obj.network_weapon_id);
 	var shield_equipped = victim_obj.shield_equip;
-	if (victim_weapon_id != Item.None && global.ItemIndex[# victim_weapon_id, ItemStat.Type] == "Shield") {
+	if (victim_weapon_id != ITEM.None && global.ItemIndex[# victim_weapon_id, ITEMSTATS.Type] == "Shield") {
 		shield_equipped = true;
 	}
 	if (shield_equipped && shield_dur > 0) {
-		shield_modifier = global.ItemIndex[# shield_id, ItemStat.Defense];
+		shield_modifier = global.ItemIndex[# shield_id, ITEMSTATS.Defense];
 	}
 
 	var final_damage = ceil(damage * damage_multiplier * (global.hard_mode == true ? 2 : 1) * shield_modifier);
 	final_damage = clamp(final_damage, 0, server_max_damage_per_hit);
+	if (final_damage < 5) {
+		result.aimpunch_modifier = 0;
+		result.hit_spd_mod = 1;
+	}
 
 	if (shield_equipped && shield_dur > 0) {
-		shield_dur = max(shield_dur - (final_damage / 50 / global.ItemIndex[# shield_id, ItemStat.Defense]), 0);
+		shield_dur = max(shield_dur - (final_damage / 50 / global.ItemIndex[# shield_id, ITEMSTATS.Defense]), 0);
 	}
 
 	if (hitbox_type > HITBOX.HeadProne) {
-		if (global.ItemIndex[# armour_id, ItemStat.Defense] <= .95 && armour_dur > 0 && hitbox_type < HITBOX.ArmNoWeapon) {
-			armour_dur = max(armour_dur - (final_damage / 50 / global.ItemIndex[# armour_id, ItemStat.Defense]), 0);
+		if (global.ItemIndex[# armour_id, ITEMSTATS.Defense] <= .95 && armour_dur > 0 && hitbox_type < HITBOX.ArmNoWeapon) {
+			armour_dur = max(armour_dur - (final_damage / 50 / global.ItemIndex[# armour_id, ITEMSTATS.Defense]), 0);
 		}
-	} else if (global.ItemIndex[# helmet_id, ItemStat.Defense] <= .95 && helmet_dur > 0) {
-		helmet_dur = max(helmet_dur - (final_damage / 50 / global.ItemIndex[# helmet_id, ItemStat.Defense]), 0);
+	} else if (global.ItemIndex[# helmet_id, ITEMSTATS.Defense] <= .95 && helmet_dur > 0) {
+		helmet_dur = max(helmet_dur - (final_damage / 50 / global.ItemIndex[# helmet_id, ITEMSTATS.Defense]), 0);
 	}
 
 	result.damage = final_damage;
@@ -2392,7 +2429,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (!instance_exists(victim_obj)) return;
 
-		if (weapon_id != Item.Bomb && weapon_id != Item.MolotovGrenade) {
+		if (weapon_id != ITEM.Bomb && weapon_id != ITEM.MolotovGrenade) {
 			var attacker_data = ds_map_find_value(player_states, attacker_pid);
 			if (!is_undefined(attacker_data)) {
 				var attacker_hp = ds_map_find_value(attacker_data, "hp");
@@ -2416,7 +2453,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         }
         if (current_hp <= 0) return;
 
-		var server_hit = server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_type, impact_pos, weapon_id, penetration_damage, shot_start, server_local_authority);
+		var server_hit = server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_type, impact_pos, weapon_id, penetration_damage, shot_start, server_local_authority, projectile_id);
 		var damage = server_hit.damage;
 		var hit_spd_mod = server_hit.hit_spd_mod;
 		var aimpunch_modifier = server_hit.aimpunch_modifier;
@@ -2549,7 +2586,7 @@ function handle_object_sync_server(socket_id) {
 				var amount  = buffer_read(receive_buffer, buffer_u16);
 
 				if (o_index != oItems) return;
-				if (item_id <= Item.None || item_id >= Item.Total) return;
+				if (item_id <= ITEM.None || item_id >= ITEM.Total) return;
 				if (amount <= 0) return;
 
 				var requester_pid = ds_map_find_value(clients, socket_id);
@@ -2719,14 +2756,14 @@ function handle_init_sync_server(socket_id) {
             if (is_undefined(armour_dur)) armour_dur = 0;
             if (is_undefined(shield_id))  shield_id  = 0;
             if (is_undefined(shield_dur)) shield_dur = 0;
-            if (is_undefined(weapon_id)) weapon_id = Item.None;
-            if (is_undefined(weapon_scope)) weapon_scope = Item.None;
-            if (is_undefined(weapon_barrel)) weapon_barrel = Item.None;
-            if (is_undefined(weapon_grip)) weapon_grip = Item.None;
-			if (is_undefined(weapon_suppressor)) weapon_suppressor = Item.None;
+            if (is_undefined(weapon_id)) weapon_id = ITEM.None;
+            if (is_undefined(weapon_scope)) weapon_scope = ITEM.None;
+            if (is_undefined(weapon_barrel)) weapon_barrel = ITEM.None;
+            if (is_undefined(weapon_grip)) weapon_grip = ITEM.None;
+			if (is_undefined(weapon_suppressor)) weapon_suppressor = ITEM.None;
 			if (is_undefined(weapon_ammo)) weapon_ammo = 0;
 			if (is_undefined(weapon_clip_ammo)) weapon_clip_ammo = 0;
-			if (is_undefined(item_use_id)) item_use_id = Item.None;
+			if (is_undefined(item_use_id)) item_use_id = ITEM.None;
 
             buffer_write(send_buffer, buffer_u8, pid);
             buffer_write(send_buffer, buffer_u8, helmet_id);

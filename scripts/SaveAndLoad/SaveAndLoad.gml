@@ -47,6 +47,7 @@ function save_game(){
 	ini_write_real("Vars", "crosshair_scale", global.crosshair_scale);
 	ini_write_string("Network", "server_ip", global.saved_server_ip);
 	ini_write_real("Vars", "saturation_shader", global.saturation_shader);
+	ini_write_string("Language", "language", global.language);
 	
 	for (var i = 0; i < array_length(global.map_rounds); i++) {
 	    for (var j = 0; j < array_length(global.map_rounds[i]); j++) {
@@ -143,6 +144,7 @@ function load_game(){
 	global.saved_server_ip = "127.0.0.1";
 	global.clear_particles_timer = 10 * game_get_speed(gamespeed_fps);
 	global.saturation_shader = true;
+	global.language = "en";
 	
 	#region Load game
 	if(file_exists("save_game.ini")){
@@ -173,6 +175,7 @@ function load_game(){
 		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
 		global.saved_server_ip = ini_read_string("Network", "server_ip", global.saved_server_ip);
 		global.saturation_shader = ini_read_real("Vars", "saturation_shader", global.saturation_shader);
+		global.language = ini_read_string("Language", "language", global.language);
 		window_set_fullscreen(ini_read_real("Vars", "windowed", true));
 		
 		global.map_rounds = array_create(MAP.Total);
@@ -208,14 +211,14 @@ function load_game(){
 	#region Load inventory
 	if(file_exists("save_inventory.ini")){
 	    ini_open("save_inventory.ini");
-	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "Inventory", Item.None));
-	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "Mouse", Item.None));
+	    ds_grid_read(global.Inventory, ini_read_string("Inventory", "Inventory", ITEM.None));
+	    ds_grid_read(global.MouseSlot, ini_read_string("Inventory", "Mouse", ITEM.None));
 		var unlocked = ds_list_create();
-		ds_list_read(unlocked, ini_read_string("Inventory", "UnlockedItems", Item.None));
+		ds_list_read(unlocked, ini_read_string("Inventory", "UnlockedItems", ITEM.None));
 
 		for(var i = 0; i < ds_list_size(unlocked); i++){
 			var item_id = unlocked[| i];
-			global.ItemIndex[# item_id, ItemStat.is_locked] = false;
+			global.ItemIndex[# item_id, ITEMSTATS.is_locked] = false;
 			if(ds_list_find_index(global.unlocked_items, item_id) == -1){
 				ds_list_add(global.unlocked_items, item_id);
 			}
@@ -242,18 +245,18 @@ function load_game(){
 	    var json_string = file_text_read_string(file);
 	    file_text_close(file);
 	    global.built_upgrades = json_parse(json_string);
-		for (var i = 0; i < Item.Total; i++) {
-		        if (global.ItemIndex[# i, ItemStat.Type] == "Weapon") {
+		for (var i = 0; i < ITEM.Total; i++) {
+		        if (global.ItemIndex[# i, ITEMSTATS.Type] == "Weapon") {
 		            var upgs = global.built_upgrades[$ string(i)];
 		            if (upgs == undefined) continue;
             
 		            // Aplikujeme upgrady pouze pokud jsou ve structu nastaveny na true
-		            if (upgs.ammo)        global.ItemIndex[# i, ItemStat.MaxAmmo]          = round(global.ItemIndex[# i, ItemStat.BaseMaxAmmo] * AMMO_UPG);
-		            if (upgs.reload)      global.ItemIndex[# i, ItemStat.ReloadSpeed]      = global.ItemIndex[# i, ItemStat.BaseReloadSpeed] * RELOAD_UPG;
-		            if (upgs.equip)       global.ItemIndex[# i, ItemStat.EquipTime]        = global.ItemIndex[# i, ItemStat.BaseEquipTime] * EQUIP_UPG;
-		            if (upgs.movement)    global.ItemIndex[# i, ItemStat.MovingSpdMul]     = min(global.ItemIndex[# i, ItemStat.BaseMovingSpdMul] * MV_UPG, 1);
-		            if (upgs.penetration) global.ItemIndex[# i, ItemStat.PenetrationPower]  = min(global.ItemIndex[# i, ItemStat.BasePenetrationPower] * PEN_UPG, 1);
-		            if (upgs.damage)      global.ItemIndex[# i, ItemStat.Damage]           = global.ItemIndex[# i, ItemStat.BaseDamage] * DMG_UPG;
+		            if (upgs.ammo)        global.ItemIndex[# i, ITEMSTATS.MaxAmmo]          = round(global.ItemIndex[# i, ITEMSTATS.BaseMaxAmmo] * AMMO_UPG);
+		            if (upgs.reload)      global.ItemIndex[# i, ITEMSTATS.ReloadSpeed]      = global.ItemIndex[# i, ITEMSTATS.BaseReloadSpeed] * RELOAD_UPG;
+		            if (upgs.equip)       global.ItemIndex[# i, ITEMSTATS.EquipTime]        = global.ItemIndex[# i, ITEMSTATS.BaseEquipTime] * EQUIP_UPG;
+		            if (upgs.movement)    global.ItemIndex[# i, ITEMSTATS.MovingSpdMul]     = min(global.ItemIndex[# i, ITEMSTATS.BaseMovingSpdMul] * MV_UPG, 1);
+		            if (upgs.penetration) global.ItemIndex[# i, ITEMSTATS.PenetrationPower]  = min(global.ItemIndex[# i, ITEMSTATS.BasePenetrationPower] * PEN_UPG, 1);
+		            if (upgs.damage)      global.ItemIndex[# i, ITEMSTATS.Damage]           = global.ItemIndex[# i, ITEMSTATS.BaseDamage] * DMG_UPG;
 		        }
 		    }
 	}

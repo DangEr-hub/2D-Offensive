@@ -7,6 +7,8 @@ function console_create() {
 	global.console[? "cursor"] = 0;
 	global.console[? "close"] = false;
 	global.console[? "history"] = ds_list_create();
+	global.console[? "input_history"] = ds_list_create();
+	global.console[? "input_select"] = 0;
 	global.console[? "select"] = 0;
 	global.console[? "preset"] = false;
 	global.console[? "dir"] = -1;
@@ -14,6 +16,10 @@ function console_create() {
 	global.console[? "string_pos"] = 1;
 	global.console[? "text"] = noone;
 	global.console[? "suggestions"] = noone;
+	global.console[? "terminal_mode"] = false;
+	global.console[? "backspace_hold"] = 0;
+	global.console[? "left_hold"] = 0;
+	global.console[? "right_hold"] = 0;
 
 	return global.console;
 
