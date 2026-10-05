@@ -13,5 +13,5 @@ if(other.stats.Tracer_image == 2){
 	BloodParticleNumber = 1;
 }
 
-create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
+create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber, (other.direction + 180) mod 360);
 play_sound(other.x, other.y, bullet_hit, other.stats.Object);

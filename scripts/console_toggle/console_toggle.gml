@@ -5,6 +5,7 @@ function console_toggle(argument0) {
 	keyboard_string = "";
 
 	if !c[? "active"]{
+	    console_selection_clear(c);
 	    var sfc_w = surface_get_width(application_surface);
 	    var sfc_h = surface_get_height(application_surface);
 	    var sfc = surface_create(sfc_w,sfc_h);
@@ -21,6 +22,7 @@ function console_toggle(argument0) {
 	    c[? "bg"] = bg;
 	    c[? "active"] = true;
 	}else{
+	    console_selection_clear(c);
 	    c[? "active"] = false;
 	    c[? "select"] = 0;
 	    c[? "string"] = "";

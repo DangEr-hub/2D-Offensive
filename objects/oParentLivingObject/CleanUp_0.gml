@@ -1,4 +1,7 @@
 event_inherited();
+if(surface_exists(body_surface)){
+	surface_free(body_surface);
+}
 if(infra_vision_light != undefined){
 	infra_vision_light.Destroy();
 }

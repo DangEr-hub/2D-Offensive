@@ -69,7 +69,7 @@ if (is_server) {
 				if(walking){ bit_states |= PLAYER_FLAGS.WALKING; }
 				if(running){ bit_states |= PLAYER_FLAGS.RUNNING; }
 				ds_map_set(data, "state",  bit_states);
-				ds_map_set(data, "defuse_has_kit", find_item(ITEM.DefuseKit) != -1);
+				ds_map_set(data, "defuse_has_kit", find_item(ITEM.defuse_kit) != -1);
 				var previous_defusing_target = ds_map_find_value(data, "defusing_target");
 				if (!is_undefined(previous_defusing_target) && previous_defusing_target != defusing_target) {
 					ds_map_set(data, "defusing_time", 0);

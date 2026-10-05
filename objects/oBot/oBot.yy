@@ -39,6 +39,9 @@
   "properties": [],
   "solid": false,
   "spriteId": null,
-  "spriteMaskId": null,
+  "spriteMaskId": {
+    "name": "spr_BotMask",
+    "path": "sprites/spr_BotMask/spr_BotMask.yy",
+  },
   "visible": true,
 }

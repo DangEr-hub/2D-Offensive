@@ -3,22 +3,23 @@ if(!instance_exists(global.local_player) || global.local_player.stats.Health_poi
 	exit;
 }
 
-if(instance_exists(oGameController) && oGameController.round_ended) exit;
-
-var living_bot_found = false;
-for(var bot_index = 0; bot_index < array_length(candidate_bots); bot_index++){
-	var candidate_bot = candidate_bots[bot_index];
-	if(instance_exists(candidate_bot) && candidate_bot.stats.Health_points > 0){
-		living_bot_found = true;
-		break;
+if(!instance_exists(oGameController) || !oGameController.round_ended){
+	var living_teammate_found = false;
+	for(var bot_index = 0; bot_index < array_length(candidate_bots); bot_index++){
+		var candidate_bot = candidate_bots[bot_index];
+		if(instance_exists(candidate_bot) && candidate_bot.stats.Team == global.local_player.stats.Team && candidate_bot.stats.Health_points > 0){
+			living_teammate_found = true;
+			break;
+		}
 	}
-}
-if(!living_bot_found){
-	if(global.local_player.stats.Team != TEAM.TERRORIST
-	|| (!global.bomb_planted && !oDraw.bomb_detonation_pending)){
-		round_end("Loss");
+	if(!living_teammate_found){
+		if(global.local_player.stats.Team != TEAM.TERRORIST
+		|| (!global.bomb_planted && !oDraw.bomb_detonation_pending)){
+			round_end("Loss");
+			exit;
+		}
+		if(!global.sudo) exit;
 	}
-	exit;
 }
 
 if(!oDraw.spectating) exit;
@@ -40,6 +41,7 @@ if(mouse_check_button_pressed(mb_left) && device_mouse_y_to_gui(0) < global.GuiH
 	select_next_bot();
 }
 
+if(instance_exists(oGameController) && oGameController.round_ended) exit;
 if(!keyboard_check_pressed(global.KeyBinds[| KEY.TakeBot])) exit;
 
 var bot = oDraw.spectate_target;
@@ -74,7 +76,7 @@ if(bot.HelmetID != ITEM.None){
 		ITEM.None, ITEM.None, ITEM.None, ITEM.None, "Helmet");
 }
 
-var grenade_ids = [ITEM.HEGrenade, ITEM.FlashBangGrenade, ITEM.SmokeGrenade, ITEM.MolotovGrenade];
+var grenade_ids = [ITEM.HEGrenade, ITEM.flashbang, ITEM.smoke, ITEM.molotov];
 for(var grenade_index = 0; grenade_index < array_length(grenade_ids); grenade_index++){
 	if(bot.Grenades[grenade_index] > 0){
 		gain_item(grenade_ids[grenade_index], bot.Grenades[grenade_index], 0, 0, 0,

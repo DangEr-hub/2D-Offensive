@@ -1,8 +1,11 @@
 var moved = false;
-var movement_speed = 0;
 
-if (FootStepTimer > 0) {
-	FootStepTimer -= global.time_step;
+if (place_meeting(x, y, oWater)) {
+	in_water = true;
+	in_water_timer = game_get_speed(gamespeed_fps);
+} else {
+	if (in_water_timer > -1) in_water_timer -= global.time_step;
+	in_water = in_water_timer > -1;
 }
 
 if (VisibilityTimer > 0) {
@@ -96,7 +99,6 @@ if (rescuing) {
 
 			moved = abs(x - old_x) > 0.001 || abs(y - old_y) > 0.001;
 			if (moved) {
-				movement_speed = point_distance(old_x, old_y, x, y);
 				RotationAngle = point_direction(old_x, old_y, x, y);
 				image_angle = RotationAngle;
 			}
@@ -153,21 +155,4 @@ if (rescuing && !rescue_completed && has_rescue_authority) {
 
 if (instance_exists(Legs)) {
 	Legs.image_speed = moved ? global.time_step : 0;
-}
-
-if (moved) {
-	if (Visible) {
-		particle_create(round(movement_speed * random(2)), .8, random(360), spr_MovementParticle, random_range(-movement_speed, movement_speed), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
-	}
-
-	if (FootStepTimer <= 0) {
-		FootStepTimer = 5;
-		FootSteps++;
-		if (Visible) {
-			particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps mod 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
-		}
-	}
-} else {
-	FootStepTimer = 5;
-	FootSteps = 0;
 }

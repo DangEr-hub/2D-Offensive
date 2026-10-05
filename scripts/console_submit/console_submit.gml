@@ -93,6 +93,15 @@ function console_autocomplete_value(suggestion){
 	return string_copy(suggestion, 1, cut_position - 1);
 }
 
+function console_delete_input_selection(c){
+	var selected = console_selection_bounds(c, -1, string_length(c[? "string"]));
+	if(selected[1] <= selected[0]) return false;
+	c[? "string"] = string_delete(c[? "string"], selected[0], selected[1] - selected[0]);
+	c[? "string_pos"] = selected[0];
+	console_selection_clear(c);
+	return true;
+}
+
 function console_submit(Console) {
 	global.console= Console;
 
@@ -110,25 +119,59 @@ function console_submit(Console) {
 			global.console[? "backspace_hold"] = 0;
 			global.console[? "left_hold"] = 0;
 			global.console[? "right_hold"] = 0;
+			if(keyboard_check_pressed(ord("A"))){
+				global.console[? "selection_anchor_line"] = -1;
+				global.console[? "selection_focus_line"] = -1;
+				global.console[? "selection_anchor_pos"] = 1;
+				global.console[? "selection_focus_pos"] = string_length(global.console[? "string"]) + 1;
+				global.console[? "string_pos"] = global.console[? "selection_focus_pos"];
+			}
+			if(keyboard_check_pressed(ord("C"))){
+				var copied_text = "";
+				var anchor_line = global.console[? "selection_anchor_line"];
+				var focus_line = global.console[? "selection_focus_line"];
+				var copy_password_input = global.console[? "terminal_mode"]
+					&& instance_exists(oTerminal) && oTerminal.sudo_login_stage == 2;
+				if(anchor_line == -1 && focus_line == -1 && !copy_password_input){
+					var selected_input = console_selection_bounds(global.console, -1, string_length(global.console[? "string"]));
+					copied_text = string_copy(global.console[? "string"], selected_input[0], selected_input[1] - selected_input[0]);
+				}else if(anchor_line >= 0 && focus_line >= 0){
+					for(var copy_row = max(anchor_line, focus_line); copy_row >= min(anchor_line, focus_line); copy_row--){
+						if(copy_row >= ds_list_size(list)) continue;
+						var copy_line = string(list[| copy_row]);
+						var selected_line = console_selection_bounds(global.console, copy_row, string_length(copy_line));
+						if(copy_row < max(anchor_line, focus_line)) copied_text += "\n";
+						copied_text += string_copy(copy_line, selected_line[0], selected_line[1] - selected_line[0]);
+					}
+				}
+				if(copied_text != "") clipboard_set_text(copied_text);
+			}
 	        if(keyboard_check_pressed(ord("V"))) {
     
 	        var clip = clipboard_get_text();
 	        clip = string_replace_all(clip,chr(10),"");
 	        clip = string_replace_all(clip,chr(13),"");
 	        clip = string_replace_all(clip,"#","");
+			console_delete_input_selection(global.console);
+			console_selection_clear(global.console);
 	        global.console[? "string"] = string_insert(clip,global.console[? "string"],global.console[? "string_pos"]);
 	        global.console[? "string_pos"] += string_length(clip);
         
 	        } 
 	        if keyboard_check_pressed(vk_backspace){
-	            global.console[? "string_pos"] -= string_length(global.console[? "string"]);
-	            global.console[? "string"] = "" ;
+				if(!console_delete_input_selection(global.console)){
+					global.console[? "string_pos"] = 1;
+					global.console[? "string"] = "";
+				}
+				console_selection_clear(global.console);
 	        }
 			if keyboard_check_pressed(vk_left){
-				if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] = 1;   
+				if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] = 1;
+				console_selection_clear(global.console);
 			}	
 			if keyboard_check_pressed(vk_right) {
-				global.console[? "string_pos"] += string_length(global.console[? "string"]);   
+				global.console[? "string_pos"] = string_length(global.console[? "string"]) + 1;
+				console_selection_clear(global.console);
 			}
 	    }
 	    else
@@ -166,24 +209,34 @@ function console_submit(Console) {
 	        {
 				global.console[? "dir"] = -1;
 				global.console[? "select"] = 0;
-	            if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;
-	            global.console[? "string"] = string_delete(global.console[? "string"],global.console[? "string_pos"],1);
+				if(!console_delete_input_selection(global.console)){
+					if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;
+					global.console[? "string"] = string_delete(global.console[? "string"],global.console[? "string_pos"],1);
+				}
+				console_selection_clear(global.console);
 	        } 
 	        else 
 	        /* Back one position */
 			if repeat_left
 	        {
-				if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;  
+				var left_selection = console_selection_bounds(global.console, -1, string_length(global.console[? "string"]));
+				if(left_selection[1] > left_selection[0]) global.console[? "string_pos"] = left_selection[0];
+				else if global.console[? "string_pos"] > 1 then global.console[? "string_pos"] -= 1;
+				console_selection_clear(global.console);
 	        } 
 	        else 
 	        /* Forward one position */ 
 	        if repeat_right
 	        {
-				global.console[? "string_pos"] = min(global.console[? "string_pos"] + 1, string_length(global.console[? "string"]) + 1);
+				var right_selection = console_selection_bounds(global.console, -1, string_length(global.console[? "string"]));
+				if(right_selection[1] > right_selection[0]) global.console[? "string_pos"] = right_selection[1];
+				else global.console[? "string_pos"] = min(global.console[? "string_pos"] + 1, string_length(global.console[? "string"]) + 1);
+				console_selection_clear(global.console);
 	        } 
 			else 
 	        /* Selected last entered command */
 	        if keyboard_check_pressed(vk_up) {
+			console_selection_clear(global.console);
 			if(global.console[? "dir"] == 1 && ds_list_size(global.console[? "suggestions"]) > 0){
 				global.console[? "select"] = max(0, global.console[? "select"] - 1);
 				sug = ds_list_find_value(global.console[? "suggestions"], global.console[? "select"]);
@@ -207,6 +260,7 @@ function console_submit(Console) {
 	        /* Selected suggested command */
 	        if keyboard_check_pressed(vk_down) 
 	        {
+			console_selection_clear(global.console);
 			var suggestion_count = ds_list_size(global.console[? "suggestions"]);
 			if(suggestion_count > 0){
 				if(global.console[? "dir"] == -1){
@@ -230,6 +284,10 @@ function console_submit(Console) {
 				&& keyboard_check_pressed(global.KeyBinds[| KEY.Console]);
 	        if !(keyboard_check_pressed(vk_enter)) && !terminal_console_key
 	        {
+			if(keyboard_lastchar != ""){
+				console_delete_input_selection(global.console);
+				console_selection_clear(global.console);
+			}
 	            global.console[? "string"] = string_insert(keyboard_lastchar,global.console[? "string"],global.console[? "string_pos"]);
 	            if keyboard_lastchar != "" {
 					global.console[? "string_pos"] += 1;
@@ -296,6 +354,7 @@ function console_submit(Console) {
 
 				global.console[? "string"] = "";
 				global.console[? "string_pos"] = 1;
+				console_selection_clear(global.console);
 				global.console[? "select"] = 0;
 				global.console[? "dir"] = -1;
 				console_preset(global.my_console);
@@ -403,7 +462,7 @@ function console_submit(Console) {
 					break;
 					case "draw bullet impact":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.DrawBulletImpact = return_logical_value(real(c[1]));
+							global.draw_bullet_impact = return_logical_value(real(c[1]));
 						}
 					break;
 					case "give item":
@@ -715,6 +774,7 @@ function console_submit(Console) {
 	        }
 	        global.console[? "string"] = "";
 	        global.console[? "string_pos"] = 1;
+		console_selection_clear(global.console);
 	        global.console[? "select"] = 0;
 	        global.console[? "dir"] = -1;
 	        console_preset(global.my_console);

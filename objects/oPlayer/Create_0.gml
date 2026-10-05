@@ -2,6 +2,10 @@ if(!instance_exists(obj_hazeC)){
 	haze_start(true, false);
 }
 event_inherited();
+br_phase = 0;
+br_amp = 0.01;
+br_spd = 0.15;
+mask_index = spr_BotMask;
 dilatation_timer = -1;
 adrenaline_timer = -1;
 steroids_timer = -1;

@@ -23,8 +23,10 @@ if(instance_exists(oPlayer)){
 		vignette_explosion = 0.5;
 	}
 	
-	if(global.local_player.AimPunchTimer > -1 || global.local_player.near_explosion_timer > -1 || global.local_player.in_water == true){
+	if(global.local_player.AimPunchTimer > -1 || global.local_player.near_explosion_timer > -1){
 		vignette_aimpunch = 0.25;
+	}
+	if(global.local_player.near_explosion_timer > -1){
 		blur_intensity = 0.05;
 	}
 	var hp_ratio = clamp(global.local_player.stats.Health_points / global.player_stats.Max_health, 0, 1);
@@ -37,6 +39,7 @@ if(instance_exists(oPlayer)){
 		var shader_bloom_intensity = global.bloom_shader ? bloom_intensity : 0;
 		var shader_bloom_darken = global.bloom_shader ? bloom_darken : 1;
 		var shader_bloom_saturation = global.bloom_shader ? bloom_saturation : 1;
+		var shader_bloom_neighbor_strength = global.bloom_shader ? bloom_neighbor_strength : 0;
 
 		if(!surface_exists(bloom_surface1)){
 			bloom_surface1 = surface_create(global.GuiW, global.GuiH);
@@ -74,7 +77,7 @@ if(instance_exists(oPlayer)){
 			shader_set_uniform_f(u_blur_steps, blur_steps);
 			shader_set_uniform_f(u_sigma, sigma);	
 			shader_set_uniform_f(u_blur_vector, 1, 0);	
-			shader_set_uniform_f(u_texel_size, texel_w, texel_h);	
+			shader_set_uniform_f(u_texel_size, 1 / global.GuiW, 1 / global.GuiH);
 
 			surface_set_target(bloom_surface2);
 			draw_surface(bloom_surface1, 0, 0);
@@ -89,24 +92,66 @@ if(instance_exists(oPlayer)){
 
 		}
 
-		// This shader also handles vignette, aberration, blur, water and saturation.
+		var scene_surface = application_surface;
+		if(global.local_player.AimPunchTimer > -1){
+			// Bloom už má hotový výsledek v bloom_surface1; druhou surface použijeme pro rozmazání scény.
+			if(!surface_exists(post_surface)){
+				post_surface = surface_create(global.GuiW, global.GuiH);
+			}else if(surface_get_width(post_surface) != global.GuiW || surface_get_height(post_surface) != global.GuiH){
+				surface_resize(post_surface, global.GuiW, global.GuiH);
+			}
+
+			var blur_draw_color = draw_get_color();
+			var blur_draw_alpha = draw_get_alpha();
+			draw_set_color(c_white);
+			draw_set_alpha(1);
+			// Zapiš výstup shaderů přímo; běžné míchání by v každém průchodu znovu ztmavilo průhledné pixely.
+			gpu_set_blendmode_ext(bm_one, bm_zero);
+
+			shader_set(shd_Blur1Pass);
+			shader_set_uniform_f(usize, global.GuiW, global.GuiH, 3);
+			surface_set_target(bloom_surface2);
+			draw_clear_alpha(c_black, 0);
+			draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
+			surface_reset_target();
+			shader_reset();
+
+			shader_set(shd_Blur2Pass);
+			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "texel_size"), 1 / global.GuiW, 1 / global.GuiH);
+			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_radius"), 1.5);
+			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_vector"), 1, 0);
+			surface_set_target(post_surface);
+			draw_clear_alpha(c_black, 0);
+			draw_surface(bloom_surface2, 0, 0);
+			surface_reset_target();
+
+			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_vector"), 0, 1);
+			surface_set_target(bloom_surface2);
+			draw_clear_alpha(c_black, 0);
+			draw_surface(post_surface, 0, 0);
+			surface_reset_target();
+			shader_reset();
+			gpu_set_blendmode(bm_normal);
+			draw_set_color(blur_draw_color);
+			draw_set_alpha(blur_draw_alpha);
+			scene_surface = bloom_surface2;
+		}
+
+		// This shader also handles vignette, aberration, blur and saturation.
 		shader_set(shader_bloom_blend);
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "vignette_strength"), vignette_level);
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "size"), 16, 16, blur_intensity);
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
 
-		if (global.local_player.in_water == true) {
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000.0);
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)) * .25);
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 0.5);
-		} else {
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0.0);
-		}
-
 		shader_set_uniform_f(u_bloom_intensity, shader_bloom_intensity);
 		shader_set_uniform_f(u_bloom_darken, shader_bloom_darken);
 		shader_set_uniform_f(u_bloom_saturation, shader_bloom_saturation);
+		shader_set_uniform_f(u_bloom_texel_size, 1 / global.GuiW, 1 / global.GuiH);
+		shader_set_uniform_f(u_bloom_neighbor_strength, shader_bloom_neighbor_strength);
+		shader_set_uniform_f(u_bloom_neighbor_radius, bloom_neighbor_radius);
+		shader_set_uniform_f(u_bloom_blend_threshold, bloom_threshold);
+		shader_set_uniform_f(u_bloom_blend_range, bloom_range);
 		texture_set_stage(u_bloom_texture, surface_get_texture(bloom_surface1));
 
 
@@ -158,11 +203,13 @@ if(instance_exists(oPlayer)){
 
 				surface_set_target(post_surface);
 				draw_clear_alpha(c_black, 0);
-				draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
-
-				if(global.bloom_shader == true){
+				draw_surface_stretched(scene_surface, 0, 0, global.GuiW, global.GuiH);
+				shader_reset();
+				if(global.bloom_shader){
 					gpu_set_blendmode(bm_add);
+					draw_set_alpha(bloom_intensity);
 					draw_surface_stretched(bloom_surface1, 0, 0, global.GuiW, global.GuiH);
+					draw_set_alpha(1);
 					gpu_set_blendmode(bm_normal);
 				}
 
@@ -204,33 +251,25 @@ if(instance_exists(oPlayer)){
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
 		shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
 
-		if (global.local_player.in_water == true) {
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000.0);
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, 0.01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)));
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 2.5);
-		} else {
-			shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0.0);
-		}
-
 		shader_set_uniform_f(u_bloom_intensity, shader_bloom_intensity);
 		shader_set_uniform_f(u_bloom_darken, shader_bloom_darken);
 		shader_set_uniform_f(u_bloom_saturation, shader_bloom_saturation);
+		shader_set_uniform_f(u_bloom_texel_size, 1 / global.GuiW, 1 / global.GuiH);
+		shader_set_uniform_f(u_bloom_neighbor_strength, shader_bloom_neighbor_strength);
+		shader_set_uniform_f(u_bloom_neighbor_radius, bloom_neighbor_radius);
+		shader_set_uniform_f(u_bloom_blend_threshold, bloom_threshold);
+		shader_set_uniform_f(u_bloom_blend_range, bloom_range);
 		texture_set_stage(u_bloom_texture, surface_get_texture(bloom_surface1));
 
-		draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
-		
-        
-		if(global.bloom_shader == true){
-			
-			#region Bloom add effect
-			// Bloom surface effect
-			gpu_set_blendmode(bm_add);
-			draw_surface_stretched(bloom_surface1, 0, 0, global.GuiW, global.GuiH); //je jedno jestli bloom_sruface1 nebo bloom_surface2
-			gpu_set_blendmode(bm_normal);
-			#endregion
-			
-		}
+		draw_surface_stretched(scene_surface, 0, 0, global.GuiW, global.GuiH);
 		shader_reset();
+		if(global.bloom_shader){
+			gpu_set_blendmode(bm_add);
+			draw_set_alpha(bloom_intensity);
+			draw_surface_stretched(bloom_surface1, 0, 0, global.GuiW, global.GuiH);
+			draw_set_alpha(1);
+			gpu_set_blendmode(bm_normal);
+		}
 		
 		if(global.local_player.ToggleNightVision == true || global.local_player.ToggleInfraVision == true) {
 		    surface_reset_target();
@@ -299,24 +338,23 @@ if(instance_exists(oPlayer)){
 				shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "size"), 16, 16, blur_intensity);
 				shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "aberration_strength"), aberration_level);
 				shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "color_saturation"), saturation_level);
-				if(global.local_player.in_water){
-					shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_time"), current_time / 1000);
-					shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), lerp(0, .01, (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps)));
-					shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_speed"), 2.5);
-				}else{
-					shader_set_uniform_f(shader_get_uniform(shader_bloom_blend, "water_strength"), 0);
-				}
 				shader_set_uniform_f(u_bloom_intensity, shader_bloom_intensity);
 				shader_set_uniform_f(u_bloom_darken, shader_bloom_darken);
 				shader_set_uniform_f(u_bloom_saturation, shader_bloom_saturation);
+				shader_set_uniform_f(u_bloom_texel_size, 1 / global.GuiW, 1 / global.GuiH);
+				shader_set_uniform_f(u_bloom_neighbor_strength, shader_bloom_neighbor_strength);
+				shader_set_uniform_f(u_bloom_neighbor_radius, bloom_neighbor_radius);
+				shader_set_uniform_f(u_bloom_blend_threshold, bloom_threshold);
+				shader_set_uniform_f(u_bloom_blend_range, bloom_range);
 				texture_set_stage(u_bloom_texture, surface_get_texture(bloom_surface1));
 
-				draw_surface_stretched(application_surface, 0, 0, global.GuiW, global.GuiH);
+				draw_surface_stretched(scene_surface, 0, 0, global.GuiW, global.GuiH);
 				shader_reset();
-
-				if(global.bloom_shader == true){
+				if(global.bloom_shader){
 					gpu_set_blendmode(bm_add);
+					draw_set_alpha(bloom_intensity);
 					draw_surface_stretched(bloom_surface1, 0, 0, global.GuiW, global.GuiH);
+					draw_set_alpha(1);
 					gpu_set_blendmode(bm_normal);
 				}
 			}
@@ -326,16 +364,3 @@ if(instance_exists(oPlayer)){
 		#endregion
 		
 }
-
-
-if(instance_exists(oPlayer)){
-	if (global.local_player.in_water == true) {
-	    var alpha = 0.25 * (global.local_player.in_water_timer + 1) / game_get_speed(gamespeed_fps);
-    
-	    draw_set_alpha(alpha);
-	    draw_set_color(c_aqua);
-	    draw_rectangle(0, 0, global.GuiW, global.GuiH, false);
-	    draw_set_alpha(1);
-	}
-}
-

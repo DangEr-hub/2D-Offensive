@@ -18,11 +18,12 @@ with (zui_create(0, 0, objUIWindowCaption, depth - 1)) {
 
 button_width = 128 * global.gui_scale;
 button_height = 16 * global.gui_scale;
-with(zui_create(zui_get_width() * .75, zui_get_height() - button_height*1.25, objUIButton)){
+var caliber_box = is_caliber_box_item(global.Inventory[#oDraw.var_slot, INDEX.slot_id]);
+with(zui_create(zui_get_width() * (caliber_box ? .5 : .75), zui_get_height() - button_height*1.25, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Close";
+	caption = tr("Close");
 	callback = function(){
 		with(oItemDescription){
 			zui_destroy();
@@ -30,19 +31,21 @@ with(zui_create(zui_get_width() * .75, zui_get_height() - button_height*1.25, ob
 	};
 }
 
-with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, objUIButton)){
-	zui_set_anchor(0.5, 0);
-	zui_set_width(other.button_width);
-	zui_set_height(other.button_height);
-	caption = "Use";
-	callback = function(){
-		if(global.Inventory[#oDraw.var_slot, INDEX.SlotAmount] <= 1){
-			with(oItemDescription){
-				zui_destroy();
+if(!caliber_box){
+	with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, objUIButton)){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(other.button_width);
+		zui_set_height(other.button_height);
+		caption = tr("Use");
+		callback = function(){
+			if(global.Inventory[#oDraw.var_slot, INDEX.SlotAmount] <= 1){
+				with(oItemDescription){
+					zui_destroy();
+				}
 			}
-		}
-		item_equip(oDraw.var_slot, "draw_varslot", global.local_player.WeaponID);
-	};
+			item_equip(oDraw.var_slot, "draw_varslot", global.local_player.WeaponID);
+		};
+	}
 }
 
 

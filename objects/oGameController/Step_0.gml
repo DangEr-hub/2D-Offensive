@@ -2,9 +2,12 @@ if(round_ended == false && oDraw.PauseMenu == false && (oDraw.RespawnMenu == fal
 	playing_time ++;
 }
 
-if(round_ended == true && (oDraw.RespawnMenu == false || instance_exists(oSpectateControl))){
+if(round_ended == true && !round_result_processed && (oDraw.RespawnMenu == false || instance_exists(oSpectateControl))){
+	round_result_processed = true;
 	if(instance_exists(oSpectateControl)){
-		with(oSpectateControl) instance_destroy();
+		if(!global.sudo){
+			with(oSpectateControl) instance_destroy();
+		}
 		with(objZUIMain) zui_destroy();
 		oDraw.spectating = false;
 		oDraw.spectate_target = noone;
@@ -26,14 +29,18 @@ if(round_ended == true && (oDraw.RespawnMenu == false || instance_exists(oSpecta
 		oDraw.GameEndMenu = true;
 		if(!IS_NET && player_win == true){
 			global.player_stats.Diamonds += global.game_struct.Rounds_win*2;
-			save_game();
 		}
 		global.game_struct.Playing_time_per_round[global.game_struct.Current_round] = playing_time / game_get_speed(gamespeed_fps);
 		var game_result = calculate_game_result(global.game_struct.Rounds_win, global.game_struct.Rounds_lost);
 		update_eggy_rating_system(game_result, global.MapID);
 	}		
-	if(next_round_requested && !oDraw.GameEndMenu){
-		with(objZUIMain) zui_destroy();
-		room_restart();
+	if(!IS_NET){
+		global.map_rounds[global.MapID][0] = global.game_struct.Rounds_win;
+		global.map_rounds[global.MapID][1] = global.game_struct.Rounds_lost;
+		save_game();
 	}
+}
+if(round_result_processed && next_round_requested && !oDraw.GameEndMenu){
+	with(objZUIMain) zui_destroy();
+	room_restart();
 }

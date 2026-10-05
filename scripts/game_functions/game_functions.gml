@@ -961,11 +961,11 @@ function player_shooting(){
 			create_bullet_tracer(
 				[Weapon.x + lengthdir_x(WeaponDistance, RotationAngle),Weapon.y + lengthdir_y(WeaponDistance, RotationAngle)],
 				[ShotX,ShotY],
-				0,
+				wpn_id == ITEM.blue_laser ? 3 : 0,
 				[
 					wpn_id, 
 					point_direction(Weapon.x + lengthdir_x(WeaponDistance, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance, RotationAngle), ShotX, ShotY),
-					BULLET_SPEED * global.time_step,
+					BULLET_SPEED * (wpn_id == ITEM.blue_laser ? 0.5 : 1) * global.time_step,
 					global.ItemIndex[#wpn_id, ITEMSTATS.Range]
 				],
 				id,
@@ -1043,6 +1043,7 @@ function inaccuracy_formula(WID, ObjectType){
 		}else if(ObjectType.object_index == oBot){
 			if(instance_exists(oBot)){
 				var behind_smoke_inaccuracy = 1;
+				var bot_modifier = 1.25;
 				var FlashedInaccuracy = 1;
 				var InSmokeInaccuracy = 1;
 				var EnemyMovingInaccuracy = 1;
@@ -1058,7 +1059,9 @@ function inaccuracy_formula(WID, ObjectType){
 				behind_smoke_inaccuracy = 5 * smoke_number + 1;
 				ds_list_destroy(smoke_list);
 
-				if(ObjectType.ChasingObject.hidden == true){
+				if(point_in_grenade_smoke(ObjectType.ChasingObject.x, ObjectType.ChasingObject.y)){
+					InSmokeInaccuracy = 8;
+				}else if(ObjectType.ChasingObject.hidden == true){
 					InSmokeInaccuracy = 5;
 				}
 			
@@ -1071,7 +1074,7 @@ function inaccuracy_formula(WID, ObjectType){
 				}
 				
 				var inaccuracy_value = min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
-				EnemyMovingInaccuracy * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ITEMSTATS.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
+				EnemyMovingInaccuracy * bot_modifier * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ITEMSTATS.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
 				return inaccuracy_value;
 
 			}

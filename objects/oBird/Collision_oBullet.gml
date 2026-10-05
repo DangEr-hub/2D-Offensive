@@ -4,7 +4,7 @@ if(!IS_NET){
 	var BloodSplashNumber = round(damage / 5);
 	var BloodParticleNumber = round(damage / 2);
 
-	create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber);
+	create_blood(BloodSplashNumber, other.x, other.y, c_red, BloodParticleNumber, (other.direction + 180) mod 360);
 }
 
 if (IS_NET) {

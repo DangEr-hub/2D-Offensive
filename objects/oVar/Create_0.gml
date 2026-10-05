@@ -64,7 +64,7 @@ global.translates = {
     Equip: { cz: "Nasadit", en: "Equip" },
     Use: { cz: "Použít", en: "Use" },
     Drop: { cz: "Pusť", en: "Drop" },
-    Respawn_menu: { cz: "Menu respawnu", en: "Respawn menu" },
+    Respawn_menu: { cz: "Menu", en: "Respawn menu" },
     Yes: { cz: "Ano", en: "Yes" },
     No: { cz: "Ne", en: "No" },
     OK: { cz: "OK", en: "OK" },
@@ -158,6 +158,8 @@ global.translates = {
     Base_Spread: { cz: "Základní rozptyl", en: "Base Spread" },
     Penetration_power: { cz: "Průraznost", en: "Penetration power" },
     Reload_time: { cz: "Doba přebíjení", en: "Reload time" },
+    Durability: { cz: "Odolnost", en: "Durability" },
+    Defense: { cz: "Ochrana", en: "Defense" },
     Equip_time: { cz: "Doba tasení", en: "Equip time" },
     Kill_reward: { cz: "Odměna za zabití", en: "Kill reward" },
     Maximal_range: { cz: "Maximální dostřel", en: "Maximal range" },
@@ -187,7 +189,7 @@ global.translates = {
     Height: { cz: "Výška", en: "Height" },
     Age: { cz: "Věk", en: "Age" },
     Helmet: { cz: "Helma", en: "Helmet" },
-    Body: { cz: "Tělo", en: "Body" },
+    Body: { cz: "Vesta", en: "Vest" },
     Primary_weapon: { cz: "Hlavní zbraň", en: "Primary weapon" },
     Secondary_weapon: { cz: "Vedlejší zbraň", en: "Secondary weapon" },
     HE_grenades: { cz: "Tříštivé granáty", en: "HE grenades" },
@@ -228,7 +230,7 @@ global.translates = {
     Run: { cz: "Běh", en: "Run" },
     Walk: { cz: "Chůze", en: "Walk" },
     Open_terminal: { cz: "Otevřít terminál", en: "Open terminal" },
-    Take_bot: { cz: "Převzít bota", en: "Take bot" },
+    Take: { cz: "Převzít", en: "Take" },
     Years: { cz: "let", en: "years" },
     Getting_spotted_chance: { cz: "Šance na odhalení", en: "Getting spotted chance" },
     Attack_power: { cz: "Síla útoku", en: "Attack power" },
@@ -242,6 +244,13 @@ global.translates = {
     Loss: { cz: "Prohra", en: "Loss" },
     Draw: { cz: "Remíza", en: "Draw" },
     You_died: { cz: "Zemřel jsi", en: "You died" },
+    Killed_by: { cz: "zabil tě", en: "killed by" },
+    By_weapon: { cz: "pomocí", en: "by" },
+    Opponent_alive: { cz: "Protivník (živý)", en: "Opponent (alive)" },
+    Hits_from: { cz: "Zásahy od", en: "Hits from" },
+    Damage_from: { cz: "Poškození od", en: "Damage from" },
+    Hits_given: { cz: "Zásahy", en: "Hits given" },
+    Damage_given: { cz: "Poškození", en: "Damage given" },
     Primary: { cz: "Primární", en: "Primary" },
     Secondary: { cz: "Sekundární", en: "Secondary" },
     Tertiary: { cz: "Terciální", en: "Tertiary" },
@@ -264,6 +273,11 @@ global.translates[$ "Damage_drop-off"] = { cz: "Pokles poškození", en: "Damage
 global.translates[$ "Damage_progress_(1)"] = { cz: "Průběh poškození (1)", en: "Damage progress (1)" };
 global.translates[$ "Damage_progress_(2)"] = { cz: "Průběh poškození (2)", en: "Damage progress (2)" };
 global.translates[$ "Leave_to_the_main_menu?"] = { cz: "Odejít do hlavní nabídky?", en: "Leave to the main menu?" };
+global.translates[$ "Exit_the_game?"] = { cz: "Ukončit hru?", en: "Exit the game?" };
+global.translates[$ "Are_you_sure?"] = { cz: "Ukončit hru?", en: "Are you sure?" };
+global.translates[$ "Continue?"] = { cz: "Pokračovat?", en: "Continue?" };
+global.translates[$ "Surrender_round?"] = { cz: "Vzdát kolo?", en: "Surrender round?" };
+global.translates[$ "This_round_will_count_as_a_loss."] = { cz: "Toto kolo se započítá jako prohra.", en: "This round will count as a loss." };
 global.translates[$ "Buy_over"] = { cz: "Čas k nákupu vypršel.", en: "The buy period is over." };
 
 
@@ -339,7 +353,7 @@ enum ATTACHMENTS {
 // 
 
 enum CALIBER{
-	GAUGES,
+	GAUGES = 1,
 	LOW,
 	MEDIUM,
 	HIGH,
@@ -419,15 +433,21 @@ global.MapProperties[# MAP.Desert, MAP_STAT.MaxFriends] = 5;
 global.MapProperties[# MAP.Desert, MAP_STAT.Tile] = spr_Desert;
 
 var desert_enemy_areas = ds_map_create();
-ds_map_add(desert_enemy_areas, "area1", [100, 750, 450, 1200, 4]); //x1, y1, x2, y2, enemy number
-ds_map_add(desert_enemy_areas, "area2", [900, 1200, 1500, 1800, 3]);
-ds_map_add(desert_enemy_areas, "area3", [900, 100, 1900, 500, 5]);
-ds_map_add(desert_enemy_areas, "area4", [2300, 400, 3000, 1000, 5]);
-ds_map_add(desert_enemy_areas, "area5", [2000, 1000, 2900, 1500, 5]);
+ds_map_add(desert_enemy_areas, "firstboxarea", [100, 750, 450, 1200, 4]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "firstboxarea2", [450, 1000, 1000, 1200, 1]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "firstboxarea3", [750, 1050, 1050, 1550, 2]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "fencearea1", [1150, 1250, 1900, 1550, 3]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "fencearea2", [1430, 1540, 1950, 1750, 3]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "buildingarea1", [590, 100, 1200, 350, 4]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "treearea", [1700, 670, 2100, 1030, 4]); //x1, y1, x2, y2, enemy number
+//ds_map_add(desert_enemy_areas, "area2", [900, 1200, 1500, 1800, 3]);
+//ds_map_add(desert_enemy_areas, "area3", [900, 100, 1900, 500, 5]);
+//ds_map_add(desert_enemy_areas, "area4", [2300, 400, 3000, 1000, 5]);
+//ds_map_add(desert_enemy_areas, "area5", [2000, 1000, 2900, 1500, 5]);
 var desert_friend_areas = ds_map_create();
-ds_map_add(desert_friend_areas, "area1", [800, 800, 1300, 1000, 2]); //x1, y1, x2, y2, enemy number
-ds_map_add(desert_friend_areas, "area2", [900, 1200, 1500, 1800, 3]);
-ds_map_add(desert_friend_areas, "area3", [900, 100, 1900, 500, 5]);
+ds_map_add(desert_friend_areas, "area1", [1000, 590, 1700, 1000, 3]); //x1, y1, x2, y2, enemy number
+//ds_map_add(desert_friend_areas, "area2", [900, 1200, 1500, 1800, 3]);
+//ds_map_add(desert_friend_areas, "area3", [900, 100, 1900, 500, 5]);
 global.MapProperties[# MAP.Desert, MAP_STAT.EnemyAreas] = desert_enemy_areas;
 global.MapProperties[# MAP.Desert, MAP_STAT.FriendAreas] = desert_friend_areas;
 
@@ -651,6 +671,10 @@ global.translates.Items[ITEM.AKM] = {
     Name: { cz: "AKM", en: "AKM" },
     Desc: { cz: "AKM je proslulá náročným ovládáním, ale také vysokou smrtonosností. Zvládnutí zpětného rázu vyžaduje cvik, ve zkušených rukou však dokáže nepřátele rychle vyřadit.", en: "Known for its challenging handling yet unmatched lethality on the battlefield. Mastering its recoil demands skill, but once tamed, it becomes a devastating tool capable of swiftly dispatching foes with deadly precision." }
 };
+global.translates.Items[ITEM.blue_laser] = {
+    Name: { cz: "Laserová zbraň", en: "Laser gun" },
+    Desc: { cz: "", en: "" }
+};
 global.translates.Items[ITEM.KevlarHelm] = { Name: { cz: "Kevlarová helma", en: "Kevlar helmet" }, Desc: { cz: "Základní helma snižuje poškození hlavy o " + string_format((1 - global.ItemIndex[# ITEM.KevlarHelm, ITEMSTATS.Defense]) * 100, 0, 1) + " %. Chrání před slabšími hrozbami a díky nízké hmotnosti téměř neomezuje pohyb.", en: "This basic helmet provides " + string_format((1 - global.ItemIndex[# ITEM.KevlarHelm, ITEMSTATS.Defense]) * 100, 0, 1) + "% damage reduction, offering essential head protection against low-level threats. Lightweight design ensures mobility is maintained." } };
 global.translates.Items[ITEM.DesertEagle] = { Name: { cz: "Desert Eagle", en: "Desert Eagle" }, Desc: { cz: "Vysoké poškození a průraznost překážek vyvažuje silný zpětný ráz a malý zásobník. Zkušený střelec dokáže každou dobře mířenou ranou způsobit vážné škody.", en: "Known for its high damage and armor penetration, presents a formidable challenge to master due to its recoil and limited magazine capacity. Despite these drawbacks, skilled player harness its power to devastating effect, making each well-placed shot count in engagements." } };
 global.translates.Items[ITEM.KevlarVest] = { Name: { cz: "Kevlarová vesta", en: "Kevlar vest" }, Desc: { cz: "Lehká vesta snižuje poškození o " + string_format((1 - global.ItemIndex[# ITEM.KevlarVest, ITEMSTATS.Defense]) * 100, 0, 1) + " %. Zvyšuje šanci na přežití, aniž by výrazně omezovala pohyb.", en: "This lightweight vest offers a basic " + string_format((1 - global.ItemIndex[# ITEM.KevlarVest, ITEMSTATS.Defense]) * 100, 0, 1) + "% damage reduction, enhancing survivability against threats. Ideal for added protection without sacrificing mobility." } };
@@ -660,14 +684,12 @@ global.translates.Items[ITEM.MilitaryVest] = { Name: { cz: "Vojenská vesta", en
 global.translates.Items[ITEM.SSG08] = { Name: { cz: "SSG 08", en: "SSG 08" }, Desc: { cz: "Přesná odstřelovací puška. Její nižší poškození vyžaduje pečlivé míření, ale zkušeného střelce odmění spolehlivými zásahy na dlouhou vzdálenost.", en: "SSG08 is a precision sniper rifle known for its deadly accuracy. While it offers unmatched precision, its lower damage requires skilled shooters to make each shot count, making it a challenging yet rewarding choice on the battlefield." } };
 global.translates.Items[ITEM.HEGrenade] = { Name: { cz: "Tříštivý granát", en: "HE grenade" }, Desc: { cz: "Výbušný granát působí vysoké poškození v širokém okolí. Hodí se k likvidaci skupin nepřátel i k zajištění důležitých míst. Zacházej s ním opatrně.", en: "Designed for maximum impact, it delivers lethal damage over a broad radius, perfect for neutralizing enemy clusters or securing critical spaces. Handle with care; its potent blast is as swift as it is fierce." } };
 global.translates.Items[ITEM.MAC11] = { Name: { cz: "MAC11", en: "MAC11" }, Desc: { cz: "Lehký samopal s vysokou kadencí a výbornou pohyblivostí na krátkou vzdálenost. Nízké poškození a slabší průraznost překážek vyžadují rychlý pohyb.", en: "MAC11 is offering exceptional mobility in close-quarters combat, altough it has limited damage output and armor penetration. Has lightweight design and rapid rate of fire but requires skilled maneuvering to maximize its effectiveness while minimizing its drawbacks." } };
-global.translates.Items[ITEM.FlashBangGrenade] = { Name: { cz: "Oslepující granát", en: "Flashbang" }, Desc: { cz: "Neletální granát oslepí a ohluší nepřátele. Naruší jejich orientaci a usnadní překvapivý postup.", en: "Disorient foes with this non-lethal flashbang. Its blinding flash and deafening bang disrupt enemy senses, ideal for stealthy advances." } };
+global.translates.Items[ITEM.flashbang] = { Name: { cz: "Oslepující granát", en: "Flashbang" }, Desc: { cz: "Neletální granát oslepí a ohluší nepřátele. Naruší jejich orientaci a usnadní překvapivý postup.", en: "Disorient foes with this non-lethal flashbang. Its blinding flash and deafening bang disrupt enemy senses, ideal for stealthy advances." } };
 global.translates.Items[ITEM.SG550] = { Name: { cz: "SIG SG550", en: "SIG SG550" }, Desc: { cz: "SIG 550 má předem nasazený zaměřovač a nabízí dobrý dostřel i poškození. Silný zpětný ráz, nižší kadence a hmotnost však vyžadují přesnou střelbu.", en: "The SIG 550 comes equipped with a preattached scope, offering exceptional range and damage. However, its high recoil and slower rate of fire demand precision shooting, while its bulkier build limits movement speed. Ideal for those who excel in calculated, long-range engagements." } };
-global.translates.Items[ITEM.SpecOpsHelm] = { Name: { cz: "Helma speciálních jednotek", en: "Spec ops helmet" }, Desc: { cz: "Helma speciálních jednotek snižuje poškození hlavy o " + string_format((1 - global.ItemIndex[# ITEM.SpecOpsHelm, ITEMSTATS.Defense]) * 100, 0, 1) + " %. Poskytuje silnou ochranu, ale její nižší výdrž a vyšší hmotnost vyžadují opatrnost.", en: "The Spec Ops Helmet, featuring a " + string_format((1 - global.ItemIndex[# ITEM.SpecOpsHelm, ITEMSTATS.Defense]) * 100, 0, 1) + "% damage reduction, is designed for intense combat situations but has lower durability. Its heavier construction focuses on maximal protection, demanding strategic use to compensate for its shorter lifespan." } };
-global.translates.Items[ITEM.SpecOpsVest] = { Name: { cz: "Vesta speciálních jednotek", en: "Spec ops vest" }, Desc: { cz: "Vesta speciálních jednotek snižuje poškození o " + string_format((1 - global.ItemIndex[# ITEM.SpecOpsVest, ITEMSTATS.Defense]) * 100, 0, 1) + " %. Nabízí vysokou ochranu za cenu vyšší hmotnosti a nižší výdrž.", en: "Equipped with " + string_format((1 - global.ItemIndex[# ITEM.SpecOpsVest, ITEMSTATS.Defense]) * 100, 0, 1) + "% damage reduction, the Spec Ops Vest offers advanced protection but with lower durability. Ideal for high-risk scenarios, its heavier build prioritizes maximum defense, requiring careful management due to its limited lifespan." } };
 global.translates.Items[ITEM.NightVision] = { Name: { cz: "Noční vidění", en: "Night vision" }, Desc: { cz: "Brýle pro noční vidění zlepšují viditelnost za špatného osvětlení.", en: "Night Vision Goggles improve visibility in low-light environments." } };
 global.translates.Items[ITEM.HealingKit] = { Name: { cz: "Lékárnička", en: "Healing kit" }, Desc: { cz: "Lékárnička obnoví značnou část životů a pomůže přežít náročný střet.", en: "The Healing kit restores a substantial amount of health, providing crucial support during intense combat situations." } };
 global.translates.Items[ITEM.InfraredVision] = { Name: { cz: "Infračervené vidění", en: "Infrared vision" }, Desc: { cz: "Infračervené brýle usnadňují odhalování nepřátel ve tmě a poskytují výhodu při nočních akcích.", en: "Gain a tactical advantage in darkness with Infrared Vision Goggles. Spot enemies easily in low-light conditions and stay ahead in nighttime missions." } };
-global.translates.Items[ITEM.SmokeGrenade] = { Name: { cz: "Kouřový granát", en: "Smoke grenade" }, Desc: { cz: "Po dopadu vytvoří hustý kouř, který omezuje výhled, usnadňuje krytý postup a mate protivníky.", en: "Upon impact, smoke grenade blankets the surrounding area with dense smoke, perfect for obscuring vision, enabling stealthy movements, or disorienting opponents." } };
+global.translates.Items[ITEM.smoke] = { Name: { cz: "Kouřový granát", en: "Smoke grenade" }, Desc: { cz: "Po dopadu vytvoří hustý kouř, který omezuje výhled, usnadňuje krytý postup a mate protivníky.", en: "Upon impact, smoke grenade blankets the surrounding area with dense smoke, perfect for obscuring vision, enabling stealthy movements, or disorienting opponents." } };
 global.translates.Items[ITEM.Javelin] = { Name: { cz: "FGM-148", en: "FGM-148" }, Desc: { cz: "Silná zbraň s vysokým poškozením a průrazností překážek. Kvůli nepřesnosti a omezené zásobě munice vyžaduje pečlivé míření.", en: "High-damage, armor-piercing powerhouse. Mastery requires skill due to its inaccuracy and limited magazine but in the hands of a skilled player, each shot spells devastation for your enemies." } };
 global.translates.Items[ITEM.HELandMine] = { Name: { cz: "Výbušná mina", en: "HE landmine" }, Desc: { cz: "Silná výbušná mina vhodná k přepadům a uzavření prostoru.", en: "The High-explosive landmine delivers devastating force, ideal for ambush tactics and area denial." } };
 global.translates.Items[ITEM.CELandMine] = { Name: { cz: "Tříštivá mina", en: "CE landmine" }, Desc: { cz: "Po výbuchu rozptýlí střepiny do okolí a ohrozí nepřátele v blízkosti.", en: "The Cluster-explosion landmine disperses explosives projectiles upon detonation, creating deadly shrapnel to eliminate nearby threats." } };
@@ -705,13 +727,12 @@ global.translates.Items[ITEM.MP9] = { Name: { cz: "MP9", en: "MP9" }, Desc: { cz
 global.translates.Items[ITEM.CZ75] = { Name: { cz: "CZ-75", en: "CZ-75" }, Desc: { cz: "Plně automatická pistole s vysokou palebnou silou na krátkou vzdálenost. Malý zásobník nedává mnoho prostoru pro chyby.", en: "This fully automatic pistol delivers devastating close-range firepower, but its limited magazine capacity leaves little room for mistakes. A high-risk, high-reward choice for aggressive players." } };
 global.translates.Items[ITEM.kevlar_shield] = { Name: { cz: "Kevlarový štít", en: "Kevlar shield" }, Desc: { cz: "Kevlarový štít blokuje " + string_format((1 - global.ItemIndex[# ITEM.kevlar_shield, ITEMSTATS.Defense]) * 100, 0, 1) + " % příchozího poškození zepředu. Je těžký, zpomaluje pohyb, brání použití zbraně a při delším nasazení se opotřebovává.", en: "This kevlar shield blocks " + string_format((1 - global.ItemIndex[# ITEM.kevlar_shield, ITEMSTATS.Defense]) * 100, 0, 1) + "% of incoming damage, offering superior frontal protection. Heavy weight reduces movement speed, prevents weapon use, and durability limits sustained defense." } };
 global.translates.Items[ITEM.military_shield] = { Name: { cz: "Vojenský štít", en: "Military shield" }, Desc: { cz: "Vojenský štít blokuje " + string_format((1 - global.ItemIndex[# ITEM.military_shield, ITEMSTATS.Defense]) * 100, 0, 1) + " % příchozího poškození zepředu. Vyšší hmotnost omezuje pohyb a nižší výdrž zkracuje dobu, po kterou vydrží palbu.", en: "This military shield blocks " + string_format((1 - global.ItemIndex[# ITEM.military_shield, ITEMSTATS.Defense]) * 100, 0, 1) + "% of incoming damage, providing enhanced frontal protection against sustained fire. Increased weight further reduces mobility, while lower durability limits prolonged engagements." } };
-global.translates.Items[ITEM.spec_ops_shield] = { Name: { cz: "Štít speciálních jednotek", en: "Spec ops shield" }, Desc: { cz: "Štít speciálních jednotek blokuje " + string_format((1 - global.ItemIndex[# ITEM.spec_ops_shield, ITEMSTATS.Defense]) * 100, 0, 1) + " % příchozího poškození zepředu. Poskytuje maximální ochranu, ale jeho extrémní hmotnost a nižší výdrž vyžadují opatrné použití.", en: "This Spec Ops shield blocks " + string_format((1 - global.ItemIndex[# ITEM.spec_ops_shield, ITEMSTATS.Defense]) * 100, 0, 1) + "% of incoming damage, delivering maximum frontal protection for high-risk operations. Extreme weight severely limits mobility, and reduced durability demands careful use." } };
 global.translates.Items[ITEM.MP7] = { Name: { cz: "MP7", en: "MP7" }, Desc: { cz: "Samopal s vysokým poškozením a výbornou přesností na krátkou vzdálenost. Prudký pokles poškození na dálku vyžaduje agresivní přiblížení k cíli.", en: "MP7 combines high damage with outstanding accuracy, allowing it to dominate close-range firefights. However, its severe damage drop-off quickly reduces effectiveness at longer ranges, demanding aggressive positioning to unleash its full potential." } };
 global.translates.Items[ITEM.P90] = { Name: { cz: "P90", en: "P90" }, Desc: { cz: "Samopal s obrovským zásobníkem, nízkým poklesem poškození a dobrou přesností za pohybu. Vyšší cena, nižší pohyblivost a rychlá ztráta přesnosti omezují jeho využití na dálku.", en: "P90 combines a massive magazine with low damage drop-off and reliable accuracy while moving, making it ideal for aggressive engagements. Its high price, reduced mobility, and rapidly declining accuracy limit its effectiveness at longer ranges." } };
 global.translates.Items[ITEM.Scar] = { Name: { cz: "SCAR-L", en: "SCAR-L" }, Desc: { cz: "Puška s velkým zásobníkem, výbornou přesností a malým poklesem poškození na dálku. Má však omezenou rezervní munici, slabší průraznost, nižší pohyblivost a vyšší cenu.", en: "Built for fast and precise eliminations, the SCAR-L combines a large magazine with exceptional accuracy and low damage drop-off. Limited reserve ammunition, low penetration, reduced mobility, and a higher price balance its reliable performance." } };
-global.translates.Items[ITEM.MolotovGrenade] = { Name: { cz: "Molotovův koktejl", en: "Molotov" }, Desc: { cz: "Zápalná láhev po dopadu praskne a rozšíří oheň po zemi. Hodí se k uzavření cesty, vyhnání nepřátel z krytu nebo potrestání těch, kdo zůstanou v plamenech.", en: "A simple incendiary bottle that bursts on impact and spreads fire across the ground. Useful for blocking paths, forcing enemies out of cover, or punishing anyone who stays inside the flames." } };
+global.translates.Items[ITEM.molotov] = { Name: { cz: "Molotovův koktejl", en: "Molotov" }, Desc: { cz: "Zápalná láhev po dopadu praskne a rozšíří oheň po zemi. Hodí se k uzavření cesty, vyhnání nepřátel z krytu nebo potrestání těch, kdo zůstanou v plamenech.", en: "A simple incendiary bottle that bursts on impact and spreads fire across the ground. Useful for blocking paths, forcing enemies out of cover, or punishing anyone who stays inside the flames." } };
 global.translates.Items[ITEM.Bomb] = { Name: { cz: "Bomba", en: "Bomb" }, Desc: { cz: "Bomba způsobí obrovské poškození na rozsáhlém území. Teroristé ji musí položit a ubránit, zatímco policisté se ji snaží včas zneškodnit.", en: "Designed for devastating objective attacks, this bomb delivers extreme damage and penetration power across a massive blast radius. Terrorists must plant and defend it, while opposing forces race to defuse it before detonation." } };
-global.translates.Items[ITEM.DefuseKit] = { Name: { cz: "Sada na zneškodnění bomby", en: "Defuse kit" }, Desc: { cz: "Nezbytná pomůcka pro zneškodnění bomby. Zkracuje potřebný čas na polovinu.", en: "This item is essential for defusing the bomb. It halves the defusing time." } };
+global.translates.Items[ITEM.defuse_kit] = { Name: { cz: "Sada na zneškodnění bomby", en: "Defuse kit" }, Desc: { cz: "Nezbytná pomůcka pro zneškodnění bomby. Zkracuje potřebný čas na polovinu.", en: "This item is essential for defusing the bomb. It halves the defusing time." } };
 global.translates.Items[ITEM.gold_card] = { Name: { cz: "Zlatá karta", en: "Golden card" }, Desc: { cz: "Otevírá zlaté bezpečnostní dveře a umožňuje vstup do jinak nepřístupných oblastí.", en: "The Golden card grants access to golden security doors, allowing entry into otherwise restricted areas." } };
 global.translates.Items[ITEM.magenta_card] = { Name: { cz: "Fialová karta", en: "Magenta card" }, Desc: { cz: "Otevírá fialové bezpečnostní dveře a umožňuje vstup do jinak nepřístupných oblastí.", en: "The Magenta card grants access to magenta security doors, allowing entry into otherwise restricted areas." } };
 global.translates.Items[ITEM.red_card] = { Name: { cz: "Červená karta", en: "Red card" }, Desc: { cz: "Otevírá červené bezpečnostní dveře a umožňuje vstup do jinak nepřístupných oblastí.", en: "The Red card grants access to red security doors, allowing entry into otherwise restricted areas." } };

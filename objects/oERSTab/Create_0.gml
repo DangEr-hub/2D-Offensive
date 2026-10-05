@@ -159,7 +159,7 @@ enemy_rating_graph_callback = function(){
 			grid_x_steps = max(1, TRACKING_PERIOD - 1);
 
 			for(var game_offset = 0; game_offset < TRACKING_PERIOD; game_offset++){
-				var enemy_index = first_enemy + game_offset;
+				var enemy_index = game_offset;
 				var enemy_ep = global.game_struct.Enemy_ep[enemy_index];
 
 				if(enemy_ep >= 0){
@@ -204,7 +204,7 @@ enemy_rd_graph_callback = function(){
 			grid_x_steps = max(1, TRACKING_PERIOD - 1);
 
 			for(var game_offset = 0; game_offset < TRACKING_PERIOD; game_offset++){
-				var enemy_index = first_enemy + game_offset;
+				var enemy_index = game_offset;
 				var enemy_rd = global.game_struct.Enemy_rd[enemy_index];
 
 				if(enemy_rd >= 0){

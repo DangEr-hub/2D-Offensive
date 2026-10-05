@@ -22,7 +22,7 @@ with(zui_create(zui_get_width() * .75, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Close";
+	caption = tr("Close");
 	callback = function(){
 		with(oArmourDescription){
 			zui_destroy();
@@ -34,9 +34,9 @@ with(zui_create(zui_get_width() * .25, zui_get_height() - button_height*1.25, ob
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);	
-	caption = "Unequip";
+	caption = tr("Unequip");
 	if(oDraw.var_slot < OtherSlot.Primary){
-		caption = "Equip";
+		caption = tr("Equip");
 	}	
 	callback = function(){
 		if(global.Inventory[#oDraw.var_slot, INDEX.SlotAmount] <= 1){

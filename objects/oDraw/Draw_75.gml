@@ -104,7 +104,7 @@ if(draw_crosshair){
 
 				draw_text_outlined(crosshair_x + max(64 * x_scale, 64), crosshair_y, text, col, c_black, 1);
 			}
-			if(has_attachment(ITEM.laser, INDEX.slot_barrel) && global.local_player.Flashed == false && (global.local_player.ScopeIn == false || global.local_player.player_has_scope != 0)){
+			if(instance_exists(global.local_player.Weapon) && has_attachment(ITEM.laser, INDEX.slot_barrel) && global.local_player.Flashed == false && (global.local_player.ScopeIn == false || global.local_player.player_has_scope != 0)){
 				var laser_pos = local_to_world(56, 16, global.local_player.Weapon.image_angle, global.local_player.Weapon);
 				var laser_gui_x = (laser_pos[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 				var laser_gui_y = (laser_pos[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
@@ -144,7 +144,11 @@ if(global.DrawParticles == true){
 		surface_reset_target();
 	}
 
-	draw_surface(oParticleSurface.gui_particle_surf, 0, 0);
+	var gui_blood_alpha = 0.7;
+	gpu_set_blendmode_ext(bm_one, bm_inv_src_alpha);
+	draw_surface_ext(oParticleSurface.gui_particle_surf, 0, 0, 1, 1, 0,
+		merge_color(c_black, c_white, gui_blood_alpha), gui_blood_alpha);
+	gpu_set_blendmode(bm_normal);
 	}
 }
 #endregion

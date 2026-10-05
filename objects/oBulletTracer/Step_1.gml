@@ -82,7 +82,7 @@ if(wall_collision != noone){
 		}
 		#endregion
 	
-		if(image_index == 0 || image_index == 2){
+		if(image_index == 0 || image_index == 2 || image_index == 3){
 		
 			#region Bullet and shrapnel hits wall
 		
@@ -99,7 +99,7 @@ if(wall_collision != noone){
 			#endregion
 				
 			#region Barrel
-			if(wall_collision.inst_id.object_index == oGlass){
+			if(wall_collision.inst_id.object_index == oGlass && wall_collision.inst_id.image_index != 1){
 				wall_collision.inst_id.stats.Health_points -= bullet_damage / (stats.Penetration_damage + 1);
 			}
 			#endregion

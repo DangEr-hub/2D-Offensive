@@ -66,12 +66,70 @@ function handle_server_receive(sender_ip, sender_port) {
 			case PACKET.ITEM_ACTION_SYNC: handle_item_action_server(key); break;
 
 			case PACKET.MACHINE_GUN_SYNC: handle_machine_gun_sync_server(key); break;
+			case PACKET.LASER_SYNC: handle_laser_sync_server(key); break;
 			
 			
 		
 			//case PACKET.WEATHER_SYNC: handle_weather_sync_server(key); break;
         }
     }
+}
+
+function server_write_laser_state(target_buffer, laser_inst) {
+	buffer_write(target_buffer, buffer_f32, laser_inst.x);
+	buffer_write(target_buffer, buffer_f32, laser_inst.y);
+	buffer_write(target_buffer, buffer_bool, laser_inst.active);
+	buffer_write(target_buffer, buffer_u16, laser_inst.laser_time);
+	buffer_write(target_buffer, buffer_s16, laser_inst.laser_timer);
+	buffer_write(target_buffer, buffer_f16, laser_inst.l_spd);
+	buffer_write(target_buffer, buffer_u16, laser_inst.emitting_time);
+	buffer_write(target_buffer, buffer_s16, laser_inst.emitting_timer);
+	buffer_write(target_buffer, buffer_f16, laser_inst.l_dist);
+	buffer_write(target_buffer, buffer_u8, laser_inst.l_n);
+	for (var ray_index = 0; ray_index < laser_inst.l_n; ray_index++) {
+		buffer_write(target_buffer, buffer_f16, laser_inst.l_points[ray_index]);
+		buffer_write(target_buffer, buffer_f16, laser_inst.l_stops[ray_index]);
+	}
+}
+
+function server_send_laser_state(laser_inst, socket_key = "") {
+	with (oNetworkManager) {
+		if (!is_server || !instance_exists(laser_inst)) return;
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.LASER_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, 0); // State snapshot
+		server_write_laser_state(send_buffer, laser_inst);
+		if (socket_key != "") {
+			sent_server_udp(server_socket, socket_key, send_buffer);
+		} else {
+			var client_key = ds_map_find_first(clients);
+			for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
+				sent_server_udp(server_socket, client_key, send_buffer);
+				client_key = ds_map_find_next(clients, client_key);
+			}
+		}
+	}
+}
+
+function server_send_laser_snapshots(socket_key) {
+	for (var laser_index = 0; laser_index < instance_number(oLaserEmitter); laser_index++) {
+		server_send_laser_state(instance_find(oLaserEmitter, laser_index), socket_key);
+	}
+}
+
+function handle_laser_sync_server(socket_key) {
+	with (oNetworkManager) {
+		if (!ds_map_exists(clients, socket_key)) return;
+		var action = buffer_read(receive_buffer, buffer_u8);
+		if (action != 1) return; // Clients may request a switch, never provide state.
+		var emitter_x = buffer_read(receive_buffer, buffer_f32);
+		var emitter_y = buffer_read(receive_buffer, buffer_f32);
+		var requested_active = buffer_read(receive_buffer, buffer_bool);
+		var laser_inst = find_laser_emitter_at(emitter_x, emitter_y);
+		if (!instance_exists(laser_inst)) return;
+		laser_inst.active = requested_active;
+	}
 }
 
 function server_set_client_sudo(player_id, enabled){
@@ -344,11 +402,12 @@ function handle_item_action_server(socket_key) {
 		var pid = ds_map_find_value(clients, socket_key);
 		var item_id = buffer_read(receive_buffer, buffer_u16);
 		var value = buffer_read(receive_buffer, buffer_f16);
-		server_process_item_action(pid, item_id, value);
+		var target_slot = buffer_read(receive_buffer, buffer_u8);
+		server_process_item_action(pid, item_id, value, target_slot);
 	}
 }
 
-function server_process_item_action(pid, item_id, requested_value = 0) {
+function server_process_item_action(pid, item_id, requested_value = 0, target_slot = 255) {
 	with (oNetworkManager) {
 		if (!is_server) return false;
 
@@ -358,18 +417,34 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 		if (player.stats.Health_points <= 0) return false;
 
 		if (is_caliber_box_item(item_id)) {
-			var weapon_id = ds_map_find_value(player_data, "weapon_id");
-			var current_clip = ds_map_find_value(player_data, "weapon_clip_ammo");
+			if (target_slot != OtherSlot.Primary && target_slot != OtherSlot.Secondary) return false;
+			var slot_prefix = (target_slot == OtherSlot.Primary) ? "primary" : "secondary";
+			var active_slot = ds_map_find_value(player_data, "active_weapon_slot");
+			var weapon_id = ds_map_find_value(player_data, slot_prefix + "_id");
+			var current_clip = ds_map_find_value(player_data, slot_prefix + "_clip_ammo");
+			if (player.is_local) {
+				weapon_id = global.Inventory[# target_slot, INDEX.slot_id];
+				current_clip = global.Inventory[# target_slot, INDEX.slot_clip_ammo] - global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
+				active_slot = player.WeaponID;
+			} else if (active_slot == target_slot) {
+				weapon_id = ds_map_find_value(player_data, "weapon_id");
+				current_clip = ds_map_find_value(player_data, "weapon_clip_ammo");
+			}
 			if (is_undefined(weapon_id) || is_undefined(current_clip)) return false;
+			if (weapon_id <= ITEM.None || weapon_id >= ITEM.Total) return false;
+			if (global.ItemIndex[# weapon_id, ITEMSTATS.Type] != "Weapon") return false;
 			if (global.ItemIndex[# weapon_id, ITEMSTATS.caliber_type] != global.ItemIndex[# item_id, ITEMSTATS.caliber_type]) return false;
 
 			var amount = global.ItemIndex[# item_id, ITEMSTATS.MaxAmmo];
 			var requested_clip = max(0, round(requested_value));
 			if (requested_clip < current_clip || requested_clip > current_clip + amount) return false;
 
-			ds_map_set(player_data, "weapon_clip_ammo", requested_clip);
-			weapon_sync = true;
-			server_item_action_broadcast(pid, item_id, amount, requested_clip);
+			ds_map_set(player_data, slot_prefix + "_clip_ammo", requested_clip);
+			if (active_slot == target_slot) {
+				ds_map_set(player_data, "weapon_clip_ammo", requested_clip);
+				weapon_sync = true;
+			}
+			server_item_action_broadcast(pid, item_id, amount, requested_clip, target_slot);
 			if (player.is_remote) {
 				if (player.network_item_action_timer <= -1) player.network_item_use_restore_id = player.network_item_use_id;
 				player.network_item_use_id = item_id;
@@ -439,6 +514,7 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 			CanShoot = true;
 
 			if (amount > 0) {
+				body_blood_stains = [];
 				damage_indicator("+" + string(round(amount)), x, y - 30, c_green, spr_Icons, ICON.health);
 			}
 		}
@@ -449,7 +525,7 @@ function server_process_item_action(pid, item_id, requested_value = 0) {
 	}
 }
 
-function server_item_action_broadcast(pid, item_id, amount, value) {
+function server_item_action_broadcast(pid, item_id, amount, value, target_slot = 255) {
 	with (oNetworkManager) {
 		if (!is_server) return;
 
@@ -460,6 +536,7 @@ function server_item_action_broadcast(pid, item_id, amount, value) {
 		buffer_write(send_buffer, buffer_u16, item_id);
 		buffer_write(send_buffer, buffer_f16, amount);
 		buffer_write(send_buffer, buffer_f16, value);
+		buffer_write(send_buffer, buffer_u8, target_slot);
 
 		var socket_key = ds_map_find_first(clients);
 		for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
@@ -2211,7 +2288,7 @@ function player_death_broadcast(attacker_pid, victim_pid, weapon_id, attacker_na
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8, PACKET.PLAYER_DEATH);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u8, attacker_pid);
+		buffer_write(send_buffer, buffer_u8, attacker_pid < 0 ? 255 : attacker_pid);
         buffer_write(send_buffer, buffer_u8, victim_pid);
         buffer_write(send_buffer, buffer_u16, weapon_id);
         buffer_write(send_buffer, buffer_string, attacker_name);
@@ -2331,7 +2408,8 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 	penetration_damage = clamp(penetration_damage, 0, 100);
 
 	var item_type = global.ItemIndex[# weapon_id, ITEMSTATS.Type];
-	if (weapon_id == ITEM.None || (item_type != "Weapon" && !(allow_server_damage_item && server_valid_server_damage_item(weapon_id)))) {
+	var is_server_laser = allow_server_damage_item && attacker_pid == -1 && weapon_id == ITEM.laser;
+	if (weapon_id == ITEM.None || (item_type != "Weapon" && !(allow_server_damage_item && server_valid_server_damage_item(weapon_id)) && !is_server_laser)) {
 		return result;
 	}
 
@@ -2351,7 +2429,7 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 
 	var attacker_x = server_player_state_value(attacker_pid, "x", shot_start[0]);
 	var attacker_y = server_player_state_value(attacker_pid, "y", shot_start[1]);
-	if (weapon_id == ITEM.Bomb || weapon_id == ITEM.MolotovGrenade) {
+	if (weapon_id == ITEM.Bomb || weapon_id == ITEM.molotov || is_server_laser) {
 		attacker_x = shot_start[0];
 		attacker_y = shot_start[1];
 	}
@@ -2429,7 +2507,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (!instance_exists(victim_obj)) return;
 
-		if (weapon_id != ITEM.Bomb && weapon_id != ITEM.MolotovGrenade) {
+		if (weapon_id != ITEM.Bomb && weapon_id != ITEM.molotov) {
 			var attacker_data = ds_map_find_value(player_states, attacker_pid);
 			if (!is_undefined(attacker_data)) {
 				var attacker_hp = ds_map_find_value(attacker_data, "hp");
@@ -2438,7 +2516,8 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 		}
 
         if (!server_validate_hit_projectile(attacker_pid, projectile_id, weapon_id)) {
-            if (!(server_local_authority && !server_valid_weapon_id(weapon_id) && server_valid_server_damage_item(weapon_id))) return;
+			var server_laser_hit = server_local_authority && attacker_pid == -1 && weapon_id == ITEM.laser;
+            if (!(server_local_authority && !server_valid_weapon_id(weapon_id) && server_valid_server_damage_item(weapon_id)) && !server_laser_hit) return;
         }
 		
 		var player_data = ds_map_find_value(player_states, victim_pid);
@@ -2480,7 +2559,8 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 			server_release_machine_gun(victim_pid);
 			award_damage_assists(victim_obj, attacker_pid);
 
-			var attacker_name = server_player_display_name(attacker_pid);
+			var attacker_name = (attacker_pid == -1 && weapon_id == ITEM.laser)
+				? "Laser" : server_player_display_name(attacker_pid);
 			var weapon_name = server_item_display_name(weapon_id);
 			
 			// Označ remote obět za mrtvou
@@ -2512,7 +2592,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
         buffer_seek(send_buffer, buffer_seek_start, 0);
         buffer_write(send_buffer, buffer_u8,  PACKET.HIT);
         buffer_write(send_buffer, buffer_u32, send_sequence++);
-        buffer_write(send_buffer, buffer_u8, attacker_pid);
+        buffer_write(send_buffer, buffer_u8, attacker_pid < 0 ? 255 : attacker_pid);
 		buffer_write(send_buffer, buffer_u8, victim_pid);
 		buffer_write(send_buffer, buffer_f16, damage);
 		buffer_write(send_buffer, buffer_u16, weapon_id);
@@ -2786,5 +2866,6 @@ function handle_init_sync_server(socket_id) {
 
         sent_server_udp(server_socket, socket_id, send_buffer);
 		server_send_machine_gun_snapshots(socket_id);
+		server_send_laser_snapshots(socket_id);
     }
 }

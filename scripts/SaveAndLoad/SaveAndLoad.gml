@@ -29,7 +29,7 @@ function save_game(){
 	ini_write_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 	ini_write_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
 	ini_write_real("Vars", "enemy_can_move", global.EnemyCanMove);
-	ini_write_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
+	ini_write_real("Vars", "draw_bullet_impact", global.draw_bullet_impact);
 	ini_write_real("Vars", "camera_crosshair_shake", global.ViewShake);
 	ini_write_real("Vars", "admin_hud", global.draw_advanced_hud);
 	ini_write_real("Vars", "draw_particles", global.DrawParticles);
@@ -125,7 +125,7 @@ function load_game(){
 	global.DynamicCrosshair = 0;
 	global.PlayerInaccuracy = 1;
 	global.EnemyCanMove = 1;
-	global.DrawBulletImpact = 0;
+	global.draw_bullet_impact = 1;
 	global.ViewShake = 1;
 	global.draw_advanced_hud = 0;
 	global.crosshair_scale = 1;
@@ -158,7 +158,7 @@ function load_game(){
 		global.DynamicCrosshair = ini_read_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
 		global.PlayerInaccuracy = ini_read_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
 		global.EnemyCanMove = ini_read_real("Vars", "enemy_can_move", global.EnemyCanMove);
-		global.DrawBulletImpact = ini_read_real("Vars", "draw_bullet_impact", global.DrawBulletImpact);
+		global.draw_bullet_impact = ini_read_real("Vars", "draw_bullet_impact", global.draw_bullet_impact);
 		global.ViewShake = ini_read_real("Vars", "camera_crosshair_shake", global.ViewShake);
 		global.draw_advanced_hud = ini_read_real("Vars", "admin_hud", global.draw_advanced_hud);
 		global.DrawParticles = ini_read_real("Vars", "draw_particles", global.DrawParticles);

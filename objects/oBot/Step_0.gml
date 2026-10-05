@@ -1,6 +1,42 @@
 /* Step */
 event_inherited();
 
+#region Respiratory effect
+var br_target_amp = 0.01;
+var br_target_spd = 0.15;
+
+if(State == STATES.Idle || State == STATES.NoMove){
+	br_target_amp = 0.014;
+	br_target_spd = 0.11;
+}else if(State == STATES.FleeDanger || State == STATES.MoveAwayFromGrenade){
+	br_target_amp = 0.08;
+	br_target_spd = 0.20;
+}
+
+if(alarm[3] > 0){
+	br_target_amp = min(br_target_amp, 0.08);
+	br_target_spd = max(br_target_spd, 0.23);
+}
+
+if(stats.Health_points < stats.Max_health_points * 0.35){
+	br_target_amp = 0.04;
+	br_target_spd = max(br_target_spd, 0.28);
+}
+
+var br_dt_ms = min(delta_time / 1000, 50) * global.time_step;
+var br_blend = clamp(br_dt_ms / 250, 0, 1);
+br_amp = lerp(br_amp, br_target_amp, br_blend);
+br_spd = lerp(br_spd, br_target_spd, br_blend);
+br_phase = (br_phase + br_spd * br_dt_ms) mod 360;
+body_visual_scale = 1 + br_amp * sin(degtorad(br_phase));
+image_xscale = 1;
+image_yscale = 1;
+if(instance_exists(Weapon)){
+	Weapon.image_xscale = body_visual_scale;
+	Weapon.image_yscale = body_visual_scale;
+}
+#endregion
+
 #region Death
 if(stats.Health_points <= 0){
 	var drop_weapon_slot = WeaponPositionID;
@@ -31,7 +67,7 @@ if(stats.Health_points <= 0){
 	instance_destroy(LegHB);
 	instance_destroy(Legs);
 	drop_experience(1, xp_value, x, y, sprite_width/4);
-	if(WeaponID[drop_weapon_slot] != ITEM.None && percent_chance(10)){
+	if(WeaponID[drop_weapon_slot] != ITEM.None && percent_chance(5)){
 		ItemDrop(
 			WeaponID[drop_weapon_slot], 
 			x + lengthdir_x(WeaponDistance, RotationAngle), 
@@ -47,7 +83,7 @@ if(stats.Health_points <= 0){
 		);
 	}
 	if(ArmourID != ITEM.None){
-		if(percent_chance(10)){
+		if(percent_chance(5)){
 			ItemDrop(
 				ArmourID, 
 				random_range(x - sprite_width/4, x + sprite_width/4), 
@@ -59,7 +95,7 @@ if(stats.Health_points <= 0){
 		}
 	}
 	if(HelmetID != ITEM.None){
-		if(percent_chance(10)){
+		if(percent_chance(5)){
 			ItemDrop(
 				HelmetID, 
 				random_range(x - sprite_width/4, x + sprite_width/4), 
@@ -70,15 +106,15 @@ if(stats.Health_points <= 0){
 			);
 		}
 	}
-	if(has_defuse_kit){
+	if(has_defuse_kit && percent_chance(50)){
 		ItemDrop(
-			ITEM.DefuseKit,
+			ITEM.defuse_kit,
 			random_range(x - sprite_width/4, x + sprite_width/4),
 			random_range(y - sprite_height/4, y + sprite_height/4)
 		);
 	}
 
-	if(percent_chance(25)){
+	if(percent_chance(10)){
 		var drop_items = [
 			{item:	ITEM.dilatation_pill, weight: 35},
 			{item:	ITEM.adrenaline, weight: 15},
@@ -110,7 +146,7 @@ if(stats.Health_points <= 0){
 	}
 	
 	
-	var gnd_id = [ITEM.HEGrenade, ITEM.FlashBangGrenade, ITEM.SmokeGrenade, ITEM.MolotovGrenade];
+	var gnd_id = [ITEM.HEGrenade, ITEM.flashbang, ITEM.smoke, ITEM.molotov];
 	for(var i = 0; i < array_length(Grenades); i ++){
 		if(Grenades[i] > 0){
 			if(percent_chance(10)){
@@ -288,6 +324,7 @@ if(healing_time >= global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.ReloadSpeed]){
 	CanShoot = true;
 	stats.Health_points += global.ItemIndex[#ITEM.HealingKit, ITEMSTATS.Damage];
 	stats.Damage_health_points = stats.Health_points;
+	body_blood_stains = [];
 	healing_time = -1;
 }
 #endregion
@@ -427,8 +464,8 @@ if(State == STATES.FleeDanger && global.EnemyCanMove == true){
 }else if(global.EnemyCanMove == true && mv_timer <= global.time_step){
 	
 	if(instance_exists(ChasingObject) && State != STATES.MoveCommand){
-		target_x = ChasingObject.x;
-		target_y = ChasingObject.y;
+		target_x = chasing_available ? ChasingObject.x : last_seen_x;
+		target_y = chasing_available ? ChasingObject.y : last_seen_y;
 	}
 	
 	#region States
@@ -459,7 +496,12 @@ if(State == STATES.FleeDanger && global.EnemyCanMove == true){
 		
 		case STATES.MoveToward:
 			if(ReactionTimer <= 0){
-				MoveTowards(target_x, target_y, Acceleration);
+				if(chasing_available || point_distance(x, y, target_x, target_y) > 64){
+					MoveTowards(target_x, target_y, Acceleration);
+				}else{
+					MoveTime = 0;
+					set_state(STATES.Walk);
+				}
 			}
 		break;
 		
@@ -588,16 +630,21 @@ if (ChasingObject != noone && !bot_target_is_enemy(ChasingObject)) {
 
 if(bot_target_is_enemy(ChasingObject) && ChasingObjectSpotted){
 	var cs_max_spread = 48 * rank_less;
+	var target_smoked = point_in_grenade_smoke(ChasingObject.x, ChasingObject.y);
+	var target_visible = chasing_available && !target_smoked;
 	if(cs_focus_target != ChasingObject || (cs_last_step_time >= 0 && current_time - cs_last_step_time > 250)){
 		cs_focus_target = ChasingObject;
 		cs_spread = cs_max_spread;
-		cs_start_angle = point_direction(x, y, ChasingObject.x, ChasingObject.y);
+		cs_start_angle = target_visible
+			? point_direction(x, y, ChasingObject.x, ChasingObject.y)
+			: point_direction(x, y, FacingX, FacingY);
 		crosshair_x = x + lengthdir_x(384, cs_start_angle);
 		crosshair_y = y + lengthdir_y(384, cs_start_angle);
 	}
 	cs_spread = max(0, cs_spread - (0.75 * rank_boost * global.time_step));
-	var cs_target_x = ChasingObject.headshot_x + sin(degtorad(current_time * .015 + cs_phase)) * cs_spread;
-	var cs_target_y = ChasingObject.headshot_y + cos(degtorad(current_time * .03 + cs_phase)) * cs_spread;
+	if(target_smoked){ cs_spread = max(cs_spread, 64 * rank_less); }
+	var cs_target_x = (target_visible ? ChasingObject.headshot_x : FacingX) + sin(degtorad(current_time * .015 + cs_phase)) * cs_spread;
+	var cs_target_y = (target_visible ? ChasingObject.headshot_y : FacingY) + cos(degtorad(current_time * .03 + cs_phase)) * cs_spread;
 	var cs_step = 8 * rank_boost * global.time_step;
 	var cs_distance = point_distance(crosshair_x, crosshair_y, cs_target_x, cs_target_y);
 	if(cs_distance <= cs_step){
@@ -619,7 +666,7 @@ cs_last_step_time = current_time;
 if(global.EnemyCanMove == true && bot_target_is_enemy(ChasingObject)){
     if(ReactionTimer <= 0){
 		var shoot_chance = .1 * rank_boost;
-		if(chasing_available == true){ shoot_chance = 1; }
+		if(chasing_available && !point_in_grenade_smoke(ChasingObject.x, ChasingObject.y)){ shoot_chance = 1; }
 
         switch(State){
             case STATES.MoveAway:
@@ -670,7 +717,6 @@ if (FlashedTimer > 0 || Reloading) { trigger_texture_timer = trigger_texture_tim
 if (StaminaTimer > 0) { StaminaTimer -= global.time_step; }
 if (EquippedGrenadeTimer > -1) {EquippedGrenadeTimer = max(-1, EquippedGrenadeTimer - global.time_step);}
 if (EquippedLandMineTimer > -1) {EquippedLandMineTimer -= global.time_step;}
-if (FootStepTimer > -1) {FootStepTimer -= global.time_step;}
 if (ReactionTimer > -1) {ReactionTimer -= global.time_step;}
 if (FlashedTimer > -1) {FlashedTimer -= global.time_step;}
 if (search_timer > -1) {search_timer -= 1;}
@@ -699,7 +745,10 @@ if(chasing_timer == 0){
 	ChasingObjectSpotted = false;
 }
 
-if(instance_exists(ChasingObject)){
+if(chasing_available && instance_exists(ChasingObject)
+&& !point_in_grenade_smoke(ChasingObject.x, ChasingObject.y)){
+	last_seen_x = ChasingObject.x;
+	last_seen_y = ChasingObject.y;
 	FacingX = ChasingObject.x;
 	FacingY = ChasingObject.y;
 }
@@ -865,26 +914,7 @@ if(mv_timer <= 0 && State != STATES.MoveCommand && State != STATES.FleeDanger &&
 #endregion
 
 #region Smoke
-var fog = instance_nearest(x, y, oFog);
-if(instance_exists(fog)){
-	if(distance_to_object(fog) <= fog.radius && fog.radius >= 100){
-		if(fog.alarm[0] > 1){
-			if(hidden == false){
-				hidden = true;	
-			}
-		}else{
-			if(hidden == true){
-				hidden = false;
-			}
-		}
-	}else{
-		if(hidden == true){
-			hidden = false;	
-		}
-	}
-}else if(hidden){
-	hidden = false;
-}
+hidden = point_in_grenade_smoke(x, y);
 
 if(hidden){
 	var can_walk_in_smoke = State == STATES.Idle
@@ -1079,7 +1109,7 @@ if(FlashLight != undefined){
 if!(instance_exists(ChasingObject)){
 	if(search_timer == -1){ search_timer = 1; } /// pokud chasingObject neexistuje, zkus okamžitě hledat
 	ChasingObjectSpotted = false;
-}else if(chasing_available){
+}else if(chasing_available && !point_in_grenade_smoke(ChasingObject.x, ChasingObject.y)){
 	ChasingObjectSpot(chasing_time);
 }else if(ChasingObjectSpotted == false && State != STATES.MoveCommand && State != STATES.FleeDanger && State != STATES.Walk){
 	if(Flashed == false){
@@ -1122,14 +1152,14 @@ if(global.EnemyCanMove == true){
 				GrenadeSpd = 7;
 			break;
 		
-			case ITEM.FlashBangGrenade:
+			case ITEM.flashbang:
 				var behindAngle = RotationAngle + 180;
 				Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
 				Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
 				GrenadeSpd = 5;
 			break;
 			
-			case ITEM.SmokeGrenade:
+			case ITEM.smoke:
 				Target_x = random_range(x - sprite_width, x + sprite_width);
 				Target_y = random_range(y - sprite_height, y + sprite_height);
 				GrenadeSpd = 1;
@@ -1168,22 +1198,6 @@ MoveTime = max(0, MoveTime - global.time_step);
 if (MoveTime > 0) {
 	XSpeed += lengthdir_x(Acceleration * 2, MoveDirection);
 	YSpeed += lengthdir_y(Acceleration * 2, MoveDirection);
-
-	if(walking){
-		FootStepTimer = -1;
-		FootSteps = 0;
-	}else{
-		if(FootStepTimer == -1){
-			FootStepTimer = 10;
-			FootSteps ++;
-		}
-		if(FootStepTimer == 0){
-			if(Visible == true){
-				particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
-				particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
-			}
-		}
-	}
 }
 	
 // Friction

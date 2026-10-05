@@ -17,6 +17,8 @@ function gain_item(ID, Amount, ItemAmmo, ItemClipAmmo, ItemDurability, ItemScope
 	var type = global.ItemIndex[#ID, ITEMSTATS.Type];
 	var is_stackable = !(type == "Armour" || type == "Helmet" || type == "Weapon" || type == "Shield");
 	var PickedUp = false;
+	
+	play_sound(global.local_player.x, global.local_player.y, snd_ItemPickup, global.local_player);
 
 	// --- SEKCE 1: HLEDÁNÍ STEJNÉHO ID ---
 	if(is_stackable) {
@@ -134,12 +136,12 @@ function wpn_has_preattached(weapon_id, socket, item) {
 function InventoryInit() {
 
 	enum ITEM{
-	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, FlashBangGrenade, SG550, SpecOpsHelm, 
-		SpecOpsVest, NightVision, HealingKit, InfraredVision, SmokeGrenade, Javelin, HELandMine, CELandMine, LELandMine, Glock, 
+	    None, AKM, KevlarHelm, DesertEagle, KevlarVest, Spas, MilitaryHelm, MilitaryVest, SSG08, HEGrenade, MAC11, flashbang, SG550,
+		NightVision, HealingKit, InfraredVision, smoke, Javelin, HELandMine, CELandMine, LELandMine, Glock,
 		StickyGrenade, red_dot_scope, two_scope, adaptive_chambering, vertical_grip, horizontal_grip, suppressor, m4a1, awm, usp, base_explosion,
 		nuclear_explosion, basic_machine_gun, galil, p250, MK18, famas, steel_knife, tec9, low_cal_box, med_cal_box, high_cal_box, gauge_box,
-		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, spec_ops_shield, MP7, P90, Scar, MolotovGrenade, Bomb, DefuseKit, gold_card,
-		magenta_card, red_card, aqua_card, green_card, black_card, white_card, m200, bipod, g36c, laser, adrenaline, steroids, Total
+		range_finder, Dragunov, dilatation_pill, MP9, CZ75, kevlar_shield, military_shield, MP7, P90, Scar, molotov, Bomb, defuse_kit, gold_card,
+		magenta_card, red_card, aqua_card, green_card, black_card, white_card, m200, bipod, g36c, laser, adrenaline, steroids, blue_laser, red_laser, yellow_laser, Total
 	}
 
 	enum ITEMSTATS{
@@ -202,11 +204,20 @@ function ItemDeclare(){
 	}
 }
 	
-function ItemAmountSubstract(ID, Amount){
-	global.Inventory[# ID, INDEX.SlotAmount] -= Amount;
-	if(global.Inventory[# ID, INDEX.SlotAmount] <= 0){
-		for(i=0;i<INDEX.Total;i++){
-			global.Inventory[# ID, i] = 0;
+function ItemAmountSubstract(ID, Amount, mouse = false){
+	if(mouse == false){
+		global.Inventory[# ID, INDEX.SlotAmount] -= Amount;
+		if(global.Inventory[# ID, INDEX.SlotAmount] <= 0){
+			for(i=0;i<INDEX.Total;i++){
+				global.Inventory[# ID, i] = 0;
+			}
+		}
+	}else{
+		global.MouseSlot[# ID, INDEX.SlotAmount] -= Amount;
+		if(global.MouseSlot[# ID, INDEX.SlotAmount] <= 0){
+			for(i=0;i<INDEX.Total;i++){
+				global.MouseSlot[# ID, i] = 0;
+			}
 		}
 	}
 }
@@ -433,12 +444,11 @@ function item_equip(slot, slot_string, weapon_id, equip = true){
 					if (!IS_NET) {
 						damage_indicator("+" + string(amt), global.local_player.x, global.local_player.y, c_white, spr_Icons, ICON.ammo);
 					} else if (oNetworkManager.is_server) {
-						server_process_item_action(network_id, Id, global.Inventory[# WeaponID, INDEX.slot_clip_ammo]);
+						server_process_item_action(network_id, Id, global.Inventory[# WeaponID, INDEX.slot_clip_ammo], WeaponID);
 					} else if (oNetworkManager.is_connected) {
-						send_item_action_complete_client(Id, global.Inventory[# WeaponID, INDEX.slot_clip_ammo]);
+						send_item_action_complete_client(Id, global.Inventory[# WeaponID, INDEX.slot_clip_ammo], WeaponID);
 					}
 
-					weapon_network_propagate();
 					item_equip_timer = item_equip_time;
 			        ItemAmountSubstract(slot, 1);
 			    }

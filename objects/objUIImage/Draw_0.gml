@@ -41,11 +41,7 @@ if(drawable == true){
 			var g = 54;
 			var b = 54;
 			shader_set(shd_LightGray);
-			if (zui_get_hover()) {
-			    shader_set_uniform_f(oDraw.BlendColor, 0.1, 0.1, 0.1, 1.0);
-			} else {
-			    shader_set_uniform_f(oDraw.BlendColor, r/255, g/255, b/255, 1.0);	
-			}
+			shader_set_uniform_f(oDraw.BlendColor, r/255, g/255, b/255, 1.0);
 			draw_sprite_stretched_ext(sprite, sprite_image_index, 0, 0, sprite_width_size, sprite_height_size, draw_get_color(), alpha * alpha_value);
 			shader_reset();	
 		}

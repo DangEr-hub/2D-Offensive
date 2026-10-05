@@ -161,18 +161,51 @@ function hitmap_record_given(attacker, victim_key, victim_name, damage) {
 	}
 }
 
-function create_blood(splash_number, xx, yy, color, part_number){
+function configure_blood_splash(blood, spray_dir, is_gui){
+	var gui_mod = 1;
+	if(is_gui){
+		gui_mod = 1.5;
+	}
+	
+	blood.movDir = random(360);
+	if(spray_dir >= 0 && random(1) < 0.8){
+		blood.movDir = spray_dir + random_range(-65, 65);
+	}
+
+	var shape_roll = random(1);
+	if(shape_roll < 0.25){
+		blood.image_xscale = random_range(1.5, 2.5) * gui_mod;
+		blood.image_yscale = random_range(0.15, 0.5) * gui_mod;
+		blood.image_angle = blood.movDir + random_range(-15, 15);
+	}else{
+		var drop_scale = shape_roll < 0.8 ? random_range(0.55, 1.25) : random_range(0.2, 0.45);
+		blood.image_xscale = drop_scale * gui_mod;
+		blood.image_yscale = drop_scale * random_range(0.75, 1.1) * gui_mod;
+		blood.image_angle = random(360);
+	}
+}
+
+function create_blood(splash_number, xx, yy, color, part_number, spray_dir = -1){
 	repeat(splash_number){
 		BloodSplash = instance_create_layer(xx, yy, "ItemsO", oBloodSplash);
 		BloodSplash.image_blend = color;
+		configure_blood_splash(BloodSplash, spray_dir, false);
+		BloodSplash.sizeChange = random_range(BloodSplash.image_xscale / 7, BloodSplash.image_xscale / 5);
 	}
 	if(instance_exists(oParticleSystem)){
 		part_type_color1(oParticleSystem.BloodParticle, color);
+		if(spray_dir >= 0){
+			var directed_count = round(part_number * 0.8);
+			part_type_direction(oParticleSystem.BloodParticle, spray_dir - 65, spray_dir + 65, 0, 0);
+			part_particles_create(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, directed_count);
+			part_number -= directed_count;
+		}
+		part_type_direction(oParticleSystem.BloodParticle, 0, 359, 0, 0);
 		part_particles_create(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, part_number);
 	}	
 }
 
-function create_blood_gui(world_x, world_y, splash_number, color = c_red){
+function create_blood_gui(world_x, world_y, splash_number, color = c_red, spray_dir = -1){
 	
 	// --- kamera (world) ---
 	var cam_x1 = oDraw.ViewX;
@@ -229,6 +262,9 @@ function create_blood_gui(world_x, world_y, splash_number, color = c_red){
 
 	// --- směr rozprsku (od hrany do středu kamery) ---
 	var splash_dir = point_direction(ix, iy, cam_cx, cam_cy);
+	if(spray_dir >= 0 && abs(angle_difference(spray_dir, splash_dir)) < 90){
+		splash_dir = spray_dir;
+	}
 
 	// --- spawn GUI blood ---
 	for(var i = 0; i < splash_number; i ++){
@@ -246,16 +282,13 @@ function create_blood_gui(world_x, world_y, splash_number, color = c_red){
 		}
 
 		var blood = instance_create_layer(s_x, s_y, "ItemsO", oBloodSplash);
-		var dir_step = 2.5;
 		blood.is_gui = true;
 		blood.gui_x = s_x;
 		blood.gui_y = s_y;
 
-		blood.movDir = splash_dir - dir_step*splash_number/2 + i*dir_step;
-		blood.fric = min(random_range(splash_number/9.75, splash_number/10), .8);
-		blood.image_alpha = random_range(.925, .927);
-		blood.image_xscale = min(random_range(splash_number/4, splash_number/3.75), 2.5);
-		blood.image_yscale = blood.image_xscale;
+		configure_blood_splash(blood, splash_dir, true);
+		blood.fric = min(random_range(splash_number/7, splash_number/5), .7);
+		blood.image_alpha = random_range(.75, .85);
 		blood.visible = false;
 		blood.sizeChange = 0;
 		blood.alphaChange = random_range(0.05, 0.0525);
@@ -265,6 +298,31 @@ function create_blood_gui(world_x, world_y, splash_number, color = c_red){
 
 }
 
+
+function add_body_blood(hit_object, hit_damage, body_part, impact_x, impact_y) {
+	if(!instance_exists(hit_object) || (hit_object.object_index != oPlayer && hit_object.object_index != oBot) || hit_damage <= 0) return;
+
+	var hit_delta_x = impact_x - hit_object.x;
+	var hit_delta_y = impact_y - hit_object.y;
+	var hit_cos = dcos(hit_object.RotationAngle);
+	var hit_sin = dsin(hit_object.RotationAngle);
+	var stain_pos_x = sprite_get_xoffset(hit_object.sprite_index) + (hit_delta_x * hit_cos - hit_delta_y * hit_sin) / hit_object.body_visual_scale;
+	var stain_pos_y = sprite_get_yoffset(hit_object.sprite_index) + (hit_delta_x * hit_sin + hit_delta_y * hit_cos) / hit_object.body_visual_scale;
+	var stain_scale = clamp(0.15 + hit_damage / 150, 0.15, 0.5) * random_range(0.85, 1.15);
+
+	var stains = hit_object.body_blood_stains;
+	if(array_length(stains) >= 24) array_delete(stains, 0, 1);
+	array_push(stains, {
+		pos_x: stain_pos_x,
+		pos_y: stain_pos_y,
+		frame: irandom(sprite_get_number(spr_BloodSplash) - 1),
+		scale: stain_scale,
+		angle: irandom(359),
+		blend: body_part <= HITBOX.HeadProne ? c_maroon : c_white,
+		alpha: min(random_range(0.2, 0.4) * (1 + hit_damage/100), 1)
+	});
+	hit_object.body_blood_stains = stains;
+}
 
 function send_hit(attacking_item, hit_object, BodyPart, impact_pos, equip_dur) {
     if (!IS_NET) { return;}
@@ -344,6 +402,14 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 	}
 
 	if(IS_NET && is_player && oNetworkManager.is_server){
+		// An environmental laser has no player owner to pass through send_hit.
+		if(attacking_item.object_index == oLaserEmitter){
+			server_process_hit(attacking_item.stats.Owner_id, hit_object.network_id,
+				attacking_item.stats.Damage, BodyPart, [impact_x, impact_y], 1, 0, [0, 0, 0],
+				attacking_item.stats.Item_id, attacking_item.stats.Penetration_damage,
+				[attacking_item.x, attacking_item.y], -1, true);
+			return;
+		}
 		send_hit(attacking_item, hit_object, BodyPart, [impact_x, impact_y], [0, 0, 0]);
 		return;
 	}
@@ -467,16 +533,20 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		if(hit_object.object_index == oBot){
 			hit_object.enemy_aimpunch = hit_object.attack_damage * aim_punch_modifier;
 		}
-		create_blood(round(hit_object.attack_damage / 5), impact_x, impact_y, blood_color, round(hit_object.attack_damage / 2));	
+		if(attacking_item.object_index == oBullet){
+			add_body_blood(hit_object, hit_object.attack_damage, BodyPart, impact_x, impact_y);
+		}
+		var blood_spray_dir = attacking_item.object_index == oBullet ? ((attacking_item.direction + 180) mod 360) : -1;
+		create_blood(round(hit_object.attack_damage / 2), impact_x, impact_y, blood_color, round(hit_object.attack_damage / 2), blood_spray_dir + 180);	
 		
 		if(!is_player || (is_player && hit_object.is_local == false)){
 			if(point_distance(hit_object.x, hit_object.y, global.local_player.x, global.local_player.y) <= 192){						
-				create_blood_gui(hit_object.x, hit_object.y, round(hit_object.attack_damage/2), BodyPart <= HITBOX.HeadProne ? c_maroon : c_red);
+				create_blood_gui(hit_object.x, hit_object.y, hit_object.attack_damage, BodyPart <= HITBOX.HeadProne ? c_maroon : c_red, blood_spray_dir);
 			}
 		}
 		
 		if(is_player && hit_object.is_local == true){
-			create_blood_gui(attacking_item.stats.Starting_x, attacking_item.stats.Starting_y, round(hit_object.attack_damage/2), BodyPart <= HITBOX.HeadProne ? c_maroon : c_red);	
+			create_blood_gui(attacking_item.stats.Starting_x, attacking_item.stats.Starting_y, hit_object.attack_damage, BodyPart <= HITBOX.HeadProne ? c_maroon : c_red, blood_spray_dir);	
 		}
 
 		var attacker_key = -1;

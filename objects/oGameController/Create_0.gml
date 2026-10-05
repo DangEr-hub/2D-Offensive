@@ -17,6 +17,7 @@ assists = 0;
 current_round = 0;
 playing_time = 0;
 round_ended = false;
+round_result_processed = false;
 next_round_requested = false;
 round_start_money = global.player_stats.Money;
 bot_spawn_position = [0, 0];
@@ -28,7 +29,7 @@ bomb_defused = false;
 global.bomb_time = 5 * game_get_speed(gamespeed_fps);
 if(!IS_NET){
 	if(global.player_stats.Player_team == TEAM.POLICE && !instance_exists(oBomb)){
-		global.bomb_time = 200 * game_get_speed(gamespeed_fps);
+		global.bomb_time = 500 * game_get_speed(gamespeed_fps);
 		var bomb_areas = global.MapProperties[# global.MapID, MAP_STAT.BombAreas];
 		var area_keys = ds_map_keys_to_array(bomb_areas);
 		var area = bomb_areas[? area_keys[irandom(array_length(area_keys) - 1)]];

@@ -1,4 +1,3 @@
-// Assuming you have the shader set up as shd_Wave
 shader_set(shd_Wave);
 
 // Pass the time uniform

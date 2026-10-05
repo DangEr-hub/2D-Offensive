@@ -152,23 +152,23 @@ function draw_text_outlined_ext(position_x, position_y, text, text_color, outlin
 	draw_set_colour(c_white);
 }
 	
-function draw_weapon_attachments(weapon_inst, muzzle_distance, suppressor_id, barrel_id, scope_id){
+function draw_weapon_attachments(weapon_inst, muzzle_distance, suppressor_id, barrel_id, scope_id, draw_alpha = 1){
 	if(suppressor_id != ITEM.None){
 		var suppressor_uvs = sprite_get_uvs(spr_Items, suppressor_id);
 		var suppressor_distance = muzzle_distance - (suppressor_uvs[4] - sprite_get_xoffset(spr_Items)) * .5;
 		draw_sprite_ext(spr_Items, suppressor_id,
 			weapon_inst.x + lengthdir_x(suppressor_distance, weapon_inst.image_angle),
 			weapon_inst.y + lengthdir_y(suppressor_distance, weapon_inst.image_angle),
-			.5, .5, weapon_inst.image_angle, c_white, 1);
+			.5, .5, weapon_inst.image_angle, c_white, draw_alpha);
 	}
 
 	if(barrel_id != ITEM.None){
 		draw_sprite_ext(spr_Attachments, global.ItemIndex[# barrel_id, ITEMSTATS.AmmoSpriteID],
-			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, 1);
+			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, draw_alpha);
 	}
 	if(scope_id != ITEM.None){
 		draw_sprite_ext(spr_Attachments, global.ItemIndex[# scope_id, ITEMSTATS.AmmoSpriteID],
-			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, 1);
+			weapon_inst.x, weapon_inst.y, 1, 1, weapon_inst.image_angle, c_white, draw_alpha);
 	}
 }
 

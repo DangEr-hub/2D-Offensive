@@ -3,12 +3,20 @@ function console_write_debug(_text){
     var line = string(_text);
 
     ds_list_insert(global.console[? "history"], 0, line);
+	if(global.console[? "selection_anchor_line"] >= 0){
+		global.console[? "selection_anchor_line"]++;
+		global.console[? "selection_focus_line"]++;
+	}
 	
 	set_font("Console");
 	var max_lines = global.ConsoleHeight * global.gui_scale / string_height("W");
 
 	if (ds_list_size(global.console[? "history"]) > max_lines){
 	    ds_list_delete(global.console[? "history"], ds_list_size(global.console[? "history"]) - 1);
+	}
+	if(global.console[? "selection_anchor_line"] >= ds_list_size(global.console[? "history"])
+	|| global.console[? "selection_focus_line"] >= ds_list_size(global.console[? "history"])){
+		console_selection_clear(global.console);
 	}
 
 }

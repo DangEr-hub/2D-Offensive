@@ -119,7 +119,7 @@ main_menu_callback = function(){
 #endregion
 
 draw_set_font(set_font("Title"));
-with (zui_create(title_position_x - string_width(other.title_string)/2, title_position_y, objUILabel)) {
+with (zui_create(title_position_x - string_width(tr(string_replace_all(title_string, " ", "_")))/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
 	color = other.title_color;
 	caption = other.title_string;

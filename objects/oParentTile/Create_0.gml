@@ -1,6 +1,6 @@
 occluder = undefined;
 transparent = false;
-hideable = false;
+hideable = false;draw_trace = true;
 if(object_index != oMachineGunFloor && object_index != oTankTrap){
 	occluder        = new BulbStaticOccluder(oLightRenderer.lighting);
 	occluder.x      = x;

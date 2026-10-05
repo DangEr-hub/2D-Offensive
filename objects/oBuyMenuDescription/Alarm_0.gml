@@ -156,7 +156,7 @@ if(global.ItemIndex[# item_variable, ITEMSTATS.Type] == "Weapon"){
 		
 		var type = get_wpn_type(other.item_variable);
 		
-		caption = "Class: " + type;
+		caption = tr("Class") + ": " + tr(string_replace_all(type, " ", "_"));
 	}
 	#endregion
 
@@ -320,12 +320,11 @@ global.ItemIndex[# item_variable, ITEMSTATS.Type] == "Shield"){
 	offset_y = -text_gap*1.5;	
 	
 	#region Health
-	var healing_amount = global.ItemIndex[# item_variable, ITEMSTATS.Damage];
 	with(zui_create(start_x, start_y, objUILabel)){
 		zui_set_anchor(0, 0);
 		font = set_font("GUI_grid");
 		color = c_white;
-		caption = "Healing power: " + string(other.healing_amount);
+		caption = tr("Healing_power") + ": " + string(global.ItemIndex[# other.item_variable, ITEMSTATS.Damage]);
 		icon_sprite_index = spr_Icons;
 		icon_image_index = ICON.health;
 		icon_after = true;

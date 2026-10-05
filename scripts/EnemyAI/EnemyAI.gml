@@ -1,6 +1,16 @@
 // Script assets have changed for v2.3.0 see
 // https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
 function decide_movement() {
+    if (ChasingObjectSpotted && !chasing_available && bot_target_is_enemy(ChasingObject)) {
+        if (point_distance(x, y, last_seen_x, last_seen_y) <= 64) {
+            set_state(STATES.Walk);
+            return;
+        }
+        if (percent_chance(clamp(60 * rank_less, 20, 90))) {
+            set_state(STATES.MoveToward);
+            return;
+        }
+    }
     if (hidden == false) {
         handle_basic_movement();
     } else {
@@ -184,6 +194,9 @@ function try_shoot(base){
 
     var shoot_timer = min(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer], 30);
     var gain = (base / shoot_timer) * rank_boost / 10;
+	if(point_in_grenade_smoke(ChasingObject.x, ChasingObject.y)){
+		gain *= clamp(0.35 + 0.2 * rank_boost, 0.45, 0.65);
+	}
 
     shoot_accumulator += gain * global.time_step;
 
@@ -242,6 +255,9 @@ function bot_bullet_create(DangerShotX, DangerShotY){
 		projectile_image = 1;
 		projectile_speed = 25;
 		homing_target = ChasingObject;
+	}else if(weapon == ITEM.blue_laser){
+		projectile_image = 3;
+		projectile_speed = 0.5 * BULLET_SPEED * global.time_step;
 	}
 	
 	with(id){
@@ -292,7 +308,8 @@ function check_enemy_rotation(EnemyObject, ChasingObject){
 	
 function check_if_available(ObjectType) {
 	if (!bot_target_is_enemy(ObjectType)) { return false; }
-	var shoot_chance = 100;
+	if (ObjectType.hidden || point_in_grenade_smoke(ObjectType.x, ObjectType.y)) { return false; }
+	if (collision_line(x, y, ObjectType.x, ObjectType.y, oSmokeTile, true, false) != noone) { return false; }
 	var collision = tile_blocks_target_view(
 		x, y,
 		ObjectType.x, ObjectType.y,
@@ -301,13 +318,19 @@ function check_if_available(ObjectType) {
 		id
 	);
     return 
-    (collision == false && distance_to_object(ObjectType) <= ChasingDistance && ObjectType.hidden == false && 
+    (collision == false && distance_to_object(ObjectType) <= ChasingDistance && 
     check_enemy_rotation(id, ObjectType) == true);
 }
 	
 function ChasingObjectSpot(Time){
 	if(ChasingObjectSpotted == false){
 		ReactionTimer = ReactionTime;
+		if(instance_exists(ChasingObject)){
+			last_seen_x = ChasingObject.x;
+			last_seen_y = ChasingObject.y;
+			FacingX = last_seen_x;
+			FacingY = last_seen_y;
+		}
 	}
 	ChasingObjectSpotted = true;
 	chasing_timer = Time;	
@@ -379,7 +402,7 @@ function EnemyShooting(DangerX, DangerY){
 		
 		#region Create flash effect
 		if(flash_effect_timer == -1){
-			flash_effect_timer = round(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer] * .75);
+			flash_effect_timer = round(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.ShootTimer] * .5);
 			if(Ammo[WeaponPositionID] % 2 == 0){
 				var MuzzleFlashLight = new BulbLight(oLightRenderer.lighting, sLightTorch, 0, FlashLightX, FlashLightY);
 				MuzzleFlashLight.angle = RotationAngle;
@@ -787,8 +810,8 @@ function ChooseGrenade(){
 		if(Grenades[Grenade] > 0){
 			switch(Grenade){
 				case 0: EquippedGrenadeID = ITEM.HEGrenade; break;	
-				case 1: EquippedGrenadeID = ITEM.FlashBangGrenade; break;	
-				case 2: EquippedGrenadeID = ITEM.SmokeGrenade; break;
+				case 1: EquippedGrenadeID = ITEM.flashbang; break;	
+				case 2: EquippedGrenadeID = ITEM.smoke; break;
 			}
 			return Grenade;
 		}

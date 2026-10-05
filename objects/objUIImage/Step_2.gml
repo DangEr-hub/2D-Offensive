@@ -1,5 +1,5 @@
 if(buy_menu == true){
-	if (zui_get_hover()) {
+	if (instance_exists(buy_menu_button) && buy_menu_button.__hover) {
 		if(!instance_exists(oBuyMenuDescription)){
 			with(zui_main()){
 				if(global.gui_scale > 1){

@@ -1,0 +1,1 @@
+building_id = 0;

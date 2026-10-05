@@ -137,7 +137,7 @@ function spawn_bots(map_index, spawn_friendly = false) {
 	            var spawn_x = 0;
 				var spawn_y = 0;
 	            var attempts = 0;
-	            var max_attempts = 100; // Limit the number of attempts to find a valid point
+	            var max_attempts = 200; // Limit the number of attempts to find a valid point
 
 	            repeat (max_attempts) {
 	                // Generate a random point within the chosen area

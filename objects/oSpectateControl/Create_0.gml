@@ -12,7 +12,7 @@ var bot_count = collision_circle_list(x, y, BOT_SELECT_RADIUS, oBot,
 	false, false, nearby_bots, true);
 for(var bot_index = 0; bot_index < bot_count; bot_index++){
 	var bot = nearby_bots[| bot_index];
-	if(bot.stats.Team == global.local_player.stats.Team
+	if((bot.stats.Team == global.local_player.stats.Team || global.sudo)
 	&& bot.stats.Health_points > 0
 	&& point_distance(x, y, bot.x, bot.y) <= BOT_SELECT_RADIUS){
 		array_push(candidate_bots, bot);
@@ -38,18 +38,45 @@ show_menu = function(){
 			break;
 		}
 	}
-	if(!living_bot_found && instance_exists(oRoundEndMenu)
-	&& instance_exists(oRoundEndMenu.spectate_button)){
-		with(oRoundEndMenu.spectate_button) zui_set_visible(false);
+	if(!living_bot_found){
+		if(instance_exists(oRoundEndMenu) && instance_exists(oRoundEndMenu.spectate_button)){
+			with(oRoundEndMenu.spectate_button) zui_set_visible(false);
+		}
+		if(instance_exists(oGameEndMenu) && instance_exists(oGameEndMenu.spectate_button)){
+			with(oGameEndMenu.spectate_button) zui_set_visible(false);
+		}
 	}
 };
 
 select_next_bot = function(){
+	if(instance_exists(oDraw.spectate_target)){
+		var spectated_bot = oDraw.spectate_target;
+		instance_activate_region(spectated_bot.x - BOT_SELECT_RADIUS, spectated_bot.y - BOT_SELECT_RADIUS,
+			BOT_SELECT_RADIUS * 2, BOT_SELECT_RADIUS * 2, true);
+		var nearby_bots = ds_list_create();
+		var nearby_count = collision_circle_list(spectated_bot.x, spectated_bot.y, BOT_SELECT_RADIUS,
+			oBot, false, false, nearby_bots, true);
+		for(var bot_index = 0; bot_index < nearby_count; bot_index++){
+			var bot = nearby_bots[| bot_index];
+			if(bot.stats.Health_points <= 0
+			|| (bot.stats.Team != global.local_player.stats.Team && !global.sudo)
+			|| point_distance(spectated_bot.x, spectated_bot.y, bot.x, bot.y) > BOT_SELECT_RADIUS) continue;
+			var already_candidate = false;
+			for(var candidate_index = 0; candidate_index < array_length(candidate_bots); candidate_index++){
+				if(candidate_bots[candidate_index] == bot){
+					already_candidate = true;
+					break;
+				}
+			}
+			if(!already_candidate) array_push(candidate_bots, bot);
+		}
+		ds_list_destroy(nearby_bots);
+	}
 	var bot_count = array_length(candidate_bots);
 	for(var offset = 1; offset <= bot_count; offset++){
 		var next_index = (selected_index + offset) mod bot_count;
 		var bot = candidate_bots[next_index];
-		if(instance_exists(bot) && bot.stats.Team == global.local_player.stats.Team && bot.stats.Health_points > 0){
+		if(instance_exists(bot) && (bot.stats.Team == global.local_player.stats.Team || global.sudo) && bot.stats.Health_points > 0){
 			selected_index = next_index;
 			oDraw.spectate_target = bot;
 			return true;
@@ -59,12 +86,12 @@ select_next_bot = function(){
 };
 
 begin_spectate = function(){
-	if(instance_exists(oGameController) && oGameController.round_ended) return;
+	if(instance_exists(oGameController) && oGameController.round_ended && !global.sudo) return;
 	var nearest_distance = 1000000000;
 	selected_index = -1;
 	for(var bot_index = 0; bot_index < array_length(candidate_bots); bot_index++){
 		var bot = candidate_bots[bot_index];
-		if(instance_exists(bot) && bot.stats.Team == global.local_player.stats.Team && bot.stats.Health_points > 0){
+		if(instance_exists(bot) && (bot.stats.Team == global.local_player.stats.Team || global.sudo) && bot.stats.Health_points > 0){
 			var bot_distance = point_distance(x, y, bot.x, bot.y);
 			if(bot_distance < nearest_distance){
 				nearest_distance = bot_distance;

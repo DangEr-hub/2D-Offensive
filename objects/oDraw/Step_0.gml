@@ -11,6 +11,9 @@ if(!network_devices_initialized){
 	for(var door_index = 0; door_index < instance_number(oDoor); door_index++){
 		register_network_device(instance_find(oDoor, door_index), "d");
 	}
+	for(var laser_index = 0; laser_index < instance_number(oLaserEmitter); laser_index++){
+		register_network_device(instance_find(oLaserEmitter, laser_index), "l");
+	}
 	for(var terminal_index = 0; terminal_index < instance_number(oTerminal); terminal_index++){
 		register_network_device(instance_find(oTerminal, terminal_index), "t");
 	}
@@ -171,7 +174,7 @@ if(instance_exists(global.local_player)){
 	}
 
 	#region Buy time
-	if(buy_time > 0){
+	if(buy_time > 0 && (IS_NET || !PauseMenu)){
 		buy_time --;
 	}
 	if(buy_period_message_timer > 0){

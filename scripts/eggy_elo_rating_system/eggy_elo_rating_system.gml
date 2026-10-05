@@ -103,6 +103,8 @@ function map_init(Map){
 
 function clear_player_statistics(total_rounds){
 	global.player_stats.Money = ROUND_STARTING_MONEY;
+	global.map_rounds[global.MapID][0] = -1;
+	global.map_rounds[global.MapID][1] = -1;
 	global.game_struct.Rounds_win = 0;
 	global.game_struct.Rounds_lost = 0;
 	global.game_struct.Current_round = 0;
@@ -546,17 +548,8 @@ function round_end(round_result, winning_team = -1){
 		oGameController.resolve_round(winning_team);
 	}
 
-	save_game();
 	oGameController.round_ended = true;
-	if(global.ranked_game == true){
-		if(round_result == "Win"){
-			oGameController.player_win = true;
-		}else{
-			oGameController.player_win = false;
-		}
-	}else{
-		oDraw.RespawnMenu = true;
-	}
+	oGameController.player_win = round_result == "Win";
 	camera_set_view_angle(CAM, 0);
 	return true;
 }

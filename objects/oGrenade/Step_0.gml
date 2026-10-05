@@ -46,7 +46,7 @@ if(stats.Item_id == ITEM.StickyGrenade){
 	}
 }
 
-if(stats.Item_id == ITEM.MolotovGrenade && image_index == 4 && instance_exists(oParticleSystem)){
+if(stats.Item_id == ITEM.molotov && image_index == 4 && instance_exists(oParticleSystem)){
 	var flame_offset = 13 * max(image_xscale, image_yscale);
 	var flame_x = x + lengthdir_x(flame_offset, image_angle - 90);
 	var flame_y = y - z + lengthdir_y(flame_offset, image_angle - 90);
@@ -92,7 +92,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			);
 			#endregion
 			
-		}else if(stats.Item_id == ITEM.FlashBangGrenade){
+		}else if(stats.Item_id == ITEM.flashbang){
 			explosion_create(
 				5, 
 				[x, y],
@@ -142,7 +142,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 					
 				}
 			}
-		}else if(stats.Item_id == ITEM.SmokeGrenade){
+		}else if(stats.Item_id == ITEM.smoke){
 				
 			#region Create smoke effect
 			instance_destroy(id);
@@ -153,7 +153,7 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 			);
 			#endregion
 				
-		}else if(stats.Item_id == ITEM.MolotovGrenade){
+		}else if(stats.Item_id == ITEM.molotov){
 			var owner_id = -1;
 			if(is_struct(stats) && variable_struct_exists(stats, "Owner_id")){
 				owner_id = stats.Owner_id;

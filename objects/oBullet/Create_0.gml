@@ -6,12 +6,13 @@ LightObject.blend = MAIN_COLOR;
 LightObject.xscale = .5;
 LightObject.yscale = .5;
 mask_index = spr_Bullet;
-image_angle = random(360);
+//image_angle = random(360);
 alarm[0] = 1;
 is_remote = false;
 bullet_network_id = -1;
 hideable_col = false;
 shooter_prone = false;
+//impact_alpha = random_range(0.9, 1);
 
 stats = {
     "Damage": 0,

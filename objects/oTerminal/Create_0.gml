@@ -20,10 +20,12 @@ rssi_tools_installed = false;
 authcrack_installed = false;
 camctl_installed = false;
 doorctl_installed = false;
+laserctl_installed = false;
 wordlist_downloaded = false;
 camera_login_ips = [];
 door_login_ips = [];
-terminal_device_types = [oCam, oDoor, oTerminal];
+laser_login_ips = [];
+terminal_device_types = [oCam, oDoor, oLaserEmitter, oTerminal];
 
 network_ip = "";
 network_name = "";
@@ -39,6 +41,7 @@ var terminal_console = global.my_console;
 terminal_console[? "terminal_mode"] = true;
 terminal_console[? "string"] = "";
 terminal_console[? "string_pos"] = 1;
+console_selection_clear(terminal_console);
 terminal_console[? "select"] = 0;
 terminal_console[? "dir"] = -1;
 terminal_console[? "backspace_hold"] = 0;
@@ -101,11 +104,13 @@ terminal_add_suggestions = function(console){
 	console_add(console, "sudo apt install rssi-tools");
 	console_add(console, "sudo apt install camctl");
 	console_add(console, "sudo apt install doorctl");
+	console_add(console, "sudo apt install laserctl");
 	if(terminal_sudo){
 		console_add(console, "apt install nmap");
 		console_add(console, "apt install rssi-tools");
 		console_add(console, "apt install camctl");
 		console_add(console, "apt install doorctl");
+		console_add(console, "apt install laserctl");
 	}
 	console_add(console, "wget authcrack.exe");
 	console_add(console, "ip addr");
@@ -122,17 +127,25 @@ terminal_add_suggestions = function(console){
 	console_add(console, "camctl --host <ip address> login <username> <password>");
 	console_add(console, "doorctl --host <ip address> status");
 	console_add(console, "doorctl --host <ip address> login <username> <password>");
+	console_add(console, "laserctl --host <ip address> status");
+	console_add(console, "laserctl --host <ip address> login <username> <password>");
 	console_add(console, "sudo systemctl stop camera@<ip address>");
 	console_add(console, "sudo systemctl start camera@<ip address>");
 	console_add(console, "sudo systemctl restart camera@<ip address>");
 	console_add(console, "sudo systemctl stop door@<ip address>");
 	console_add(console, "sudo systemctl start door@<ip address>");
+	console_add(console, "sudo systemctl stop laser@<ip address>");
+	console_add(console, "sudo systemctl start laser@<ip address>");
+	console_add(console, "sudo systemctl restart laser@<ip address>");
 	if(terminal_sudo){
 		console_add(console, "systemctl stop camera@<ip address>");
 		console_add(console, "systemctl start camera@<ip address>");
 		console_add(console, "systemctl restart camera@<ip address>");
 		console_add(console, "systemctl stop door@<ip address>");
 		console_add(console, "systemctl start door@<ip address>");
+		console_add(console, "systemctl stop laser@<ip address>");
+		console_add(console, "systemctl start laser@<ip address>");
+		console_add(console, "systemctl restart laser@<ip address>");
 	}
 };
 
@@ -251,6 +264,11 @@ terminal_command_submit = function(input){
 				doorctl_installed = true;
 				terminal_write(["Reading package lists... Done", "Setting up doorctl...", "Done."]);
 			return;
+
+			case "laserctl":
+				laserctl_installed = true;
+				terminal_write(["Reading package lists... Done", "Setting up laserctl...", "Done."]);
+			return;
 		}
 	}
 
@@ -299,6 +317,8 @@ terminal_command_submit = function(input){
 			terminal_write(["8554/tcp open    camera-control"]);
 		}else if(device.object_index == oDoor){
 			terminal_write(["9443/tcp open    door-control"]);
+		}else if(device.object_index == oLaserEmitter){
+			terminal_write(["9553/tcp open    laser-control"]);
 		}else{
 			terminal_write(["8080/tcp open    terminal-control"]);
 		}
@@ -380,7 +400,7 @@ terminal_command_submit = function(input){
 		}
 		var cracked_username = oDraw.network_username;
 		var cracked_password = oDraw.network_password;
-		if(device.object_index == oCam || device.object_index == oDoor){
+		if(device.object_index == oCam || device.object_index == oDoor || device.object_index == oLaserEmitter){
 			cracked_username = device.usrname;
 			cracked_password = device.passwd;
 		}
@@ -396,15 +416,17 @@ terminal_command_submit = function(input){
 		return;
 	}
 
-	if(word_count >= 4 && (words[0] == "camctl" || words[0] == "doorctl") && words[1] == "--host"){
+	if(word_count >= 4 && (words[0] == "camctl" || words[0] == "doorctl" || words[0] == "laserctl") && words[1] == "--host"){
 		var tool_is_camera = words[0] == "camctl";
-		if((tool_is_camera && !camctl_installed) || (!tool_is_camera && !doorctl_installed)){
+		var tool_is_door = words[0] == "doorctl";
+		if((tool_is_camera && !camctl_installed) || (tool_is_door && !doorctl_installed)
+		|| (words[0] == "laserctl" && !laserctl_installed)){
 			terminal_write(["bash: " + words[0] + ": command not found"]);
 			return;
 		}
 
 		var device = terminal_find_device_by_ip(words[2]);
-		var expected_object = tool_is_camera ? oCam : oDoor;
+		var expected_object = tool_is_camera ? oCam : (tool_is_door ? oDoor : oLaserEmitter);
 		if(!instance_exists(device) || device.object_index != expected_object){
 			terminal_write([words[0] + ": controller not found"]);
 			return;
@@ -414,9 +436,8 @@ terminal_command_submit = function(input){
 			return;
 		}
 
-		var logged_in = tool_is_camera
-			? terminal_ip_is_logged_in(camera_login_ips, device.network_ip)
-			: terminal_ip_is_logged_in(door_login_ips, device.network_ip);
+		var login_ips = tool_is_camera ? camera_login_ips : (tool_is_door ? door_login_ips : laser_login_ips);
+		var logged_in = terminal_ip_is_logged_in(login_ips, device.network_ip);
 
 		switch(words[3]){
 			case "status":
@@ -443,8 +464,10 @@ terminal_command_submit = function(input){
 				if(!logged_in){
 					if(tool_is_camera){
 						array_push(camera_login_ips, device.network_ip);
-					}else{
+					}else if(tool_is_door){
 						array_push(door_login_ips, device.network_ip);
+					}else{
+						array_push(laser_login_ips, device.network_ip);
 					}
 				}
 				terminal_write(["Authentication successful.", "Session established."]);
@@ -462,17 +485,20 @@ terminal_command_submit = function(input){
 			var target_ip = string_delete(service_name, 1, at_position);
 			var device = terminal_find_device_by_ip(target_ip);
 
-			if((service_type != "camera" && service_type != "door")
+			if((service_type != "camera" && service_type != "door" && service_type != "laser")
 			|| !instance_exists(device)
 			|| (service_type == "camera" && device.object_index != oCam)
-			|| (service_type == "door" && device.object_index != oDoor)){
+			|| (service_type == "door" && device.object_index != oDoor)
+			|| (service_type == "laser" && device.object_index != oLaserEmitter)){
 				terminal_write(["Unit " + service_name + " could not be found."]);
 				return;
 			}
 
 			var logged_in = service_type == "camera"
 				? terminal_ip_is_logged_in(camera_login_ips, target_ip)
-				: terminal_ip_is_logged_in(door_login_ips, target_ip);
+				: (service_type == "door"
+					? terminal_ip_is_logged_in(door_login_ips, target_ip)
+					: terminal_ip_is_logged_in(laser_login_ips, target_ip));
 			if(!logged_in){
 				terminal_write(["Authentication required."]);
 				return;
@@ -480,7 +506,7 @@ terminal_command_submit = function(input){
 
 			if(action == "status"){
 				var service_status;
-				if(service_type == "camera"){
+				if(service_type == "camera" || service_type == "laser"){
 					service_status = device.active ? "   Active: active (running)" : "   Active: inactive (stopped)";
 				}else{
 					service_status = device.opened ? "   Active: inactive (unlocked)" : "   Active: active (locked)";
@@ -493,8 +519,12 @@ terminal_command_submit = function(input){
 			}
 
 			if(action == "stop" || action == "start" || action == "restart"){
-				if(service_type == "camera"){
-					device.active = action != "stop";
+				if(service_type == "camera" || service_type == "laser"){
+					if(service_type == "laser" && IS_NET && !oNetworkManager.is_server){
+						send_laser_active_request(device, action != "stop");
+					}else{
+						device.active = action != "stop";
+					}
 				}else{
 					device.open_door(noone, true, action == "stop");
 				}

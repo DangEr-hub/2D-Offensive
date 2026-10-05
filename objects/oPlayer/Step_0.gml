@@ -524,7 +524,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 		if (defusing) {
 			if (defusing_target == DEFUSE_TARGET.BOMB) {
-				var has_defuse_kit = find_item(ITEM.DefuseKit) != -1;
+				var has_defuse_kit = find_item(ITEM.defuse_kit) != -1;
 				defusing_max = DEFUSE_TIME * (has_defuse_kit ? 1 : 2);
 			} else {
 				defusing_max = DEFUSE_TIME;
@@ -598,7 +598,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					item_equip_timer = max(item_equip_timer, 0);
 				}
 			}
-			if(FootStepTimer > -1) { FootStepTimer -= global.time_step; }
 			if(ScopeInaccuracyTimer > -1){ScopeInaccuracyTimer -= global.time_step;}
 			if(EquippedGrenadeTimer > -1){EquippedGrenadeTimer -= global.time_step;}
 			if(near_explosion_timer > -1){near_explosion_timer -= global.time_step;}
@@ -753,17 +752,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Hidden flag
-			var hidden_in_smoke = false;
 			var hidden_in_grass = place_meeting(x, y, oGrass);
-			var fog = instance_nearest(x, y, oFog);
-
-			if (fog) {
-			    if (fog.radius > 100 && distance_to_object(fog) <= fog.radius && fog.alarm[0] > 1) {
-			        hidden_in_smoke = true;
-			    }
-			}
-
-			hidden = hidden_in_smoke || hidden_in_grass;
+			hidden = point_in_grenade_smoke(x, y) || hidden_in_grass;
 			#endregion
 	
 	
@@ -1224,17 +1214,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(!move_ypos){ YSpeed = 0; }
 
 				if(Moving == true){
-					if(walking){
-						FootSteps = 0;
-						FootStepTimer = -1;
-					}else if(moving_state != STATES_PLAYER.prone_state){
-						if(FootStepTimer == -1){
-							FootStepTimer = 5; FootSteps ++;
-						}
-						if(FootStepTimer == 0 && Visible == true){
-							particle_create(1, 0, RotationAngle, spr_FootSteps, 0, 0, RotationAngle, 0, false, false, FootSteps % 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
-						}
-					}
 				    if(move_xpos){
 						XSpeed = min(RelativeSpeedX, MOVE_SPD) * dcos(MoveDirection) * Delta * SpeedMul;
 				        if (place_meeting(x + XSpeed, y, oParentTile)){
@@ -1244,10 +1223,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							RelativeSpeedX = min(RelativeSpeedX + RelativeSpeedValue, MOVE_SPD);
 							x += XSpeed;
 						}
-						if(moving_state != STATES_PLAYER.prone_state && !walking && Visible == true){
-							particle_create(round(abs(XSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(XSpeed) * -1, abs(XSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
-						}
-				
 				    }
 				    if(move_ypos){
 						YSpeed =  min(RelativeSpeedY, MOVE_SPD) * -dsin(MoveDirection) * Delta * SpeedMul;
@@ -1258,12 +1233,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 							RelativeSpeedY = min(RelativeSpeedY + RelativeSpeedValue, MOVE_SPD);
 							y += YSpeed;
 						}
-						if(moving_state != STATES_PLAYER.prone_state && !walking && Visible == true){
-							particle_create(round(abs(YSpeed) * random(2)), .8, random(360), spr_MovementParticle, random_range(abs(YSpeed) * -1, abs(YSpeed)), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
-						}
 					}
 				}else{
-					FootSteps = 0; FootStepTimer = -1;
 		
 					#region Knockback
 					XSpeed = -lengthdir_x(Weapon.KickBackEffect / 10 * bipod_mod, RotationAngle);
@@ -1653,6 +1624,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					var healing_amount = min(global.ItemIndex[#HealingItemId, ITEMSTATS.Damage], global.player_stats.Max_health - stats.Health_points);
 					stats.Health_points += healing_amount;
 					stats.Damage_health_points = stats.Health_points;
+					if(healing_amount > 0) body_blood_stains = [];
 					damage_indicator("+" + string(round(healing_amount)), x, y - 30, c_green, spr_Icons, ICON.health);
 					CanShoot = true;
 				} else if (oNetworkManager.is_server) {
@@ -2047,12 +2019,50 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oDoor);
 			instance_activate_object(oCam);
 			instance_activate_object(oTerminalTile);
+			instance_activate_object(oLaserEmitter);
+			instance_activate_object(oCollisionTriangle);
 			#endregion
 		
 		}
 	
 	}
 }
+
+#region Respiratory effect
+var br_target_amp = 0.01;
+var br_target_spd = 0.15;
+
+if(!Moving){
+	br_target_amp = 0.014;
+	br_target_spd = 0.11;
+}else if(running){
+	br_target_amp = 0.08;
+	br_target_spd = 0.20;
+}
+
+if((is_local && ShootTimer > 0) || (is_remote && (network_shoot_timer > -1 || (instance_exists(Weapon) && Weapon.KickBackEffect > 0)))){
+	br_target_amp = max(br_target_amp, 0.08);
+	br_target_spd = max(br_target_spd, 0.23);
+}
+
+if(stats.Health_points < stats.Max_health_points * 0.35){
+	br_target_amp = 0.04;
+	br_target_spd = max(br_target_spd, 0.28);
+}
+
+var br_dt_ms = min(delta_time / 1000, 50) * global.time_step;
+var br_blend = clamp(br_dt_ms / 250, 0, 1);
+br_amp = lerp(br_amp, br_target_amp, br_blend);
+br_spd = lerp(br_spd, br_target_spd, br_blend);
+br_phase = (br_phase + br_spd * br_dt_ms) mod 360;
+body_visual_scale = 1 + br_amp * sin(degtorad(br_phase));
+image_xscale = 1;
+image_yscale = 1;
+if(instance_exists(Weapon)){
+	Weapon.image_xscale = body_visual_scale;
+	Weapon.image_yscale = body_visual_scale;
+}
+#endregion
 
 #region Death
 var should_handle_death = false;

@@ -1,6 +1,10 @@
 var hs_x = 73;
 var hs_y = 33;
 
+if(stats.Health_points <= 0 && array_length(body_blood_stains) > 0){
+	body_blood_stains = [];
+}
+
 if (moving_state == STATES_PLAYER.prone_state) { 
 	hs_x = 137;
 	hs_y = 38;

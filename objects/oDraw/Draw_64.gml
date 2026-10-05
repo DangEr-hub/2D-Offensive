@@ -329,29 +329,6 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				draw_set_font(set_font("Console"));
 				draw_set_color(c_black);
 				
-				if(has_attachment(ITEM.laser, WeaponPositionID, id, ATTACHMENTS.barrel)){
-					var cx = (crosshair_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-					var cy = (crosshair_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-					var laser_pos = local_to_world(56, 16, Weapon.image_angle, Weapon);
-					var laser_gui_x = (laser_pos[0] - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
-					var laser_gui_y = (laser_pos[1] - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-					var laser_dx = cx - laser_gui_x;
-					var laser_dy = cy - laser_gui_y;
-					var laser_length = max(1, point_distance(laser_gui_x, laser_gui_y, cx, cy));
-					var offset_x = -laser_dy / laser_length;
-					var offset_y = laser_dx / laser_length;
-					draw_set_color(c_red);
-					for(var glow_offset = 3; glow_offset >= 1; glow_offset--){
-						draw_set_alpha(0.08 * (4 - glow_offset));
-						draw_line(laser_gui_x + offset_x * glow_offset, laser_gui_y + offset_y * glow_offset,
-							cx + offset_x * glow_offset, cy + offset_y * glow_offset);
-						draw_line(laser_gui_x - offset_x * glow_offset, laser_gui_y - offset_y * glow_offset,
-							cx - offset_x * glow_offset, cy - offset_y * glow_offset);
-					}
-					draw_set_alpha(1);
-					draw_line(laser_gui_x, laser_gui_y, cx, cy);
-				}
-
 				if(global.draw_damage == true){
 					var health_bar_x = round(HealthX - sprite_width/2);
 					var health_bar_y = round(HealthY - sprite_height/2);
@@ -460,7 +437,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				&& point_distance(global.local_player.x, global.local_player.y, hostage.x, hostage.y) <= HOSTAGE_RANGE && hostage.Visible) {
 					var hostage_x = (hostage.x - ViewX) * (global.GuiW / ViewW);
 					var hostage_y = (hostage.y - ViewY) * (global.GuiH / ViewH);
-					var hostage_prompt = "Take - [" + keycode_to_string(global.KeyBinds[| KEY.HostageTake]) + "]";
+					var hostage_prompt = tr("Take_hostage") + " - [" + keycode_to_string(global.KeyBinds[| KEY.HostageTake]) + "]";
 					draw_text_outlined(round(hostage_x - string_width(hostage_prompt) * .5), round(hostage_y), hostage_prompt, c_white, c_black, 1);
 				}
 			}
@@ -470,7 +447,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				if (instance_exists(bomb) && point_distance(global.local_player.x, global.local_player.y, bomb.x, bomb.y) <= HOSTAGE_RANGE/2 && bomb.Visible) {
 					var bomb_x = (bomb.x - ViewX) * (global.GuiW / ViewW);
 					var bomb_y = (bomb.y - ViewY) * (global.GuiH / ViewH);
-					var defuse_prompt = "Defuse - [" + keycode_to_string(global.KeyBinds[| KEY.Defuse]) + "]";
+					var defuse_prompt = tr("Defuse_bomb") + " - [" + keycode_to_string(global.KeyBinds[| KEY.Defuse]) + "]";
 					draw_text_outlined(round(bomb_x - string_width(defuse_prompt) * .5), round(bomb_y), defuse_prompt, c_white, c_black, 1);
 				}
 			}
@@ -730,7 +707,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 					rank_position = get_rank(global.game_struct.Player_ep);
 				}
 				if!(instance_exists(oInventory)){
-					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_width/2, default_yy, 1, 1, 0, c_white, global.gui_alpha);
+					draw_sprite_ext(spr_ranks, rank_position, xx - sprite_get_width(spr_ranks), default_yy, 1, 1, 0, c_white, global.gui_alpha);
 				}
 			}
 		}
@@ -918,7 +895,7 @@ with(oSlot){
 		}
 
 		draw_set_alpha(slot_alpha);
-		if(VarSlot < OtherSlot.Primary && (global.ItemIndex[# Id, ITEMSTATS.Type] == "Item" || global.ItemIndex[# Id, ITEMSTATS.Type] == "Grenade")){
+		if(VarSlot < OtherSlot.Primary && (global.ItemIndex[# Id, ITEMSTATS.Type] == "Item" || global.ItemIndex[# Id, ITEMSTATS.Type] == "Grenade" || global.ItemIndex[# Id, ITEMSTATS.Type] == "Landmine")){
 			draw_text_outlined(xx + sprite_get_width(spr_Slot)/1.5*scale - string_width(Amount), yy + sprite_get_height(spr_Slot)/1.5*scale, Amount, c_white, c_black, 1);
 		}
 		draw_set_alpha(1);
@@ -1063,22 +1040,55 @@ with(oSlot){
 			}else if(VarSlot == OtherSlot.Primary){
 			
 				#region Primary equip and dequip
-				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY)) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY && !is_caliber_box_item(MouseID)))) {
 				    item_swap("mouse", VarSlot);
 				    Id = ITEM.None;
 				} else if (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.PRIMARY) {
 				    item_swap("mouse", VarSlot);
 				}
+				
+				if(global.ItemIndex[# MouseID, ITEMSTATS.MaxAmmo] > 0){
+					if(global.ItemIndex[# Id, ITEMSTATS.caliber_type] == global.ItemIndex[# MouseID, ITEMSTATS.caliber_type]){
+						var amt = global.ItemIndex[# MouseID, ITEMSTATS.MaxAmmo];
+						global.Inventory[# VarSlot, INDEX.slot_clip_ammo] += amt;
+						if (!IS_NET) {
+							damage_indicator("+" + string(amt), mouse_x, mouse_y, c_white, spr_Icons, ICON.ammo);
+						} else if (oNetworkManager.is_server) {
+							server_process_item_action(global.local_player.network_id, MouseID, global.Inventory[# VarSlot, INDEX.slot_clip_ammo], VarSlot);
+						} else if (oNetworkManager.is_connected) {
+							send_item_action_complete_client(MouseID, global.Inventory[# VarSlot, INDEX.slot_clip_ammo], VarSlot);
+						}
+						
+				        ItemAmountSubstract(0, 1, true);
+					}
+				}
+				
 				#endregion
 				
 			}else if(VarSlot == OtherSlot.Secondary){
 				
 				#region Secondary equip and dequip
-				if (Id != ITEM.None && (MouseID == ITEM.None || global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY)) {
+				if (Id != ITEM.None && (MouseID == ITEM.None || (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY && !is_caliber_box_item(MouseID)))) {
 				    item_swap("mouse", VarSlot);
 				    Id = ITEM.None;
 				} else if (global.ItemIndex[#MouseID, ITEMSTATS.WeaponType] == WEAPON_TYPE.SECONDARY) {
 				    item_swap("mouse", VarSlot);
+				}
+				
+				if(global.ItemIndex[# MouseID, ITEMSTATS.MaxAmmo] > 0){
+					if(global.ItemIndex[# Id, ITEMSTATS.caliber_type] == global.ItemIndex[# MouseID, ITEMSTATS.caliber_type]){
+						var amt = global.ItemIndex[# MouseID, ITEMSTATS.MaxAmmo];
+						global.Inventory[# VarSlot, INDEX.slot_clip_ammo] += amt;
+						if (!IS_NET) {
+							damage_indicator("+" + string(amt), mouse_x, mouse_y, c_white, spr_Icons, ICON.ammo);
+						} else if (oNetworkManager.is_server) {
+							server_process_item_action(global.local_player.network_id, MouseID, global.Inventory[# VarSlot, INDEX.slot_clip_ammo], VarSlot);
+						} else if (oNetworkManager.is_connected) {
+							send_item_action_complete_client(MouseID, global.Inventory[# VarSlot, INDEX.slot_clip_ammo], VarSlot);
+						}
+						
+				        ItemAmountSubstract(0, 1, true);
+					}
 				}
 				#endregion
 				

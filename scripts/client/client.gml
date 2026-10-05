@@ -81,9 +81,66 @@ function handle_client_receive() {
 			case PACKET.MACHINE_GUN_SYNC: handle_machine_gun_sync_client(); break;
 
 			case PACKET.SUDO_SYNC: handle_sudo_sync_client(); break;
+			case PACKET.LASER_SYNC: handle_laser_sync_client(sequence); break;
 			
         }
     }
+}
+
+function send_laser_active_request(laser_inst, requested_active) {
+	with (oNetworkManager) {
+		if (!is_connected || is_server || !instance_exists(laser_inst)) return;
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.LASER_SYNC);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u8, 1); // Switch request
+		buffer_write(send_buffer, buffer_f32, laser_inst.x);
+		buffer_write(send_buffer, buffer_f32, laser_inst.y);
+		buffer_write(send_buffer, buffer_bool, requested_active);
+		network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
+	}
+}
+
+function handle_laser_sync_client(packet_sequence) {
+	with (oNetworkManager) {
+		if (buffer_read(receive_buffer, buffer_u8) != 0) return;
+		var emitter_x = buffer_read(receive_buffer, buffer_f32);
+		var emitter_y = buffer_read(receive_buffer, buffer_f32);
+		var synced_active = buffer_read(receive_buffer, buffer_bool);
+		var synced_laser_time = buffer_read(receive_buffer, buffer_u16);
+		var synced_laser_timer = buffer_read(receive_buffer, buffer_s16);
+		var synced_l_spd = buffer_read(receive_buffer, buffer_f16);
+		var synced_emitting_time = buffer_read(receive_buffer, buffer_u16);
+		var synced_emitting_timer = buffer_read(receive_buffer, buffer_s16);
+		var synced_l_dist = buffer_read(receive_buffer, buffer_f16);
+		var synced_l_n = buffer_read(receive_buffer, buffer_u8);
+		var synced_points = [];
+		var synced_stops = [];
+		for (var ray_index = 0; ray_index < synced_l_n; ray_index++) {
+			array_push(synced_points, buffer_read(receive_buffer, buffer_f16));
+			array_push(synced_stops, buffer_read(receive_buffer, buffer_f16));
+		}
+		var laser_inst = find_laser_emitter_at(emitter_x, emitter_y);
+		if (!instance_exists(laser_inst) || packet_sequence <= laser_inst.laser_last_sync_sequence) return;
+		var laser_was_emitting = laser_inst.active && laser_inst.emitting_timer > 0;
+		laser_inst.laser_last_sync_sequence = packet_sequence;
+		laser_inst.active = synced_active;
+		laser_inst.laser_time = synced_laser_time;
+		laser_inst.laser_timer = synced_laser_timer;
+		laser_inst.l_spd = synced_l_spd;
+		laser_inst.emitting_time = synced_emitting_time;
+		laser_inst.emitting_timer = synced_emitting_timer;
+		laser_inst.l_dist = synced_l_dist;
+		laser_inst.l_n = synced_l_n;
+		laser_inst.l_points = synced_points;
+		laser_inst.l_stops = synced_stops;
+		if (synced_active && synced_emitting_timer > 0 && !laser_was_emitting) {
+			var listener_target = get_audio_listener_target();
+			if (instance_exists(listener_target) && point_distance(laser_inst.x, laser_inst.y, listener_target.x, listener_target.y) <= 384) {
+				play_sound(laser_inst.x, laser_inst.y, snd_Laser);
+			}
+		}
+	}
 }
 
 function handle_sudo_sync_client(){
@@ -277,7 +334,7 @@ function handle_item_use_update_client() {
 	}
 }
 
-function send_item_action_complete_client(item_id, value = 0) {
+function send_item_action_complete_client(item_id, value = 0, target_slot = 255) {
 	with (oNetworkManager) {
 		if (is_server || !is_connected || client_socket < 0) return;
 
@@ -286,6 +343,7 @@ function send_item_action_complete_client(item_id, value = 0) {
 		buffer_write(send_buffer, buffer_u32, send_sequence++);
 		buffer_write(send_buffer, buffer_u16, item_id);
 		buffer_write(send_buffer, buffer_f16, value);
+		buffer_write(send_buffer, buffer_u8, target_slot);
 		network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
 	}
 }
@@ -296,6 +354,7 @@ function handle_item_action_client() {
 		var item_id = buffer_read(receive_buffer, buffer_u16);
 		var amount = buffer_read(receive_buffer, buffer_f16);
 		var value = buffer_read(receive_buffer, buffer_f16);
+		var target_slot = buffer_read(receive_buffer, buffer_u8);
 		var player = find_instance_by_network_id(oPlayer, pid);
 
 		if (item_id == ITEM.dilatation_pill) {
@@ -327,11 +386,14 @@ function handle_item_action_client() {
 				CanShoot = true;
 
 				if (amount > 0) {
+					body_blood_stains = [];
 					damage_indicator("+" + string(round(amount)), x, y - 30, c_green, spr_Icons, ICON.health);
 				}
 			} else if (is_caliber_box_item(item_id)) {
 				if (is_local) {
-					global.Inventory[# WeaponID, INDEX.slot_clip_ammo] = round(value);
+					if (target_slot == OtherSlot.Primary || target_slot == OtherSlot.Secondary) {
+						global.Inventory[# target_slot, INDEX.slot_clip_ammo] = round(value);
+					}
 				}
 				if (amount > 0) {
 					damage_indicator("+" + string(round(amount)), x, y - 30, c_white, spr_Icons, ICON.ammo);
@@ -1463,7 +1525,7 @@ function send_tick_update_client() {
 			buffer_write(other.send_buffer, buffer_u8, moving_state);
 			buffer_write(other.send_buffer, buffer_u8, stats.Team);
 			buffer_write(other.send_buffer, buffer_f16, stats.Health_points);
-			buffer_write(other.send_buffer, buffer_bool, find_item(ITEM.DefuseKit) != -1);
+			buffer_write(other.send_buffer, buffer_bool, find_item(ITEM.defuse_kit) != -1);
 			buffer_write(other.send_buffer, buffer_u8, defusing_target);
         }
         

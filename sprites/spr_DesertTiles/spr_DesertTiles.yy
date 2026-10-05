@@ -13,7 +13,7 @@
   "edgeFiltering": false,
   "For3D": false,
   "frames": [
-    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"f76da7bd-2a48-41ac-becf-da2275f1aff2",},
+    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"4349d7c9-a392-43a0-a1b2-359bffbdd05b",},
   ],
   "gridX": 32,
   "gridY": 32,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"f76da7bd-2a48-41ac-becf-da2275f1aff2","path":"sprites/spr_DesertTiles/spr_DesertTiles.yy",},},},"Disabled":false,"id":"3afbd398-4da5-4d53-9c2d-298a2e54ceea","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"4349d7c9-a392-43a0-a1b2-359bffbdd05b","path":"sprites/spr_DesertTiles/spr_DesertTiles.yy",},},},"Disabled":false,"id":"79d983f2-1a88-4d94-97ef-4b0e0b10fdc8","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,

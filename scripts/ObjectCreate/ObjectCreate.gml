@@ -13,6 +13,20 @@ function create_fog(xx, yy, radius, dir, spd, rot_spd, num, alpha, fade, time, m
 	return noone;
 }
 
+function point_in_grenade_smoke(pos_x, pos_y){
+	var smoke_count = instance_number(oSmokeTile);
+	for(var i = 0; i < smoke_count; i++){
+		var smoke_tile = instance_find(oSmokeTile, i);
+		var smoke_radius = smoke_tile.sprite_width * abs(smoke_tile.image_xscale) * 0.5;
+		var smoke_dx = pos_x - smoke_tile.x;
+		var smoke_dy = pos_y - smoke_tile.y;
+		if(smoke_dx * smoke_dx + smoke_dy * smoke_dy <= smoke_radius * smoke_radius){
+			return true;
+		}
+	}
+	return false;
+}
+
 
 function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
 	if(IS_NET && instance_exists(oNetworkManager) && !oNetworkManager.is_server && oNetworkManager.is_connected){

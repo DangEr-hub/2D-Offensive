@@ -9,7 +9,7 @@ if(stats.Health_points <= 0){
 	exit;
 }
 if(Visible == true){
-	with(Weapon){
+	if(State != STATES.MACHINE_GUN) with(Weapon){
 		var owner_can_draw = instance_exists(Owner) && Owner.stats.Health_points > 0;
 
 		if(Visible == true && owner_can_draw){
@@ -35,57 +35,7 @@ if(Visible == true){
 		}
 	}
 	
-	var armour_sprite_index = 0;
-	if(image_index == TEXTURES.no_weapon){
-		armour_sprite_index = 0;	
-	}else if(image_index == TEXTURES.pistol){
-		armour_sprite_index = 1;
-	}else if(image_index == TEXTURES.assault_rifle){
-		armour_sprite_index = 2;
-	}else if(image_index == TEXTURES.flashed_weapon){
-		armour_sprite_index = 3;
-	}else if(image_index == TEXTURES.flashed_no_weapon){
-		armour_sprite_index = 4;
-	}else if(image_index == TEXTURES.reload || image_index == TEXTURES.knife_attack){
-		armour_sprite_index = 7;
-	}else if(image_index >= TEXTURES.prone){
-		armour_sprite_index = 5;
-	}
-	
-	if(image_index == TEXTURES.flashed_prone || image_index == TEXTURES.flashed_prone_second || image_index == TEXTURES.flashed_prone_third){
-		armour_sprite_index = 6;
-	}
-	
-	if(image_index == TEXTURES.reload_prone || image_index == TEXTURES.reload_prone_second || image_index == TEXTURES.reload_prone_third){
-		armour_sprite_index = 8;
-	}
-	
-	if(image_index == TEXTURES.knife_prone || image_index == TEXTURES.knife_prone_second || image_index == TEXTURES.knife_prone_third){
-		armour_sprite_index = 8;
-	}
-
-	if(ArmourID == ITEM.KevlarVest){
-		draw_sprite_ext(spr_KevlarVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == ITEM.MilitaryVest){
-		draw_sprite_ext(spr_MilitaryVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}else if(ArmourID == ITEM.SpecOpsVest){
-		draw_sprite_ext(spr_SpecOpsVest, armour_sprite_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha);
-	}
-
-	var helmet_sprite_index = -1;
-	var helmet_index = -1;
-	switch(HelmetID){
-		case ITEM.KevlarHelm: helmet_sprite_index = 0; break;
-		case ITEM.MilitaryHelm: helmet_sprite_index = 1; break;
-		case ITEM.SpecOpsHelm: helmet_sprite_index = 2; break;
-		case ITEM.NightVision: helmet_sprite_index = 3; break;
-		case ITEM.InfraredVision: helmet_sprite_index = 4; break;
-	}
-	helmet_index = helmet_sprite_index;
-	if(State == STATES.Prone){ helmet_index = helmet_sprite_index + 5; }
-	if(helmet_sprite_index != -1){draw_sprite_ext(spr_Helmet, helmet_index, x, y, image_xscale, image_yscale, RotationAngle, image_blend, image_alpha)};
-	
-	if(WeaponID[WeaponPositionID] != ITEM.None && Weapon.Visible
+	if(State != STATES.MACHINE_GUN && WeaponID[WeaponPositionID] != ITEM.None && Weapon.Visible
 	&& EquippedGrenadeTimer == -1 && EquippedLandMineTimer == -1){
 		draw_weapon_attachments(
 			Weapon, WeaponDistance,
@@ -93,6 +43,25 @@ if(Visible == true){
 			attachments[WeaponPositionID][ATTACHMENTS.barrel],
 			attachments[WeaponPositionID][ATTACHMENTS.scope]
 		);
+	}
+	if(instance_exists(Weapon) && has_attachment(ITEM.laser, ATTACHMENTS.barrel, id, WeaponPositionID)){
+		var laser_pos = local_to_world(56, 16, Weapon.image_angle, Weapon);
+		var laser_dx = crosshair_x - laser_pos[0];
+		var laser_dy = crosshair_y - laser_pos[1];
+		var laser_length = max(1, point_distance(laser_pos[0], laser_pos[1], crosshair_x, crosshair_y));
+		var offset_x = -laser_dy / laser_length;
+		var offset_y = laser_dx / laser_length;
+		draw_set_color(c_red);
+		for(var glow_offset = 3; glow_offset >= 1; glow_offset--){
+			draw_set_alpha(0.08 * (4 - glow_offset));
+			draw_line(laser_pos[0] + offset_x * glow_offset, laser_pos[1] + offset_y * glow_offset,
+				crosshair_x + offset_x * glow_offset, crosshair_y + offset_y * glow_offset);
+			draw_line(laser_pos[0] - offset_x * glow_offset, laser_pos[1] - offset_y * glow_offset,
+				crosshair_x - offset_x * glow_offset, crosshair_y - offset_y * glow_offset);
+		}
+		draw_set_alpha(1);
+		draw_line(laser_pos[0], laser_pos[1], crosshair_x, crosshair_y);
+		draw_set_color(c_white);
 	}
 		
 	if (EquippedGrenadeTimer > -1) {

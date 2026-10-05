@@ -19,10 +19,10 @@ if(local_player_died){
 	offset_position_y = 128;
 	killed_by_weapon = oDraw.KilledByWeapon;
 	killed_by_name = oDraw.KilledByName;
-	KilledByString = "killed by: " + string(killed_by_name) + " by " + string(killed_by_weapon);
+	KilledByString = tr("You_died") + " - " + tr("Killed_by") + ": " + string(killed_by_name) + " " + tr("By_weapon") + " " + string(killed_by_weapon);
 	
-	with (zui_create(zui_get_width() * .5 - string_width(KilledByString)/1.75, killed_by_y, objUILabel)) {
-		caption = "You died - " + other.KilledByString;
+	with (zui_create(zui_get_width() * .5 - string_width(KilledByString)/2, killed_by_y, objUILabel)) {
+		caption = other.KilledByString;
 	}
 }else{
 	with (zui_create(zui_get_width() * .5, killed_by_y, objUILabel)) {
@@ -49,6 +49,6 @@ with(zui_create(zui_get_width() * .5, offset_position_y + grid_height, objUIButt
 	}
 }
 
-with(zui_create(zui_get_width() * .5 - string_width("Opponent(alive)")*5/2, offset_position_y, objUIGrid)){
+with(zui_create(zui_get_width() * .5 - string_width(tr("Opponent_alive"))*5/2, offset_position_y, objUIGrid)){
 	zui_set_anchor(0, 0);
 }

@@ -101,13 +101,13 @@ separator = "/";
 score_string_width = string_width(player_score + enemy_score + separator);
 player_score_string_width = string_width(player_score);
 title_color = MAIN_COLOR;
-title_string = "Win";
+title_string = tr("Win");
 if(global.game_struct.Rounds_lost > global.game_struct.Rounds_win){
 	title_color = c_red;
-	title_string = "Loss";	
+	title_string = tr("Loss");	
 }else if(global.game_struct.Rounds_lost == global.game_struct.Rounds_win){
 	title_color = c_ltgray;
-	title_string = "Draw";
+	title_string = tr("Draw");
 }
 with (zui_create(title_position_x - string_width(title_string)/2, title_position_y, objUILabel)) {
 	font = set_font("Title");
@@ -181,6 +181,19 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIBu
 	zui_set_height(other.button_height);
 	caption = "Exit";
 	callback = other.exit_callback;
+}
+
+spectate_button = noone;
+if(!IS_NET && global.sudo && instance_exists(oSpectateControl)
+&& array_length(oSpectateControl.candidate_bots) > 0){
+	spectate_button = zui_create(zui_get_width() * .5, button_start_y - button_spacing, objUIButton, -999);
+	with(spectate_button){
+		zui_set_anchor(0.5, 0);
+		zui_set_width(other.button_width);
+		zui_set_height(other.button_height);
+		caption = "Spectate";
+		callback = function(){ with(oSpectateControl) begin_spectate(); };
+	}
 }
 
 #endregion

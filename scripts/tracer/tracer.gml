@@ -327,8 +327,8 @@ function handle_grenade_sync_client() {
 					create_grenade_explosion_visual(
 						impact_x,
 						impact_y,
-						ITEM.MolotovGrenade,
-						global.ItemIndex[# ITEM.MolotovGrenade, ITEMSTATS.Damage],
+						ITEM.molotov,
+						global.ItemIndex[# ITEM.molotov, ITEMSTATS.Damage],
 						impact_net_id,
 						impact_age
 					);
@@ -429,12 +429,12 @@ function server_molotov_state_broadcast() {
 }
 
 function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage, network_id = -1, initial_age = 0) {
-    if (item_id == ITEM.SmokeGrenade) {
+    if (item_id == ITEM.smoke) {
         create_fog(x_pos, y_pos, random_range(100, 150), random(360), 0.1, random_range(.1, .5), 11, .9, .75, SMOKE_TIME);
         return;
     }
 
-	if (item_id == ITEM.MolotovGrenade) {
+	if (item_id == ITEM.molotov) {
 		var impact = noone;
 		if(network_id >= 0){
 			impact = find_instance_by_network_id(oMolotovImpact, network_id);
@@ -475,7 +475,7 @@ function create_grenade_explosion_visual(x_pos, y_pos, item_id, explosion_damage
         2 * game_get_speed(gamespeed_fps)
     );
 
-    if (item_id == ITEM.FlashBangGrenade && instance_exists(global.local_player)) {
+    if (item_id == ITEM.flashbang && instance_exists(global.local_player)) {
         if (!collision_line(x_pos, y_pos, global.local_player.x, global.local_player.y, oParentTile, true, false)) {
             if (point_distance(x_pos, y_pos, global.local_player.x, global.local_player.y) < global.FlashBangMaxDistance) {
                 if (global.GodMode == false) {

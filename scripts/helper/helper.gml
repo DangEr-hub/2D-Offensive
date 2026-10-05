@@ -39,7 +39,20 @@ function compute_airplane_network_id() {
     return irandom(65535);
 }
 
+function find_laser_emitter_at(pos_x, pos_y) {
+	var laser_inst = instance_nearest(pos_x, pos_y, oLaserEmitter);
+	if (instance_exists(laser_inst) && abs(laser_inst.x - pos_x) < .5 && abs(laser_inst.y - pos_y) < .5) {
+		return laser_inst;
+	}
+	return noone;
+}
+
 function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid, attacker_item_id = ITEM.None){
+	if(attacker_item_id != ITEM.None
+	&& global.ItemIndex[# attacker_item_id, ITEMSTATS.Type] == "Weapon"
+	&& global.ItemIndex[# attacker_item_id, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.KNIFE){
+		add_body_blood(object, damage, BodyPart, impact_pos[0], impact_pos[1]);
+	}
 	
 	var blood_color = c_red;
 	if(BodyPart <= HITBOX.HeadProne){
@@ -64,9 +77,13 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 	}
 
 	damage_indicator("-" + string(damage), impact_pos[0], impact_pos[1], c_white, spr_Icons, ICON.health);
-	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2));
+	var blood_attacker = find_instance_by_network_id(oPlayer, attacker_pid);
+	var blood_spray_dir = instance_exists(blood_attacker) && attacker_item_id != ITEM.Bomb && attacker_item_id != ITEM.laser
+		? ((point_direction(blood_attacker.x, blood_attacker.y, impact_pos[0], impact_pos[1]) + 180) mod 360)
+		: -1;
+	create_blood(round(damage / 5), impact_pos[0], impact_pos[1], blood_color, round(damage / 2), blood_spray_dir);
 	hit_effects(BodyPart, armour_id, helmet_id, shield_id,
-	equip_dur[0], equip_dur[1], equip_dur[2], impact_pos[0], impact_pos[1], find_instance_by_network_id(oPlayer, attacker_pid), object, true); //true - serverově to je zatím vždy hráč
+	equip_dur[0], equip_dur[1], equip_dur[2], impact_pos[0], impact_pos[1], blood_attacker, object, true); //true - serverově to je zatím vždy hráč
 	statistics_hit("Health", damage, object);
 
 	if(IS_NET && object.object_index == oPlayer){
@@ -76,12 +93,15 @@ function hit_remote_object(damage, object, BodyPart, impact_pos, hit_spd_mod, ai
 			network_shield_dur = equip_dur[2];
 		}
 
-		var attacker = find_instance_by_network_id(oPlayer, attacker_pid);
+		var attacker = blood_attacker;
 		var attacker_name = "Player " + string(attacker_pid);
 		var hitmap_attacker_key = attacker_pid;
 		var hitmap_attacker = attacker;
 		if(instance_exists(attacker)){
 			attacker_name = attacker.stats.Name;
+		}
+		if ((attacker_pid == -1 || attacker_pid == 255) && attacker_item_id == ITEM.laser) {
+			attacker_name = "Laser";
 		}
 		if (attacker_item_id == ITEM.Bomb) {
 			hitmap_attacker_key = HITMAP_KEY_BOMB;

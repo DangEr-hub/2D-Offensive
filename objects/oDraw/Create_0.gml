@@ -53,6 +53,7 @@ network_password = network_passwords[irandom(array_length(network_passwords) - 1
 network_next_host = 2;
 network_camera_number = 1;
 network_door_number = 1;
+network_laser_number = 1;
 network_terminal_number = 1;
 network_terminal_ip = "";
 network_terminal_name = "";
@@ -83,6 +84,11 @@ register_network_device = function(device, device_prefix){
 		case "d":
 			device.network_name = "d" + string(network_door_number);
 			network_door_number++;
+		break;
+
+		case "l":
+			device.network_name = "l" + string(network_laser_number);
+			network_laser_number++;
 		break;
 
 		case "t":
@@ -243,20 +249,25 @@ u_bloom_intensity = shader_get_uniform(shader_bloom_blend, "bloom_intensity");
 u_bloom_darken = shader_get_uniform(shader_bloom_blend, "bloom_darken");
 u_bloom_saturation = shader_get_uniform(shader_bloom_blend, "bloom_saturation");
 u_bloom_texture = shader_get_sampler_index(shader_bloom_blend, "bloom_texture");
-bloom_threshold = 0.29;
-bloom_intensity = .05;
+u_bloom_texel_size = shader_get_uniform(shader_bloom_blend, "bloom_texel_size");
+u_bloom_neighbor_strength = shader_get_uniform(shader_bloom_blend, "bloom_neighbor_strength");
+u_bloom_neighbor_radius = shader_get_uniform(shader_bloom_blend, "bloom_neighbor_radius");
+u_bloom_blend_threshold = shader_get_uniform(shader_bloom_blend, "bloom_threshold");
+u_bloom_blend_range = shader_get_uniform(shader_bloom_blend, "bloom_range");
+bloom_threshold = 0.35;
+bloom_intensity = .1;
 bloom_saturation = 5;
+bloom_neighbor_strength = 1; // přímý efekt okolních světlých pixelů (0 = vypnuto)
+bloom_neighbor_radius = 4; // vzdálenost okolních vzorků v pixelech
 shader_blur = shd_BlurLerp;
 u_blur_steps = shader_get_uniform(shader_blur, "blur_steps");
 u_sigma = shader_get_uniform(shader_blur, "sigma");
 u_blur_vector = shader_get_uniform(shader_blur, "blur_vector");
 u_texel_size = shader_get_uniform(shader_blur, "texel_size");
-bloom_darken = 0.5;
-blur_steps = 10;
-sigma = .1;
-bloom_range = .75;
-texel_w = 1/display_get_width();
-texel_h = 1/display_get_height();
+bloom_darken = 1;
+blur_steps = 16;
+sigma = .5;
+bloom_range = .55;
 #endregion
 
 ItemY = global.GuiH - 256;

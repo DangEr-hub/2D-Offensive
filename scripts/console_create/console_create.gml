@@ -14,6 +14,11 @@ function console_create() {
 	global.console[? "dir"] = -1;
 	global.console[? "string"] = "";
 	global.console[? "string_pos"] = 1;
+	global.console[? "selection_anchor_line"] = -2; // -1 = vstup, 0+ = historie
+	global.console[? "selection_focus_line"] = -2;
+	global.console[? "selection_anchor_pos"] = 1;
+	global.console[? "selection_focus_pos"] = 1;
+	global.console[? "selection_dragging"] = false;
 	global.console[? "text"] = noone;
 	global.console[? "suggestions"] = noone;
 	global.console[? "terminal_mode"] = false;

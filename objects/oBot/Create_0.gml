@@ -1,5 +1,8 @@
 /* Create event */
 event_inherited();
+br_phase = random(360);
+br_amp = 0.01;
+br_spd = 0.15;
 can_prone = true;
 walking = false;
 chasing_timer = -1;
@@ -46,7 +49,7 @@ stats.Assists = 0;
 stats.Deaths = 0;
 stats.Money = ROUND_STARTING_MONEY;
 stats.Team = choose(TEAM.TERRORIST, TEAM.POLICE);
-has_defuse_kit = stats.Team == TEAM.POLICE && percent_chance(25);
+has_defuse_kit = false;
 stats.Room = room;
 WeaponID = [0, 0];
 WeaponDistance = 0;
@@ -103,6 +106,8 @@ EquippedGrenadeTimer = -1;
 EquippedGrenadeTime = .25 * game_get_speed(gamespeed_fps);
 FacingX = 0;
 FacingY = 0;
+last_seen_x = x;
+last_seen_y = y;
 EquippedGrenadeID = ITEM.None;
 xp_value = 1;
 grenade_angle = random(360);
@@ -122,12 +127,13 @@ EquippedLandMineTime = .25 * game_get_speed(gamespeed_fps);
 EquippedLandMineTimer = -1;
 LandMines = [3, 3, 3];
 AccelX = 0;AccelY = 0;VelocityX = 0;VelocityY = 0;
-Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, SmokeGrenades, MolotovGrenades
+Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, smokes, molotovs
 GrenadeObject = noone;
-check_chasing_timer = 1 * game_get_speed(gamespeed_fps);
+check_chasing_timer = max(1, round(0.5 * game_get_speed(gamespeed_fps)));
 alarm[6] = 1;
 sprite_index = stats.Team == TEAM.TERRORIST ? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4) : choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3); ///fallback
 mv_timer = 5;
+mask_index = spr_BotMask;
 
 enum EQUIPMENT_LEVEL {
     FIRST,
@@ -137,7 +143,7 @@ enum EQUIPMENT_LEVEL {
 }
 
 equipment_level = 0;
-alarm[0] = 2;
+alarm[0] = 3;
 var primary_weapons = [ITEM.None];
 var secondary_weapons = [];
 for(var item_id = 1; item_id < ITEM.Total; item_id++){
@@ -157,8 +163,8 @@ WeaponID[0] = primary_weapons[irandom(array_length(primary_weapons) - 1)];
 WeaponID[1] = array_length(secondary_weapons) > 0
 	? secondary_weapons[irandom(array_length(secondary_weapons) - 1)]
 	: ITEM.None;
-ArmourID = choose(ITEM.None, ITEM.KevlarVest, ITEM.MilitaryVest, ITEM.SpecOpsVest);
-HelmetID = choose(ITEM.None, ITEM.KevlarHelm, ITEM.MilitaryHelm, ITEM.SpecOpsHelm);
+ArmourID = choose(ITEM.None, ITEM.KevlarVest, ITEM.MilitaryVest);
+HelmetID = choose(ITEM.None, ITEM.KevlarHelm, ITEM.MilitaryHelm);
 ShieldID = ITEM.None;
 Ammo[0] = global.ItemIndex[#WeaponID[0], ITEMSTATS.MaxAmmo];
 ClipAmmo[0] = global.ItemIndex[#WeaponID[0], ITEMSTATS.ClipAmmo];
@@ -190,7 +196,7 @@ XSpeed = 0;
 YSpeed = 0;
 ReactionTimer = -1;
 ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * rank_less, .25 * game_get_speed(gamespeed_fps), 1 * game_get_speed(gamespeed_fps));
-ChasingDistance = min(768 * rank_boost, 1200);
+ChasingDistance = min(480 * rank_boost, 900);
 #endregion
 
 #region Legs

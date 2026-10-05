@@ -5,7 +5,6 @@ LightObject.y = y;
 LightObject.angle = image_angle;
 
 
-
 #region Infra vision
 if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNightVision == true){
 	if(infra_vision_light == undefined){
@@ -180,7 +179,7 @@ if(is_local){
 }
 
 #region Normal bullet tracer
-if(image_index == 0){
+if(image_index == 0 || image_index == 3){
 	if(distance_to_point(stats.Starting_x, stats.Starting_y) >= PointDistance){
 		var bullet = create_bullet(
 			stats.Shot_x,

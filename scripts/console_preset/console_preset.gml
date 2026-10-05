@@ -29,7 +29,7 @@ function console_preset(argument0) {
 	console_add(c, "set money <amount> [player id]" + sudo_text);
 	console_add(c, "set dynamic crosshair {0,1} " + string(global.DynamicCrosshair));
 	console_add(c, "set crosshair alpha <0;1> " + string(global.CrosshairAlpha));
-	console_add(c, "draw bullet impact {0,1} " + string(global.DrawBulletImpact) + sudo_text);
+	console_add(c, "draw bullet impact {0,1} " + string(global.draw_bullet_impact) + sudo_text);
 	console_add(c, "draw admin hud {0,1} " + string(global.draw_advanced_hud) + sudo_text);
 	console_add(c, "set hitbox alpha <0;1> " + string(global.HitBoxAlpha) + sudo_text);
 	console_add(c, "set fullscreen {0,1} " + string(fullscreen));

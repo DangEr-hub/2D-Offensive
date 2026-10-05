@@ -14,6 +14,7 @@
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":2,"isDnD":false,},
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,},
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":52,"eventType":9,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":80,"eventType":9,"isDnD":false,},
   ],
   "managed": true,
   "overriddenProperties": [],
@@ -44,6 +45,9 @@
     "name": "spr_PoliceChar",
     "path": "sprites/spr_PoliceChar/spr_PoliceChar.yy",
   },
-  "spriteMaskId": null,
+  "spriteMaskId": {
+    "name": "spr_BotMask",
+    "path": "sprites/spr_BotMask/spr_BotMask.yy",
+  },
   "visible": true,
 }

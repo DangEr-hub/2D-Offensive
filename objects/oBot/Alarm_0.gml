@@ -1,15 +1,19 @@
 /// @description Post-create event
+has_defuse_kit = stats.Team == TEAM.POLICE && percent_chance(25);
+sprite_index = stats.Team == TEAM.TERRORIST
+	? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4)
+	: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
 equipment_level = EQUIPMENT_LEVEL.FIRST;
 if(global.ranked_game == false){
-	ArmourID = choose(ITEM.None, ITEM.KevlarVest, ITEM.MilitaryVest, ITEM.SpecOpsVest);
-	HelmetID = choose(ITEM.None, ITEM.KevlarHelm, ITEM.MilitaryHelm, ITEM.SpecOpsHelm);
+	ArmourID = choose(ITEM.None, ITEM.KevlarVest, ITEM.MilitaryVest);
+	HelmetID = choose(ITEM.None, ITEM.KevlarHelm, ITEM.MilitaryHelm);
 }else{
 	var streak_team_index = global.local_player.stats.Team - TEAM.POLICE;
 	var lost_rounds = global.game_struct.Loss_streak[streak_team_index];
 	var won_rounds = global.game_struct.Win_streak[streak_team_index];
 	if(global.game_struct.Current_round <= 0){
 		LandMines = [0, 0, 0];
-		Grenades = [1, 1, 1, 1]; //HEGrenades, FlashGrenades, SmokeGrenades, MolotovGrenades
+		Grenades = [1, 1, 1, 1]; //HEGrenades, FlashGrenades, smokes, molotovs
 		// First round equipment
 		equipment_level = EQUIPMENT_LEVEL.FIRST;
 		/*WeaponID[0] = choose(ITEM.None, ITEM.MAC11);
@@ -22,8 +26,8 @@ if(global.ranked_game == false){
 			// Equipment if player lost two last rounds or won three or more last rounds (1nd best equipment)
 			/*WeaponID[0] = choose(ITEM.SG550, ITEM.AKM, ITEM.SSG08, ITEM.Spas, ITEM.m4a1, ITEM.awm, ITEM.galil, ITEM.MK18, ITEM.famas);
 			WeaponID[1] = choose(ITEM.DesertEagle, ITEM.CZ75, ITEM.tec9);*/
-			ArmourID = percent_chance(75) ? ITEM.MilitaryVest : ITEM.SpecOpsVest; 
-			HelmetID = percent_chance(75) ? ITEM.MilitaryHelm : ITEM.SpecOpsHelm;
+			ArmourID = ITEM.MilitaryVest;
+			HelmetID = ITEM.MilitaryHelm;
 		}else if(lost_rounds >= 4 || won_rounds == 1){
 			equipment_level = stats.Team == global.local_player.stats.Team ? EQUIPMENT_LEVEL.HIGH : EQUIPMENT_LEVEL.LOW;
 			// Equipment if player lost three last rounds or won one last round (3nd best equipment)

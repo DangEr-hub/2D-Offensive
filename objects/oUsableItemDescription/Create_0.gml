@@ -22,7 +22,7 @@ with(zui_create(zui_get_width() * .5, zui_get_height() - button_height*1.25, obj
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Close";
+	caption = tr("Close");
 	callback = function(){
 		with(oUsableItemDescription){
 			zui_destroy();

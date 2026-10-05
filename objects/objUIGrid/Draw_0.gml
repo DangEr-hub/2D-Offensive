@@ -141,9 +141,9 @@ if(show_stats){
 	
 	#region Respawn menu
 	var max_rows = 8;
-	var Columns = ["Opponent(alive)", "Hits from", "Damage from", "Hits given", "Damage given"];
+	var Columns = [tr("Opponent_alive"), tr("Hits_from"), tr("Damage_from"), tr("Hits_given"), tr("Damage_given")];
 	var NumColumns = array_length(Columns);
-	var CellWidth = string_width("Opponent(alive)");
+	var CellWidth = string_width(Columns[0]);
 	var CellHeight = 32 * global.gui_scale;
 	var cell_x = x;
 	var cell_y = y;
@@ -243,8 +243,8 @@ if(show_stats){
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
 	var statTitles = [
-		"Damage: ", "Ammo: ", "Reload time: ", "Max. range: ", "RPM: ",
-		"Class: ", "Moving speed: ", "Penetration: ", ""
+		tr("Damage") + ": ", tr("Ammo") + ": ", tr("Reload_time") + ": ", tr("Maximal_range") + ": ", tr("RPM") + ": ",
+		tr("Class") + ": ", tr("Movement_speed") + ": ", tr("Penetration") + ": ", ""
 	];					
 					
 	#region Draw grid
@@ -285,7 +285,7 @@ if(show_stats){
 					break;
 
 					case ITEMSTATS.Range:
-						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " Units";
+						text = statTitles[statIndex] + string(global.ItemIndex[#Id, statIndex]) + " " + tr("Units");
 					break;
 										
 					case ITEMSTATS.ShootingMode:
@@ -293,7 +293,7 @@ if(show_stats){
 					break;
 					
 					case ITEMSTATS.WeaponTypeClass:
-						text = get_wpn_type(Id);
+						text = statTitles[statIndex] + tr(string_replace_all(get_wpn_type(Id), " ", "_"));
 					break;
 									
 					default:
@@ -317,7 +317,7 @@ if(show_stats){
 	var rows = 1;
 	var columns = 3;
 	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
-	var statTitles = ["Weight: ", "Defense: ", "Durability: "];
+	var statTitles = [tr("Weight") + ": ", tr("Defense") + ": ", tr("Durability") + ": "];
 						
 	#region Draw grid
 	for (var i = 0; i < rows; i++) {
@@ -373,7 +373,7 @@ if(show_stats){
 	#region Item description
 	var rows = 1;
 	var cell_height = ITEM_CELL_HEIGHT * global.gui_scale;
-	var statTitles = ["Damage: ", "Penetration power: "];
+	var statTitles = [tr("Damage") + ": ", tr("Penetration_power") + ": "];
 	var columns = array_length(statTitles);
 						
 	#region Draw grid
@@ -388,12 +388,12 @@ if(show_stats){
 			draw_set_font(set_font("GUI_grid"));
 			var text = "";
 			
-			switch(statTitles[j]){			
-				case "Damage: ":
+			switch(j){
+				case 0:
 					text = statTitles[0] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, INDEX.slot_id], ITEMSTATS.Damage]);
 				break;
 				
-				case "Penetration power: ":
+				case 1:
 					text = statTitles[1] + string(global.ItemIndex[#global.Inventory[#oDraw.var_slot, INDEX.slot_id], ITEMSTATS.PenetrationPower]*100) + " %";
 				break;
 			}
