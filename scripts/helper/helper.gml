@@ -206,10 +206,8 @@ function sent_server_udp(server_socket, socket_key, send_buffer){
 }
 
 function create_local_player(pid) {
-    var player = instance_create_layer(200, 200, "LivingO", oPlayer);
-    player.network_id = pid;
-    player.is_local = true;
-    player.is_remote = false;
+    var player = instance_create_layer(200, 200, "LivingO", oPlayer,
+		{network_id: pid, is_local: true, is_remote: false});
     
     // Store player data
     with (oNetworkManager) {
@@ -238,6 +236,15 @@ function create_local_player(pid) {
         ds_map_add(player_data, "weapon_clip_ammo", global.Inventory[# player.WeaponID, INDEX.slot_clip_ammo]);
         
         ds_map_add(player_states, pid, player_data);
+		if (is_server && !ds_map_exists(player_stats, pid)) {
+			var host_stats = ds_map_create();
+			ds_map_add(host_stats, "Kills", 0);
+			ds_map_add(host_stats, "Assists", 0);
+			ds_map_add(host_stats, "Deaths", 0);
+			ds_map_add(host_stats, "Money", global.player_stats.Money);
+			ds_map_add(host_stats, "InaccuracyModifier", global.PlayerInaccuracy);
+			ds_map_add(player_stats, pid, host_stats);
+		}
     }
     
     return player;
@@ -433,13 +440,16 @@ function find_living_player_teammate(team, excluded_player = noone) {
 }
 
 function create_remote_player(pid, x_pos, y_pos) {
-    var player = instance_create_layer(x_pos, y_pos, "LivingO", oPlayer);
-    player.network_id = pid;
-    player.is_local = false;
-    player.is_remote = true;
+    if (!layer_exists("LivingO")) return noone;
+    var player = instance_create_layer(x_pos, y_pos, "LivingO", oPlayer,
+		{network_id: pid, is_local: false, is_remote: true});
     player.target_x = x_pos;
     player.target_y = y_pos;
     apply_remote_player_network_state(player, pid);
+	var player_stats = ds_map_find_value(oNetworkManager.player_stats, pid);
+	if (!is_undefined(player_stats) && ds_map_exists(player_stats, "InaccuracyModifier")) {
+		player.inaccuracy_modifier = ds_map_find_value(player_stats, "InaccuracyModifier");
+	}
 
     return player;
 }

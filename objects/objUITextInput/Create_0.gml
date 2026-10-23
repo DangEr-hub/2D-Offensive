@@ -9,5 +9,6 @@ alpha = global.gui_alpha*2.25;
 text = "";
 active = false;
 chars = [];
+sound = false;
 del_timer = -1;
 alarm[0] = 1;

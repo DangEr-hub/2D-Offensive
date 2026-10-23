@@ -42,10 +42,10 @@ if(instance_exists(Object)){
 		}
 		if(Object.Visible && Object.in_water_timer <= game_get_speed(gamespeed_fps) * .9){
 			if(Object.object_index != oBot || step_due){
-				particle_create(round(movement_amount * random(2)), .8, random(360), spr_MovementParticle, random_range(-movement_amount, movement_amount), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, x, y);
+				particle_create(round(movement_amount * random(2)), .8, random(360), spr_MovementParticle, random_range(-movement_amount, movement_amount), random_range(-90, 90), random(360), 1, choose(true, false), false, 0, [x, y]);
 			}
 			if(step_due){
-				particle_create(1, 0, image_angle, spr_FootSteps, 0, 0, image_angle, 0, false, false, Object.FootSteps mod 2, x, y, .5, 1.5 * game_get_speed(gamespeed_fps));
+				particle_create(1, 0, image_angle, spr_FootSteps, 0, 0, image_angle, 0, false, false, Object.FootSteps mod 2, [x, y], .5, 1.5 * game_get_speed(gamespeed_fps));
 			}
 		}
 	}else{

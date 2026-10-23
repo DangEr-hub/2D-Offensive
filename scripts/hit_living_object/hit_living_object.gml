@@ -110,13 +110,16 @@ function award_damage_assists(victim, killer_key){
 			}
 		}
 
-		if(!instance_exists(assister)){
+		if(!instance_exists(assister) || assister.stats.Team == victim.stats.Team){
 			continue;
 		}
 
 		if(assister.object_index == oPlayer){
 			assister.stats.Assists++;
 			if(!IS_NET && assister.is_local){
+				global.game_struct.Match_assists++;
+			}
+			if(IS_NET && oNetworkManager.is_server && assister.is_local){
 				global.game_struct.Match_assists++;
 			}
 			if(assister.is_local && global.ranked_game){
@@ -193,15 +196,25 @@ function create_blood(splash_number, xx, yy, color, part_number, spray_dir = -1)
 		BloodSplash.sizeChange = random_range(BloodSplash.image_xscale / 7, BloodSplash.image_xscale / 5);
 	}
 	if(instance_exists(oParticleSystem)){
-		part_type_color1(oParticleSystem.BloodParticle, color);
+		var size_scale = clamp(.7 + part_number / 70, .75, 1.5);
+		var line_number = part_number > 0 ? clamp(round(part_number / 2), 5, 25) : 0;
+		part_type_size(oParticleSystem.BloodParticle, .25 * size_scale, 1.25 * size_scale, 0, .05);
+		part_type_size_x(oParticleSystem.blood_line, .5 * size_scale, 1.4 * size_scale, 0, 0);
+		part_type_size_y(oParticleSystem.blood_line, .7 * size_scale, 1.8 * size_scale, 0, 0);
 		if(spray_dir >= 0){
 			var directed_count = round(part_number * 0.8);
 			part_type_direction(oParticleSystem.BloodParticle, spray_dir - 65, spray_dir + 65, 0, 0);
-			part_particles_create(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, directed_count);
+			part_particles_create_colour(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, color, directed_count);
 			part_number -= directed_count;
+			var directed_lines = round(line_number * .8);
+			part_type_direction(oParticleSystem.blood_line, spray_dir - 65, spray_dir + 65, 0, 0);
+			part_particles_create_colour(global.ParticleSystem, xx, yy, oParticleSystem.blood_line, color, directed_lines);
+			line_number -= directed_lines;
 		}
 		part_type_direction(oParticleSystem.BloodParticle, 0, 359, 0, 0);
-		part_particles_create(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, part_number);
+		part_particles_create_colour(global.ParticleSystem, xx, yy, oParticleSystem.BloodParticle, color, part_number);
+		part_type_direction(oParticleSystem.blood_line, 0, 359, 0, 0);
+		part_particles_create_colour(global.ParticleSystem, xx, yy, oParticleSystem.blood_line, color, line_number);
 	}	
 }
 
@@ -315,6 +328,8 @@ function add_body_blood(hit_object, hit_damage, body_part, impact_x, impact_y) {
 	array_push(stains, {
 		pos_x: stain_pos_x,
 		pos_y: stain_pos_y,
+		body_part: body_part,
+		prone: hit_object.image_index >= TEXTURES.prone && hit_object.image_index < TEXTURES.grenade_throw,
 		frame: irandom(sprite_get_number(spr_BloodSplash) - 1),
 		scale: stain_scale,
 		angle: irandom(359),
@@ -500,14 +515,14 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 			DamageMultiplier = BODY_MULTIPLIER;
 			if(armour_durability > 0 && global.ItemIndex[# armour_id, ITEMSTATS.Defense] <= .95){
 				hit_object.attack_damage *= global.ItemIndex[# armour_id, ITEMSTATS.Defense] * penetration_power;
-				aim_punch_modifier *= .1;
+				aim_punch_modifier *= .05;
 			}
 		}else if(BodyPart >= HITBOX.Head){
 			DamageMultiplier = HEADSHOT_MULTIPLIER;
 			blood_color = c_maroon;
 			if(helmet_durability > 0 && global.ItemIndex[# helmet_id, ITEMSTATS.Defense] <= .95){
 				hit_object.attack_damage *= global.ItemIndex[# helmet_id, ITEMSTATS.Defense] * penetration_power;
-				aim_punch_modifier *= .1;
+				aim_punch_modifier *= .05;
 			}
 		}
 
@@ -608,22 +623,28 @@ function hit_living_object(hit_object, BodyPart, attacking_item, ArmourID, Helme
 		var reward = global.ItemIndex[# attacking_item.stats.Item_id, ITEMSTATS.reward];
 
 		if (hp <= hit_object.attack_damage) {
-			if (!is_hostage) {
+			if (!is_hostage && !(instance_exists(attacker) && attacker.stats.Team == hit_object.stats.Team)) {
 				award_damage_assists(hit_object, attacker_key);
 			}
 
 			if (!IS_NET) {
 				if(!is_hostage && instance_exists(attacker) && attacker.object_index == oPlayer && attacker.is_local){
-					global.player_stats.Money += reward;
-					attacker.stats.Kills++;
-					global.game_struct.Match_kills++;
-					if(global.ranked_game){
-						global.player_stats.Kills++;
-						oGameController.kills++;
+					if (attacker.stats.Team == hit_object.stats.Team) {
+						global.player_stats.Money = max(0, global.player_stats.Money - TEAM_KILL_PENALTY);
+					} else {
+						global.player_stats.Money += reward;
+						attacker.stats.Kills++;
+						global.game_struct.Match_kills++;
+						if(global.ranked_game){
+							global.player_stats.Kills++;
+							oGameController.kills++;
+						}
 					}
 				}else if(!is_hostage && instance_exists(attacker) && attacker.object_index == oBot){
-					attacker.stats.Kills++;
-					attacker.stats.Money += reward;
+					if (attacker.stats.Team != hit_object.stats.Team) {
+						attacker.stats.Kills++;
+						attacker.stats.Money += reward;
+					}
 				}
 
 				if(is_bot){
@@ -794,11 +815,9 @@ function hit_effects(BodyPart, armour_id, helmet_id, shield_id, armour_durabilit
             }
 
             for (var i = 0; i < round(max(hit_object.attack_damage / 5, 10)); i++) {
-                part_type_color1(oParticleSystem.headshot_particle, c_gray);
                 part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
                 part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
-                part_particles_create(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, 1);
-                part_type_color1(oParticleSystem.headshot_particle, c_white);
+                part_particles_create_colour(global.ParticleSystem, impact_x, impact_y, oParticleSystem.headshot_particle, c_gray, 1);
             }
 
             var sound_effect = snd_BulletHitArmour1;

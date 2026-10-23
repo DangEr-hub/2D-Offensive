@@ -1,3 +1,77 @@
+function draw_crosshair(xx, yy){
+	var previous_color = draw_get_color();
+	var previous_alpha = draw_get_alpha();
+	var spread = global.cs_conf.spread * global.cs_conf.scale;
+	var draw_center = global.cs_conf.dynamic && global.cs_conf.type != CS_TYPE.DOT && instance_exists(global.local_player);
+	if(draw_center){
+		var weapon_id = global.Inventory[# global.local_player.WeaponID, INDEX.slot_id];
+		var outward_shift = inaccuracy_formula(weapon_id, global.local_player) * 2;
+		spread += global.cs_conf.type == CS_TYPE.CIRC ? outward_shift : outward_shift * 2;
+	}
+	var w = global.cs_conf.width * global.cs_conf.scale;
+	var h = global.cs_conf.height * global.cs_conf.scale;
+	var o = global.cs_conf.outline ? max(0, global.cs_conf.outline_w * global.cs_conf.scale) : 0;
+	var center_spread = min(12 * global.cs_conf.scale, spread/2);
+	var draw_count = draw_center ? 2 : 1;
+
+	draw_set_alpha(global.cs_conf.alpha);
+	for(var draw_pass = 0; draw_pass < draw_count; draw_pass++){
+		if(draw_pass == 1) spread = center_spread;
+		if(global.cs_conf.type == CS_TYPE.CLASSIC){
+			var crosshair_position = [
+				[xx - spread/2 - w, yy - h/2, xx - spread/2, yy + h/2], // left
+				[xx + spread/2, yy - h/2, xx + spread/2 + w, yy + h/2], // right
+				[xx - h/2, yy - spread/2 - w, xx + h/2, yy - spread/2], // top
+				[xx - h/2, yy + spread/2, xx + h/2, yy + spread/2 + w]  // bottom
+			];
+
+			if(o > 0){
+				draw_set_color(global.cs_conf.outline_color);
+				draw_rectangle(crosshair_position[0][0] - o, crosshair_position[0][1] - o, crosshair_position[0][2], crosshair_position[0][3] + o, false);
+				draw_rectangle(crosshair_position[1][0], crosshair_position[1][1] - o, crosshair_position[1][2] + o, crosshair_position[1][3] + o, false);
+				draw_rectangle(crosshair_position[2][0] - o, crosshair_position[2][1] - o, crosshair_position[2][2] + o, crosshair_position[2][3], false);
+				draw_rectangle(crosshair_position[3][0] - o, crosshair_position[3][1], crosshair_position[3][2] + o, crosshair_position[3][3] + o, false);
+			}
+
+			draw_set_color(global.cs_conf.color);
+			draw_rectangle(crosshair_position[0][0], crosshair_position[0][1], crosshair_position[0][2] - o, crosshair_position[0][3], false);
+			draw_rectangle(crosshair_position[1][0] + o, crosshair_position[1][1], crosshair_position[1][2], crosshair_position[1][3], false);
+			draw_rectangle(crosshair_position[2][0], crosshair_position[2][1], crosshair_position[2][2], crosshair_position[2][3] - o, false);
+			draw_rectangle(crosshair_position[3][0], crosshair_position[3][1] + o, crosshair_position[3][2], crosshair_position[3][3], false);
+		}else if(global.cs_conf.type == CS_TYPE.CIRC){
+			var ring_width = min(h, spread);
+			var ring_radius = spread - ring_width/2;
+			if(o > 0){
+				draw_circular_bar(xx, yy, ring_radius, 0, 1, global.cs_conf.outline_color, global.cs_conf.outline_color, ring_width + 2*o, global.cs_conf.alpha);
+			}
+			draw_circular_bar(xx, yy, ring_radius, 0, 1, global.cs_conf.color, global.cs_conf.color, ring_width, global.cs_conf.alpha);
+		}else if(global.cs_conf.type == CS_TYPE.RECT){
+			for(var frame_pass = 0; frame_pass < 2; frame_pass++){
+				if(frame_pass == 0 && o <= 0) continue;
+				var frame_padding = frame_pass == 0 ? o : 0;
+				var outer_half = spread/2 + frame_padding;
+				var inner_half = max(0, spread/2 - h - frame_padding);
+				draw_set_color(frame_pass == 0 ? global.cs_conf.outline_color : global.cs_conf.color);
+				draw_rectangle(xx - outer_half, yy - outer_half, xx + outer_half, yy - inner_half, false);
+				draw_rectangle(xx - outer_half, yy + inner_half, xx + outer_half, yy + outer_half, false);
+				draw_rectangle(xx - outer_half, yy - inner_half, xx - inner_half, yy + inner_half, false);
+				draw_rectangle(xx + inner_half, yy - inner_half, xx + outer_half, yy + inner_half, false);
+			}
+		}else if(global.cs_conf.type == CS_TYPE.DOT){
+			var half_width = w/2;
+			var half_height = h/2;
+			if(o > 0){
+				draw_set_color(global.cs_conf.outline_color);
+				draw_ellipse(xx - half_width - o, yy - half_height - o, xx + half_width + o, yy + half_height + o, false);
+			}
+			draw_set_color(global.cs_conf.color);
+			draw_ellipse(xx - half_width, yy - half_height, xx + half_width, yy + half_height, false);
+		}
+	}
+	draw_set_color(previous_color);
+	draw_set_alpha(previous_alpha);
+}
+
 function draw_lens_flare() {
     var obj_main = argument0; // The light source
     var obj_target = argument1; // The object to draw lens flare towards
@@ -74,7 +148,8 @@ function draw_circular_bar(x, y, radius, value, max_value, bar_color, background
 	var inner_radius = max(0, safe_radius - safe_thickness * .5);
 	var outer_radius = safe_radius + safe_thickness * .5;
 	var progress = max_value > 0 ? clamp(value / max_value, 0, 1) : 0;
-	var segments = max(96, ceil(outer_radius * 3));
+	// Two vertices per segment; keep each triangle strip below 512 vertices.
+	var segments = clamp(ceil(outer_radius * 3), 96, 240);
 	var safe_alpha = clamp(alpha, 0, 1);
 
 	draw_set_alpha(1);

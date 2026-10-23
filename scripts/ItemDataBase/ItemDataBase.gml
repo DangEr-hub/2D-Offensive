@@ -178,7 +178,7 @@ function ItemDataBase(){
 	add_shooting_modes(ITEM.basic_machine_gun, ["Auto", "Semi", "Burst", "Safety"]);
 	add_shooting_modes(ITEM.famas, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(ITEM.galil, ["Auto", "Safety"]);
-	add_shooting_modes(ITEM.p250, ["Semi", "Safety"]);;
+	add_shooting_modes(ITEM.p250, ["Semi", "Safety"]);
 	add_shooting_modes(ITEM.MK18, ["Auto", "Burst", "Safety"]);
 	add_shooting_modes(ITEM.steel_knife, ["Semi", "Safety"]);
 	add_shooting_modes(ITEM.tec9, ["Semi", "Safety"]);
@@ -364,7 +364,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# ITEM.DesertEagle, ITEMSTATS.Type] = "Weapon";
 	WeaponStats(ITEM.DesertEagle, "Desert Eagle", 1.75 * game_get_speed(gamespeed_fps), 700, 51, 140, 7, WEAPON_TYPE.SECONDARY, 4, 11, snd_DesertEagle, 7, 2, false,
-	0, 0, 10, 30, 1.5, 9, 7.5, 0, 0, .5, 1, WEAPON_CLASS.PISTOL, .9, .932, .1 * game_get_speed(gamespeed_fps), .77, 100, 2, 7, true, ".50 AE", CALIBER.HIGH);
+	0, 0, 10, 30, 1, 9, 7.5, 0, 0, .5, 1, WEAPON_CLASS.PISTOL, .9, .932, .1 * game_get_speed(gamespeed_fps), .77, 100, 2, 7, true, ".50 AE", CALIBER.HIGH);
 	global.ItemIndex[# ITEM.DesertEagle, ITEMSTATS.random_bullet_spread] = true;
 	global.ItemIndex[# ITEM.DesertEagle, ITEMSTATS.difficulty] = 5;
 	global.ItemIndex[# ITEM.DesertEagle, ITEMSTATS.ItemColor] = c_ltgray;
@@ -572,7 +572,7 @@ function ItemDataBase(){
 	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.Type] = "Grenade";
 	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.Name] = "HE grenade";
 	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.Cost] = 25;
-	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.ReloadSpeed] = 2.5;
+	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.ReloadSpeed] = 15;
 	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.Damage] = 98;
 	global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.PenetrationPower] = .5;
 	//global.ItemIndex[# ITEM.HEGrenade, ITEMSTATS.damage_drop] = .001;
@@ -605,7 +605,7 @@ function ItemDataBase(){
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.Type] = "Grenade";
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.Name] = "Molotov";
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.Cost] = 45;
-	global.ItemIndex[# ITEM.molotov, ITEMSTATS.ReloadSpeed] = 2.5;
+	global.ItemIndex[# ITEM.molotov, ITEMSTATS.ReloadSpeed] = 12;
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.Damage] = 18;
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.PenetrationPower] = .75;
 	global.ItemIndex[# ITEM.molotov, ITEMSTATS.BulletCasingID] = 4;
@@ -622,7 +622,7 @@ function ItemDataBase(){
 	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.Type] = "Grenade";
 	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.Name] = "Flashbang";
 	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.Cost] = 25;
-	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.ReloadSpeed] = 2.5;
+	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.ReloadSpeed] = 15;
 	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.Damage] = 11;
 	global.ItemIndex[# ITEM.flashbang, ITEMSTATS.PenetrationPower] = .5;
 	//global.ItemIndex[# ITEM.flashbang, ITEMSTATS.damage_drop] = .001;
@@ -754,7 +754,7 @@ function ItemDataBase(){
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.Damage] = 0;
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.PenetrationPower] = 0;
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.Cost] = 25;
-	global.ItemIndex[# ITEM.smoke, ITEMSTATS.ReloadSpeed] = 2.5;
+	global.ItemIndex[# ITEM.smoke, ITEMSTATS.ReloadSpeed] = 12;
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.BulletCasingID] = 2;
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.ItemColor] = c_gray;
 	global.ItemIndex[# ITEM.smoke, ITEMSTATS.damage_drop] = function(dist)  {
@@ -1117,7 +1117,7 @@ function ItemDataBase(){
 	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.Type] = "Grenade";
 	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.Name] = "Sticky grenade";
 	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.Cost] = 50;
-	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.ReloadSpeed] = 5;
+	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.ReloadSpeed] = 15;
 	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.Damage] = 49;
 	global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.PenetrationPower] = .89;
 	//global.ItemIndex[# ITEM.StickyGrenade, ITEMSTATS.damage_drop] = .005;
@@ -1140,7 +1140,7 @@ function ItemDataBase(){
 	
 	global.ItemIndex[# ITEM.defuse_kit, ITEMSTATS.Type] = "Item";
 	global.ItemIndex[# ITEM.defuse_kit, ITEMSTATS.Name] = "Defuse kit";
-	global.ItemIndex[# ITEM.defuse_kit, ITEMSTATS.ItemColor] = c_blue;;
+	global.ItemIndex[# ITEM.defuse_kit, ITEMSTATS.ItemColor] = c_blue;
 
 	global.ItemIndex[# ITEM.two_scope, ITEMSTATS.Type] = "Item";
 	global.ItemIndex[# ITEM.two_scope, ITEMSTATS.Name] = "Sniper scope";

@@ -72,14 +72,13 @@ if(drawable == true){
 			var StartDescriptionY = y + DescriptionStringHeight/2;
 			draw_text_outlined(x, StartDescriptionY, DescriptionString, c_white, c_black, 1);
 		
-			var offset_y = DescriptionStringHeight * 3;
 			var disadvantages_string = tr_adv(Id, false);
 			var disadvantages_height = string_count_lines(disadvantages_string) * font_get_size(draw_get_font());
 			var advantages_string = tr_adv(Id, true);
 			var advantages_height = string_count_lines(advantages_string) * font_get_size(draw_get_font());
 			var disadvantages_x = x + string_width(advantages_string)*1.1;
 			var advantages_x = x;
-			var advantages_y = y + offset_y;
+			var advantages_y = StartDescriptionY + DescriptionStringHeight + font_get_size(draw_get_font()) * 3;
 			draw_text_outlined(disadvantages_x, advantages_y, disadvantages_string, c_red, c_black, 1);
 			draw_text_outlined(advantages_x, advantages_y, advantages_string, c_yellow, c_black, 1);
 		}

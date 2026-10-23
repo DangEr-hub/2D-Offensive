@@ -2,6 +2,7 @@ if(!instance_exists(obj_hazeC)){
 	haze_start(true, false);
 }
 event_inherited();
+shooting_mode = -1;
 br_phase = 0;
 br_amp = 0.01;
 br_spd = 0.15;
@@ -10,7 +11,6 @@ dilatation_timer = -1;
 adrenaline_timer = -1;
 steroids_timer = -1;
 current_building_id = -1;
-door_cooldown = -1;
 command = array_create(4, -1);
 anim_base = TEXTURES.prone;
 equip_time_max = -1;
@@ -60,6 +60,8 @@ Weapon = noone;
 machine_gun_take_loadout = undefined;
 XSpeed = 0;
 YSpeed = 0;
+InaccuracyXSpeed = 0;
+InaccuracyYSpeed = 0;
 ScopeIn = false;
 ScopeInaccuracyTimer = -1;
 EquippedGrenadeTimer = -1;
@@ -138,6 +140,8 @@ StaminaHealingTimer = -1;
 #region Crosshair vars
 CrosshairShake = 0;
 crosshair_position = [mouse_x, mouse_y];
+crosshair_x = x + lengthdir_x(384, RotationAngle);
+crosshair_y = y + lengthdir_y(384, RotationAngle);
 #endregion
 
 #region Camera
@@ -154,8 +158,6 @@ RelativeSpeedX = 0;
 RelativeSpeedY = 0;
 last_move_xpos = 0;
 last_move_ypos = 0;
-MovingStabilizationTime = round(.025 * game_get_speed(gamespeed_fps));
-MovingStabilizationTimer = -1;
 running = false;
 walking = false;
 shield_equip = false;
@@ -188,9 +190,14 @@ LegHB.MainObject = id;
 /// Player Object - Create Event (Network additions)
 
 // Network properties
-network_id = -1;
-is_local = true;
-is_remote = false;
+if (!variable_instance_exists(id, "network_id")) network_id = -1;
+if (!variable_instance_exists(id, "is_local")) is_local = true;
+if (!variable_instance_exists(id, "is_remote")) is_remote = false;
+if (!IS_NET && is_local) {
+	global.player_stats.Lifes = MAX_LIFES;
+	global.player_stats.Respawn_point = [x, y];
+}
+inaccuracy_modifier = is_local ? global.PlayerInaccuracy : 1;
 // Interpolation for remote players
 target_x = x;
 target_y = y;
@@ -225,7 +232,7 @@ Flashed = false;
 
 #endregion
 
-if(global.ranked_game == true){
+if(global.ranked_game == true && is_local && !instance_exists(oGameController)){
 	instance_create_layer(x, y, "OtherO", oGameController);
 }
 

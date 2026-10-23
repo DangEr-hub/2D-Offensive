@@ -11,7 +11,7 @@ stats = {
 	Object_index: -1,
 	Owner_name: "",
 	Object: noone,
-	Health_points: 100 * (image_index + 1),
+	Health_points: 15 * (image_index + 1),
 };
 
 //haze = haze_circle_add(x, y, sprite_width*1.5);

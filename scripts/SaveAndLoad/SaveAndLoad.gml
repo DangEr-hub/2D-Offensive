@@ -25,15 +25,13 @@ function save_game(){
 	ini_write_real("Vars", "time_speed", global.TimeSpeed);
 	ini_write_real("Vars", "godmode", global.GodMode);
 	ini_write_real("Vars", "map_id", global.MapID);
-	ini_write_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
-	ini_write_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
+	ini_write_real("Vars", "player_character_seed", global.player_character_seed);
 	ini_write_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
 	ini_write_real("Vars", "enemy_can_move", global.EnemyCanMove);
 	ini_write_real("Vars", "draw_bullet_impact", global.draw_bullet_impact);
 	ini_write_real("Vars", "camera_crosshair_shake", global.ViewShake);
 	ini_write_real("Vars", "admin_hud", global.draw_advanced_hud);
 	ini_write_real("Vars", "draw_particles", global.DrawParticles);
-	ini_write_real("Vars", "crosshair_color", global.crosshair_color);
 	ini_write_real("Vars", "draw_other_models", global.draw_other_models);
 	ini_write_real("Vars", "sound_gain", global.sound_gain);
 	ini_write_real("Vars", "bloom_shader", global.bloom_shader);
@@ -44,7 +42,6 @@ function save_game(){
 	ini_write_real("Vars", "windowed", window_get_fullscreen());
 	ini_write_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 	ini_write_real("Vars", "anti_aliasing", global.anti_aliasing);
-	ini_write_real("Vars", "crosshair_scale", global.crosshair_scale);
 	ini_write_string("Network", "server_ip", global.saved_server_ip);
 	ini_write_real("Vars", "saturation_shader", global.saturation_shader);
 	ini_write_string("Language", "language", global.language);
@@ -58,6 +55,14 @@ function save_game(){
 	ini_close();
 	#endregion
 	
+	#region Save crosshair settings
+	if(file_exists("crosshair.json")){
+		file_delete("crosshair.json");
+	}
+	var crosshair_file = file_text_open_write("crosshair.json");
+	file_text_write_string(crosshair_file, json_stringify(global.cs_conf));
+	file_text_close(crosshair_file);
+	#endregion
 	#region Save keyboard input
 	if(file_exists("save_keyboard_input.ini")){
 		file_delete("save_keyboard_input.ini");	
@@ -121,16 +126,12 @@ function load_game(){
 	global.TimeSpeed = 15;
 	global.GodMode = false;
 	global.MapID = MAP.Desert;
-	global.CrosshairAlpha = 1;
-	global.DynamicCrosshair = 0;
 	global.PlayerInaccuracy = 1;
 	global.EnemyCanMove = 1;
 	global.draw_bullet_impact = 1;
 	global.ViewShake = 1;
 	global.draw_advanced_hud = 0;
-	global.crosshair_scale = 1;
 	global.DrawParticles = 1;
-	global.crosshair_color = c_white;
 	global.draw_other_models = 0;
 	global.sound_gain = 100;
 	global.bloom_shader = 1;
@@ -154,15 +155,13 @@ function load_game(){
 		global.TimeSpeed = ini_read_real("Vars", "time_speed", global.TimeSpeed);
 		global.GodMode = ini_read_real("Vars", "godmode", global.GodMode);
 		global.MapID = ini_read_real("Vars", "map_id", global.MapID);	
-		global.CrosshairAlpha = ini_read_real("Vars", "crosshair_alpha", global.CrosshairAlpha);
-		global.DynamicCrosshair = ini_read_real("Vars", "dynamic_crosshair", global.DynamicCrosshair);
+		global.player_character_seed = ini_read_real("Vars", "player_character_seed", global.player_character_seed);
 		global.PlayerInaccuracy = ini_read_real("Vars", "player_inaccuracy", global.PlayerInaccuracy);
 		global.EnemyCanMove = ini_read_real("Vars", "enemy_can_move", global.EnemyCanMove);
 		global.draw_bullet_impact = ini_read_real("Vars", "draw_bullet_impact", global.draw_bullet_impact);
 		global.ViewShake = ini_read_real("Vars", "camera_crosshair_shake", global.ViewShake);
 		global.draw_advanced_hud = ini_read_real("Vars", "admin_hud", global.draw_advanced_hud);
 		global.DrawParticles = ini_read_real("Vars", "draw_particles", global.DrawParticles);
-		global.crosshair_color = ini_read_real("Vars", "crosshair_color", global.crosshair_color);
 		global.draw_other_models = ini_read_real("Vars", "draw_other_models", global.draw_other_models);
 		global.sound_gain = ini_read_real("Vars", "sound_gain", global.sound_gain);
 		global.bloom_shader = ini_read_real("Vars", "bloom_shader", ini_read_real("Vars", "toggle_bloom_shader", global.bloom_shader));
@@ -172,7 +171,6 @@ function load_game(){
 		global.window_height = ini_read_real("Vars", "window_height", global.window_height);
 		global.clear_particles_timer = ini_read_real("Vars", "clear_particles_timer", global.clear_particles_timer);
 		global.anti_aliasing = ini_read_real("Vars", "anti_aliasing", global.anti_aliasing);
-		global.crosshair_color = ini_read_real("Vars", "crosshair_scale", global.crosshair_scale);
 		global.saved_server_ip = ini_read_string("Network", "server_ip", global.saved_server_ip);
 		global.saturation_shader = ini_read_real("Vars", "saturation_shader", global.saturation_shader);
 		global.language = ini_read_string("Language", "language", global.language);
@@ -191,6 +189,14 @@ function load_game(){
 	
 	#endregion
 	
+	#region Load crosshair settings
+	if(file_exists("crosshair.json")){
+		var crosshair_file = file_text_open_read("crosshair.json");
+		var crosshair_json = file_text_read_string(crosshair_file);
+		file_text_close(crosshair_file);
+		global.cs_conf = json_parse(crosshair_json);
+	}
+	#endregion
 	#region Load keyboard input
 	if(file_exists("save_keyboard_input.ini")){
 		ini_open("save_keyboard_input.ini");

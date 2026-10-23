@@ -235,7 +235,7 @@ function reset_gui(){
 			if(PauseMenu == true){
 				instance_destroy(objZUIMain);
 				pause(id);
-			}else if(RespawnMenu == true){
+			}else if(RespawnMenu == true && !(instance_exists(global.local_player) && global.local_player.stats.Team == TEAM.NONE)){
 				instance_destroy(objZUIMain);
 				with(zui_main()){
 					if(other.GameEndMenu == true){
@@ -293,6 +293,12 @@ function reset_gui(){
 	}
 }
 	
+function open_choose_team_menu() {
+	if (!instance_exists(oDraw)) return;
+	oDraw.team_menu_dismissed = false;
+	oDraw.team_menu_requested = true;
+}
+
 function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageIndicatorColor, DamageIndicatorSprite, DamageIndicatorSpriteID, DamageIndicatorFont = set_font("Console")) {
 	
 	if(global.draw_damage == false && DamageIndicatorSpriteID == ICON.health){
@@ -318,7 +324,7 @@ function damage_indicator(DamageIndicatorString, PositionX, PositionY, DamageInd
 	}
 }
 
-function set_crosshair_color(ColorString){
+function set_crosshair_color(ColorString, outline = false){
 	if (string_length(ColorString) == 9) {
 		var r = string_copy(ColorString, 1, 3);
 		var g = string_copy(ColorString, 4, 3);
@@ -332,6 +338,7 @@ function set_crosshair_color(ColorString){
 		g = clamp(g, 0, 255);
 		b = clamp(b, 0, 255);
 
-		global.crosshair_color = make_color_rgb(r, g, b);
+		if(outline) global.cs_conf.outline_color = make_color_rgb(r, g, b);
+		else global.cs_conf.color = make_color_rgb(r, g, b);
 	}
 }

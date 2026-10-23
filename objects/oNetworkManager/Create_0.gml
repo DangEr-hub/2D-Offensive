@@ -28,6 +28,11 @@ max_clients = 4;
 server_max_damage_per_hit = 500;
 round_resolved = false;
 team_round_wins = array_create(TEAM.TERRORIST + 1, 0);
+last_round_winner = TEAM.NONE;
+last_round_menu_score = 0;
+last_match_state_sequence = -1;
+last_tick_sequence = -1;
+player_life_sequence = array_create(max_clients + 1, -1);
 
 // Network state
 
@@ -95,7 +100,10 @@ enum PACKET {
 	ITEM_ACTION_SYNC,
 	MACHINE_GUN_SYNC,
 	SUDO_SYNC,
-	LASER_SYNC
+	LASER_SYNC,
+	BUY_ITEM,
+	MATCH_STATE,
+	TEAM_SELECT
 }
 
 enum MACHINE_GUN_SYNC_ACTION {
@@ -140,6 +148,10 @@ hb_client    = 0;   // heartbeat of client
 last_item_use_id = -1;
 item_use_resync_timer = 0;
 item_use_resync_interval = 2;
+pending_buy_item = ITEM.None;
+pending_buy_id = 0;
+next_buy_id = 0;
+pending_buy_timer = 0;
 
 /// ping
 ping_interval = 1;  // how often to measure latency
@@ -147,6 +159,7 @@ ping_timer = 0;
 ping_ms = 0;
 stats_sync_timer = 0;
 stats_sync_interval = .25;
+match_state_sync_timer = 0;
 game_win_diamond_granted = false;
 molotov_sync_timer = 0;
 molotov_sync_interval = .5;

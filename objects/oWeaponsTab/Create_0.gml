@@ -267,10 +267,6 @@ refresh_weapon_ui = function(){
 };
 
 draw_set_font(set_font("Console"));
-/*weapons = [ITEM.AKM, ITEM.MK18, ITEM.m4a1, ITEM.SG550, ITEM.galil, 
-			ITEM.famas, ITEM.awm, ITEM.SSG08, ITEM.Dragunov, ITEM.MAC11, ITEM.MP9, ITEM.MP7, ITEM.P90, ITEM.DesertEagle, ITEM.Glock, ITEM.usp, ITEM.p250, ITEM.tec9, ITEM.CZ75,
-			ITEM.Spas, ITEM.Javelin
-		  ];*/
 		  
 		  
 weapons = [];
@@ -639,21 +635,6 @@ dmg_graph_callback = function(){
 	
 	if!(instance_exists(oWeaponsTab.dmg_graph)){
 	oWeaponsTab.dmg_graph = zui_create(zui_get_width() * .5, zui_get_height() * .5, objUIGraph);
-	/*with(dmg_graph){
-		zui_set_depth(-1000);
-		scale = 10;
-		var steps = ceil(global.ItemIndex[# oWeaponsTab.wpn, ITEMSTATS.Range] / scale) + 1;
-		
-		for(var i = 0; i < steps; i++){
-			array_push(values_x, i*scale);	
-		}
-		
-		var base_dmg = global.ItemIndex[# oWeaponsTab.wpn, ITEMSTATS.Damage];
-		var dmg_drop = global.ItemIndex[# oWeaponsTab.wpn, ITEMSTATS.damage_drop];
-		for(var i = 0; i < array_length(values_x); i ++){
-			array_push(values_y, base_dmg * power(1 - dmg_drop, values_x[i]));
-		}
-	}*/
 
 	with(dmg_graph){
 	    zui_set_depth(-1000);

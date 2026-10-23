@@ -1,1 +1,0 @@
-AimPunchTimer = AimPunchTime;

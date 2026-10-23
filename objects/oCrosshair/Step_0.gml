@@ -1,9 +1,9 @@
 recoil_speed = .1;
 WobbleResetSpeed = .25;
 StabilizationSpeed = 15;
-if(global.local_player.weapon_shooting_mode == "Semi"){
-	recoil_speed = 10;
-	StabilizationSpeed = 75;
+if(instance_exists(global.local_player) && global.local_player.shooting_mode == "Semi"){
+	recoil_speed = 1;
+	StabilizationSpeed = 9;
 }
 
 if(HitMarker > -1){	
@@ -34,12 +34,14 @@ if(instance_exists(global.local_player)){
 	        WobbleY += 5*max(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0) * 1.5;
 	        WobbleScopeInMultiplier = clamp(round((100/(global.local_player.stats.Stamina_points + 1)) - 1)*2, 0, 10);
 	    }
+	}else{
+		WobbleScopeInMultiplier = lerp(WobbleScopeInMultiplier, 0, WobbleResetSpeed);
 	}
 
 	if(global.local_player.AimPunchTimer > -1){
 		WobbleX += global.local_player.AimPunchTimer * .25;
 		WobbleY += global.local_player.AimPunchTimer * 1.5;
-		WobbleAimPunchMultiplier = global.local_player.AimPunchTimer;	
+		WobbleAimPunchMultiplier = global.local_player.AimPunchTimer * global.local_player.AimPunchMultiplier;
 	}else{
 		WobbleAimPunchMultiplier = lerp(WobbleAimPunchMultiplier, 0, WobbleResetSpeed);	
 	}
@@ -65,9 +67,8 @@ if(instance_exists(global.local_player)){
 			var KBPhase2 = global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.KBPhase2];
 			#endregion
 
-			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootTimer] / 2 
-			/*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.WeaponTypeClass] == WEAPON_CLASS.PISTOL*/) 
-			|| (global.local_player.shooting /*&& global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.PISTOL*/)) {
+			if ((!global.local_player.CanShoot && global.local_player.ShootTimer >= global.ItemIndex[# global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootTimer] / 2 ) 
+			|| (global.local_player.shooting)) {
 				
 				#region Recoil mechanic
 			    axis_multiplier[1] = -sign(global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.RecoilY]);
@@ -88,8 +89,8 @@ if(instance_exists(global.local_player)){
 					targetY = mouse_y - DeltaY;
 			    }
 
-			    x = lerp(x, targetX, recoil_speed*2);
-			    y = lerp(y, targetY, recoil_speed*2);
+			    x = lerp(x, targetX, recoil_speed);
+			    y = lerp(y, targetY, recoil_speed);
 
 			    var newDeltaX = mouse_x - x;
 			    var newDeltaY = mouse_y - y;
@@ -137,21 +138,17 @@ if(instance_exists(global.local_player)){
 				
 			}
 		}else{
-			x = lerp(x, mouse_x, WobbleResetSpeed*2);
-			y = lerp(y, mouse_y, WobbleResetSpeed*2);
+			x = lerp(x, mouse_x, WobbleResetSpeed);
+			y = lerp(y, mouse_y, WobbleResetSpeed);
 		}
 		#endregion
 		
 	}else{
 
 		#region Basic recoil
-		if(global.local_player.CanShoot == false && global.local_player.ShootTimer >= global.ItemIndex[#global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], ITEMSTATS.ShootTimer]/2){
-			if(RecoilTimer[0] == -1){
-				RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
-			}
-			if(RecoilTimer[1] == -1){
-				RecoilTimer[1] = floor(abs(recoilX)/StabilizationSpeed);
-			}
+		if(recoil_pending){
+			RecoilTimer[0] = floor(abs(recoilY)/StabilizationSpeed);
+			RecoilTimer[1] = floor(abs(recoilX)/StabilizationSpeed);
 		}
 		
 		
@@ -189,6 +186,7 @@ if(instance_exists(global.local_player)){
 		#endregion
 		
 	}
+	recoil_pending = false;
 	// Fade only the recoil offset near the opposite viewport edge. This keeps
 	// the spray pattern intact while allowing the crosshair to reach every edge.
 	var view_left = oDraw.ViewX;
@@ -245,7 +243,7 @@ if(instance_exists(global.local_player)){
 
 #region Dynamic crosshair
 AlphaMul = 1;
-if(global.DynamicCrosshair == true){
+if(global.cs_conf.dynamic == true){
 	AlphaMul = .25;
 }
 #endregion

@@ -47,12 +47,12 @@ function set_current_enemy(){
 function game_struct_create(){
 	var return_struct = {
 		"Previous_ep": convert_to_eggy_scale(MIN_EP),
-		"Playing_time_per_round": array_create(MAX_ROUNDS, 0),
+		"Playing_time_per_round": array_create(MAX_ROUNDS + 1, 0),
 		"Predictive_volatility": PLAYER_STARTING_VOLATILITY,
 		"Game_volatility": array_create(TRACKING_PERIOD, PLAYER_STARTING_VOLATILITY),
 		"Player_ep": convert_to_eggy_scale(MIN_EP), // Eggy scale
-		"Current_game": 0,
-		"Current_round": 0,
+		"Current_game": 1,
+		"Current_round": 1,
 		"Rounds_win": 0,
 		"Rounds_lost": 0,
 		"Match_kills": 0,
@@ -65,8 +65,8 @@ function game_struct_create(){
 		"Lost_games": 0,
 		"Tied_games": 0,
 		"Player_rd": convert_to_eggy_scale(RD_START, true), // Eggy scale
-		"Kills_per_round": array_create(MAX_ROUNDS, 0),
-		"Headshots_per_round": array_create(MAX_ROUNDS, 0),
+		"Kills_per_round": array_create(MAX_ROUNDS + 1, 0),
+		"Headshots_per_round": array_create(MAX_ROUNDS + 1, 0),
 		"Recent_results": array_create(TRACKING_PERIOD, -1),
 		"Expected_results": array_create(TRACKING_PERIOD, -1),
 		"Enemy_ep": array_create(TRACKING_PERIOD, -1),
@@ -84,14 +84,12 @@ function game_struct_create(){
 }
 
 function map_init(Map){
-	if(global.player_stats.Player_team == TEAM.NONE){
-		global.player_stats.Player_team = choose(TEAM.POLICE, TEAM.TERRORIST);
-	}
+	// Nový zápas počká na výběr týmu hráčem.
 	global.game_struct.Match_kills = 0;
 	global.game_struct.Match_assists = 0;
 	global.game_struct.Match_deaths = 0;
 	global.MapID = Map;
-	initialize_bot_database(Map);
+	if(global.player_stats.Player_team != TEAM.NONE) initialize_bot_database(Map);
 	if(global.map_rounds[Map][2] == -1){
 		global.map_rounds[Map][2] = global.game_struct.Enemy_ep[global.game_struct.Current_game];
 	}
@@ -107,10 +105,11 @@ function clear_player_statistics(total_rounds){
 	global.map_rounds[global.MapID][1] = -1;
 	global.game_struct.Rounds_win = 0;
 	global.game_struct.Rounds_lost = 0;
-	global.game_struct.Current_round = 0;
+	global.game_struct.Current_round = 1;
 	global.game_struct.Win_streak = array_create(2, 0);
 	global.game_struct.Loss_streak = array_create(2, 0);
 	global.player_stats.Player_team = TEAM.NONE;
+	global.player_character_seed = irandom(2147483646);
 	global.BotMatchStats = [];
 	for(var i=0;i<total_rounds;i++){
 		global.game_struct.Headshots_per_round[i] = 0;
@@ -132,18 +131,19 @@ function reset_player_door_keys(){
 function reset_singleplayer_game(){
 	global.game_struct.Rounds_win = 0;
 	global.game_struct.Rounds_lost = 0;
-	global.game_struct.Current_round = 0;
+	global.game_struct.Current_round = 1;
 	global.game_struct.Match_kills = 0;
 	global.game_struct.Match_assists = 0;
 	global.game_struct.Match_deaths = 0;
 	global.player_stats.Player_team = TEAM.NONE;
+	global.player_character_seed = irandom(2147483646);
 	global.player_stats.Money = ROUND_STARTING_MONEY;
 	ds_grid_clear(global.Inventory, 0);
 	ds_grid_clear(global.MouseSlot, 0);
 	global.player_stats.Weight = 0;
 	reset_player_door_keys();
 
-	for(var i = 0; i < MAX_ROUNDS; i++){
+	for(var i = 0; i < MAX_ROUNDS + 1; i++){
 		global.game_struct.Headshots_per_round[i] = 0;
 		global.game_struct.Kills_per_round[i] = 0;
 		global.game_struct.Playing_time_per_round[i] = 0;
@@ -507,8 +507,12 @@ function round_end(round_result, winning_team = -1){
 		reset_player_door_keys();
 		oNetworkManager.round_resolved = true;
 		oNetworkManager.team_round_wins[winning_team]++;
+		oNetworkManager.last_round_winner = winning_team;
+		var completed_rounds = oNetworkManager.team_round_wins[TEAM.POLICE] + oNetworkManager.team_round_wins[TEAM.TERRORIST];
+		var game_ended = oNetworkManager.team_round_wins[winning_team] >= (MAX_ROUNDS / 2 + 1);
+		global.game_struct.Current_round = completed_rounds + (game_ended ? 0 : 1);
 
-		if (instance_exists(local_player)) {
+		if (instance_exists(local_player) && local_player.stats.Team != TEAM.NONE) {
 			global.game_struct.Rounds_win = oNetworkManager.team_round_wins[local_player.stats.Team];
 			var local_enemy_team = local_player.stats.Team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE;
 			global.game_struct.Rounds_lost = oNetworkManager.team_round_wins[local_enemy_team];
@@ -524,9 +528,9 @@ function round_end(round_result, winning_team = -1){
 		if (instance_exists(oDraw)) {
 			oDraw.spectating = false;
 			oDraw.spectate_target = noone;
-			var game_ended = oNetworkManager.team_round_wins[winning_team] >= (MAX_ROUNDS / 2 + 1);
 			oDraw.GameEndMenu = game_ended;
 			oDraw.RespawnMenu = true;
+			reset_gui();
 
 			if (game_ended && !oNetworkManager.game_win_diamond_granted) {
 				if (instance_exists(local_player) && local_player.stats.Team == winning_team) {
@@ -538,6 +542,7 @@ function round_end(round_result, winning_team = -1){
 		}
 
 		server_round_end_broadcast(winning_team);
+		server_broadcast_match_state();
 		camera_set_view_angle(CAM, 0);
 		return true;
 	}

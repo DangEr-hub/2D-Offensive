@@ -1,3 +1,8 @@
+if(global.ranked_game && global.game_struct.Current_round == 1){
+	with(oMachineGun){ instance_destroy(); }
+	with(oMachineGunFloor){ instance_destroy(); }
+}
+
 if(round_ended == false && oDraw.PauseMenu == false && (oDraw.RespawnMenu == false || instance_exists(oSpectateControl))){
 	playing_time ++;
 }
@@ -22,7 +27,7 @@ if(round_ended == true && !round_result_processed && (oDraw.RespawnMenu == false
 		global.game_struct.Rounds_lost ++;	
 	}
 	if(global.game_struct.Rounds_win < (MAX_ROUNDS/2 + 1) && global.game_struct.Rounds_lost < (MAX_ROUNDS/2 + 1)){
-		global.game_struct.Playing_time_per_round[global.game_struct.Current_round] = playing_time / game_get_speed(gamespeed_fps);
+		global.game_struct.Playing_time_per_round[global.game_struct.Current_round - 1] = playing_time / game_get_speed(gamespeed_fps);
 		global.game_struct.Current_round ++;
 	}else{
 		///Game end calculating ep
@@ -30,11 +35,16 @@ if(round_ended == true && !round_result_processed && (oDraw.RespawnMenu == false
 		if(!IS_NET && player_win == true){
 			global.player_stats.Diamonds += global.game_struct.Rounds_win*2;
 		}
-		global.game_struct.Playing_time_per_round[global.game_struct.Current_round] = playing_time / game_get_speed(gamespeed_fps);
+		global.game_struct.Playing_time_per_round[global.game_struct.Current_round - 1] = playing_time / game_get_speed(gamespeed_fps);
 		var game_result = calculate_game_result(global.game_struct.Rounds_win, global.game_struct.Rounds_lost);
 		update_eggy_rating_system(game_result, global.MapID);
 	}		
 	if(!IS_NET){
+		if(instance_exists(global.local_player) && global.local_player.stats.Health_points <= 0){
+			ds_grid_clear(global.Inventory, 0);
+			ds_grid_clear(global.MouseSlot, 0);
+			global.player_stats.Weight = 0;
+		}
 		global.map_rounds[global.MapID][0] = global.game_struct.Rounds_win;
 		global.map_rounds[global.MapID][1] = global.game_struct.Rounds_lost;
 		save_game();

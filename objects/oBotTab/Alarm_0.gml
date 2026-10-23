@@ -20,9 +20,9 @@ var armour_name = target_bot.ArmourID == ITEM.None
 	? tr("None")
 	: tr_name(target_bot.ArmourID);
 var health_text = "Health: " + string(round(target_bot.stats.Health_points)) + "/" + string(round(target_bot.stats.Max_health_points));
-var weight_text = "Weight: " + string_format(target_bot.stats.Weight, 0, 1) + " kg";
-var height_text = "Height: " + string_format(target_bot.stats.Height, 0, 1) + " cm";
-var age_text = tr("Age") + ": " + string(round(target_bot.stats.Age)) + " " + tr("Years");
+var weight_text = "Weight: " + string_format(real(target_bot.stats.Weight), 0, 1) + " kg";
+var height_text = "Height: " + string_format(real(target_bot.stats.Height), 0, 1) + " cm";
+var age_text = tr("Age") + ": " + string(round(real(target_bot.stats.Age))) + " " + tr("Years");
 var helmet_text = "Helmet: " + helmet_name;
 var armour_text = "Body: " + armour_name;
 var primary_text = "Primary weapon: " + primary_name;

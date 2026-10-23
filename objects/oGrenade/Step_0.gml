@@ -1,9 +1,11 @@
 /// @description Insert description here
 // You can write your code in this editor
+var grenade_previous_x = x;
+var grenade_previous_y = y;
 if(stuck == false){
 	x += lengthdir_x(stats.Speed, stats.Direction);
 	y += lengthdir_y(stats.Speed, stats.Direction);
-	stats.Speed *= .95 * global.time_step;
+	stats.Speed *= 1 - (1 - 0.95) * global.time_step;
 	
 	if!(place_meeting(x, y, oParentTile) && place_meeting(x, y, oBot)){
 		image_angle += stats.Speed*2 * global.time_step;
@@ -43,6 +45,22 @@ if(stats.Item_id == ITEM.StickyGrenade){
 			x = stuck_to.x + stuck_offset_x;
 			y = stuck_to.y + stuck_offset_y;
 		}
+	}
+}
+
+if(stuck == false){
+	var hit_wall = place_meeting(x, y, oParentTile);
+	var hit_bot = instance_place(x, y, oBot);
+	if(hit_bot == stats.Object){ hit_bot = noone; }
+	if(hit_wall || hit_bot != noone){
+		var hit_x = place_meeting(x, grenade_previous_y, oParentTile)
+			|| (hit_bot != noone && place_meeting(x, grenade_previous_y, hit_bot));
+		var hit_y = place_meeting(grenade_previous_x, y, oParentTile)
+			|| (hit_bot != noone && place_meeting(grenade_previous_x, y, hit_bot));
+		if(!hit_x && !hit_y){ hit_x = true; hit_y = true; }
+		if(hit_x){ x = grenade_previous_x; stats.Direction = 180 - stats.Direction; }
+		if(hit_y){ y = grenade_previous_y; stats.Direction = -stats.Direction; }
+		stats.Speed *= .75;
 	}
 }
 
@@ -121,21 +139,21 @@ if(ExplosionTimer <= -1 || ExplodeTimer <= -1){
 					#endregion					
 				}
 			}
-			if(instance_exists(oBot)){
-				if!(collision_line(x, y, oBot.x, oBot.y, oParentTile, true, false)){
-					if (point_distance(x, y, oBot.x, oBot.y) < global.FlashBangMaxDistance) {
+			with(oBot){
+				if(point_distance(other.x, other.y, x, y) < global.FlashBangMaxDistance){
+					if(!collision_line(other.x, other.y, x, y, oParentTile, true, false)){
 						
 						#region Flash enemy
-						var angular_diff = abs(point_direction(oBot.x, oBot.y, x, y) - oBot.RotationAngle);
+						var angular_diff = abs(point_direction(x, y, other.x, other.y) - RotationAngle);
 						if (angular_diff > 180){
 							angular_diff = 360 - angular_diff;
 						}
-						oBot.Reloading = false;
-						oBot.ReloadTime = 0;
-						oBot.reload_timer = -1;
-						oBot.Flashed = true;
-						oBot.trigger_texture_timer = oBot.trigger_texture_time;
-						oBot.FlashedTimer = round(oBot.FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(x, y, oBot.x, oBot.y) / global.FlashBangMaxDistance)*.1));
+						Reloading = false;
+						ReloadTime = 0;
+						reload_timer = -1;
+						Flashed = true;
+						trigger_texture_timer = trigger_texture_time;
+						FlashedTimer = round(FlashedTime * (1 - (angular_diff / 180)) * (1 - (point_distance(other.x, other.y, x, y) / global.FlashBangMaxDistance)*.1));
 						#endregion
 						
 					}
@@ -212,48 +230,3 @@ var scale = 1 + (z/100);
 image_xscale = scale;
 image_yscale = scale;
 #endregion
-
-if(stuck == false){
-	
-	#region Collision with wall
-	if (place_meeting(x, y, oParentTile)) {
-		// Reflect off wall
-		stats.Speed *= .75;
-		stats.Direction = -stats.Direction * random_range(.9, 1);
-		x -= lengthdir_x(stats.Speed, stats.Direction);  // Move out of collision
-	}
-
-	if (place_meeting(x, y, oParentTile)) {
-		stats.Speed *= .75;
-		stats.Direction = (180 - stats.Direction) * random_range(.9, 1);
-		y -= lengthdir_y(stats.Speed, stats.Direction);  // Move out of collision
-	}
-	#endregion
-
-	#region Collision with enemy
-
-	x += lengthdir_x(stats.Speed, stats.Direction);
-	if (place_meeting(x, y, oBot)) {
-		var EnemyNearest = instance_nearest(x, y, oBot);
-		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
-			stats.Speed *= .75;
-		    stats.Direction = -stats.Direction * random_range(.75, 1);
-		    x -= lengthdir_x(stats.Speed, stats.Direction);  // Move out of collision
-		}
-	}
-
-	y += lengthdir_y(stats.Speed, stats.Direction);
-	if(instance_exists(oBot)){
-		var EnemyNearest = instance_nearest(x, y, oBot);
-		if (place_meeting(x, y, EnemyNearest) && stats.Object != EnemyNearest) {
-			stats.Speed *= .75;
-		    stats.Direction = (180 - stats.Direction) * random_range(.75, 1);
-		    y -= lengthdir_y(stats.Speed, stats.Direction);  // Move out of collision
-		}
-	}
-
-	#endregion
-
-}
-
-

@@ -17,7 +17,7 @@ toggle_bloom_string = "Bloom shader: ";
 anti_aliasing_string = "Anti-aliasing: ";
 volume_gain_string = "Volume gain: ";
 saturation_level_string = "Saturation level: ";
-text_height = string_height("a")*2;
+text_height = min(string_height("a")*2, 36 * global.gui_scale);
 
 language_callback = function(language_code){
 	global.language = language_code;
@@ -104,6 +104,61 @@ toggle_particles_callback = function(){
 
 crosshair_color_text_input_callback = function(InputText){
 	set_crosshair_color(InputText);	
+	save_game();
+};
+
+crosshair_type_callback = function(type_index){
+	global.cs_conf.type = type_index;
+	for(var checkbox_index = 0; checkbox_index < 4; checkbox_index++){
+		crosshair_type_checkboxes[checkbox_index].value = checkbox_index == type_index;
+	}
+	save_game();
+};
+
+crosshair_outline_color_callback = function(input_text){
+	set_crosshair_color(input_text, true);
+	save_game();
+};
+
+crosshair_reset_callback = function(){
+	global.cs_conf.width = 15;
+	global.cs_conf.height = 2;
+	global.cs_conf.alpha = 1;
+	global.cs_conf.scale = 1;
+	global.cs_conf.outline = true;
+	global.cs_conf.outline_w = 1;
+	global.cs_conf.outline_color = c_black;
+	global.cs_conf.color = c_white;
+	global.cs_conf.dynamic = false;
+	global.cs_conf.spread = 24;
+
+	var reset_sliders = [
+		[spread_slider, 24], [width_slider, 15], [height_slider, 2],
+		[outline_width_slider, 1], [alpha_slider, 20], [scale_slider, 4]
+	];
+	for(var slider_index = 0; slider_index < array_length(reset_sliders); slider_index++){
+		var slider = reset_sliders[slider_index][0];
+		var slider_value = reset_sliders[slider_index][1];
+		slider.value = slider_value;
+		slider.pvalue = slider_value;
+		slider.handle.__x = inverse_lerp(slider.minimum, slider.maximum, slider_value) * (slider.__width - 16) + 8;
+	}
+	spread_slider_label.caption = "Spread: 24";
+	width_slider_label.caption = "Width: 15";
+	height_slider_label.caption = "Height: 2";
+	outline_width_slider_label.caption = "Outline W: 1";
+	alpha_slider_label.caption = "Alpha: 1";
+	scale_slider_label.caption = "Scale: 1";
+	outline_checkbox.value = true;
+	dynamic_crosshair_checkbox.value = false;
+	crosshair_color_input.init_text = "255255255";
+	crosshair_color_input.chars = ["2", "5", "5", "2", "5", "5", "2", "5", "5"];
+	crosshair_color_input.text = crosshair_color_input.init_text;
+	crosshair_color_input.active = false;
+	outline_color_input.init_text = "000000000";
+	outline_color_input.chars = ["0", "0", "0", "0", "0", "0", "0", "0", "0"];
+	outline_color_input.text = outline_color_input.init_text;
+	outline_color_input.active = false;
 	save_game();
 };
 
@@ -278,57 +333,16 @@ with(toggle_particles_button){
 }
 #endregion
 
-#region Crosshair color
-with(zui_create(position_x, position_y + text_height*4, objUILabel)){
-	color = c_white;
-	caption = other.crosshair_color_string;
-}
-
-with(zui_create(position_x + gap*.75, position_y + text_height*4 - text_height/3, objUITextInput)){
-	zui_set_anchor(0, 0);
-	var r = (global.crosshair_color >> 16) & 0xFF;
-	var g = (global.crosshair_color >> 8) & 0xFF;
-	var b = global.crosshair_color & 0xFF;
-	var r_str = string(r);
-	var g_str = string(g);
-	var b_str = string(b);
-	r_str = string_repeat("0", 3 - string_length(r_str)) + r_str;
-	g_str = string_repeat("0", 3 - string_length(g_str)) + g_str;
-	b_str = string_repeat("0", 3 - string_length(b_str)) + b_str;
-
-	init_text = r_str + g_str + b_str;
-	max_string_length = string_length("255255255");
-	callback = other.crosshair_color_text_input_callback;
-}
-#endregion
-
-#region Dynamic crosshair
 checkbox_size = 16 * global.gui_scale;
-with(zui_create(position_x, position_y + text_height*5, objUILabel)){
-	color = c_white;
-	caption = "Dynamic crosshair: ";
-}
-
-with(zui_create(position_x + gap, position_y + text_height*5 - checkbox_size/2, objUICheckbox)){
-	zui_set_anchor(0, 0);
-	zui_set_size(other.checkbox_size, other.checkbox_size);
-	value = global.DynamicCrosshair;
-	callback = function(){
-		value = !value;
-		global.DynamicCrosshair = value;
-		save_game();
-	};
-}
-#endregion
 
 #region Fullscreen
 fullscreen_string = "Toggle fullscreen: ";
-with(zui_create(position_x, position_y + text_height*6, objUILabel)){
+with(zui_create(position_x, position_y + text_height*4, objUILabel)){
 	color = c_white;
 	caption = other.fullscreen_string;
 }
 
-with(zui_create(position_x + gap, position_y + text_height*6 - checkbox_size/2, objUICheckbox)){
+with(zui_create(position_x + gap, position_y + text_height*4 - checkbox_size/2, objUICheckbox)){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
 	value = window_get_fullscreen();
@@ -341,12 +355,12 @@ with(zui_create(position_x + gap, position_y + text_height*6 - checkbox_size/2, 
 
 #region Player name
 player_name_string = "Player’s name: ";
-with(zui_create(position_x, position_y + text_height*7, objUILabel)){
+with(zui_create(position_x, position_y + text_height*5, objUILabel)){
 	color = c_white;
 	caption = other.player_name_string;
 }
 
-with(zui_create(position_x + gap*.75, position_y + text_height*7 - text_height/3, objUITextInput)){
+with(zui_create(position_x + gap*.75, position_y + text_height*5 - text_height/3, objUITextInput)){
 	zui_set_anchor(0, 0);
 	init_text = global.player_stats.Name;
 	max_string_length = 16;
@@ -357,12 +371,12 @@ with(zui_create(position_x + gap*.75, position_y + text_height*7 - text_height/3
 #endregion
 
 #region Window size
-with(zui_create(position_x, position_y + text_height*8, objUILabel)){
+with(zui_create(position_x, position_y + text_height*6, objUILabel)){
 	color = c_white;
 	caption = "Window size: ";
 }
 
-window_resolution_button = zui_create(position_x + gap, position_y + text_height * 7.5, objUIButton);
+window_resolution_button = zui_create(position_x + gap, position_y + text_height*5.5, objUIButton);
 
 with (window_resolution_button) {
     zui_set_anchor(0.5, 0);
@@ -377,12 +391,12 @@ with (window_resolution_button) {
 #endregion
 
 #region GUI scale
-with(zui_create(position_x, position_y + text_height*9, objUILabel)){
+with(zui_create(position_x, position_y + text_height*7, objUILabel)){
 	color = c_white;
 	caption = "GUI scale: ";
 }
 
-gui_scale_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*9), objUIButton);
+gui_scale_button = zui_create(position_x + gap, round(position_y - text_height/4 + text_height*7), objUIButton);
 with(gui_scale_button){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(64 * global.gui_scale);
@@ -394,12 +408,12 @@ with(gui_scale_button){
 #endregion
 
 #region Saturation level
-with(zui_create(position_x, position_y + text_height*10, objUILabel)){
+with(zui_create(position_x, position_y + text_height*8, objUILabel)){
 	color = c_white;
 	caption = other.saturation_level_string;
 }
 
-with(zui_create(position_x + gap*.75, position_y + text_height*10 - text_height/3, objUITextInput)){
+with(zui_create(position_x + gap*.75, position_y + text_height*8 - text_height/3, objUITextInput)){
 	zui_set_anchor(0, 0);
 	init_text = string(global.saturation_level);
 	max_string_length = 4;
@@ -408,12 +422,12 @@ with(zui_create(position_x + gap*.75, position_y + text_height*10 - text_height/
 #endregion
 
 #region Language
-with(zui_create(position_x, position_y + text_height*11, objUILabel)){
+with(zui_create(position_x, position_y + text_height*9, objUILabel)){
 	color = c_white;
 	caption = "Language: ";
 }
 
-language_cz_checkbox = zui_create(position_x + gap, position_y + text_height*11 - checkbox_size/2, objUICheckbox);
+language_cz_checkbox = zui_create(position_x + gap, position_y + text_height*9 - checkbox_size/2, objUICheckbox);
 with(language_cz_checkbox){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
@@ -421,12 +435,12 @@ with(language_cz_checkbox){
 	callback = function(){ oSettingsTab.language_callback("cz"); };
 }
 
-with(zui_create(position_x + gap + checkbox_size + 12 * global.gui_scale, position_y + text_height*11, objUILabel)){
+with(zui_create(position_x + gap + checkbox_size + 12 * global.gui_scale, position_y + text_height*9, objUILabel)){
 	color = c_white;
 	caption = "CZ";
 }
 
-language_en_checkbox = zui_create(position_x + gap + 100 * global.gui_scale, position_y + text_height*11 - checkbox_size/2, objUICheckbox);
+language_en_checkbox = zui_create(position_x + gap + 100 * global.gui_scale, position_y + text_height*9 - checkbox_size/2, objUICheckbox);
 with(language_en_checkbox){
 	zui_set_anchor(0, 0);
 	zui_set_size(other.checkbox_size, other.checkbox_size);
@@ -434,19 +448,243 @@ with(language_en_checkbox){
 	callback = function(){ oSettingsTab.language_callback("en"); };
 }
 
-with(zui_create(position_x + gap + 100 * global.gui_scale + checkbox_size + 12 * global.gui_scale, position_y + text_height*11, objUILabel)){
+with(zui_create(position_x + gap + 100 * global.gui_scale + checkbox_size + 12 * global.gui_scale, position_y + text_height*9, objUILabel)){
 	color = c_white;
 	caption = "EN";
 }
 #endregion
 
+#region Crosshair type
+crosshair_type_names = ["Classic", "Circ.", "Rect.", "Dot"];
+crosshair_type_checkboxes = array_create(4);
+var type_start_x = position_x + 170 * global.gui_scale;
+var type_spacing = (setting_tab_width - type_start_x - 24 * global.gui_scale) / 4;
+with(zui_create(position_x, position_y + text_height*10, objUILabel)){
+	color = c_white;
+	caption = "Crosshair type: ";
+}
+for(var type_index = 0; type_index < 4; type_index++){
+	var type_x = type_start_x + type_index * type_spacing;
+	crosshair_type_checkboxes[type_index] = zui_create(type_x, position_y + text_height*10 - checkbox_size/2, objUICheckbox);
+	with(crosshair_type_checkboxes[type_index]){
+		zui_set_anchor(0, 0);
+		zui_set_size(other.checkbox_size, other.checkbox_size);
+		crosshair_type_value = type_index;
+		value = global.cs_conf.type == crosshair_type_value;
+		callback = function(){ oSettingsTab.crosshair_type_callback(crosshair_type_value); };
+	}
+	with(zui_create(type_x + checkbox_size + 4 * global.gui_scale, position_y + text_height*10, objUILabel)){
+		color = c_white;
+		caption = other.crosshair_type_names[type_index];
+	}
+}
+#endregion
 
+#region Dynamic crosshair
+dynamic_crosshair_checkbox = zui_create(position_x + gap, position_y + text_height*11 - checkbox_size/2, objUICheckbox);
+with(zui_create(position_x, position_y + text_height*11, objUILabel)){
+	color = c_white;
+	caption = "Dynamic crosshair: ";
+}
+with(dynamic_crosshair_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = global.cs_conf.dynamic;
+	callback = function(){
+		value = !value;
+		global.cs_conf.dynamic = value;
+		save_game();
+	};
+}
+#endregion
 
+#region Crosshair color
+with(zui_create(position_x, position_y + text_height*12, objUILabel)){
+	color = c_white;
+	caption = other.crosshair_color_string;
+}
+crosshair_color_input = zui_create(position_x + gap*.75, position_y + text_height*12 - text_height/3, objUITextInput);
+with(crosshair_color_input){
+	zui_set_anchor(0, 0);
+	var r = (global.cs_conf.color >> 16) & 0xFF;
+	var g = (global.cs_conf.color >> 8) & 0xFF;
+	var b = global.cs_conf.color & 0xFF;
+	var r_str = string(r);
+	var g_str = string(g);
+	var b_str = string(b);
+	r_str = string_repeat("0", 3 - string_length(r_str)) + r_str;
+	g_str = string_repeat("0", 3 - string_length(g_str)) + g_str;
+	b_str = string_repeat("0", 3 - string_length(b_str)) + b_str;
+	init_text = r_str + g_str + b_str;
+	max_string_length = string_length("255255255");
+	callback = other.crosshair_color_text_input_callback;
+}
+#endregion
 
+#region Crosshair spread
+spread_slider_label = zui_create(position_x, position_y + text_height*13, objUILabel);
+with(spread_slider_label){
+	color = c_white;
+	caption = "Spread: " + string(global.cs_conf.spread);
+}
+spread_slider = zui_create(position_x + gap, position_y + text_height*13 - text_height/4, objUISlider);
+with(spread_slider){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(256);
+	minimum = 2;
+	maximum = 100;
+	value = global.cs_conf.spread;
+	callback = function(slider_value){
+		global.cs_conf.spread = slider_value;
+		oSettingsTab.spread_slider_label.caption = "Spread: " + string(slider_value);
+		save_game();
+	};
+}
+#endregion
 
+#region Crosshair width and height
+width_slider_label = zui_create(position_x, position_y + text_height*14, objUILabel);
+with(width_slider_label){
+	color = c_white;
+	caption = "Width: " + string(global.cs_conf.width);
+}
+width_slider = zui_create(position_x + 155 * global.gui_scale, position_y + text_height*14 - text_height/4, objUISlider);
+with(width_slider){
+	zui_set_anchor(0, 0);
+	zui_set_width(80 * global.gui_scale);
+	minimum = 2;
+	maximum = 48;
+	value = clamp(round(global.cs_conf.width), minimum, maximum);
+	callback = function(slider_value){
+		global.cs_conf.width = slider_value;
+		oSettingsTab.width_slider_label.caption = "Width: " + string(slider_value);
+		save_game();
+	};
+}
+height_slider_label = zui_create(position_x + 310 * global.gui_scale, position_y + text_height*14, objUILabel);
+with(height_slider_label){
+	color = c_white;
+	caption = "Height: " + string(global.cs_conf.height);
+}
+height_slider = zui_create(position_x + 405 * global.gui_scale, position_y + text_height*14 - text_height/4, objUISlider);
+with(height_slider){
+	zui_set_anchor(0, 0);
+	zui_set_width(80 * global.gui_scale);
+	minimum = 2;
+	maximum = 48;
+	value = clamp(round(global.cs_conf.height), minimum, maximum);
+	callback = function(slider_value){
+		global.cs_conf.height = slider_value;
+		oSettingsTab.height_slider_label.caption = "Height: " + string(slider_value);
+		save_game();
+	};
+}
+#endregion
 
+#region Crosshair outline
+with(zui_create(position_x, position_y + text_height*15, objUILabel)){
+	color = c_white;
+	caption = "Outline: ";
+}
+outline_checkbox = zui_create(position_x + 155 * global.gui_scale, position_y + text_height*15 - checkbox_size/2, objUICheckbox);
+with(outline_checkbox){
+	zui_set_anchor(0, 0);
+	zui_set_size(other.checkbox_size, other.checkbox_size);
+	value = global.cs_conf.outline;
+	callback = function(){
+		value = !value;
+		global.cs_conf.outline = value;
+		save_game();
+	};
+}
+outline_width_slider_label = zui_create(position_x + 310 * global.gui_scale, position_y + text_height*15, objUILabel);
+with(outline_width_slider_label){
+	color = c_white;
+	caption = "Outline W: " + string(global.cs_conf.outline_w);
+}
+outline_width_slider = zui_create(position_x + 405 * global.gui_scale, position_y + text_height*15 - text_height/4, objUISlider);
+with(outline_width_slider){
+	zui_set_anchor(0, 0);
+	zui_set_width(80 * global.gui_scale);
+	minimum = 1;
+	maximum = 8;
+	value = clamp(round(global.cs_conf.outline_w), minimum, maximum);
+	callback = function(slider_value){
+		global.cs_conf.outline_w = slider_value;
+		oSettingsTab.outline_width_slider_label.caption = "Outline W: " + string(slider_value);
+		save_game();
+	};
+}
+#endregion
 
+#region Crosshair outline color
+with(zui_create(position_x, position_y + text_height*16, objUILabel)){
+	color = c_white;
+	caption = "Outline color (rgb): ";
+}
+outline_color_input = zui_create(position_x + gap*.75, position_y + text_height*16 - text_height/3, objUITextInput);
+with(outline_color_input){
+	zui_set_anchor(0, 0);
+	var red_value = (global.cs_conf.outline_color >> 16) & 0xFF;
+	var green_value = (global.cs_conf.outline_color >> 8) & 0xFF;
+	var blue_value = global.cs_conf.outline_color & 0xFF;
+	init_text = string_repeat("0", 3 - string_length(string(red_value))) + string(red_value)
+		+ string_repeat("0", 3 - string_length(string(green_value))) + string(green_value)
+		+ string_repeat("0", 3 - string_length(string(blue_value))) + string(blue_value);
+	max_string_length = 9;
+	callback = other.crosshair_outline_color_callback;
+}
+#endregion
 
+#region Crosshair alpha and scale
+alpha_slider_label = zui_create(position_x, position_y + text_height*17, objUILabel);
+with(alpha_slider_label){
+	color = c_white;
+	caption = "Alpha: " + string(global.cs_conf.alpha);
+}
+alpha_slider = zui_create(position_x + 155 * global.gui_scale, position_y + text_height*17 - text_height/4, objUISlider);
+with(alpha_slider){
+	zui_set_anchor(0, 0);
+	zui_set_width(80 * global.gui_scale);
+	minimum = 0;
+	maximum = 20;
+	value = clamp(round(global.cs_conf.alpha * 20), minimum, maximum);
+	callback = function(slider_value){
+		global.cs_conf.alpha = slider_value / 20;
+		oSettingsTab.alpha_slider_label.caption = "Alpha: " + string(global.cs_conf.alpha);
+		save_game();
+	};
+}
+scale_slider_label = zui_create(position_x + 310 * global.gui_scale, position_y + text_height*17, objUILabel);
+with(scale_slider_label){
+	color = c_white;
+	caption = "Scale: " + string(global.cs_conf.scale);
+}
+scale_slider = zui_create(position_x + 405 * global.gui_scale, position_y + text_height*17 - text_height/4, objUISlider);
+with(scale_slider){
+	zui_set_anchor(0, 0);
+	zui_set_width(80 * global.gui_scale);
+	minimum = 1;
+	maximum = 20;
+	value = clamp(round(global.cs_conf.scale * 4), minimum, maximum);
+	callback = function(slider_value){
+		global.cs_conf.scale = slider_value / 4;
+		oSettingsTab.scale_slider_label.caption = "Scale: " + string(global.cs_conf.scale);
+		save_game();
+	};
+}
+#endregion
 
-
-
+#region Reset crosshair
+with(zui_create(position_x, position_y + text_height*18, objUILabel)){
+	color = c_white;
+	caption = "Reset crosshair: ";
+}
+with(zui_create(position_x + gap, position_y + text_height*18 - text_height/4, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(96 * global.gui_scale);
+	zui_set_height(16 * global.gui_scale);
+	caption = "Reset";
+	callback = other.crosshair_reset_callback;
+}
+#endregion

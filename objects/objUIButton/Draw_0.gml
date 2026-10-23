@@ -8,8 +8,13 @@ var ratio_y = __height / ref_h;
 var final_scale = min(ratio_x, ratio_y) * 2;
 
 if (zui_get_hover()) {
+	if(sound == false){
+		audio_play_sound(snd_Button, 0, false);
+		sound = true;
+	}
     draw_set_color(pressed ? c_black : MAIN_COLOR); 
 } else {
+	sound = false;
     draw_set_color(color);
 }
 

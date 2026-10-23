@@ -149,7 +149,7 @@ if(stats.Health_points <= 0){
 	var gnd_id = [ITEM.HEGrenade, ITEM.flashbang, ITEM.smoke, ITEM.molotov];
 	for(var i = 0; i < array_length(Grenades); i ++){
 		if(Grenades[i] > 0){
-			if(percent_chance(10)){
+			if(percent_chance(5)){
 				ItemDrop(gnd_id[i],  random_range(x - sprite_width/4, x + sprite_width/4), random_range(y - sprite_height/4, y + sprite_height/4));	
 			}
 		}
@@ -661,6 +661,13 @@ if(bot_target_is_enemy(ChasingObject) && ChasingObjectSpotted){
 	crosshair_x = x + lengthdir_x(384, RotationAngle);
 	crosshair_y = y + lengthdir_y(384, RotationAngle);
 }
+if(AimPunchTimer > -1){
+	aimpunch_wobble_x += AimPunchTimer;
+	aimpunch_wobble_y += AimPunchTimer * 2;
+	var aimpunch_wobble = AimPunchTimer * AimPunchMultiplier;
+	crosshair_x += sin(degtorad(aimpunch_wobble_x)) * aimpunch_wobble;
+	crosshair_y += sin(degtorad(aimpunch_wobble_y)) * aimpunch_wobble;
+}
 cs_last_step_time = current_time;
 
 if(global.EnemyCanMove == true && bot_target_is_enemy(ChasingObject)){
@@ -786,8 +793,9 @@ if(WeaponID[WeaponPositionID] == ITEM.None){
 }
 
 
-if(FlashedTimer == 0){
-	Flashed = false;	
+if(Flashed && FlashedTimer <= 0){
+	Flashed = false;
+	FlashedTimer = -1;
 }
 
 if(ArmourDurability[0] <= 0){
@@ -1043,7 +1051,7 @@ if(Reloading && reload_timer <= 0){
 		#region Normal reloading
 		if(WeaponID[WeaponPositionID] != ITEM.Spas && WeaponID[WeaponPositionID] != ITEM.Javelin){
 			particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
-			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.AmmoSpriteID], x, y);		
+			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.AmmoSpriteID], [x, y]);		
 		}
 		if (Ammo[WeaponPositionID] < MaxAmmo[WeaponPositionID] && ClipAmmo[WeaponPositionID] > 0) {
 			if (ClipAmmo[WeaponPositionID] > AmmoNeeded) {
@@ -1144,29 +1152,8 @@ if(global.EnemyCanMove == true){
 	}
 
 	if(State == STATES.ThrowGrenade && EquippedGrenadeTimer == -1 && bot_target_is_enemy(ChasingObject)){
-		var Target_x, Target_y, GrenadeSpd;
-		switch(EquippedGrenadeID){
-			case ITEM.HEGrenade:
-				Target_x = ChasingObject.x;
-				Target_y = ChasingObject.y;
-				GrenadeSpd = 7;
-			break;
-		
-			case ITEM.flashbang:
-				var behindAngle = RotationAngle + 180;
-				Target_x = x + lengthdir_x(distance_to_object(ChasingObject), behindAngle);
-				Target_y = y + lengthdir_y(distance_to_object(ChasingObject), behindAngle);
-				GrenadeSpd = 5;
-			break;
-			
-			case ITEM.smoke:
-				Target_x = random_range(x - sprite_width, x + sprite_width);
-				Target_y = random_range(y - sprite_height, y + sprite_height);
-				GrenadeSpd = 1;
-			break;
-		}
 		create_grenade(Weapon.x + lengthdir_x(WeaponDistance/2, RotationAngle), Weapon.y + lengthdir_y(WeaponDistance/2, RotationAngle), 
-		EquippedGrenade, GrenadeSpd, Target_x, Target_y, EquippedGrenadeID);
+		global.ItemIndex[# EquippedGrenadeID, ITEMSTATS.BulletCasingID], global.ItemIndex[# EquippedGrenadeID, ITEMSTATS.ReloadSpeed], crosshair_x, crosshair_y, EquippedGrenadeID);	
 		trigger_texture_timer = trigger_texture_time;
 		mv_timer = 1;
 		grenade_angle = random(360);
@@ -1205,7 +1192,8 @@ XSpeed = approach(XSpeed, 0, Friction);
 YSpeed = approach(YSpeed, 0, Friction);
 
 ///Movement speed limitation
-var movement_speed_limit = walking ? MaxSpeed * WALK_SPD : MaxSpeed;
+var movement_speed_limit = (walking ? MaxSpeed * WALK_SPD : MaxSpeed)
+	* (AimPunchTimer > -1 ? aimpunch_speed_multiplier : 1);
 XSpeed = clamp(XSpeed, -movement_speed_limit, movement_speed_limit);
 YSpeed = clamp(YSpeed, -movement_speed_limit, movement_speed_limit);
 	
@@ -1215,7 +1203,7 @@ YSpeed = clamp(YSpeed, -movement_speed_limit, movement_speed_limit);
 var relative_direction = angle_difference(RotationAngle, enemy_aimpunch_direction);
 var direction_sign = sign(relative_direction);
 var rotation_adjustment = lerp(enemy_aimpunch * direction_sign, 0, .1);
-var RotationSpeed = State == STATES.Prone ? 4.5 : 9;
+var RotationSpeed = State == STATES.Prone ? 9 : 15;
 if(instance_exists(Weapon)){
 	var weapon_position_offset = State == STATES.Prone ? 64 : 0;
 	if(chasing_available || ChasingObjectSpotted == true){

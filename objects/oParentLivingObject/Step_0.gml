@@ -1,7 +1,7 @@
 var hs_x = 73;
 var hs_y = 33;
 
-if(stats.Health_points <= 0 && array_length(body_blood_stains) > 0){
+if(stats.Health_points <= 0 && array_length(body_blood_stains) > 0 || stats.Health_points >= stats.Max_health_points){
 	body_blood_stains = [];
 }
 
@@ -83,12 +83,15 @@ if(check_vis_timer == -1){
 	}else if (is_target) {
 
 	    if (!global.enemy_visibility) {
+			var observer_ax = real(observer.ax), observer_ay = real(observer.ay);
+			var observer_bx = real(observer.bx), observer_by = real(observer.by);
+			var observer_cx = real(observer.cx), observer_cy = real(observer.cy);
 
 			var in_fov =
-		        point_in_triangle(bbox_left,  bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-		        point_in_triangle(bbox_right, bbox_top,    observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-		        point_in_triangle(bbox_left,  bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy) ||
-		        point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
+		        point_in_triangle(bbox_left,  bbox_top,    observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy) ||
+		        point_in_triangle(bbox_right, bbox_top,    observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy) ||
+		        point_in_triangle(bbox_left,  bbox_bottom, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy) ||
+		        point_in_triangle(bbox_right, bbox_bottom, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy);
 
 	        var force_visible = stats.Health_points <= 0 || (object_index == oBot && (State == STATES.ThrowGrenade || State == STATES.LayDownLandMine || HPTimer != -1));
 	        if (in_fov || force_visible) {
@@ -193,6 +196,7 @@ if(AimPunchTimer > -1){
 }
 
 if(AimPunchTimer == 0){
-	AimPunchMultiplier = 1;	
+	AimPunchMultiplier = 0;
+	aimpunch_speed_multiplier = 1;
 }
 #endregion

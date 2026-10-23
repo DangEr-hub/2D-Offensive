@@ -1,17 +1,23 @@
 /// @description Post-create event
+if (stats.Team == TEAM.NONE) {
+	alarm[0] = 1;
+	exit;
+}
 has_defuse_kit = stats.Team == TEAM.POLICE && percent_chance(25);
-sprite_index = stats.Team == TEAM.TERRORIST
-	? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4)
-	: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
+sprite_index = get_player_team_sprite(stats.Team);
 equipment_level = EQUIPMENT_LEVEL.FIRST;
 if(global.ranked_game == false){
 	ArmourID = choose(ITEM.None, ITEM.KevlarVest, ITEM.MilitaryVest);
 	HelmetID = choose(ITEM.None, ITEM.KevlarHelm, ITEM.MilitaryHelm);
 }else{
-	var streak_team_index = global.local_player.stats.Team - TEAM.POLICE;
+	var streak_team = stats.Team;
+	if (instance_exists(global.local_player) && global.local_player.stats.Team != TEAM.NONE) {
+		streak_team = global.local_player.stats.Team;
+	}
+	var streak_team_index = streak_team - TEAM.POLICE;
 	var lost_rounds = global.game_struct.Loss_streak[streak_team_index];
 	var won_rounds = global.game_struct.Win_streak[streak_team_index];
-	if(global.game_struct.Current_round <= 0){
+	if(global.game_struct.Current_round == 1){
 		LandMines = [0, 0, 0];
 		Grenades = [1, 1, 1, 1]; //HEGrenades, FlashGrenades, smokes, molotovs
 		// First round equipment

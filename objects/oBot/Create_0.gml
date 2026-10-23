@@ -62,6 +62,8 @@ image_speed = 0;
 RotationAngle = random(360);
 crosshair_x = x + lengthdir_x(384, RotationAngle);
 crosshair_y = y + lengthdir_y(384, RotationAngle);
+aimpunch_wobble_x = 0;
+aimpunch_wobble_y = 0;
 cs_phase = random(360);
 cs_focus_target = noone;
 cs_start_angle = RotationAngle;
@@ -131,7 +133,7 @@ Grenades = [3, 3, 3, 3]; //HEGrenades, FlashGrenades, smokes, molotovs
 GrenadeObject = noone;
 check_chasing_timer = max(1, round(0.5 * game_get_speed(gamespeed_fps)));
 alarm[6] = 1;
-sprite_index = stats.Team == TEAM.TERRORIST ? choose(spr_TerroristChar, spr_TerroristChar3, spr_TerroristChar2, spr_TerroristChar4) : choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3); ///fallback
+sprite_index = get_player_team_sprite(stats.Team); ///fallback
 mv_timer = 5;
 mask_index = spr_BotMask;
 
@@ -194,6 +196,8 @@ MoveDirection = RotationAngle;
 MoveTime = 0;
 XSpeed = 0;
 YSpeed = 0;
+InaccuracyXSpeed = 0;
+InaccuracyYSpeed = 0;
 ReactionTimer = -1;
 ReactionTime = clamp(2 * game_get_speed(gamespeed_fps) * rank_less, .25 * game_get_speed(gamespeed_fps), 1 * game_get_speed(gamespeed_fps));
 ChasingDistance = min(480 * rank_boost, 900);

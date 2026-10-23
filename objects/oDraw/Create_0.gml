@@ -163,6 +163,10 @@ PauseMenu = false;
 RespawnMenu = false;
 spectating = false;
 spectate_target = noone;
+team_menu_dismissed = false;
+team_menu_button = noone;
+team_menu_requested = false;
+team_menu_return_respawn = false;
 BackGround = -1;
 #endregion
 
@@ -270,4 +274,3 @@ sigma = .5;
 bloom_range = .55;
 #endregion
 
-ItemY = global.GuiH - 256;

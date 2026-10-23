@@ -87,6 +87,8 @@ select_next_bot = function(){
 
 begin_spectate = function(){
 	if(instance_exists(oGameController) && oGameController.round_ended && !global.sudo) return;
+	instance_activate_region(x - BOT_SELECT_RADIUS, y - BOT_SELECT_RADIUS,
+		BOT_SELECT_RADIUS * 2, BOT_SELECT_RADIUS * 2, true);
 	var nearest_distance = 1000000000;
 	selected_index = -1;
 	for(var bot_index = 0; bot_index < array_length(candidate_bots); bot_index++){

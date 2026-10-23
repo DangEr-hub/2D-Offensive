@@ -2,7 +2,7 @@
 // You can write your code in this editor
 event_inherited();
 //draw_set_font(fnt_ConsoleSmall);
-//draw_text(x, y - 50, "attachments " + string(attachments));
+//draw_text(x, y - 50, "timer " + string(AimPunchTimer));
 //draw_text(x, y - 75, "eq level " + string(equipment_level));
 //draw_text(x, y - 200, "ava " + string(check_if_available(ChasingObject)));
 if(stats.Health_points <= 0){

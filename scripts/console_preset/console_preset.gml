@@ -10,9 +10,9 @@ function console_preset(argument0) {
 		return;
 	}
 
-	var r = (global.crosshair_color >> 16) & 0xFF;
-	var g = (global.crosshair_color >> 8) & 0xFF;
-	var b = global.crosshair_color & 0xFF;
+	var r = (global.cs_conf.color >> 16) & 0xFF;
+	var g = (global.cs_conf.color >> 8) & 0xFF;
+	var b = global.cs_conf.color & 0xFF;
 	var fullscreen = window_get_fullscreen();
 	var sudo_text = " (sudo)";
 
@@ -27,10 +27,11 @@ function console_preset(argument0) {
 	console_add(c, "give item <item id>" + sudo_text);
 	console_add(c, "change team {0,1} (restart) " + string(global.player_stats.Player_team) + sudo_text);
 	console_add(c, "set money <amount> [player id]" + sudo_text);
-	console_add(c, "set dynamic crosshair {0,1} " + string(global.DynamicCrosshair));
-	console_add(c, "set crosshair alpha <0;1> " + string(global.CrosshairAlpha));
+	console_add(c, "set lifes <amount> (singleplayer)" + sudo_text);
+	console_add(c, "set dynamic crosshair {0,1} " + string(global.cs_conf.dynamic));
+	console_add(c, "set crosshair alpha <0;1> " + string(global.cs_conf.alpha));
 	console_add(c, "draw bullet impact {0,1} " + string(global.draw_bullet_impact) + sudo_text);
-	console_add(c, "draw admin hud {0,1} " + string(global.draw_advanced_hud) + sudo_text);
+	console_add(c, "draw admin hud {0,1} " + string(global.draw_advanced_hud));
 	console_add(c, "set hitbox alpha <0;1> " + string(global.HitBoxAlpha) + sudo_text);
 	console_add(c, "set fullscreen {0,1} " + string(fullscreen));
 	console_add(c, "set enemy movement {0,1} " + string(global.EnemyCanMove) + sudo_text);
@@ -43,7 +44,7 @@ function console_preset(argument0) {
 	console_add(c, "set time <minutes>" + sudo_text);
 	console_add(c, "set buy time <seconds>" + sudo_text);
 	console_add(c, "toggle camera shake {0,1} " + string(global.ViewShake) + sudo_text);
-	console_add(c, "set player inaccuracy " + string(global.PlayerInaccuracy) + sudo_text);
+	console_add(c, "set inaccuracy modifier <value> [player id] " + string(global.PlayerInaccuracy) + sudo_text);
 	console_add(c, "clear particles {0,1}");
 	console_add(c, "draw particles {0,1} " + string(global.DrawParticles));
 	console_add(c, "set weather {0,1,2}" + sudo_text);
@@ -60,7 +61,7 @@ function console_preset(argument0) {
 	console_add(c, "set clear timer " + string(global.clear_particles_timer));
 	console_add(c, "get latency");
 	console_add(c, "unlock all items {0,1}" + sudo_text);
-	console_add(c, "set crosshair scale " + string(global.crosshair_scale));
+	console_add(c, "set crosshair scale " + string(global.cs_conf.scale));
 	console_add(c, "draw hud {0,1} " + string(global.draw_hud));
 	c[? "preset"] = true;
 }

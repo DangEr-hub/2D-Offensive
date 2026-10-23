@@ -12,9 +12,9 @@ strength = random_range(1.5, 2.5);
 
 //image_index = irandom(3);
 
-//if(global.MapID == MAP.Desert){
-	//image_index = irandom_range(1, 3);
-//}
+if(global.MapID == MAP.Desert){
+	image_index = irandom_range(1, 3);
+}
 
 
 

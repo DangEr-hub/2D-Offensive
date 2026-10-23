@@ -16,7 +16,7 @@ if(Breakable == false){
 				if(surface_exists(oParticleSurface.ParticleSurface)){
 					surface_set_target(oParticleSurface.ParticleSurface);
 					gpu_set_tex_filter(true);
-					draw_self();
+					draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, alpha * image_alpha);
 					gpu_set_tex_filter(false);
 					surface_reset_target();
 					instance_destroy(self);

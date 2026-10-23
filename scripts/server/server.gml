@@ -8,6 +8,17 @@ function start_server() {
             show_debug_message("Failed to create server socket!");
             return false;
         }
+		global.player_stats.Player_team = TEAM.NONE;
+		global.player_stats.Money = ROUND_STARTING_MONEY;
+		global.game_struct.Rounds_win = 0;
+		global.game_struct.Rounds_lost = 0;
+		global.game_struct.Match_kills = 0;
+		global.game_struct.Match_assists = 0;
+		global.game_struct.Match_deaths = 0;
+		ds_grid_clear(global.Inventory, 0);
+		ds_grid_clear(global.MouseSlot, 0);
+		global.player_stats.Weight = 0;
+		reset_player_door_keys();
         
         is_server = true;
         is_connected = true;
@@ -24,9 +35,17 @@ function handle_server_receive(sender_ip, sender_port) {
         buffer_seek(receive_buffer, buffer_seek_start, 0);
         var packet_type = buffer_read(receive_buffer, buffer_u8);
         var sequence = buffer_read(receive_buffer, buffer_u32);
+		if (packet_type != PACKET.CONNECT_REQUEST
+		&& (room != rm_ServerTest || !layer_exists("LivingO") || !layer_exists("ItemsO")
+		|| !layer_exists("OtherO") || !instance_exists(global.local_player) || !instance_exists(oLightRenderer))) {
+			return;
+		}
 
         var key = sender_ip + ":" + string(sender_port);
-        ds_map_set(client_timeout, key, current_time);
+		if (packet_type != PACKET.CONNECT_REQUEST) {
+			if (!ds_map_exists(clients, key)) return;
+			ds_map_set(client_timeout, key, current_time);
+		}
 
         switch (packet_type) {
             case PACKET.CONNECT_REQUEST: handle_connect_request(sender_ip, sender_port); break;
@@ -67,6 +86,8 @@ function handle_server_receive(sender_ip, sender_port) {
 
 			case PACKET.MACHINE_GUN_SYNC: handle_machine_gun_sync_server(key); break;
 			case PACKET.LASER_SYNC: handle_laser_sync_server(key); break;
+			case PACKET.BUY_ITEM: handle_buy_request_server(key); break;
+			case PACKET.TEAM_SELECT: handle_team_select_server(key); break;
 			
 			
 		
@@ -132,17 +153,17 @@ function handle_laser_sync_server(socket_key) {
 	}
 }
 
-function server_set_client_sudo(player_id, enabled){
+function server_set_client_sudo(plr_id, enabled){
 	with(oNetworkManager){
 		if(!is_server) return false;
 
 		var socket_key = ds_map_find_first(clients);
 		while(!is_undefined(socket_key)){
-			if(ds_map_find_value(clients, socket_key) == player_id){
+			if(ds_map_find_value(clients, socket_key) == plr_id){
 				buffer_seek(send_buffer, buffer_seek_start, 0);
 				buffer_write(send_buffer, buffer_u8, PACKET.SUDO_SYNC);
 				buffer_write(send_buffer, buffer_u32, send_sequence++);
-				buffer_write(send_buffer, buffer_u8, player_id);
+				buffer_write(send_buffer, buffer_u8, plr_id);
 				buffer_write(send_buffer, buffer_u8, enabled ? 1 : 0);
 				sent_server_udp(server_socket, socket_key, send_buffer);
 				return true;
@@ -992,6 +1013,7 @@ function handle_connect_request(sender_ip, sender_port) {
 			ds_map_set(stats, "Assists", 0);
 			ds_map_set(stats, "Deaths", 0);
 			ds_map_set(stats, "Money", ROUND_STARTING_MONEY);
+			ds_map_set(stats, "InaccuracyModifier", 1);
 			ds_map_add(player_stats, pid, stats);
 		}
 
@@ -1003,6 +1025,59 @@ function handle_connect_request(sender_ip, sender_port) {
         buffer_write(send_buffer, buffer_u8, pid);
         network_send_udp(server_socket, sender_ip, sender_port, send_buffer, buffer_tell(send_buffer));
     }
+}
+
+function server_send_match_state(socket_key) {
+	with (oNetworkManager) {
+		if (!is_server || !instance_exists(oDraw)) return;
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.MATCH_STATE);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u32, max(0, ceil(oDraw.buy_time)));
+		buffer_write(send_buffer, buffer_u8, team_round_wins[TEAM.POLICE]);
+		buffer_write(send_buffer, buffer_u8, team_round_wins[TEAM.TERRORIST]);
+		buffer_write(send_buffer, buffer_bool, round_resolved);
+		buffer_write(send_buffer, buffer_u8, last_round_winner);
+		sent_server_udp(server_socket, socket_key, send_buffer);
+	}
+}
+
+function server_broadcast_match_state() {
+	with (oNetworkManager) {
+		if (!is_server) return;
+		var socket_key = ds_map_find_first(clients);
+		for (var client_index = 0; client_index < ds_map_size(clients); client_index++) {
+			server_send_match_state(socket_key);
+			socket_key = ds_map_find_next(clients, socket_key);
+		}
+	}
+}
+
+function server_set_player_team(pid, selected_team) {
+	with (oNetworkManager) {
+		if (!is_server || (selected_team != TEAM.POLICE && selected_team != TEAM.TERRORIST)) return false;
+		var player = find_instance_by_network_id(oPlayer, pid);
+		if (!instance_exists(player)) return false;
+		var player_data = server_get_player_state(pid);
+		var current_team = ds_map_find_value(player_data, "Team");
+		if (current_team == selected_team) return true;
+		ds_map_set(player_data, "Team", selected_team);
+		player.stats.Team = selected_team;
+		if (pid == my_pid) {
+			global.player_stats.Player_team = selected_team;
+			global.game_struct.Rounds_win = team_round_wins[selected_team];
+			global.game_struct.Rounds_lost = team_round_wins[selected_team == TEAM.POLICE ? TEAM.TERRORIST : TEAM.POLICE];
+		}
+		return true;
+	}
+}
+
+function handle_team_select_server(socket_key) {
+	with (oNetworkManager) {
+		var selected_team = buffer_read(receive_buffer, buffer_u8);
+		if (!ds_map_exists(clients, socket_key)) return;
+		server_set_player_team(ds_map_find_value(clients, socket_key), selected_team);
+	}
 }
 
 function server_player_display_name(pid) {
@@ -1037,6 +1112,7 @@ function send_stats_broadcast(){
 			buffer_write(send_buffer, buffer_u16, server_player_stat_value(stats, "Assists"));
 			buffer_write(send_buffer, buffer_u16, server_player_stat_value(stats, "Deaths"));
 			buffer_write(send_buffer, buffer_s32, server_player_stat_value(stats, "Money"));
+			buffer_write(send_buffer, buffer_f32, !is_undefined(stats) && ds_map_exists(stats, "InaccuracyModifier") ? ds_map_find_value(stats, "InaccuracyModifier") : 1);
 			pid = ds_map_find_next(player_states, pid);
 		}
 
@@ -1045,6 +1121,55 @@ function send_stats_broadcast(){
 			sent_server_udp(server_socket, socket_key, send_buffer);
 			socket_key = ds_map_find_next(clients, socket_key);
 		}
+	}
+}
+
+function handle_buy_request_server(socket_key){
+	with(oNetworkManager){
+		var request_id = buffer_read(receive_buffer, buffer_u16);
+		var item_id = buffer_read(receive_buffer, buffer_u16);
+		if(!ds_map_exists(clients, socket_key)) return;
+		var pid = ds_map_find_value(clients, socket_key);
+		var stats = ds_map_find_value(player_stats, pid);
+		if(is_undefined(stats)) return;
+
+		var last_request_id = ds_map_find_value(stats, "last_buy_id");
+		var approved = false;
+		var money = ds_map_find_value(stats, "Money");
+		if(is_undefined(money)) money = 0;
+		var request_distance = is_undefined(last_request_id) ? 1
+			: (request_id - last_request_id + 65536) mod 65536;
+		if(request_distance > 0 && request_distance < 32768){
+			var buyer = find_instance_by_network_id(oPlayer, pid);
+			if(item_id > ITEM.None && item_id < ITEM.Total
+			&& instance_exists(buyer) && buyer.stats.Team != TEAM.NONE && buyer.stats.Health_points > 0
+			&& instance_exists(oDraw) && oDraw.buy_time > 0){
+				var cost = global.ItemIndex[# item_id, ITEMSTATS.Cost];
+				if(cost >= 0 && money >= cost){
+					money -= cost;
+					ds_map_set(stats, "Money", money);
+					buyer.stats.Money = money;
+					approved = true;
+					send_stats_broadcast();
+				}
+			}
+			ds_map_set(stats, "last_buy_id", request_id);
+			ds_map_set(stats, "last_buy_item", item_id);
+			ds_map_set(stats, "last_buy_approved", approved);
+			ds_map_set(stats, "last_buy_money", money);
+		}else if(item_id == ds_map_find_value(stats, "last_buy_item")){
+			approved = ds_map_find_value(stats, "last_buy_approved");
+			money = ds_map_find_value(stats, "last_buy_money");
+		}
+
+		buffer_seek(send_buffer, buffer_seek_start, 0);
+		buffer_write(send_buffer, buffer_u8, PACKET.BUY_ITEM);
+		buffer_write(send_buffer, buffer_u32, send_sequence++);
+		buffer_write(send_buffer, buffer_u16, request_id);
+		buffer_write(send_buffer, buffer_u16, item_id);
+		buffer_write(send_buffer, buffer_bool, approved);
+		buffer_write(send_buffer, buffer_s32, money);
+		sent_server_udp(server_socket, socket_key, send_buffer);
 	}
 }
 
@@ -1106,6 +1231,7 @@ function process_server_respawn(){
                 death_from_server = false;
                 death_attacker_pid = -1;
 				death_handled = false;
+				visible = true;
 				KilledByName = "No one";
 				KilledByWeapon = "Nothing";
 				player_can_shoot = true;
@@ -1184,6 +1310,7 @@ function handle_player_respawn_server(socket_key) {
                 death_from_server = false;
                 death_attacker_pid = -1;
 				death_handled = false;
+				visible = true;
                 KilledByName = "No one";
 				KilledByWeapon = "Nothing";
 				player_can_shoot = true;
@@ -1493,7 +1620,7 @@ function handle_tick_update_server(socket_id) {
 		var client_defusing_target = buffer_read(receive_buffer, buffer_u8);
 		client_defusing_target = clamp(client_defusing_target, DEFUSE_TARGET.NONE, DEFUSE_TARGET.HOSTAGE);
 		moving_state_id = clamp(moving_state_id, STATES_PLAYER.none_state, STATES_PLAYER.mortar_state);
-		team_id = clamp(team_id, TEAM.POLICE, TEAM.TERRORIST);
+		// Tým v klientském ticku je jen historické pole paketu. Rozhoduje server.
         
         
         // Store player position
@@ -1502,6 +1629,8 @@ function handle_tick_update_server(socket_id) {
             player_data = ds_map_create();
             ds_map_add(player_states, pid, player_data);
         }
+		team_id = ds_map_find_value(player_data, "Team");
+		if (is_undefined(team_id)) team_id = TEAM.NONE;
 		var server_hp = ds_map_find_value(player_data, "hp");
 		if (is_undefined(server_hp)) {
 			server_hp = global.player_stats.Max_health;
@@ -1795,7 +1924,7 @@ function send_tick_broadcast() {
             if (is_undefined(dir)) dir = 0;
             if (is_undefined(state)) state = 0;
             if (is_undefined(moving_state_id)) moving_state_id = STATES_PLAYER.none_state;
-			if (is_undefined(team_id)) team_id = TEAM.POLICE;
+			if (is_undefined(team_id)) team_id = TEAM.NONE;
 			if (is_undefined(hp)) hp = global.player_stats.Max_health;
 			if (is_undefined(defusing_time)) defusing_time = 0;
 			if (is_undefined(defusing_max)) defusing_max = DEFUSE_TIME;
@@ -2081,6 +2210,7 @@ function handle_equipment_update_server(socket_id) {
             player_data = ds_map_create();
             ds_map_add(player_states, pid, player_data);
         }
+		if (server_player_state_value(pid, "hp", global.player_stats.Max_health) <= 0) return;
         
         ds_map_set(player_data, "helmet_id", helmet_id);
         ds_map_set(player_data, "helmet_dur", helmet_dur);
@@ -2126,6 +2256,7 @@ function handle_weapon_update_server(socket_id) {
             player_data = ds_map_create();
             ds_map_add(player_states, pid, player_data);
         }
+		if (server_player_state_value(pid, "hp", global.player_stats.Max_health) <= 0) return;
         
         ds_map_set(player_data, "weapon_id", weapon_id);
         ds_map_set(player_data, "weapon_scope", weapon_scope);
@@ -2328,12 +2459,22 @@ function server_living_player_count(team) {
 	return living_count;
 }
 
+function server_team_player_count(team) {
+	var player_count = 0;
+	for (var player_index = 0; player_index < instance_number(oPlayer); player_index++) {
+		var player = instance_find(oPlayer, player_index);
+		if (instance_exists(player) && player.stats.Team == team) player_count++;
+	}
+	return player_count;
+}
+
 function server_check_round_end() {
 	if (!instance_exists(oNetworkManager) || !oNetworkManager.is_server || oNetworkManager.round_resolved) return false;
 	if (instance_exists(oDraw) && oDraw.bomb_detonation_pending) return false;
 
 	var police_alive = server_living_player_count(TEAM.POLICE);
 	var terrorists_alive = server_living_player_count(TEAM.TERRORIST);
+	if (server_team_player_count(TEAM.POLICE) == 0 || server_team_player_count(TEAM.TERRORIST) == 0) return false;
 	var winning_team = -1;
 
 	if (police_alive <= 0 && terrorists_alive > 0) {
@@ -2453,13 +2594,13 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 		damage_multiplier = BODY_MULTIPLIER;
 		if (armour_dur > 0 && global.ItemIndex[# armour_id, ITEMSTATS.Defense] <= .95) {
 			damage = damage * global.ItemIndex[# armour_id, ITEMSTATS.Defense] * penetration_power;
-			aim_punch_modifier *= .1;
+			aim_punch_modifier *= .05;
 		}
 	} else if (hitbox_type >= HITBOX.Head) {
 		damage_multiplier = HEADSHOT_MULTIPLIER;
 		if (helmet_dur > 0 && global.ItemIndex[# helmet_id, ITEMSTATS.Defense] <= .95) {
 			damage = damage * global.ItemIndex[# helmet_id, ITEMSTATS.Defense] * penetration_power;
-			aim_punch_modifier *= .1;
+			aim_punch_modifier *= .05;
 		}
 	}
 
@@ -2502,10 +2643,15 @@ function server_calculate_authoritative_hit(attacker_pid, victim_obj, hitbox_typ
 
 function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type, impact_pos, client_hit_spd_mod, client_aimpunch_modifier, client_equip_dur, weapon_id, penetration_damage, shot_start, projectile_id = -1, server_local_authority = false) {
     with (oNetworkManager) {
-        if (!is_server) return;
+		if (!is_server || round_resolved) return;
 
         var victim_obj = find_instance_by_network_id(oPlayer, victim_pid);
         if (!instance_exists(victim_obj)) return;
+		if (victim_obj.stats.Team == TEAM.NONE) return;
+		if (attacker_pid >= 0) {
+			var living_attacker = find_instance_by_network_id(oPlayer, attacker_pid);
+			if (!instance_exists(living_attacker) || living_attacker.stats.Team == TEAM.NONE) return;
+		}
 
 		if (weapon_id != ITEM.Bomb && weapon_id != ITEM.molotov) {
 			var attacker_data = ds_map_find_value(player_states, attacker_pid);
@@ -2538,6 +2684,9 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 		var aimpunch_modifier = server_hit.aimpunch_modifier;
 		var equip_dur = server_hit.equip_dur;
 		if (damage <= 0) return;
+		if (attacker_pid == my_pid && attacker_pid != victim_pid && instance_exists(oCrosshair)) {
+			oCrosshair.HitMarker = hitbox_type <= HITBOX.HeadProne ? 4 : 0;
+		}
 
 		hit_remote_object(damage, victim_obj, hitbox_type, [impact_pos[0], impact_pos[1]], hit_spd_mod, aimpunch_modifier, equip_dur, attacker_pid, weapon_id);
 
@@ -2557,7 +2706,43 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 
 		if (current_hp > 0 && new_hp <= 0) {
 			server_release_machine_gun(victim_pid);
-			award_damage_assists(victim_obj, attacker_pid);
+			var attacker_obj = find_instance_by_network_id(oPlayer, attacker_pid);
+			var is_team_kill = instance_exists(attacker_obj)
+				&& attacker_obj.stats.Team == victim_obj.stats.Team;
+			if (!is_team_kill) award_damage_assists(victim_obj, attacker_pid);
+			var victim_stats = ds_map_find_value(player_stats, victim_pid);
+			if (!is_undefined(victim_stats)) {
+				ds_map_set(victim_stats, "Deaths", server_player_stat_value(victim_stats, "Deaths") + 1);
+			}
+			if (victim_pid == my_pid) global.game_struct.Match_deaths++;
+			if (attacker_pid >= 0 && attacker_pid != victim_pid) {
+				var attacker_stats = ds_map_find_value(player_stats, attacker_pid);
+				if (!is_undefined(attacker_stats)) {
+					var previous_money = server_player_stat_value(attacker_stats, "Money");
+					var new_money = is_team_kill
+						? max(0, previous_money - TEAM_KILL_PENALTY)
+						: previous_money + global.ItemIndex[# weapon_id, ITEMSTATS.reward];
+					ds_map_set(attacker_stats, "Money", new_money);
+					if (!is_team_kill) ds_map_set(attacker_stats, "Kills", server_player_stat_value(attacker_stats, "Kills") + 1);
+					if (attacker_pid == my_pid) {
+						global.player_stats.Money = new_money;
+						if (!is_team_kill) global.game_struct.Match_kills++;
+					}
+					if (!is_team_kill && instance_exists(attacker_obj)) attacker_obj.stats.Kills++;
+				}
+			}
+			ds_map_set(player_data, "weapon_id", ITEM.None);
+			ds_map_set(player_data, "item_use_id", ITEM.None);
+			var clear_equipment = ["helmet", "armour", "shield"];
+			for (var equipment_index = 0; equipment_index < array_length(clear_equipment); equipment_index++) {
+				ds_map_set(player_data, clear_equipment[equipment_index] + "_id", ITEM.None);
+				ds_map_set(player_data, clear_equipment[equipment_index] + "_dur", 0);
+			}
+			ds_map_set(player_data, "primary_id", ITEM.None);
+			ds_map_set(player_data, "secondary_id", ITEM.None);
+			equipment_sync = true;
+			weapon_sync = true;
+			server_item_use_broadcast(victim_pid, ITEM.None);
 
 			var attacker_name = (attacker_pid == -1 && weapon_id == ITEM.laser)
 				? "Laser" : server_player_display_name(attacker_pid);
@@ -2566,6 +2751,12 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 			// Označ remote obět za mrtvou
 		    with (victim_obj) {
 		        stats.Health_points = 0;
+				if (is_remote) stats.Deaths++;
+				network_weapon_id = ITEM.None;
+				network_item_use_id = ITEM.None;
+				network_helmet_id = ITEM.None;
+				network_armour_id = ITEM.None;
+				network_shield_id = ITEM.None;
 		        death_from_server = true;
                 death_attacker_pid = attacker_pid;
                 KilledByName = attacker_name;
@@ -2586,7 +2777,7 @@ function server_process_hit(attacker_pid, victim_pid, client_damage, hitbox_type
 		        }
 		    }
 
-			server_check_round_end();
+			if (!is_team_kill) server_check_round_end();
         }
 
         buffer_seek(send_buffer, buffer_seek_start, 0);
@@ -2865,6 +3056,7 @@ function handle_init_sync_server(socket_id) {
         }
 
         sent_server_udp(server_socket, socket_id, send_buffer);
+		server_send_match_state(socket_id);
 		server_send_machine_gun_snapshots(socket_id);
 		server_send_laser_snapshots(socket_id);
     }

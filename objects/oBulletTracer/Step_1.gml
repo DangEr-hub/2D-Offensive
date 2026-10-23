@@ -69,10 +69,13 @@ if(wall_collision != noone){
 		
 		#region Variables
 		var wall_sound = snd_BulletConcrete;
-		var WallParticles = irandom_range(global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage], global.ItemIndex[#stats.Item_id, ITEMSTATS.Damage]*2);
+		var WallParticles = clamp(round(bullet_damage / 5), 2, 24);
 		if(image_index == 2){
 			WallParticles = 1;	
 		}
+		var wall_color = get_wall_impact_color(wall_collision.inst_id,
+			wall_collision.xx + lengthdir_x(2, direction),
+			wall_collision.yy + lengthdir_y(2, direction));
 		if(wall_collision.inst_id.Type == MATERIAL.METAL){
 			wall_sound = snd_BulletMetal;
 		}else if(wall_collision.inst_id.Type == MATERIAL.WOOD){
@@ -118,44 +121,13 @@ if(wall_collision != noone){
 
 				for (var i = 0; i < spark_number; i++) {
 					var randomDirection = random_range(direction - 180 - 90, direction - 180 + 90);
-					part_type_color1(partType, c_gray);
 					part_type_direction(partType, randomDirection, randomDirection, 0, 0);
 					part_type_orientation(partType, randomDirection, randomDirection, 0, 0, false);
-					part_particles_create(partSystem, posX, posY, partType, 1);
-					part_type_color1(partType, c_white);
+					part_particles_create_colour(partSystem, posX, posY, partType, c_gray, 1);
 				}
 			}
-			var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
-			particle_create(
-				WallParticles, 
-				0.8, 
-				random(360), 
-				ParticleTexture, 
-				random_range(-5, -10), 
-				random_range(-90, 90), 
-				other.image_angle, 
-				1, 
-				false, 
-				false, 
-				0, 
-				wall_collision.xx,
-				wall_collision.yy
-			);
-			particle_create(
-				round(WallParticles/2), 
-				0.8, 
-				random(360), 
-				ParticleTexture, 
-				random_range(-5, -10), 
-				random_range(-90, 90), 
-				other.image_angle, 
-				1, 
-				true, 
-				false, 
-				0, 
-				wall_collision.xx,
-				wall_collision.yy
-			);
+			create_wall_debris(WallParticles, wall_collision.xx, wall_collision.yy, wall_color, direction - 180, false);
+			create_wall_debris(round(WallParticles / 2), wall_collision.xx, wall_collision.yy, wall_color, direction - 180, true);
 			particle_create(
 				WallParticles, 
 				.8, 
@@ -168,8 +140,7 @@ if(wall_collision != noone){
 				choose(true, false),
 				false,
 				0,
-				wall_collision.xx,
-				wall_collision.yy
+				[wall_collision.xx, wall_collision.yy]
 			);
 			#endregion
 			
@@ -178,11 +149,8 @@ if(wall_collision != noone){
 		}else if(image_index == 1){
 		
 			#region Rocket hits wall
-			var ParticleTexture = choose(spr_WallParticle, spr_WallParticleTwo);
-			particle_create(WallParticles, 0.8, random(360), ParticleTexture, 
-			random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, false, false, 0, x, y);
-			particle_create(round(WallParticles/2), 0.8, random(360), ParticleTexture, 
-			random_range(-5, -10), random_range(-90, 90), other.image_angle, 1, true, false, 0, x, y);
+			create_wall_debris(WallParticles, wall_collision.xx, wall_collision.yy, wall_color, direction - 180, false);
+			create_wall_debris(round(WallParticles / 2), wall_collision.xx, wall_collision.yy, wall_color, direction - 180, true);
 			explosion_create(
 				10, 
 				[x, y],
@@ -263,21 +231,11 @@ if(!place_meeting(x, y, impact_wall) || shot_inside_wall){
             break;
         }
 		
-		var impact_col = c_white;
-		if(impact_wall.sprite_index == spr_TileCollision){
-			var clr = tilemap_get_pixel(
-			    layer_tilemap_get_id(layer_get_id("WallTiles")),
-			    global.MapProperties[# global.MapID, MAP_STAT.Tile],
-			    32,
-			    32,
-			    impact_wall.x,
-			    impact_wall.y
-			);
-			impact_col = make_color_rgb(clr[0], clr[1], clr[2]);
-		}else{
-			var arr = sprite_getpixel(impact_wall.sprite_index, impact_wall.image_index, floor(impact_wall.sprite_width/2), floor(impact_wall.sprite_height/2));
-			impact_col = make_color_rgb(arr[0], arr[1], arr[2]);
-		}
+		var impact_col = get_wall_impact_color(impact_wall, impact_sx, impact_sy);
+		var impact_damage = stats.Damage * global.ItemIndex[#stats.Item_id, ITEMSTATS.damage_drop](
+			point_distance(stats.Starting_x, stats.Starting_y, impact_sx, impact_sy)) / (stats.Penetration_damage + 1);
+		create_impact_line_particles(impact_sx, impact_sy, impact_col,
+			impact_damage, direction - 180);
 
 
         // ===== GENEROVÁNÍ OFFSETŮ PRO SEGMENTY =====

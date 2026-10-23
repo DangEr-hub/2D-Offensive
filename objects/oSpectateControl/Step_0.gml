@@ -12,13 +12,9 @@ if(!instance_exists(oGameController) || !oGameController.round_ended){
 			break;
 		}
 	}
-	if(!living_teammate_found){
-		if(global.local_player.stats.Team != TEAM.TERRORIST
-		|| (!global.bomb_planted && !oDraw.bomb_detonation_pending)){
-			round_end("Loss");
-			exit;
-		}
-		if(!global.sudo) exit;
+	if(!living_teammate_found && global.player_stats.Lifes <= 0 && !oDraw.spectating){
+		round_end("Loss");
+		exit;
 	}
 }
 
@@ -42,6 +38,7 @@ if(mouse_check_button_pressed(mb_left) && device_mouse_y_to_gui(0) < global.GuiH
 }
 
 if(instance_exists(oGameController) && oGameController.round_ended) exit;
+if(global.player_stats.Lifes <= 0) exit;
 if(!keyboard_check_pressed(global.KeyBinds[| KEY.TakeBot])) exit;
 
 var bot = oDraw.spectate_target;

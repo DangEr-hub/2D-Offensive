@@ -28,9 +28,9 @@ function point_in_grenade_smoke(pos_x, pos_y){
 }
 
 
-function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id){
+function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY, ItemID, ObjectType = id, ThrowMoveX = XSpeed, ThrowMoveY = YSpeed){
 	if(IS_NET && instance_exists(oNetworkManager) && !oNetworkManager.is_server && oNetworkManager.is_connected){
-		send_grenade_spawn_request(ID, GrenadeSpeed, TargetX, TargetY, ItemID);
+		send_grenade_spawn_request(ID, GrenadeSpeed, TargetX, TargetY, ItemID, ThrowMoveX, ThrowMoveY);
 		return noone;
 	}
 
@@ -39,17 +39,14 @@ function create_grenade(PositionX, PositionY, ID, GrenadeSpeed, TargetX, TargetY
 		owner_id = ObjectType.network_id;
 	}
 
-	ObjectSpeed = sqrt(power(XSpeed, 2) + power(YSpeed, 2));
-	MoveDirX = dcos(MoveDirection) * ObjectSpeed;
-	MoveDirY = -dsin(MoveDirection) * ObjectSpeed;
 	GrenadeDirX = dcos(point_direction(PositionX, PositionY, TargetX, TargetY)) * GrenadeSpeed;
 	GrenadeDirY = -dsin(point_direction(PositionX, PositionY, TargetX, TargetY)) * GrenadeSpeed;
-	DotProduct = dot_product(MoveDirX, MoveDirY, GrenadeDirX, GrenadeDirY);		
+	DotProduct = dot_product(ThrowMoveX, ThrowMoveY, GrenadeDirX, GrenadeDirY);
 	GrenadeObject = instance_create_depth(PositionX, PositionY, depth + 1, oGrenade);
 	GrenadeObject.stats = {
 		Object_index: ObjectType.object_index,
 		Owner_name: ObjectType.stats.Name,
-		Speed: max(GrenadeSpeed * global.time_step + (DotProduct * .1), 1),
+		Speed: max(GrenadeSpeed * global.time_step + (DotProduct * .05), 1),
 		Object: ObjectType,
 		Item_id: ItemID,
 		Owner_id: owner_id,
@@ -101,12 +98,14 @@ function create_molotov_impact(PositionX, PositionY, Damage, ObjectType, ItemID,
 	return impact;
 }
 
-function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, xPosition, yPosition, Alpha = 1, FadeAwayTime = 1){
+function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness, Dir, ImageSpeed, CanStay, CanBounce, ImageIndex, pos, Alpha = 1, FadeAwayTime = 1, BlendColor = c_white, scale = 1){
+	var created_particle = noone;
 	if(global.DrawParticles == true){
 		repeat(Number){
-			Particle = instance_create_layer(xPosition, yPosition, "ItemsO", oParticle);
-			with(Particle){
+			created_particle = instance_create_layer(pos[0], pos[1], "ItemsO", oParticle);
+			with(created_particle){
 				sprite_index = Sprite;
+				image_blend = BlendColor;
 				image_angle = Angle;
 				fric = Friction;
 				image_speed = ImageSpeed * global.time_step;
@@ -115,9 +114,21 @@ function particle_create(Number, Friction, Angle, Sprite, Speed, AngleRandomness
 				image_index = ImageIndex;
 				alpha = Alpha;
 				FadeAwayTimer = FadeAwayTime * global.time_step;
+				image_xscale = scale;
+				image_yscale = scale;
 				motion_add(Dir + AngleRandomness, Speed * global.time_step);
 			}
 		}
+	}
+	return created_particle;
+}
+
+function create_wall_debris(particle_number, pos_x, pos_y, impact_color, impact_dir, can_stay){
+	if(!global.DrawParticles) return;
+	repeat(particle_number){
+		particle_create(1, .8, random(360), choose(spr_WallParticle, spr_WallParticle2),
+			random_range(5, 10), random_range(-90, 90), impact_dir,
+			1, can_stay, false, 0, [pos_x, pos_y], 1, 5, impact_color);
 	}
 }
 
@@ -173,11 +184,15 @@ function explosion_create(ShrapnelNumber, pos, ExplosionDamage, Destroy, ObjectT
 			shrapnel.stats.Owner_id = attribution_owner_id;
 		}
 	}
-	create_fog(pos[0], pos[1], clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75), random(360), 0.1, random_range(.1, .5), 
-		clamp(round(ExplosionDamage/10), 5, 7.5), 
-		clamp(ExplosionDamage/250, .5, .9), 
-		clamp(ExplosionDamage/250, .1, .75), 2 * game_get_speed(gamespeed_fps)
-	);
+	if(global.DrawParticles && instance_exists(oParticleSystem)){
+		create_fog(pos[0], pos[1], clamp(random_range(ExplosionDamage, 1.5*ExplosionDamage), 50, 75), random(360), 0.1, random_range(.1, .5), 
+			clamp(round(ExplosionDamage/10), 5, 7.5), 
+			clamp(ExplosionDamage/250, .5, .9), 
+			clamp(ExplosionDamage/250, .1, .75), 2 * game_get_speed(gamespeed_fps)
+		);
+		
+		part_particles_create(global.ParticleSystem, pos[0], pos[1], oParticleSystem.ember_particle, ShrapnelNumber*2);
+	}
 	
 	
 	

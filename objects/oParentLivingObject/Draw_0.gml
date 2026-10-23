@@ -99,9 +99,23 @@ if(Visible == true){
 	if(array_length(body_blood_stains) > 0){
 		var previous_blend = gpu_get_blendmode_ext_sepalpha();
 		gpu_set_blendmode_ext_sepalpha(bm_src_alpha, bm_inv_src_alpha, bm_zero, bm_one);
+		var body_is_prone = image_index >= TEXTURES.prone && image_index < TEXTURES.grenade_throw;
 		for(var stain_index = 0; stain_index < array_length(body_blood_stains); stain_index++){
 			var stain = body_blood_stains[stain_index];
-			draw_sprite_ext(spr_BloodSplash, stain.frame, stain.pos_x, stain.pos_y,
+			var stain_x = stain.pos_x;
+			var stain_y = stain.pos_y;
+			if(stain.prone != body_is_prone){
+				var pose_shift_x = 0;
+				var pose_shift_y = 0;
+				if(stain.body_part <= HITBOX.HeadProne){ pose_shift_x = 70; pose_shift_y = 5; }
+				else if(stain.body_part <= HITBOX.BodyProne){ pose_shift_x = 27; pose_shift_y = -7; }
+				else if(stain.body_part <= HITBOX.ArmProneGrenade){ pose_shift_x = 50; pose_shift_y = -8; }
+				else { pose_shift_x = -12; pose_shift_y = -17; }
+				var pose_direction = body_is_prone ? 1 : -1;
+				stain_x += pose_shift_x * pose_direction;
+				stain_y += pose_shift_y * pose_direction;
+			}
+			draw_sprite_ext(spr_BloodSplash, stain.frame, stain_x, stain_y,
 				stain.scale, stain.scale, stain.angle, stain.blend, stain.alpha);
 		}
 		gpu_set_blendmode_ext_sepalpha(previous_blend[0], previous_blend[1], previous_blend[2], previous_blend[3]);

@@ -1,5 +1,5 @@
 // Step Event of oCamera
-if(global.local_player != -1 && instance_exists(oDraw)){
+if(instance_exists(global.local_player) && instance_exists(oDraw)){
 	if (oDraw.PauseMenu == false && (oDraw.RespawnMenu == false || oDraw.spectating)) {
 		if (oDraw.spectating && instance_exists(oDraw.spectate_target)) {
 			camera_set_xy(oDraw.spectate_target.x, oDraw.spectate_target.y,

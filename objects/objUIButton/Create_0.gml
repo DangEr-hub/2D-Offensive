@@ -1,5 +1,6 @@
 caption_color = c_white;
 caption = "";
+sound = false;
 caption_offset_y = 0;
 alpha = global.gui_alpha * 3; alpha_value = 0;
 pressed = 0;

@@ -3,7 +3,7 @@ global.bomb_time = 5 * game_get_speed(gamespeed_fps);
 global.player_character_seed = irandom(2147483646);
 global.my_console = console_create();
 global.unlocked_items = ds_list_create();
-global.local_player = -1;
+global.local_player = noone;
 global.sudo = false;
 global.InventoryEquipLeftTopCorner = [-1, -1];
 global.InventoryEquipRightBottomCorner = [-1, -1];
@@ -137,6 +137,19 @@ global.translates = {
     Volume_gain: { cz: "Hlasitost", en: "Volume gain" },
     Saturation_level: { cz: "Sytost barev", en: "Saturation level" },
     Dynamic_crosshair: { cz: "Dynamický zaměřovač", en: "Dynamic crosshair" },
+    Crosshair_type: { cz: "Typ zaměřovače", en: "Crosshair type" },
+    Classic: { cz: "Klasický", en: "Classic" },
+    Dot: { cz: "Tečka", en: "Dot" },
+    Spread: { cz: "Rozptyl", en: "Spread" },
+    Width: { cz: "Šířka", en: "Width" },
+    Outline: { cz: "Obrys", en: "Outline" },
+    Outline_W: { cz: "Šířka obrysu", en: "Outline W" },
+    Alpha: { cz: "Průhlednost", en: "Alpha" },
+    Scale: { cz: "Měřítko", en: "Scale" },
+    Reset_crosshair: { cz: "Obnovit zaměřovač", en: "Reset crosshair" },
+    Choose_team: { cz: "Vybrat tým", en: "Choose team" },
+    Terrorists: { cz: "Teroristé", en: "Terrorists" },
+    Count: { cz: "Počet", en: "Count" },
     Toggle_fullscreen: { cz: "Celá obrazovka", en: "Toggle fullscreen" },
     Window_size: { cz: "Velikost okna", en: "Window size" },
     GUI_scale: { cz: "Měřítko GUI", en: "GUI scale" },
@@ -229,7 +242,7 @@ global.translates = {
     Bot_info: { cz: "Informace o botovi", en: "Bot info" },
     Run: { cz: "Běh", en: "Run" },
     Walk: { cz: "Chůze", en: "Walk" },
-    Open_terminal: { cz: "Otevřít terminál", en: "Open terminal" },
+    Interact: { cz: "Interagovat", en: "Interakt" },
     Take: { cz: "Převzít", en: "Take" },
     Years: { cz: "let", en: "years" },
     Getting_spotted_chance: { cz: "Šance na odhalení", en: "Getting spotted chance" },
@@ -260,13 +273,16 @@ global.translates = {
     Gauges: { cz: "Broková ráže", en: "Gauges" },
     Rocket: { cz: "Raketa", en: "Rocket" },
 	Bomb_planted: { cz: "Bomba položena", en: "Bomb planted"},
-    Sources_description: { cz: "Inspirace: Counter-Strike, CS2D\na Unturned.\nProhlášení o použití AI:\nTento projekt vzniká s pomocí AI,\nkonkrétně agenta ChatGPT Codex.\nJsem hobby programátor v GML\ns vlastním životem a prací. AI mi\npomáhá rychleji realizovat nápady\na přidávat do 2D Offensive věci,\nkteré bych těžko zvládl sám.", en: "Inspired by Counter-Strike, CS2D \nand Unturned.\nDeclaration of AI usage:\nThis project, as many things in 2026, \nis developed with help of an AI, \nconcretely ChatGPT codex agent.\nI am just a hobby GML programmer\nwith his own life and job. AI speeds up\nimplementing ideas or even helps to\nimplement ideas that I have never imagined\nadding in 2D Offensive." },
+    Sources_description: { cz: "Inspirace: Counter-Strike, CS2D\n, Unturned a Endless war 4.\nProhlášení o použití AI:\nTento projekt vzniká s pomocí AI,\nkonkrétně agenta ChatGPT Codex.\nJsem hobby programátor v GML\ns vlastním životem a prací. AI mi\npomáhá rychleji realizovat nápady\na přidávat do 2D Offensive věci,\nkteré bych těžko zvládl sám.", en: "Inspired by Counter-Strike, CS2D \n, Unturned and Endless war 4.\nDeclaration of AI usage:\nThis project, as many things in 2026, \nis developed with help of an AI, \nconcretely ChatGPT codex agent.\nI am just a hobby GML programmer\nwith his own life and job. AI speeds up\nimplementing ideas or even helps to\nimplement ideas that I have never imagined\nadding in 2D Offensive." },
     Items: array_create(ITEM.Total)
 };
 global.translates[$ "Play!"] = { cz: "Hrát!", en: "Play!" };
 global.translates[$ "Launch!"] = { cz: "Odpálit!", en: "Launch!" };
 global.translates[$ "K/D_ratio"] = { cz: "Poměr K/D", en: "K/D ratio" };
 global.translates[$ "Crosshair_color_(rgb)"] = { cz: "Barva zaměřovače (RGB)", en: "Crosshair color (rgb)" };
+global.translates[$ "Outline_color_(rgb)"] = { cz: "Barva obrysu (RGB)", en: "Outline color (rgb)" };
+global.translates[$ "Circ."] = { cz: "Kruh", en: "Circ." };
+global.translates[$ "Rect."] = { cz: "Čtverec", en: "Rect." };
 global.translates[$ "Anti-aliasing"] = { cz: "Vyhlazování hran", en: "Anti-aliasing" };
 global.translates[$ "Player’s_name"] = { cz: "Jméno hráče", en: "Player’s name" };
 global.translates[$ "Damage_drop-off"] = { cz: "Pokles poškození", en: "Damage drop-off" };
@@ -303,7 +319,9 @@ global.player_stats = {
 	Sniper_cases: 100,
 	Smg_cases: 100,
 	Heavy_cases: 100,
-	Player_team: choose(TEAM.POLICE, TEAM.TERRORIST),
+	Lifes: MAX_LIFES,
+	Respawn_point: [-1, -1],
+	Player_team: TEAM.NONE,
     Get_KD: function() {
         return (Deaths != 0) ? (Kills / Deaths) : 0;
     },
@@ -337,14 +355,36 @@ global.game_struct = game_struct_create();
 
 enum ICON{
 	none, health, stamina, xp, kills, deaths, armour, kd, headshot_percentage, accuracy, time, game, tracking, won_game, lost_game, tied_game, 
-	ammo, assists, total
+	ammo, assists, lifes, total
 }
+
+enum CS_TYPE{
+	CLASSIC,
+	CIRC,
+	RECT,
+	DOT
+}
+
+global.cs_conf = {
+	"outline": true,
+	"type": CS_TYPE.CLASSIC,
+	"outline_w": 1,
+	"outline_color": c_black,
+	"color": c_white,
+	"alpha": 1,
+	"scale": 1,
+	"spread": 24,
+	"dynamic": false,
+	"width": 15,
+	"height": 2,
+};
 
 enum TEAM{
 	NONE,
 	POLICE,
 	TERRORIST
 }
+
 
 enum ATTACHMENTS {
 	scope, barrel, grip, suppressor, total
@@ -440,6 +480,7 @@ ds_map_add(desert_enemy_areas, "fencearea1", [1150, 1250, 1900, 1550, 3]); //x1,
 ds_map_add(desert_enemy_areas, "fencearea2", [1430, 1540, 1950, 1750, 3]); //x1, y1, x2, y2, enemy number
 ds_map_add(desert_enemy_areas, "buildingarea1", [590, 100, 1200, 350, 4]); //x1, y1, x2, y2, enemy number
 ds_map_add(desert_enemy_areas, "treearea", [1700, 670, 2100, 1030, 4]); //x1, y1, x2, y2, enemy number
+ds_map_add(desert_enemy_areas, "treearea", [150, 1500, 650, 2500, 7]); //x1, y1, x2, y2, enemy number
 //ds_map_add(desert_enemy_areas, "area2", [900, 1200, 1500, 1800, 3]);
 //ds_map_add(desert_enemy_areas, "area3", [900, 100, 1900, 500, 5]);
 //ds_map_add(desert_enemy_areas, "area4", [2300, 400, 3000, 1000, 5]);
@@ -577,7 +618,7 @@ enum KEY{
 	BuyMenu, DropWeapon, Console,
 	KnifeLight, KnifeHeavy, UseItem, Scope,
 	Scoreboard, HostageTake, Defuse, Door,
-	BotInfo, Run, Walk, OpenTerm, TakeBot,
+	BotInfo, Run, Walk, Interact, TakeBot,
 	Total
 }
 

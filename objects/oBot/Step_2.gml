@@ -1,9 +1,13 @@
 /// @description Movement
 /* End step */
 if(stats.Health_points <= 0){
+	InaccuracyXSpeed = 0;
+	InaccuracyYSpeed = 0;
 	exit;
 }
 
+InaccuracyXSpeed = XSpeed;
+InaccuracyYSpeed = YSpeed;
 var hasLegs = instance_exists(Legs);
 if(XSpeed == 0 && YSpeed == 0){
 	if(hasLegs){

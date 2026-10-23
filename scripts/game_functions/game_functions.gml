@@ -16,8 +16,7 @@
 /// @return {instance}  object instance id
 ///
 /// GMLscripts.com/license
-function collision_triangle(x1, y1, x2, y2, x3, y3, object)
-{
+function collision_triangle(x1, y1, x2, y2, x3, y3, object){
     // Bounding box check (early out)
     var xmin = min(x1, x2, x3);
     var xmax = max(x1, x2, x3);
@@ -380,20 +379,37 @@ function create_haze_effect(pos_x, pos_y, haze_timer, haze_follow_object, haze_t
 
 function buy_item(ItemID){
 	if(global.player_stats.Money >= global.ItemIndex[#ItemID, ITEMSTATS.Cost] && !is_inventory_full(ItemID) && global.ItemIndex[#ItemID, ITEMSTATS.is_locked] == false){
+		if(IS_NET && instance_exists(oNetworkManager) && !oNetworkManager.is_server){
+			if(oNetworkManager.pending_buy_item != ITEM.None) return;
+			oNetworkManager.pending_buy_item = ItemID;
+			oNetworkManager.next_buy_id = (oNetworkManager.next_buy_id + 1) mod 65536;
+			oNetworkManager.pending_buy_id = oNetworkManager.next_buy_id;
+			send_buy_request_client();
+			return;
+		}
 		global.player_stats.Money -= global.ItemIndex[#ItemID, ITEMSTATS.Cost];
-		gain_item(
-			ItemID,
-			1,
-			global.ItemIndex[#ItemID, ITEMSTATS.MaxAmmo], 
-			global.ItemIndex[#ItemID, ITEMSTATS.ClipAmmo], 
-			global.ItemIndex[#ItemID, ITEMSTATS.BaseDurability],
-			global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "scope"] ?? ITEM.None,
-            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "barrel"] ?? ITEM.None,
-            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "grip"] ?? ITEM.None,
-            global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "suppressor"] ?? ITEM.None,
-			false
-		);
+		if(IS_NET && instance_exists(oNetworkManager) && oNetworkManager.is_server){
+			var host_stats = ds_map_find_value(oNetworkManager.player_stats, oNetworkManager.my_pid);
+			if(!is_undefined(host_stats)) ds_map_set(host_stats, "Money", global.player_stats.Money);
+			send_stats_broadcast();
+		}
+		grant_bought_item(ItemID);
 	}
+}
+
+function grant_bought_item(ItemID){
+	gain_item(
+		ItemID,
+		1,
+		global.ItemIndex[#ItemID, ITEMSTATS.MaxAmmo],
+		global.ItemIndex[#ItemID, ITEMSTATS.ClipAmmo],
+		global.ItemIndex[#ItemID, ITEMSTATS.BaseDurability],
+		global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "scope"] ?? ITEM.None,
+		global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "barrel"] ?? ITEM.None,
+		global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "grip"] ?? ITEM.None,
+		global.ItemIndex[#ItemID, ITEMSTATS.preattached][$ "suppressor"] ?? ITEM.None,
+		false
+	);
 }
 
 function has_attachment(item_id, slot, object = global.local_player, which_slot = 0){
@@ -424,14 +440,15 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 		var random_x = 0;
 		var random_y = 0;
 		if(!explosion && point_distance(pos[0], pos[1], shot_pos[0], shot_pos[1]) > item_dir_spd_dist[3]){
+			var inaccuracy = inaccuracy_formula(item_dir_spd_dist[0], BulletObject);
 			random_x = random_range(
-				shot_pos[0] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
-				shot_pos[0] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+				shot_pos[0] - inaccuracy, 
+				shot_pos[0] + inaccuracy
 			);
 			
 			random_y = random_range(
-				shot_pos[1] - inaccuracy_formula(item_dir_spd_dist[0], BulletObject), 
-				shot_pos[1] + inaccuracy_formula(item_dir_spd_dist[0], BulletObject)
+				shot_pos[1] - inaccuracy, 
+				shot_pos[1] + inaccuracy
 			);
 			bullet_x = pos[0] +
 			lengthdir_x(item_dir_spd_dist[3], point_direction(pos[0], pos[1], random_x, random_y));
@@ -538,14 +555,47 @@ function create_bullet_tracer(pos, shot_pos, BulletImage, item_dir_spd_dist, Bul
 function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletStartingY, BulletObject, BulletItemID, BulletPenetrationDamage, TracerImage, ObjectIndex, ObjectName, BulletDirection, owner_id, projectile_id = -1){
 	var Bullet = instance_create_layer(BulletX, BulletY, "ItemsO", oBullet);
 	var damage = BulletDamage * global.ItemIndex[# BulletItemID, ITEMSTATS.damage_drop](point_distance(BulletX, BulletY, BulletStartingX, BulletStartingY)) / (BulletPenetrationDamage + 1);
+	var water_impact = position_meeting(BulletX, BulletY, oWater);
+	if(water_impact){
+		Bullet.image_blend = c_aqua;
+		Bullet.image_alpha = .8;
+		if(global.DrawParticles && instance_exists(oParticleSystem)){
+			part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.rain_particle, 5);
+			var splash_alpha = random_range(0.1, 0.25);
+			repeat (2) {
+				var splash = particle_create(
+				1,
+				0,
+				0,
+				spr_RainSplash,
+				0,                  
+				0,
+				0,
+				0,                 
+				false,
+				false, 
+				0,
+				[BulletX, BulletY],
+				splash_alpha,
+				-1, c_white, .25 * (1 + damage/100)
+				);
+				if (instance_exists(splash)) {
+					splash.RainPhase = 1;
+					splash.z_height = 0;
+					splash.image_index = 1;
+				}
+			}
+		}
+	}
 	
 	var particles_number = 1;
 	if(TracerImage != 2){
 		particles_number = round(damage/5);
-		create_fog(BulletX, BulletY, damage/10, random(360), 0.1, random_range(.1, .5), 
-			clamp(round(damage/10), 5, 7.5), clamp(damage/50, .5, .9), 
+		var impact_fog = create_fog(BulletX, BulletY, damage/10, random(360), 0.1, random_range(.1, .5),
+			clamp(round(damage/10), 5, 7.5), water_impact ? .8 : clamp(damage/50, .5, .9),
 			clamp(damage/50, .1, .75), 2 * game_get_speed(gamespeed_fps)
 		);	
+		if(water_impact && instance_exists(impact_fog)) impact_fog.image_blend = c_aqua;
 	}
 	
 	particle_create(
@@ -560,19 +610,28 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 		choose(true, false),
 		false,
 		0,
-		BulletX,
-		BulletY
+		[BulletX, BulletY],
+		water_impact ? .8 : 1,
+		1,
+		water_impact ? c_aqua : c_white
 	);
 	if(instance_exists(oParticleSystem)){
-		part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.Spark, particles_number);
+		if(water_impact){
+			part_type_alpha1(oParticleSystem.Spark, .8);
+			part_type_alpha1(oParticleSystem.headshot_particle, .8);
+			part_particles_create_colour(global.ParticleSystem, BulletX, BulletY, oParticleSystem.Spark, c_aqua, particles_number);
+			part_type_alpha1(oParticleSystem.Spark, 1);
+		}else{
+			part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.Spark, particles_number);
+		}
 		for (var i = 0; i < particles_number; i++) {
 			var randomDirection = random_range(BulletDirection - 180 - 90, BulletDirection - 180 + 90);
-			part_type_color1(oParticleSystem.headshot_particle, c_gray);
 			part_type_direction(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0);
 			part_type_orientation(oParticleSystem.headshot_particle, randomDirection, randomDirection, 0, 0, false);
-			part_particles_create(global.ParticleSystem, BulletX, BulletY, oParticleSystem.headshot_particle, 1);
-			part_type_color1(oParticleSystem.headshot_particle, c_white);
+			part_particles_create_colour(global.ParticleSystem, BulletX, BulletY,
+				oParticleSystem.headshot_particle, water_impact ? c_aqua : c_gray, 1);
 		}
+		if(water_impact) part_type_alpha1(oParticleSystem.headshot_particle, 1);
 	}
 	Bullet.direction = BulletDirection;
 	Bullet.stats.Damage = damage;
@@ -586,8 +645,47 @@ function create_bullet(BulletX, BulletY, BulletDamage, BulletStartingX, BulletSt
 	Bullet.stats.Owner_name = ObjectName;
 	Bullet.stats.Owner_id = owner_id;
 	Bullet.bullet_network_id = projectile_id;
+	Bullet.image_xscale = 0.9 * (1 + damage/100);
+	Bullet.image_yscale = Bullet.image_xscale;
 	return Bullet;
 }
+function get_wall_impact_color(wall_inst, pos_x, pos_y){
+	if(wall_inst.sprite_index == spr_TileCollision){
+		var tile_color = tilemap_get_pixel(
+			layer_tilemap_get_id(layer_get_id("WallTiles")),
+			global.MapProperties[# global.MapID, MAP_STAT.Tile],
+			32, 32, pos_x, pos_y
+		);
+		if(is_array(tile_color)){
+			return make_color_rgb(tile_color[0], tile_color[1], tile_color[2]);
+		}
+		return c_gray;
+	}
+
+	var hit_dx = pos_x - wall_inst.x;
+	var hit_dy = pos_y - wall_inst.y;
+	var hit_cos = dcos(wall_inst.image_angle);
+	var hit_sin = dsin(wall_inst.image_angle);
+	var sprite_x = (hit_dx * hit_cos - hit_dy * hit_sin) / wall_inst.image_xscale + sprite_get_xoffset(wall_inst.sprite_index);
+	var sprite_y = (hit_dx * hit_sin + hit_dy * hit_cos) / wall_inst.image_yscale + sprite_get_yoffset(wall_inst.sprite_index);
+	var pixel_color = sprite_getpixel(wall_inst.sprite_index, wall_inst.image_index,
+		clamp(floor(sprite_x), 0, sprite_get_width(wall_inst.sprite_index) - 1),
+		clamp(floor(sprite_y), 0, sprite_get_height(wall_inst.sprite_index) - 1));
+	return make_color_rgb(pixel_color[0], pixel_color[1], pixel_color[2]);
+}
+
+function create_impact_line_particles(pos_x, pos_y, impact_color, damage, impact_dir, impact_alpha = 1){
+	if(!instance_exists(oParticleSystem)) return;
+	var size_scale = clamp(.7 + damage / 80, .8, 1.5);
+	part_type_size_x(oParticleSystem.blood_line, .5 * size_scale, 1.4 * size_scale, 0, 0);
+	part_type_size_y(oParticleSystem.blood_line, .7 * size_scale, 1.8 * size_scale, 0, 0);
+	part_type_direction(oParticleSystem.blood_line, impact_dir - 90, impact_dir + 90, 0, 0);
+	if(impact_alpha != 1) part_type_alpha3(oParticleSystem.blood_line, impact_alpha, impact_alpha * .95, 0);
+	part_particles_create_colour(global.ParticleSystem, pos_x, pos_y, oParticleSystem.blood_line,
+		impact_color, clamp(round(damage / 8), 5, 25));
+	if(impact_alpha != 1) part_type_alpha3(oParticleSystem.blood_line, 1, .95, 0);
+}
+
 function process_bullet_collision(starting_x, starting_y, current_x, current_y, target_x, target_y, object_type, single_hit) {
     var collision_info = find_collision_point(starting_x, starting_y, target_x, target_y, object_type);
     if (array_length(collision_info) > 0) {
@@ -842,7 +940,7 @@ function create_shooting_effects(object){
 		#region Create bullet casing
 		if(global.ItemIndex[#wpn_id, ITEMSTATS.BulletCasingID] != -1){
 			particle_create(global.ItemIndex[#wpn_id, ITEMSTATS.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-			0, RotationAngle - 180, 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.BulletCasingID], x, y, 1, 60);
+			0, RotationAngle - 180, 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.BulletCasingID], [x, y], 1, 60);
 		}
 		#endregion
 				
@@ -868,6 +966,7 @@ function create_shooting_effects(object){
 }
 
 function player_shooting(){
+	oCrosshair.recoil_pending = true;
 	
 	if(global.ranked_game == true
 	&& global.ItemIndex[#wpn_id, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
@@ -899,6 +998,7 @@ function player_shooting(){
 		var vertical_recoil_multiplier = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackPower];
 		var crosshair_aim_x = oCrosshair.aim_x;
 		var crosshair_aim_y = oCrosshair.aim_y;
+		var inaccuracy = inaccuracy_formula(current_weapon_id, id);
 
 		
 		if(moving_state == STATES_PLAYER.prone_state){
@@ -910,29 +1010,29 @@ function player_shooting(){
 
 		if (global.ItemIndex[#wpn_id, ITEMSTATS.random_bullet_spread] == true) {
 			ShotX = random_range(
-				crosshair_aim_x - inaccuracy_formula(current_weapon_id, id),
-				crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)
+				crosshair_aim_x - inaccuracy,
+				crosshair_aim_x + inaccuracy
 			);
 			ShotY = random_range(
-				crosshair_aim_y - inaccuracy_formula(current_weapon_id, id),
-				crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)
+				crosshair_aim_y - inaccuracy,
+				crosshair_aim_y + inaccuracy
 			);
 		} else {
 			if (KickBack <= kb_phase_1) {
-				ShotX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id), crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
-				ShotY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id), crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
+				ShotX = random_range(crosshair_aim_x - inaccuracy, crosshair_aim_x + inaccuracy) - KickBack * recoil_offset_x * vertical_recoil_multiplier;
+				ShotY = random_range(crosshair_aim_y - inaccuracy, crosshair_aim_y + inaccuracy) - KickBack * recoil_offset_y * horizontal_recoil_multiplier;
 
 				if (KickBack == kb_phase_1) {
-					DeltaX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id), crosshair_aim_x + inaccuracy_formula(current_weapon_id, id)) - ShotX;
-					DeltaY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id), crosshair_aim_y + inaccuracy_formula(current_weapon_id, id)) - ShotY;
+					DeltaX = random_range(crosshair_aim_x - inaccuracy, crosshair_aim_x + inaccuracy) - ShotX;
+					DeltaY = random_range(crosshair_aim_y - inaccuracy, crosshair_aim_y + inaccuracy) - ShotY;
 				}
 			} else {
-				ShotX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_x + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaX;
-				ShotY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_y + inaccuracy_formula(current_weapon_id, id) * 0.25) - DeltaY;
+				ShotX = random_range(crosshair_aim_x - inaccuracy * 0.25, crosshair_aim_x + inaccuracy * 0.25) - DeltaX;
+				ShotY = random_range(crosshair_aim_y - inaccuracy * 0.25, crosshair_aim_y + inaccuracy * 0.25) - DeltaY;
 
 				if (KickBack == kb_phase_2) {
-					DeltaX = random_range(crosshair_aim_x - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_x + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotX;
-					DeltaY = random_range(crosshair_aim_y - inaccuracy_formula(current_weapon_id, id) * 0.25, crosshair_aim_y + inaccuracy_formula(current_weapon_id, id) * 0.25) - ShotY;
+					DeltaX = random_range(crosshair_aim_x - inaccuracy * 0.25, crosshair_aim_x + inaccuracy * 0.25) - ShotX;
+					DeltaY = random_range(crosshair_aim_y - inaccuracy * 0.25, crosshair_aim_y + inaccuracy * 0.25) - ShotY;
 				}
 			}
 		}
@@ -1014,8 +1114,14 @@ function inaccuracy_formula(WID, ObjectType){
 					moving_state_inaccuracy = .5;	
 				}
 	
-				if(ObjectType.Moving == true){
-					MovingIn = global.ItemIndex[#WID, ITEMSTATS.MovingInaccuracyMultiplier];
+				var aim_speed_x = ObjectType.is_remote ? ObjectType.XSpeed : ObjectType.InaccuracyXSpeed;
+				var aim_speed_y = ObjectType.is_remote ? ObjectType.YSpeed : ObjectType.InaccuracyYSpeed;
+				var velocity = sqrt(power(aim_speed_x, 2) + power(aim_speed_y, 2)) * 1000000 / max(delta_time, 1);
+				var max_velocity = MOVE_SPD * ObjectType.SpeedMul;
+				var threshold = 0.35;
+				if(max_velocity > 0){
+					var move_factor = max((velocity/max_velocity - threshold)/(1 - threshold), 0);
+					MovingIn = 1 + (global.ItemIndex[# WID, ITEMSTATS.MovingInaccuracyMultiplier] - 1) * sqrt(move_factor);
 				}
 			
 				var ScopeTimerInaccuracy = 1;
@@ -1036,14 +1142,18 @@ function inaccuracy_formula(WID, ObjectType){
 						ScopeInaccuracy = .5;
 					}
 				}
-				return
-				min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
-				(laser_mod * KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * global.PlayerInaccuracy * moving_state_inaccuracy * run_modifier * walk_modifier * global.ItemIndex[# suppressor_item, ITEMSTATS.KickBackPower] * max(ScopeTimerInaccuracy, 1)), 175);
+				var total_inaccuracy = 	min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
+				(laser_mod * KickBackIn * MovingIn * range_inaccuracy * ScopeInaccuracy * ObjectType.inaccuracy_modifier * 
+				moving_state_inaccuracy * run_modifier * walk_modifier * global.ItemIndex[# suppressor_item, ITEMSTATS.KickBackPower] * 
+				max(ScopeTimerInaccuracy, 1)), 175);
+				
+				show_debug_message(total_inaccuracy);
+				return total_inaccuracy;
 			}
 		}else if(ObjectType.object_index == oBot){
 			if(instance_exists(oBot)){
 				var behind_smoke_inaccuracy = 1;
-				var bot_modifier = 1.25;
+				var bot_modifier = 1.5;
 				var FlashedInaccuracy = 1;
 				var InSmokeInaccuracy = 1;
 				var EnemyMovingInaccuracy = 1;
@@ -1069,12 +1179,15 @@ function inaccuracy_formula(WID, ObjectType){
 					FlashedInaccuracy = 10;
 				}
 			
-				if(sqrt(power(ObjectType.XSpeed, 2) + power(ObjectType.YSpeed, 2)) > ObjectType.MaxSpeed/2){
-					EnemyMovingInaccuracy = global.ItemIndex[#WID, ITEMSTATS.MovingInaccuracyMultiplier];
+				var bot_velocity = sqrt(power(ObjectType.InaccuracyXSpeed, 2) + power(ObjectType.InaccuracyYSpeed, 2));
+				var bot_max_velocity = ObjectType.MaxSpeed * (ObjectType.walking ? WALK_SPD : 1);
+				if(bot_max_velocity > 0){
+					var bot_move_factor = clamp((bot_velocity / bot_max_velocity - 0.35), 0, 1);
+					EnemyMovingInaccuracy = 1 + global.ItemIndex[#WID, ITEMSTATS.MovingInaccuracyMultiplier] * power(bot_move_factor, 0.5);
 				}
 				
 				var inaccuracy_value = min(global.ItemIndex[#WID, ITEMSTATS.Inaccuracy] *
-				EnemyMovingInaccuracy * bot_modifier * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ITEMSTATS.EnemyInaccuracyCompensation] + 1) * (ObjectType.AimPunchMultiplier + 1) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
+				EnemyMovingInaccuracy * bot_modifier * EnemyRangeInaccuracy * bot_walk_modifier * (global.ItemIndex[#WID, ITEMSTATS.EnemyInaccuracyCompensation] + 1) * (1 + (ObjectType.AimPunchTimer > -1 ? ObjectType.AimPunchMultiplier : 0)) * InSmokeInaccuracy * FlashedInaccuracy * behind_smoke_inaccuracy, 350);
 				return inaccuracy_value;
 
 			}
@@ -1265,26 +1378,12 @@ function create_player(PlayerHP, PlayerStamina, PlayerName, PlayerTeam){
 }
 
 function get_player_team_sprite(_team, _variant_seed = -1) {
-	if (_team == TEAM.TERRORIST) {
-		if (_variant_seed < 0) {
-			return choose(spr_TerroristChar, spr_TerroristChar2, spr_TerroristChar3, spr_TerroristChar4);
-		}
-
-		switch (abs(floor(_variant_seed)) mod 4) {
-			case 0: return spr_TerroristChar;
-			case 1: return spr_TerroristChar2;
-			case 2: return spr_TerroristChar3;
-			default: return spr_TerroristChar4;
-		}
-	}
-
-	if (_variant_seed < 0) {
-		return choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
-	}
-
-	switch (abs(floor(_variant_seed)) mod 3) {
-		case 0: return spr_PoliceChar;
-		case 1: return spr_PoliceChar2;
-		default: return spr_PoliceChar3;
-	}
+	var team_sprites = _team == TEAM.TERRORIST
+		? [spr_TerroristChar, spr_TerroristChar2, spr_TerroristChar3, spr_TerroristChar4]
+		: [spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3, spr_PoliceChar4];
+	var sprite_count = array_length(team_sprites);
+	var sprite_position = _variant_seed < 0
+		? irandom(sprite_count - 1)
+		: abs(floor(_variant_seed)) mod sprite_count;
+	return team_sprites[sprite_position];
 }

@@ -4,12 +4,17 @@ if(drawable == true){
 	if(clickable == true){
 		if(hover == true){
 			if (zui_get_hover()) {
+				if(sound == false){
+					audio_play_sound(snd_Button, 0, false);
+					sound = true;
+				}
 				if (pressed)
 					draw_set_color(c_black);
 				else{
 					draw_set_color(MAIN_COLOR); 
 				}
 			} else {
+				sound = false;
 				draw_set_color(c_white);
 			}
 		}else{

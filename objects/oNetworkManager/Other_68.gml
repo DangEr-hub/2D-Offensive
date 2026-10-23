@@ -4,10 +4,10 @@ switch (type) {
 		case network_type_data:
 		    var sender_ip   = async_load[? "ip"];
 		    var sender_port = async_load[? "port"];
-		    buffer_seek(receive_buffer, buffer_seek_start, 0);
-			
 			var inbuf = async_load[? "buffer"];
-			var sz    = buffer_get_size(inbuf);
+			var sz    = async_load[? "size"];
+			if (sz < 5) break; // packet type (u8) + sequence (u32)
+			buffer_resize(receive_buffer, sz); // Do not leave bytes from the previous packet readable.
 			buffer_seek(receive_buffer, buffer_seek_start, 0);
 			buffer_copy(inbuf, 0, sz, receive_buffer, 0);
 
@@ -15,7 +15,7 @@ switch (type) {
 		    if (is_server)
 		        handle_server_receive(sender_ip, sender_port);
 		    else
-		        handle_client_receive();
+		        handle_client_receive(sender_ip, sender_port);
 		    break;
 
     case network_type_disconnect:

@@ -12,7 +12,5 @@ repeat(5){
 
 	bot.stats.Team = enemy_team;
 	bot.has_defuse_kit = enemy_team == TEAM.POLICE && percent_chance(25);
-	bot.sprite_index = enemy_team == TEAM.TERRORIST
-		? choose(spr_TerroristChar, spr_TerroristChar2, spr_TerroristChar3, spr_TerroristChar4)
-		: choose(spr_PoliceChar, spr_PoliceChar2, spr_PoliceChar3);
+	bot.sprite_index = get_player_team_sprite(enemy_team);
 }

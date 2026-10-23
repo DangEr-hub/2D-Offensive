@@ -27,6 +27,7 @@ aim_y = y;
 visual_x = x;
 visual_y = y;
 RecoilTimer = [-1, -1];
+recoil_pending = false;
 Recoil = [0, 0];
 StabilizationSpeed = 15;
 axis_multiplier = [0, 0];

@@ -1,5 +1,5 @@
 /* oNetworkManager - Step */
-if (instance_exists(global.local_player)) {
+if (room == rm_ServerTest && instance_exists(global.local_player) && global.local_player.object_index == oPlayer) {
 	item_use_resync_timer += delta_time / 1000000;
 	var current_item_use_id = global.Inventory[# global.local_player.item_use_position, INDEX.slot_id];
 	if (global.local_player.Healing && global.local_player.HealingItemId != ITEM.None) {
@@ -27,6 +27,11 @@ if (instance_exists(global.local_player)) {
 if (is_server) {
 	server_update_health_regeneration();
 	server_update_defusing();
+	match_state_sync_timer += delta_time / 1000000;
+	if (match_state_sync_timer >= 5) {
+		server_broadcast_match_state();
+		match_state_sync_timer = 0;
+	}
 
 	stats_sync_timer += delta_time / 1000000;
 	if(stats_sync_timer >= stats_sync_interval){
@@ -124,6 +129,10 @@ if (is_server) {
 }
 
 if (!is_server && is_connected) {
+	if (pending_buy_item != ITEM.None) {
+		pending_buy_timer += delta_time / 1000000;
+		if (pending_buy_timer >= .5) send_buy_request_client();
+	}
 	if (current_time - last_server_packet_time > server_timeout_threshold) {
 		handle_server_disconnect();
 		exit;

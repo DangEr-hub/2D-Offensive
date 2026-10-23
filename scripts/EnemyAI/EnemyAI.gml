@@ -392,7 +392,7 @@ function EnemyShooting(DangerX, DangerY){
 		
 		if(global.ItemIndex[# WeaponID[WeaponPositionID], ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.MISSILE){
 			particle_create(global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.Bullets], 0.75, random(360), spr_BulletCasing, random_range(10, 30),
-			0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.BulletCasingID], x, y, 1, 60);
+			0, RotationAngle - 180, 0, false, true, global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.BulletCasingID], [x, y], 1, 60);
 		}
 		Weapon.KickBackEffect = global.ItemIndex[#WeaponID[WeaponPositionID], ITEMSTATS.KickBackPower];
 		KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);	

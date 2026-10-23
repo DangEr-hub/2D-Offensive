@@ -1,6 +1,6 @@
 if(is_local){ image_alpha = point_in_grenade_smoke(x, y) ? 0.75 : 1; }
 event_inherited();
-//draw_text(x, y - 20, "kbe " + string(in_water_timer));
+//((draw_text(x, y - 20, "am " + string(AimPunchMultiplier));
 //draw_text(x, y - 40, "am " + string(AimPunchMultiplier));
 //draw_text(x, y - 60, "def " + string(global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_id], ITEMSTATS.Defense]));
 //draw_text(x, y - 110, "rd " + string(global.game_struct.Player_rd));
@@ -9,7 +9,7 @@ event_inherited();
 if(Visible == true){
 	if(is_local && instance_exists(Weapon)){ Weapon.image_alpha = image_alpha; }
 	
-	with(Weapon){
+	if(moving_state != STATES_PLAYER.machine_gun_state && instance_exists(Weapon)) with(Weapon){
 		var owner_can_draw = instance_exists(Owner) && Owner.stats.Health_points > 0;
 
 		if(Visible == true && owner_can_draw){
@@ -113,7 +113,7 @@ if(Visible == true){
 			should_draw_attachments = (global.Inventory[# item_use_position, INDEX.slot_id] == ITEM.None);
 		}
 
-		if(should_draw_attachments && Weapon.Visible){
+		if(moving_state != STATES_PLAYER.machine_gun_state && should_draw_attachments && instance_exists(Weapon) && Weapon.Visible){
 			draw_weapon_attachments(Weapon, WeaponDistance, suppressor_id, barrel_id, scope_id, image_alpha);
 		}
 

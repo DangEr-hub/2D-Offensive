@@ -7,7 +7,7 @@ draw_set_font(set_font("Console"));
 draw_set_valign(fa_middle);
 
 #region Crosshair
-var draw_crosshair = instance_exists(global.local_player)
+var show_crosshair = instance_exists(global.local_player)
 	&& !spectating
 	&& RespawnMenu == false
 	&& PauseMenu == false
@@ -18,79 +18,22 @@ var draw_crosshair = instance_exists(global.local_player)
 	&& !instance_exists(oMortarMenu)
 	&& !instance_exists(oStatisticsTable)
 	&& !instance_exists(oBotTab)
+	&& !instance_exists(oChooseTeam)
 	&& !global.my_console[? "active"]
 	&& global.local_player.player_can_shoot;
 
 
-if(draw_crosshair){
+if(show_crosshair){
 	with(oCrosshair){
-		var x_scale = image_xscale * .5 * global.crosshair_scale;
-		var y_scale = image_yscale * .5 * global.crosshair_scale;
+		var x_scale = image_xscale * .5 * global.cs_conf.scale;
+		var y_scale = image_yscale * .5 * global.cs_conf.scale;
 		crosshair_x = (visual_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 		crosshair_y = (visual_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
 		if(HitMarker > -1){
-			draw_sprite_ext(spr_HitMarker, HitMarker, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, image_blend, global.CrosshairAlpha);
+			draw_sprite_ext(spr_HitMarker, HitMarker, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, image_blend, global.cs_conf.alpha);
 		}
-		if(instance_exists(global.local_player) && global.Inventory[# global.local_player.WeaponID, INDEX.slot_scope] != ITEM.two_scope && global.local_player.ScopeIn == false){
-			draw_sprite_ext(spr_StaticCrosshair, 0, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
-			if(global.local_player.player_can_shoot == true && !global.my_console[? "active"]){
-				//draw_sprite_ext(spr_StaticCrosshair, 0, crosshair_x, crosshair_y, y_scale, x_scale, image_angle, global.crosshair_color, global.CrosshairAlpha * AlphaMul);
-				if(global.DynamicCrosshair == true){
-					Gap = 25;
-					draw_sprite_ext(
-						spr_DynamicCrosshair,
-						0,
-						crosshair_x - Gap - inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player) * 2 + x_offset,
-						crosshair_y,
-						y_scale,
-						x_scale,
-						0,
-						global.crosshair_color,
-						global.CrosshairAlpha
-					); ///Left
-					draw_sprite_ext(
-						spr_DynamicCrosshair,
-						0,
-						crosshair_x + Gap + inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player) * 2 + x_offset,
-						crosshair_y,
-						y_scale,
-						x_scale,
-						0,
-						global.crosshair_color,
-						global.CrosshairAlpha
-					); ///Right
-					draw_sprite_ext(
-						spr_DynamicCrosshair,
-						0,
-						crosshair_x,
-						crosshair_y - Gap - inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player) * 2 + y_offset,
-						y_scale,
-						x_scale,
-						90,
-						global.crosshair_color,
-						global.CrosshairAlpha
-					); ///Top
-					draw_sprite_ext(
-						spr_DynamicCrosshair,
-						0,
-						crosshair_x,
-						crosshair_y + Gap + inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player) * 2 + y_offset,
-						y_scale,
-						x_scale,
-						90,
-						global.crosshair_color,
-						global.CrosshairAlpha
-					); ///Down
-				}
-			}
-		}else{
-			if(global.DynamicCrosshair == true){
-				Gap = 25;
-				draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x - Gap - 1 + x_offset, crosshair_y, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Left
-				draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x + Gap + 1 + x_offset, crosshair_y, y_scale, x_scale, 0, global.crosshair_color, global.CrosshairAlpha); ///Right
-				draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y - Gap - 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Top
-				draw_sprite_ext(spr_DynamicCrosshair, 0, crosshair_x, crosshair_y + Gap + 1 + y_offset, y_scale, x_scale, 90, global.crosshair_color, global.CrosshairAlpha); ///Down
-			}
+		if((global.Inventory[# global.local_player.WeaponID, INDEX.slot_scope] != ITEM.two_scope && global.local_player.ScopeIn == false)){
+			draw_crosshair(crosshair_x, crosshair_y);
 		}
 
 		if(global.local_player.player_can_shoot == true){

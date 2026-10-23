@@ -22,6 +22,7 @@
 - Prefer existing project patterns and functions over creating new systems.
 - Before adding a new system or state variable, check whether the project already has equivalent functionality and integrate with it instead of creating a redundant parallel solution.
 - Keep GML straightforward. Avoid unnecessary abstractions, migration code, compatibility layers, or overly defensive helpers for small changes.
+- When changing save formats or configuration variables, do not add fallback reads, one-time migrations, or compatibility code for old values unless explicitly requested. The user handles removal of obsolete variables and data.
 - Preserve all existing user changes. The working tree may already be dirty.
 - Be careful with scope inside `with` blocks. Use `other` only when its scope is clear and valid.
 - Never use GameMaker built-in variable names (such as `direction`, `speed`, `health`, `x`, or `y`) for custom variables or function parameters. Use descriptive names such as `move_dir`, `move_speed`, or `pos_x` instead. This does not prohibit intentional use of the actual built-in instance variables.

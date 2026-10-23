@@ -1,5 +1,10 @@
 event_inherited();
 
+if (is_local && stats.Team == TEAM.NONE) {
+	player_can_shoot = false;
+	exit;
+}
+
 if (is_local && dilatation_timer > -1) {
 	dilatation_timer -= 1;
 	if (dilatation_timer <= 0) {
@@ -9,7 +14,7 @@ if (is_local && dilatation_timer > -1) {
 }
 
 var bipod_mod = 1;
-
+shooting_mode = ds_list_find_value(global.ItemIndex[#wpn_id, ITEMSTATS.ShootingMode], weapon_shooting_mode);
 var reload_time_scale = (global.time_step == 1) ? 1 : 0.5;
 var reload_frame_step = max(0, delta_time * game_get_speed(gamespeed_fps) / 1000000) * reload_time_scale;
 
@@ -28,6 +33,10 @@ if (stats.Health_points <= 0) {
 }
 
 if(is_local){
+	if(!player_can_shoot || global.my_console[? "active"] || moving_state >= STATES_PLAYER.machine_gun_state){
+		InaccuracyXSpeed = 0;
+		InaccuracyYSpeed = 0;
+	}
 	if(moving_state == STATES_PLAYER.prone_state && global.Inventory[# WeaponID, INDEX.slot_grip] == ITEM.bipod){
 		bipod_mod = global.ItemIndex[# global.Inventory[# WeaponID, INDEX.slot_grip], ITEMSTATS.KickBackInaccuracyMultiplier];
 	}
@@ -48,7 +57,9 @@ if(is_local){
 	running = can_change_move_speed && movement_key_down && !walking && stats.Stamina_points > 0 && run_key_down;
 	#endregion
 
-	if(keyboard_check(global.KeyBinds[| KEY.Scoreboard])){
+	if(keyboard_check(global.KeyBinds[| KEY.Scoreboard]) && instance_exists(oDraw)
+	&& !oDraw.PauseMenu && !oDraw.RespawnMenu && !oDraw.GameEndMenu
+	&& !instance_exists(oChooseTeam) && !instance_exists(oSettingsTab)){
 		statistics_table_open();
 	}else{
 		statistics_table_close();
@@ -173,7 +184,7 @@ if (is_remote) {
 		remote_reload_effect_played = true;
 		if(wpn_id != ITEM.Javelin){
 			particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
-			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.AmmoSpriteID], x, y);		
+			random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.AmmoSpriteID], [x, y]);		
 		}
 	}
 
@@ -181,6 +192,8 @@ if (is_remote) {
     y = lerp(y, target_y, INTERPOLATION_SPD);
 	var remote_rotation_delta = ((target_direction - RotationAngle + 540) mod 360) - 180;
 	RotationAngle = (RotationAngle + remote_rotation_delta * INTERPOLATION_SPD + 360) mod 360;
+	crosshair_x = x + lengthdir_x(384, RotationAngle);
+	crosshair_y = y + lengthdir_y(384, RotationAngle);
 	Weapon.KickBackEffect = max(0, Weapon.KickBackEffect - 1);
 	KickBackAngle = random_range(-Weapon.KickBackEffect, Weapon.KickBackEffect);
 
@@ -606,10 +619,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(ShootTimer > -1){ShootTimer -= global.time_step;}
 			if(ShootTimer <= 0){CanShoot = true;}
 			if(kick_back_timer > -1){kick_back_timer -= global.time_step;}
-			if(MovingStabilizationTimer > -1){MovingStabilizationTimer -= (global.time_step == 1 ? 1 : 0.5); }
 			if(equip_timer > -1){equip_time += (global.time_step == 1 ? 1 : 0.5); equip_timer -= (global.time_step == 1 ? 1 : 0.5); }
 			if(ReloadTimer > 0){ReloadTimer = max(0, ReloadTimer - reload_frame_step);}
-			MovingStabilizationTimer = max(MovingStabilizationTimer, -1); // Kvůli problémum s časováním global.time_step (bullet time efekt)
 			ReloadTimer = clamp(ReloadTimer, -1, global.ItemIndex[# wpn_id, ITEMSTATS.ReloadSpeed]); ///Kvůli problémum s bullet time efektem
 			
 			if(FlashedAlpha > 0.075 || near_explosion_timer > -1 || stats.Health_points <= 0){
@@ -1020,7 +1031,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			#endregion
 	
 			#region Shooting mode
-			var Shoot = -1; var shooting_mode = ds_list_find_value(global.ItemIndex[#wpn_id, ITEMSTATS.ShootingMode], weapon_shooting_mode);
+			var Shoot = -1;
 	
 			if(keyboard_check_pressed(global.KeyBinds[| KEY.ChangeMode]) && shooting == false){
 				var list_size = ds_list_size(global.ItemIndex[#wpn_id, ITEMSTATS.ShootingMode]);
@@ -1150,6 +1161,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 			#region Movement
 			if(player_can_shoot == true && !global.my_console[? "active"] && moving_state < STATES_PLAYER.machine_gun_state){
+				InaccuracyXSpeed = 0;
+				InaccuracyYSpeed = 0;
 				var Up = keyboard_check(global.KeyBinds[| KEY.Up]);
 				var Right = keyboard_check(global.KeyBinds[| KEY.Right]);
 				var Left = keyboard_check(global.KeyBinds[| KEY.Left]);
@@ -1173,7 +1186,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				var ShootingSpeedMultiplier = 1;
 				var ReloadingSpeedMultiplier = 1;
 				var moving_speed_multiplier = 1;
-				var WeightSpeedMultiplier = 1 / (global.player_stats.Weight/75 + 1);
+				var WeightSpeedMultiplier = 1 / (global.player_stats.Weight/150 + 1);
 				var WeaponSpeedMultiplier = 1;
 				
 				if(AimPunchTimer == -1){ aimpunch_speed_multiplier = 1; }
@@ -1200,12 +1213,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(Left || Right || Down || Up){
 				    Moving = true;
 				} else {
-					if(MovingStabilizationTimer == -1 && Moving == true){
-						MovingStabilizationTimer = MovingStabilizationTime;
-					}
+					Moving = false;
 				}
 
-				if(!(Left || Right || Down || Up) && MovingStabilizationTimer == 0){ Moving = false; }
 
 				if!(Left || Right){ RelativeSpeedX = max(0, RelativeSpeedX - RelativeSpeedValue); }
 
@@ -1216,6 +1226,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				if(Moving == true){
 				    if(move_xpos){
 						XSpeed = min(RelativeSpeedX, MOVE_SPD) * dcos(MoveDirection) * Delta * SpeedMul;
+						InaccuracyXSpeed = XSpeed != 0 ? XSpeed : min(RelativeSpeedValue, MOVE_SPD) * dcos(MoveDirection) * Delta * SpeedMul;
 				        if (place_meeting(x + XSpeed, y, oParentTile)){
 				            while (!place_meeting(x + sign(XSpeed),y,oParentTile))
 								x += sign(XSpeed); XSpeed = 0;
@@ -1226,6 +1237,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				    }
 				    if(move_ypos){
 						YSpeed =  min(RelativeSpeedY, MOVE_SPD) * -dsin(MoveDirection) * Delta * SpeedMul;
+						InaccuracyYSpeed = YSpeed != 0 ? YSpeed : min(RelativeSpeedValue, MOVE_SPD) * -dsin(MoveDirection) * Delta * SpeedMul;
 				        if(place_meeting(x, y + YSpeed, oParentTile)){
 				            while (!place_meeting(x,y + sign(YSpeed),oParentTile))
 								y += sign(YSpeed); YSpeed = 0;
@@ -1282,10 +1294,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 			}
 
-			if(door_cooldown > 0){ door_cooldown--; }
 			var door = collision_line(xprevious, yprevious, x, y, oRoofTrigger, false, true);
 
-			if(door != noone && door_cooldown <= 0){
+			if(door != noone){
 				var w = door.bbox_right - door.bbox_left;
 				var h = door.bbox_bottom - door.bbox_top;
 				var crossed = false;
@@ -1294,20 +1305,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 
 				if(w > h){
 					// horizontální dveře → průchod NAHORU / DOLŮ
-					var prev = sign(yprevious - cen_y);
-					var curr = sign(y - cen_y);
-					//když se prev a curr liší, prošel hráč skrze středovou osu
-					if(prev != 0 && curr != 0){
-						crossed = (prev * curr < 0);
-					}
+					crossed = (yprevious < cen_y) != (y < cen_y);
 				}else{
 					// vertikální dveře → průchod DOLEVA / DOPRAVA
-					var prev = sign(xprevious - cen_x);
-					var curr = sign(x - cen_x);
-					//když se prev a curr liší, prošel hráč skrze středovou osu
-					if(prev != 0 && curr != 0){
-						crossed = (prev * curr < 0);
-					}
+					crossed = (xprevious < cen_x) != (x < cen_x);
 				}
 
 				if(crossed){
@@ -1316,7 +1317,6 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					}else{
 						current_building_id = door.building_id; // vstup
 					}
-					door_cooldown = 10;
 				}
 			}
 
@@ -1326,7 +1326,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!instance_exists(oTerminal)
 			&& !global.my_console[? "active"]
 			&& player_can_shoot
-			&& keyboard_check_pressed(global.KeyBinds[| KEY.OpenTerm])){
+			&& keyboard_check_pressed(global.KeyBinds[| KEY.Interact])){
 				var nearby_terminal = instance_nearest(x, y, oTerminalTile);
 				if(instance_exists(nearby_terminal) && point_distance(x, y, nearby_terminal.x, nearby_terminal.y) <= 96){
 					Moving = false;
@@ -1518,10 +1518,10 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 				}
 			}
 	
-			var RotationSpeed = 9;
+			var RotationSpeed = 15;
 			if(moving_state == STATES_PLAYER.prone_state){
 				LegHB.visible = true;
-				RotationSpeed = 4.5;
+				RotationSpeed = 9;
 				WX = 64;
 				WY = 64;
 				Legs.visible = false;	
@@ -1728,7 +1728,9 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			if(!global.my_console[? "active"] && !instance_exists(oBuyMenu) && moving_state != STATES_PLAYER.mortar_state){
 		
 				#region Inventory
-				if(!defusing && keyboard_check_pressed(global.KeyBinds[| KEY.Inventory])){
+				if(!defusing && !oDraw.PauseMenu && !oDraw.RespawnMenu && !oDraw.GameEndMenu
+				&& !instance_exists(oChooseTeam) && !instance_exists(oSettingsTab)
+				&& keyboard_check_pressed(global.KeyBinds[| KEY.Inventory])){
 					if(player_can_shoot == true){
 						instance_create_layer(x, y, "OtherO", oInventory);
 						player_can_shoot = false;
@@ -1883,7 +1885,7 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 					#region Normal reloading
 					if(wpn_id != ITEM.Javelin){
 						particle_create(1, 0.75, random(360), spr_AmmoType, random_range(10, 30),
-						random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.AmmoSpriteID], x, y);		
+						random_range(-90, 90), point_direction(x, y, x + lengthdir_x(35, RotationAngle - 90), y + lengthdir_y(40, RotationAngle - 90)), 0, true, true, global.ItemIndex[#wpn_id, ITEMSTATS.AmmoSpriteID], [x, y]);		
 					}
 					Reloading = false;
 					ReloadTime = 0;
@@ -1990,6 +1992,8 @@ if (instance_exists(oDraw) && stats.Health_points > 0){
 			instance_activate_object(oItemDescription);
 			instance_activate_object(objUIWindowCaption);
 			instance_activate_object(objZUIMain);
+			instance_activate_object(objUIBlack);
+			instance_activate_object(oChooseTeam);
 			instance_activate_object(objUIButton);
 			instance_activate_object(objUILabel);
 			instance_activate_object(objUIGrid);
@@ -2080,7 +2084,17 @@ if (!IS_NET) {
 
 if (should_handle_death) {
     death_handled = true;
+	visible = false;
     if(is_local){
+		if(!IS_NET) global.player_stats.Lifes = max(0, global.player_stats.Lifes - 1);
+		with (oBloodSplash) {
+			if (is_gui) instance_destroy();
+		}
+		if (instance_exists(oParticleSurface) && surface_exists(oParticleSurface.gui_particle_surf)) {
+			surface_set_target(oParticleSurface.gui_particle_surf);
+			draw_clear_alpha(c_black, 0);
+			surface_reset_target();
+		}
 		if(!IS_NET && is_struct(machine_gun_take_loadout)){
 			dismount_local_player_from_machine_gun(id, machine_gun_take_loadout.gun);
 			machine_gun_take_loadout = undefined;
@@ -2092,9 +2106,13 @@ if (should_handle_death) {
         with (oSlot) instance_destroy();
         item_description_destroy();
 
-		ds_grid_clear(global.Inventory, 0);
-		ds_grid_clear(global.MouseSlot, 0);
-		global.player_stats.Weight = 0;
+		if (IS_NET) {
+			ds_grid_clear(global.Inventory, 0);
+			ds_grid_clear(global.MouseSlot, 0);
+			global.player_stats.Weight = 0;
+			equip_network_propagate();
+			weapon_network_propagate();
+		}
 
         audio_stop_sound(snd_EarRing);
         muffled_sounds = 1;
@@ -2121,9 +2139,16 @@ if (should_handle_death) {
 		}
 	}
 
-    oDraw.KilledByWeapon = KilledByWeapon;
-    oDraw.KilledByName = KilledByName;
-    Weapon.image_index = 0;
+	if (is_local) {
+		oDraw.KilledByWeapon = KilledByWeapon;
+		oDraw.KilledByName = KilledByName;
+	}
+	if (instance_exists(Weapon)) Weapon.image_index = 0;
+	network_weapon_id = ITEM.None;
+	network_item_use_id = ITEM.None;
+	network_helmet_id = ITEM.None;
+	network_armour_id = ITEM.None;
+	network_shield_id = ITEM.None;
     image_index = 3;
 	if(instance_exists(Legs)){
 		Legs.Visible = false;
@@ -2156,7 +2181,6 @@ if (should_handle_death) {
 	play_sound(x, y, choose(snd_Death1, snd_Death2));
 
 	if(!IS_NET){
-		visible = false;
 		if(instance_exists(Knife)) Knife.visible = false;
 		oDraw.RespawnMenu = true;
 		oDraw.GameEndMenu = false;

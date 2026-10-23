@@ -23,7 +23,6 @@ function console_command_requires_sudo(command){
 		case "room restart":
 		case "give item":
 		case "draw bullet impact":
-		case "draw admin hud":
 		case "set hitbox alpha":
 		case "change team":
 		case "godmode":
@@ -33,7 +32,7 @@ function console_command_requires_sudo(command){
 		case "set buy time":
 		case "set time speed":
 		case "toggle camera shake":
-		case "set player inaccuracy":
+		case "set inaccuracy modifier":
 		case "set weather":
 		case "draw other models":
 		case "draw damage":
@@ -42,6 +41,7 @@ function console_command_requires_sudo(command){
 		case "set enemy rating":
 		case "set played games":
 		case "set money":
+		case "set lifes":
 		case "unlock all items":
 			return true;
 	}
@@ -72,7 +72,7 @@ function console_command_word_count(words, start_index, last_index){
 	if(first_word == "set"){
 		var second_word = words[start_index + 1];
 		if(second_word == "time" && start_index + 2 <= last_index && words[start_index + 2] == "speed") return 3;
-		if(second_word == "money" || second_word == "fullscreen" || second_word == "time"
+		if(second_word == "money" || second_word == "lifes" || second_word == "fullscreen" || second_word == "time"
 		|| second_word == "weather" || second_word == "saturation"
 		|| second_word == "aberration") return 2;
 		return 3;
@@ -452,12 +452,12 @@ function console_submit(Console) {
 					break;
 					case "set dynamic crosshair":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.DynamicCrosshair = return_logical_value(real(c[1]));
+							global.cs_conf.dynamic = return_logical_value(real(c[1]));
 						}
 					break;
 					case "set crosshair alpha":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.CrosshairAlpha = clamp(real(c[1]), 0, 1);
+							global.cs_conf.alpha = clamp(real(c[1]), 0, 1);
 						}
 					break;
 					case "draw bullet impact":
@@ -486,8 +486,10 @@ function console_submit(Console) {
 						if(no == 1 && string_digits(c[1]) != ""){
 							var requested_team = round(real(c[1])) + 1;
 							if(requested_team == TEAM.POLICE || requested_team == TEAM.TERRORIST){
+							if (!IS_NET) {
 								global.player_stats.Player_team = requested_team;
 								room_restart();
+							}
 							}
 						}
 					break;
@@ -533,7 +535,20 @@ function console_submit(Console) {
 						}
 					break;	
 					case "set buy time":
-						if(no == 1 && string_digits(c[1]) != "") then oDraw.buy_time = max(real(c[1]) * 60, 0);
+						if(no == 1 && string_digits(c[1]) != "" && console_has_authority()) {
+							oDraw.buy_time = max(real(c[1]) * game_get_speed(gamespeed_fps), 0);
+							if(IS_NET && oNetworkManager.is_server) server_broadcast_match_state();
+						}
+					break;
+					case "set lifes":
+						if(IS_NET){
+							console_write_debug("[CONSOLE] set lifes is only available in singleplayer.");
+						}else if(no == 1 && c[1] != "" && string_digits(c[1]) == c[1]){
+							global.player_stats.Lifes = real(c[1]);
+							console_write_debug("[CONSOLE] Lifes = " + string(global.player_stats.Lifes));
+						}else{
+							console_write_debug("[CONSOLE] Usage: set lifes <non-negative integer>.");
+						}
 					break;
 					case "set time speed":
 						if(no == 1 && string_digits(c[1]) != "") then global.TimeSpeed = real(c[1]);
@@ -541,9 +556,31 @@ function console_submit(Console) {
 					case "toggle camera shake":
 						if(no == 1 && string_digits(c[1]) != "") then global.ViewShake = return_logical_value(real(c[1]));
 					break;	
-					case "set player inaccuracy":
-						if(no == 1 && string_digits(c[1]) != "") then global.PlayerInaccuracy = real(c[1]);
-					break;	
+					case "set inaccuracy modifier":
+						if(no >= 1 && string_digits(c[1]) != ""){
+							var modifier_value = max(0, real(c[1]));
+							var local_player_id = instance_exists(oNetworkManager) && oNetworkManager.is_connected ? oNetworkManager.my_pid : 0;
+							var target_player_id = local_player_id;
+							if(no >= 2 && string_digits(c[2]) != "") target_player_id = round(real(c[2]));
+							if(IS_NET && !oNetworkManager.is_server){
+								console_write_debug("[CONSOLE] Only the server host can set a player's inaccuracy modifier.");
+								break;
+							}
+							var target_player = IS_NET ? find_instance_by_network_id(oPlayer, target_player_id) : global.local_player;
+							if(IS_NET && !instance_exists(target_player)){
+								console_write_debug("[CONSOLE] Player " + string(target_player_id) + " was not found.");
+								break;
+							}
+							if(instance_exists(target_player)) target_player.inaccuracy_modifier = modifier_value;
+							if(target_player_id == local_player_id) global.PlayerInaccuracy = modifier_value;
+							if(IS_NET){
+								var target_stats = ds_map_find_value(oNetworkManager.player_stats, target_player_id);
+								if(!is_undefined(target_stats)) ds_map_set(target_stats, "InaccuracyModifier", modifier_value);
+								send_stats_broadcast();
+							}
+							console_write_debug("[CONSOLE] Player " + string(target_player_id) + " inaccuracy modifier = " + string(modifier_value));
+						}
+					break;
 					
 					case "clear particles":
 						if(no == 1 && string_digits(c[1]) != ""){
@@ -610,7 +647,7 @@ function console_submit(Console) {
 					            b = clamp(b, 0, 255);
 
 					            // Set crosshair color
-					            global.crosshair_color = make_color_rgb(r, g, b);
+					            global.cs_conf.color = make_color_rgb(r, g, b);
 					        }
 					    }
 					break;
@@ -723,8 +760,8 @@ function console_submit(Console) {
 
 					case "get id":
 						if(no == 0){
-							var player_id = instance_exists(oNetworkManager) && oNetworkManager.is_connected ? oNetworkManager.my_pid : 0;
-							console_write_debug("[CONSOLE] Player ID: " + string(player_id));
+							var plr_id = instance_exists(oNetworkManager) && oNetworkManager.is_connected ? oNetworkManager.my_pid : 0;
+							console_write_debug("[CONSOLE] Player ID: " + string(plr_id));
 						}
 					break;
 					
@@ -736,7 +773,7 @@ function console_submit(Console) {
 					
 					case "set crosshair scale":
 						if(no == 1 && string_digits(c[1]) != ""){
-							global.crosshair_scale = real(c[1]);
+							global.cs_conf.scale = real(c[1]);
 						}
 					break;
 					

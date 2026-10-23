@@ -7,7 +7,8 @@
 function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	// Returns an array with the color info of a pixel inside a sprite
 	var _sprite = argument0;
-	var _subimg = argument1;
+	var frame_count = sprite_get_number(argument0);
+	var _subimg = ((floor(argument1) mod frame_count) + frame_count) mod frame_count;
 	var _x = argument2;
 	var _y = argument3;
 
@@ -16,6 +17,7 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	var sprH = sprite_get_height(_sprite);
 	var sprX = sprite_get_xoffset(_sprite);
 	var sprY = sprite_get_yoffset(_sprite);
+	var required_bytes = 4 * sprW * sprH;
 	_x = clamp(floor(_x), 0, sprW - 1);
 	_y = clamp(floor(_y), 0, sprH - 1);
 
@@ -34,7 +36,12 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	    exists = 1;
     
 	    if (array_length(arr) > _subimg && buffer_exists(arr[_subimg])){
-	        exists = 2;
+	        if (buffer_get_size(arr[_subimg]) >= required_bytes){
+	            exists = 2;
+	        } else {
+	            buffer_delete(arr[_subimg]);
+	            arr[@ _subimg] = -1;
+	        }
 	    }
 	}
 
@@ -55,7 +62,7 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	if (exists == 1){
 	    var arr = global.sprBuff[? key];
     
-	    var buff = buffer_create(4 * sprW * sprH, buffer_fixed, 1);
+	    var buff = buffer_create(required_bytes, buffer_fixed, 1);
 	    arr[@ _subimg] = buff;
     
 	    var surf = surface_create(sprW, sprH);
@@ -83,8 +90,11 @@ function sprite_getpixel(argument0, argument1, argument2, argument3) {
 	if (exists == 2){
 	    var arr = global.sprBuff[? key];
 	    var buff = arr[_subimg];
-    
-	    buffer_seek(buff, buffer_seek_start, 4*((sprW*_y)+_x));
+	    var pixel_offset = 4 * ((sprW * _y) + _x);
+	    if (pixel_offset < 0 || pixel_offset + 4 > buffer_get_size(buff)){
+	        return [128, 128, 128, 255];
+	    }
+	    buffer_seek(buff, buffer_seek_start, pixel_offset);
     
 	    var clr;
 	    clr[0] = buffer_read(buff, buffer_u8);

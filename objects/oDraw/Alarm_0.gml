@@ -20,6 +20,8 @@ instance_activate_object(objUILabel);
 	instance_activate_object(objZUIMain);
 	instance_activate_object(objUIBlack);
 	instance_activate_object(oPause);
+	instance_activate_object(oChooseTeam);
+	instance_activate_object(oSpectateControl);
 	instance_activate_object(oConsole);
 	instance_activate_object(oPlayer);
 }else{

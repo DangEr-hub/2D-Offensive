@@ -19,10 +19,12 @@ gap = 128;
 spectate_respawn = !IS_NET && instance_exists(oSpectateControl)
 	&& instance_exists(global.local_player)
 	&& global.local_player.stats.Health_points <= 0;
+can_respawn = spectate_respawn && global.player_stats.Lifes > 0
+	&& instance_exists(oGameController) && !oGameController.round_ended;
 test_respawn = spectate_respawn || (IS_NET
 	&& instance_exists(global.local_player)
 	&& global.local_player.stats.Health_points <= 0
-	&& (!oNetworkManager.is_server || !oNetworkManager.round_resolved));
+	&& !oNetworkManager.round_resolved);
 
 if(test_respawn){
 	title_color = c_gray;
@@ -85,6 +87,56 @@ popup_respawn_callback_positive = function(){
 };
 
 respawn_callback = function(){
+	if(can_respawn && instance_exists(oGameController) && !oGameController.round_ended){
+		if(!instance_exists(global.local_player)) return;
+		with(global.local_player){
+			x = global.player_stats.Respawn_point[0];
+			y = global.player_stats.Respawn_point[1];
+			stats.Health_points = stats.Max_health_points;
+			stats.Damage_health_points = stats.Max_health_points;
+			stats.Stamina_points = global.player_stats.Max_stamina;
+			stats.Damage_stamina_points = global.player_stats.Max_stamina;
+			death_handled = false;
+			visible = true;
+			Visible = true;
+			depth -= 1;
+			moving_state = STATES_PLAYER.none_state;
+			shield_equip = false;
+			Flashed = false;
+			FlashedAlpha = 0;
+			FlashedBackGround = -1;
+			image_index = TEXTURES.no_weapon;
+			anim_base = TEXTURES.no_weapon;
+			LegHB.visible = false;
+			Legs.visible = true;
+			Legs.Visible = true;
+			HeadHB.image_index = HITBOX.Head;
+			BodyHB.image_index = HITBOX.BodyNoWeapon;
+			ArmHB.image_index = HITBOX.ArmNoWeapon;
+			WX = 8;
+			WY = 8;
+			if(instance_exists(Knife)) Knife.visible = true;
+			Reloading = false;
+			ReloadTimer = -1;
+			equip_timer = -1;
+			shooting = false;
+			ShootTimer = -1;
+			CanShoot = true;
+			player_can_shoot = true;
+			RelativeSpeedX = 0;
+			RelativeSpeedY = 0;
+			XSpeed = 0;
+			YSpeed = 0;
+		}
+		with(oSpectateControl) instance_destroy();
+		oDraw.spectating = false;
+		oDraw.spectate_target = noone;
+		oDraw.RespawnMenu = false;
+		oDraw.BackGround = -1;
+		oDraw.alarm[0] = -1;
+		with(objZUIMain) zui_destroy();
+		return;
+	}
 	if(spectate_respawn && instance_exists(oGameController) && !oGameController.round_ended){
 		ui_show_popup("Surrender round?", "This round will count as a loss.", "Yes", "No", 288 * global.gui_scale, 128 * global.gui_scale, popup_respawn_callback_positive, -1);
 	}else{
@@ -173,8 +225,9 @@ with (zui_create(current_rank_x - rank_image_size_width/2, base_position_y + ran
 offset_y = clamp(128 * global.gui_scale, 144, 224);
 button_width = 128 * global.gui_scale;
 button_height = 32 * global.gui_scale;
-button_spacing = round(button_height * 1.4);
-button_start_y = round(zui_get_height() * .7 - offset_y);
+button_spacing = round(button_height * 1.2);
+button_start_y = min(round(zui_get_height() * .7 - offset_y),
+	zui_get_height() - button_height - button_spacing * 6 - 24 * global.gui_scale);
 with(zui_create(zui_get_width() * .5, button_start_y + button_spacing, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
@@ -218,11 +271,22 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIBu
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
-	caption = "Next round";
-	callback = other.respawn_callback;
+	caption = "Choose team";
+	callback = function(){
+		open_choose_team_menu();
+		with(oRoundEndMenu) zui_destroy();
+	};
 }
 
 with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton, -999)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
+	caption = other.can_respawn ? "Respawn" : "Next round";
+	callback = other.respawn_callback;
+}
+
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*5, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
@@ -230,7 +294,7 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIBu
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*5, objUIButton, -999)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*6, objUIButton, -999)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

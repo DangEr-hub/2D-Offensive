@@ -5,7 +5,7 @@ var cam_x = camera_get_view_x(CAM);
 var cam_y = camera_get_view_y(CAM);
 var cam_width = camera_get_view_width(CAM);
 var cam_height = camera_get_view_height(CAM);
-if(global.Weather == 1){
+if(global.Weather == WEATHER.RAIN){
 	if!(audio_is_playing(snd_Rain)){
 		audio_play_sound(snd_Rain, 0, true);
 	}
@@ -22,8 +22,8 @@ if(global.Weather == 1){
 			false,
 			false, 
 			0,
-			random_range(cam_x, cam_x + cam_width),
-			random_range(cam_y, cam_y + cam_height),
+			[random_range(cam_x, cam_x + cam_width),
+			random_range(cam_y, cam_y + cam_height)],
 			random_range(0.1, 0.25), 
 			-1
 		);
@@ -38,7 +38,7 @@ if(global.Weather == 1){
 		else if (s == 2) { xx = random_range(cam_x, cam_x + cam_width); yy = cam_y - m; }
 		else { xx = random_range(cam_x, cam_x + cam_width); yy = cam_y + cam_height + m; }
 	}
-}else if(global.Weather == 2){
+}else if(global.Weather == WEATHER.SNOW){
 	if(percent_chance(100)){
 		if(instance_exists(oParticleSystem)){
 			part_emitter_region(global.ParticleSystem, oParticleSystem.weather_emitter, cam_x, cam_x + cam_width, cam_y, cam_y + cam_height, ps_shape_rectangle, ps_distr_linear);

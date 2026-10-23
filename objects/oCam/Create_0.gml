@@ -11,7 +11,7 @@ max_spawn = 3;
 spawn_n = 0;
 alarm[0] = 5;
 
-fov = 90;
+fov = 45;
 
 lx1 = 0;
 ly1 = 0;

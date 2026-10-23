@@ -4,6 +4,7 @@
 #macro ADRENALINE_TIME 3 * game_get_speed(gamespeed_fps)
 #macro STEROID_TIME 5 * game_get_speed(gamespeed_fps)
 #macro ADRENALINE_MOD 1.25
+#macro MAX_LIFES 2
 #macro STEROIDS_MOD 1.25
 #macro MENU_COLOR make_color_rgb(0, 76, 76)
 #macro DEFUSE_TIME 5 * game_get_speed(gamespeed_fps)
@@ -14,6 +15,7 @@
 #macro WALK_SPD .5
 #macro RUN_SPD 1.2
 #macro ROUND_LOSS_REWARD 50
+#macro TEAM_KILL_PENALTY 300
 #macro HOSTAGE_RANGE 128
 #macro HITMAP_KEY_BOMB -1000000
 #macro ROUND_LOSS_STREAK_BONUS 75

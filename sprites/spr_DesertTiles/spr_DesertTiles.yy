@@ -3,9 +3,9 @@
   "resourceVersion": "1.0",
   "name": "spr_DesertTiles",
   "bbox_bottom": 671,
-  "bbox_left": 64,
+  "bbox_left": 0,
   "bbox_right": 799,
-  "bbox_top": 64,
+  "bbox_top": 32,
   "bboxMode": 0,
   "collisionKind": 1,
   "collisionTolerance": 0,
@@ -13,7 +13,7 @@
   "edgeFiltering": false,
   "For3D": false,
   "frames": [
-    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"4349d7c9-a392-43a0-a1b2-359bffbdd05b",},
+    {"resourceType":"GMSpriteFrame","resourceVersion":"1.1","name":"79e9c803-9b7b-4f6e-98e3-8399f9531ceb",},
   ],
   "gridX": 32,
   "gridY": 32,
@@ -54,7 +54,7 @@
     "timeUnits": 1,
     "tracks": [
       {"resourceType":"GMSpriteFramesTrack","resourceVersion":"1.0","name":"frames","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"1.0","Keyframes":[
-            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"4349d7c9-a392-43a0-a1b2-359bffbdd05b","path":"sprites/spr_DesertTiles/spr_DesertTiles.yy",},},},"Disabled":false,"id":"79d983f2-1a88-4d94-97ef-4b0e0b10fdc8","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
+            {"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"1.0","Channels":{"0":{"resourceType":"SpriteFrameKeyframe","resourceVersion":"1.0","Id":{"name":"79e9c803-9b7b-4f6e-98e3-8399f9531ceb","path":"sprites/spr_DesertTiles/spr_DesertTiles.yy",},},},"Disabled":false,"id":"cfe63c5f-852a-4510-afab-36a626d12b2f","IsCreationKey":false,"Key":0.0,"Length":1.0,"Stretch":false,},
           ],},"modifiers":[],"spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange": null,

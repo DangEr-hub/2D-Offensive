@@ -41,6 +41,16 @@ part_type_direction(flame_particle,0,360,0,9);
 part_type_blend(flame_particle,1);
 part_type_life(flame_particle,10,20);
 
+// Embers for explosion impacts
+ember_particle = part_type_create();
+part_type_shape(ember_particle, pt_shape_flare);
+part_type_size(ember_particle, .1, .3, -.002, 0);
+part_type_color3(ember_particle, c_orange, c_red, c_maroon);
+part_type_alpha3(ember_particle, 1, .8, 0);
+part_type_speed(ember_particle, 2, 5, -.08, 0);
+part_type_direction(ember_particle, 0, 359, 0, 0);
+part_type_life(ember_particle, 100, 150);
+
 fog_particle = part_type_create();
 part_type_shape(fog_particle, pt_shape_cloud);
 part_type_size(fog_particle, .5, 1, 0, .05);
@@ -58,6 +68,29 @@ part_type_speed(BloodParticle,1,5,0,0);
 part_type_direction(BloodParticle,0,359,0,0);
 part_type_life(BloodParticle,22,22);
 part_type_sprite(BloodParticle, spr_BloodParticle, true, 0, true);
+
+// Blood and wall impact streaks
+blood_line = part_type_create();
+part_type_shape(blood_line, pt_shape_line);
+part_type_color1(blood_line, c_red);
+part_type_scale(blood_line, .5, .25);
+part_type_size_x(blood_line, .5, 1.4, 0, 0);
+part_type_size_y(blood_line, .7, 1.8, 0, 0);
+part_type_speed(blood_line, 15, 20, 0, 0);
+part_type_direction(blood_line, 0, 359, 0, 0);
+part_type_orientation(blood_line, 0, 0, 0, 0, true);
+part_type_alpha3(blood_line, 1, .95, 0);
+part_type_life(blood_line, 5, 8);
+
+// Short yellow streak behind a flying bullet
+bullet_trail_particle = part_type_create();
+part_type_shape(bullet_trail_particle, pt_shape_line);
+part_type_color1(bullet_trail_particle, c_yellow);
+part_type_scale(bullet_trail_particle, 1, .1);
+part_type_size(bullet_trail_particle, .25, .5, 0, 0);
+part_type_speed(bullet_trail_particle, 20, 30, 0, 0);
+part_type_alpha1(bullet_trail_particle, 1);
+part_type_life(bullet_trail_particle, 3, 5);
 
 //Spark
 Spark = part_type_create();

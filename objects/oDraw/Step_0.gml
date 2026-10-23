@@ -4,6 +4,32 @@ global.GuiW = display_get_gui_width();
 global.GuiH = display_get_gui_height();
 global.local_player = get_local_player();
 
+if (instance_exists(global.local_player)
+&& (team_menu_requested || (global.local_player.stats.Team == TEAM.NONE && !team_menu_dismissed))
+&& !instance_exists(oChooseTeam)) {
+	team_menu_requested = false;
+	with (objUIBlack) zui_destroy();
+	with (zui_main()) {
+		zui_create(0, 0, objUIBlack, -1000);
+		zui_create(zui_get_width() * .5, zui_get_height() * .5, oChooseTeam, -1000);
+	}
+}
+
+if (team_menu_dismissed && instance_exists(global.local_player)
+&& global.local_player.stats.Team == TEAM.NONE && !instance_exists(spectate_target)) {
+	with (oBot) {
+		if (oDraw.spectate_target == noone && stats.Team != TEAM.NONE && stats.Health_points > 0) oDraw.spectate_target = id;
+	}
+	with (oPlayer) {
+		if (!is_local && oDraw.spectate_target == noone && stats.Health_points > 0) oDraw.spectate_target = id;
+	}
+}
+
+if (team_menu_return_respawn && !instance_exists(oChooseTeam)) {
+	team_menu_return_respawn = false;
+	reset_gui();
+}
+
 if(!network_devices_initialized){
 	for(var camera_index = 0; camera_index < instance_number(oCam); camera_index++){
 		register_network_device(instance_find(oCam, camera_index), "c");
@@ -111,6 +137,16 @@ if(round_end_timer == 0){
 #endregion
 
 if(instance_exists(global.local_player)){
+	if(!IS_NET && global.local_player.stats.Health_points > 0
+	&& !PauseMenu && !RespawnMenu && !GameEndMenu
+	&& !global.my_console[? "active"] && !instance_exists(oInventory)
+	&& keyboard_check_pressed(global.KeyBinds[| KEY.Interact]) && instance_exists(oRespawnPoint)){
+		var respawn_point = instance_nearest(global.local_player.x, global.local_player.y, oRespawnPoint);
+		if(instance_exists(respawn_point)
+		&& point_distance(global.local_player.x, global.local_player.y, respawn_point.x, respawn_point.y) <= 96){
+			global.player_stats.Respawn_point = [global.local_player.x, global.local_player.y];
+		}
+	}
 	
 	#region Decoration spawning
 	if(!decor_spawned){
@@ -304,6 +340,7 @@ if(instance_exists(global.local_player)){
 	|| instance_exists(oMortarMenu)
 	|| instance_exists(oStatisticsTable)
 	|| instance_exists(oBotTab)
+	|| instance_exists(oChooseTeam)
 	|| keyboard_check(global.KeyBinds[| KEY.Scoreboard])
 	|| global.my_console[? "active"]
 	|| global.local_player.player_can_shoot == false){
@@ -313,8 +350,11 @@ if(instance_exists(global.local_player)){
 	}
 
 	if(!instance_exists(oSpectateControl) && keyboard_check_pressed(global.KeyBinds[| KEY.WeaponAttachments])){
-		if(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id] != ITEM.None && (!global.my_console[? "active"]) && !instance_exists(oInventory) && PauseMenu == false &&
-		!instance_exists(oBuyMenu)){
+		if(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id] != ITEM.None
+		&& !global.my_console[? "active"] && !instance_exists(oInventory)
+		&& !PauseMenu && !RespawnMenu && !GameEndMenu
+		&& !instance_exists(oChooseTeam) && !instance_exists(oSettingsTab)
+		&& !instance_exists(oBuyMenu)){
 			if(show_weapon_attachments == false){
 				with(zui_main()){
 					with(zui_create(zui_get_width() * .5, zui_get_height() * .75, oWeaponAttachments)){
@@ -342,8 +382,12 @@ if(instance_exists(global.local_player)){
 	}
 	
 	#region Buy menu
-	if (!instance_exists(oSpectateControl) && !global.my_console[? "active"] && !instance_exists(oInventory) && global.local_player.moving_state != STATES_PLAYER.mortar_state &&
-	keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
+	if (!instance_exists(oSpectateControl) && !global.my_console[? "active"]
+	&& !instance_exists(oInventory) && !PauseMenu && !RespawnMenu && !GameEndMenu
+	&& !instance_exists(oChooseTeam) && !instance_exists(oSettingsTab)
+	&& global.local_player.stats.Team != TEAM.NONE
+	&& global.local_player.moving_state != STATES_PLAYER.mortar_state
+	&& keyboard_check_pressed(global.KeyBinds[| KEY.BuyMenu])) {
 		if(buy_time <= 0){
 			buy_period_message_timer = game_get_speed(gamespeed_fps) * 2;
 		}else{
@@ -361,7 +405,7 @@ if(instance_exists(global.local_player)){
 	#endregion
 
 
-	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0 && !instance_exists(oRoundEndMenu) && !instance_exists(oGameEndMenu)){
+	if(RespawnMenu == true && alarm[0] == -1 && BackGround < 0 && !instance_exists(oChooseTeam) && !instance_exists(oRoundEndMenu) && !instance_exists(oGameEndMenu)){
 		with(zui_main()){
 			if(other.GameEndMenu == true && !instance_exists(oGameEndMenu)){
 				zui_create(0, 0, objUIBlack, -1000);

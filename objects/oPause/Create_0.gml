@@ -82,11 +82,23 @@ with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*2, objUIBu
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);
+	caption = "Choose team";
+	callback = function(){
+		open_choose_team_menu();
+		oDraw.PauseMenu = false;
+		unpause(oDraw);
+	};
+}
+
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIButton)){
+	zui_set_anchor(0.5, 0);
+	zui_set_width(other.button_width);
+	zui_set_height(other.button_height);
 	caption = "Main menu";
 	callback = other.main_menu_callback;
 }
 
-with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*3, objUIButton)){
+with(zui_create(zui_get_width() * .5, button_start_y + button_spacing*4, objUIButton)){
 	zui_set_anchor(0.5, 0);
 	zui_set_width(other.button_width);
 	zui_set_height(other.button_height);

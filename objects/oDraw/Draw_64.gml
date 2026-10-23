@@ -8,9 +8,8 @@ if(spectating == true){
 		if(!instance_exists(oCrosshair)){ break; }
 		var cx = (crosshair_x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
 		var cy = (crosshair_y - oDraw.ViewY) * (global.GuiH / oDraw.ViewH);
-		var x_scale = oCrosshair.image_xscale * .5 * global.crosshair_scale;
-		var y_scale = oCrosshair.image_yscale * .5 * global.crosshair_scale;
-		draw_sprite_ext(spr_StaticCrosshair, 0, cx, cy, x_scale, y_scale, oCrosshair.image_angle, global.crosshair_color, global.CrosshairAlpha * oCrosshair.AlphaMul);	
+		//draw_sprite_ext(spr_StaticCrosshair, 0, cx, cy, x_scale, y_scale, oCrosshair.image_angle, global.cs_conf.color, global.cs_conf.alpha * oCrosshair.AlphaMul);
+		draw_crosshair(cx, cy);
 	}
 }
 #endregion
@@ -35,8 +34,9 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 	
 	#region Draw scope
 	if (global.local_player.ScopeIn == true) {
+		var inaccuracy = inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player);
 		if(global.local_player.player_has_scope == 0){
-			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player)*5), 0.1);
+			var ScopeBlurValue = min((.005 + (global.local_player.ViewShake / 100)) * 5*inaccuracy, 0.1);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 			var ScopeRadius = sprite_get_width(spr_SniperScope) * 1.75;
 			SurfaceWidth = global.GuiW;
@@ -103,11 +103,11 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			#endregion
 			
 		}else if(global.local_player.player_has_scope == 1){
-			var ScopeBlurValue = min((.0025 + (global.local_player.ViewShake / 250)) * (inaccuracy_formula(global.Inventory[# global.local_player.WeaponID, INDEX.slot_id], global.local_player)), 0.15);
+			var ScopeBlurValue = min((.0025 + (global.local_player.ViewShake / 250)) * inaccuracy, 0.15);
 			BlurValue = lerp(BlurValue, ScopeBlurValue, 0.05);
 		    shader_set(shd_Blur1Pass);
 		    shader_set_uniform_f(usize, 64, 64, BlurValue);
-			draw_sprite_ext(spr_SniperScope, global.local_player.player_has_scope, oCrosshair.crosshair_x, oCrosshair.crosshair_y, 2.1, 2.1, 0, c_white, 0.5);
+			draw_sprite_ext(spr_SniperScope, global.local_player.player_has_scope, oCrosshair.crosshair_x, oCrosshair.crosshair_y, 2.1, 2.1, 0, c_white, 1);
 			shader_reset();
 		}
 
@@ -398,6 +398,16 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 	
 		#region Draw use button
 		if(!instance_exists(oInventory) && global.draw_hud){
+			if(!IS_NET && instance_exists(oRespawnPoint)){
+				var respawn_point = instance_nearest(global.local_player.x, global.local_player.y, oRespawnPoint);
+				if(instance_exists(respawn_point)
+				&& point_distance(global.local_player.x, global.local_player.y, respawn_point.x, respawn_point.y) <= 96){
+					var respawn_gui_x = (respawn_point.x - ViewX) * (global.GuiW / ViewW);
+					var respawn_gui_y = (respawn_point.y - ViewY) * (global.GuiH / ViewH);
+					var respawn_prompt = "Set respawn point - " + keycode_to_string(global.KeyBinds[| KEY.Interact]);
+					draw_text_outlined(round(respawn_gui_x - string_width(respawn_prompt) * .5), round(respawn_gui_y), respawn_prompt, c_white, c_black, 1);
+				}
+			}
 			if(instance_exists(oItems)){
 				with(oItems){
 					var xx = (x - oDraw.ViewX) * (global.GuiW / oDraw.ViewW);
@@ -471,7 +481,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 				if (instance_exists(terminal_tile) && point_distance(global.local_player.x, global.local_player.y, terminal_tile.x, terminal_tile.y) <= 96) {
 					var terminal_x = ((terminal_tile.bbox_left + terminal_tile.bbox_right) * .5 - ViewX) * (global.GuiW / ViewW);
 					var terminal_y = ((terminal_tile.bbox_top + terminal_tile.bbox_bottom) * .5 - ViewY) * (global.GuiH / ViewH);
-					var terminal_prompt = "Open - [" + keycode_to_string(global.KeyBinds[| KEY.OpenTerm]) + "]";
+					var terminal_prompt = "Open - [" + keycode_to_string(global.KeyBinds[| KEY.Interact]) + "]";
 					draw_text_outlined(round(terminal_x - string_width(terminal_prompt) * .5), round(terminal_y), terminal_prompt, c_white, c_black, 1);
 				}
 			}
@@ -483,7 +493,7 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			if(global.local_player.AimPunchTimer > -1){
 				var scale = choose(-1, 1);
 				draw_sprite_ext(spr_AimPunch, global.local_player.AimPunchDir, 0, 0, global.GuiW/sprite_get_width(spr_AimPunch),
-				global.GuiH/sprite_get_height(spr_AimPunch), 0, c_white, 1);	
+				global.GuiH/sprite_get_height(spr_AimPunch), 0, c_white, max(global.local_player.AimPunchMultiplier, 0.5));
 			}
 		}
 		#endregion	
@@ -502,17 +512,8 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			#endregion
 			
 			#region Draw item switching outside of inventory
-			if(global.Inventory[#global.local_player.item_use_position, INDEX.slot_id] != ITEM.None){
-				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleLeft])) + "] - Left ";
-				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleRight])) + "] - Right";
-				var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.gui_scale;
-			    var Id = global.Inventory[#global.local_player.item_use_position, INDEX.slot_id];        
-			    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1);  
-				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*2, tr_name(Id), c_white, c_black, 1);            
-				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*3, CycleLeftString, c_white, c_black, 1);
-				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale + string_width(CycleLeftString), ItemY + TextHeightSmall*3, CycleRightString, c_white, c_black, 1);
-			}
 			#endregion
+			
 			
 			#region Draw player healtbars, mags and money
 			var bar_gap = (sprite_get_height(spr_HealthBar)*global.gui_scale);
@@ -531,6 +532,25 @@ if(instance_exists(oPlayer) && RespawnMenu == false && PauseMenu == false && !sp
 			var money_string = tr("Money") + ": " + string(global.player_stats.Money);
 			var money_x = HUDShift;
 			var money_y = StaminaY - bar_gap*4.5;
+			var life_x = HUDShift * 2;
+			var life_y = money_y - sprite_get_height(spr_Icons) * global.gui_scale;
+			var w = sprite_get_width(spr_Icons) * global.gui_scale * 1.1;
+			
+			if(global.Inventory[#global.local_player.item_use_position, INDEX.slot_id] != ITEM.None){
+				var CycleLeftString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleLeft])) + "] - Left ";
+				var CycleRightString = "[" + string(keycode_to_string(global.KeyBinds[| KEY.CycleRight])) + "] - Right";
+				var ItemX = HUDShift + sprite_get_width(spr_Items)/2 * global.gui_scale;
+				var ItemY = life_y - 75 * global.gui_scale;
+			    var Id = global.Inventory[#global.local_player.item_use_position, INDEX.slot_id];        
+			    draw_sprite_ext(spr_Items, Id, ItemX, ItemY, 1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, 1);  
+				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*2, tr_name(Id), c_white, c_black, 1);            
+				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale, ItemY + TextHeightSmall*3, CycleLeftString, c_white, c_black, 1);
+				draw_text_outlined(ItemX - sprite_get_width(spr_Items)/2 * global.gui_scale + string_width(CycleLeftString), ItemY + TextHeightSmall*3, CycleRightString, c_white, c_black, 1);
+			}
+			
+			for(var i = 0; i < global.player_stats.Lifes; i ++){
+				draw_sprite_ext(spr_Icons, ICON.lifes, life_x + i*w, life_y, 1 * global.gui_scale, 1 * global.gui_scale, 0, c_white, global.gui_alpha * 2);	
+			}
 			weapon = global.Inventory[# global.local_player.WeaponID, INDEX.slot_id];
 			if(global.ItemIndex[# weapon, ITEMSTATS.Type] == "Weapon" && global.ItemIndex[# weapon, ITEMSTATS.WeaponTypeClass] != WEAPON_CLASS.KNIFE){ 
 				for(var i=0;i<AmmoDrawValue;i++){

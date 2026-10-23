@@ -4,6 +4,13 @@ LightObject.x = x;
 LightObject.y = y;
 LightObject.angle = image_angle;
 
+if(global.DrawParticles && instance_exists(oParticleSystem) && (image_index == 0 || image_index == 3)){
+	var rand_a = random_range(-15, 15);
+	part_type_direction(oParticleSystem.bullet_trail_particle, image_angle + rand_a - 180, image_angle + rand_a - 180, 0, 0);
+	part_type_orientation(oParticleSystem.bullet_trail_particle, image_angle + rand_a, image_angle + rand_a, 0, 0, false);
+	part_particles_create(global.ParticleSystem, x, y, oParticleSystem.bullet_trail_particle, 15);
+}
+
 
 #region Infra vision
 if(global.local_player.ToggleInfraVision == true || global.local_player.ToggleNightVision == true){
@@ -97,14 +104,15 @@ if(is_local){
 				}
 			}
 		}else{
+			var inaccuracy = inaccuracy_formula(stats.Item_id, stats.Object);
 			RandomX = random_range(
-				stats.Shot_x - inaccuracy_formula(stats.Item_id, stats.Object), 
-				stats.Shot_x + inaccuracy_formula(stats.Item_id, stats.Object)
+				stats.Shot_x - inaccuracy, 
+				stats.Shot_x + inaccuracy
 			);
 			
 			RandomY = random_range(
-				stats.Shot_y - inaccuracy_formula(stats.Item_id, stats.Object), 
-				stats.Shot_y + inaccuracy_formula(stats.Item_id, stats.Object)
+				stats.Shot_y - inaccuracy, 
+				stats.Shot_y + inaccuracy
 			);
 			NearestTargetX = stats.Starting_x +
 			lengthdir_x(global.ItemIndex[#stats.Item_id, ITEMSTATS.Range], point_direction(stats.Starting_x, stats.Starting_y, RandomX, RandomY));

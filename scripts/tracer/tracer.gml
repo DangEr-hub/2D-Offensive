@@ -203,7 +203,7 @@ function send_projectile_spawn(start_pos, angle_spd_id_dist, shot_pos, damage, i
     }
 }
 
-function send_grenade_spawn_request(image_id, grenade_speed, target_x, target_y, item_id) {
+function send_grenade_spawn_request(image_id, grenade_speed, target_x, target_y, item_id, throw_move_x, throw_move_y) {
     with (oNetworkManager) {
         if (!is_connected || client_socket < 0) return;
 
@@ -216,6 +216,8 @@ function send_grenade_spawn_request(image_id, grenade_speed, target_x, target_y,
         buffer_write(send_buffer, buffer_f16, target_x);
         buffer_write(send_buffer, buffer_f16, target_y);
         buffer_write(send_buffer, buffer_u16, item_id);
+        buffer_write(send_buffer, buffer_f16, throw_move_x);
+        buffer_write(send_buffer, buffer_f16, throw_move_y);
 
         network_send_udp(client_socket, server_ip, server_port, send_buffer, buffer_tell(send_buffer));
     }
@@ -234,9 +236,14 @@ function handle_grenade_sync_server(socket_key) {
                 var target_x = buffer_read(receive_buffer, buffer_f16);
                 var target_y = buffer_read(receive_buffer, buffer_f16);
                 var item_id = buffer_read(receive_buffer, buffer_u16);
+                var throw_move_x = buffer_read(receive_buffer, buffer_f16);
+                var throw_move_y = buffer_read(receive_buffer, buffer_f16);
 
                 if (item_id <= ITEM.None || item_id >= ITEM.Total) return;
                 if (global.ItemIndex[# item_id, ITEMSTATS.Type] != "Grenade") return;
+                var max_throw_move = MOVE_SPD * 2 / game_get_speed(gamespeed_fps);
+                throw_move_x = clamp(throw_move_x, -max_throw_move, max_throw_move);
+                throw_move_y = clamp(throw_move_y, -max_throw_move, max_throw_move);
 
                 var owner_pid = ds_map_find_value(clients, socket_key);
                 var owner = find_instance_by_network_id(oPlayer, owner_pid);
@@ -249,7 +256,7 @@ function handle_grenade_sync_server(socket_key) {
                         spawn_x = Weapon.x + lengthdir_x(WeaponDistance / 2, RotationAngle);
                         spawn_y = Weapon.y + lengthdir_y(WeaponDistance / 2, RotationAngle);
                     }
-                    create_grenade(spawn_x, spawn_y, image_id, grenade_speed, target_x, target_y, item_id, id);
+                    create_grenade(spawn_x, spawn_y, image_id, grenade_speed, target_x, target_y, item_id, id, throw_move_x, throw_move_y);
                 }
             break;
         }

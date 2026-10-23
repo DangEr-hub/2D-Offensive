@@ -118,7 +118,7 @@ if(instance_exists(oPlayer)){
 
 			shader_set(shd_Blur2Pass);
 			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "texel_size"), 1 / global.GuiW, 1 / global.GuiH);
-			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_radius"), 1.5);
+			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_radius"), max(1.5 * global.local_player.AimPunchMultiplier, .25));
 			shader_set_uniform_f(shader_get_uniform(shd_Blur2Pass, "blur_vector"), 1, 0);
 			surface_set_target(post_surface);
 			draw_clear_alpha(c_black, 0);

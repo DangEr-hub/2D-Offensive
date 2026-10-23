@@ -19,10 +19,13 @@ if (check_vis_timer > 0) {
 } else if (instance_exists(global.local_player)) {
 	check_vis_timer = check_vis_time;
 	var observer = global.local_player;
-	var in_fov = point_in_triangle(bbox_left, bbox_top, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy)
-		|| point_in_triangle(bbox_right, bbox_top, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy)
-		|| point_in_triangle(bbox_left, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy)
-		|| point_in_triangle(bbox_right, bbox_bottom, observer.ax, observer.ay, observer.bx, observer.by, observer.cx, observer.cy);
+	var observer_ax = real(observer.ax), observer_ay = real(observer.ay);
+	var observer_bx = real(observer.bx), observer_by = real(observer.by);
+	var observer_cx = real(observer.cx), observer_cy = real(observer.cy);
+	var in_fov = point_in_triangle(bbox_left, bbox_top, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy)
+		|| point_in_triangle(bbox_right, bbox_top, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy)
+		|| point_in_triangle(bbox_left, bbox_bottom, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy)
+		|| point_in_triangle(bbox_right, bbox_bottom, observer_ax, observer_ay, observer_bx, observer_by, observer_cx, observer_cy);
 
 	if (in_fov
 	&& collision_line(x, y, observer.x, observer.y, oParentTile, true, false) == noone

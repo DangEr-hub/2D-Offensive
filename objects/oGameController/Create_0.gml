@@ -14,7 +14,7 @@ player_win = false;
 headshots = 0;
 kills = 0;
 assists = 0;
-current_round = 0;
+current_round = 1;
 playing_time = 0;
 round_ended = false;
 round_result_processed = false;
@@ -108,10 +108,11 @@ resolve_round = function(winning_team) {
 			ds_map_set(player_stats, "Assists", 0);
 			ds_map_set(player_stats, "Deaths", 0);
 			ds_map_set(player_stats, "Money", ROUND_STARTING_MONEY);
+			ds_map_set(player_stats, "InaccuracyModifier", pid == oNetworkManager.my_pid ? global.PlayerInaccuracy : 1);
 			ds_map_set(oNetworkManager.player_stats, pid, player_stats);
 		}
 
-		if (!is_undefined(player_team)) {
+		if (player_team == TEAM.POLICE || player_team == TEAM.TERRORIST) {
 			var current_money = ds_map_exists(player_stats, "Money")
 				? ds_map_find_value(player_stats, "Money")
 				: ROUND_STARTING_MONEY;
